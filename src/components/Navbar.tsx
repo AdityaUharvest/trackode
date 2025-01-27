@@ -1,10 +1,26 @@
 'use client'
-import {useState} from "react";
-
+import {useEffect, useState} from "react";
+import { useSession } from "next-auth/react";
 const Navbar: React.FC = () => {
+  const {data: session, status} = useSession();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
   const [isLoggedin, setLoggedin]=useState(false);
+  const [user, setUser] = useState<{ name: string; email: string; image: string } | null>(null);
+  useEffect(() => {
+    if(session){
+      setLoggedin(true);
+      setUser(
+        {
+          name: session?.user?.name || '',
+          email: session?.user?.email||'',
+          image: session?.user?.image||''
+        }
+      );
+    }
+  },[session]);
+  
+  
   return (
     <nav className="bg-black border-white-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -35,7 +51,7 @@ const Navbar: React.FC = () => {
             <span className="sr-only">Open user menu</span>
             <img
               className="w-8 h-8 rounded-full"
-              src="https://flowbite.com/docs/images/people/profile-picture-3.jpg"
+              src={user?.image}
               alt="user photo"
             />
           </button>
@@ -58,16 +74,16 @@ const Navbar: React.FC = () => {
             >
               <div className="px-4 py-3">
                 <span className="block text-sm text-white dark:text-white">
-                  Bonnie Green
+                 {user?.name}
                 </span>
                 <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
-                  name@flowbite.com
+                  {user?.email}
                 </span>
               </div>
               <ul className="py-2 ">
                 <li>
                   <a
-                    href="#"
+                    href="/admin-dashboard"
                     className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                   >
                     Dashboard
@@ -81,22 +97,8 @@ const Navbar: React.FC = () => {
                     Settings
                   </a>
                 </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Earnings
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                  >
-                    Sign out
-                  </a>
-                </li>
+                
+                
               </ul>
             </div>
           )}

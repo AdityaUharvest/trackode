@@ -10,10 +10,15 @@
   },
   "dependencies": {
     "@shadcn/ui": "^0.0.4",
+    "bcryptjs": "^2.4.3",
     "flowbite": "^3.0.0",
+    "mongoose": "^8.9.5",
+    "moongoose": "^0.0.5",
     "next": "15.1.6",
+    "next-auth": "^5.0.0-beta.25",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-toastify": "^11.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
