@@ -15,7 +15,7 @@ const SignInButton = () => {
 
     try {
       // Initiate sign-in
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google");
     } catch (error) {
       // Show an error toast if sign-in fails
       toast.error("Sign in failed. Please try again.");
