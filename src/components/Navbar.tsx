@@ -53,6 +53,7 @@ const Navbar: React.FC = () => {
               className="w-8 h-8 rounded-full"
               src={user?.image}
               alt="user photo"
+              loading="lazy"
             />
           </button>
           ):

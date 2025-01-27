@@ -32,6 +32,7 @@ export default function ProfileCard() {
                 className="w-24 h-24 rounded-full mx-auto"
                 src={user?.image}
                 alt="user profile"
+                loading='lazy'
               />
             </div>
             <div className="p-2 text-center">
