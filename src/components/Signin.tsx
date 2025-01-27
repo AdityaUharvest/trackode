@@ -1,17 +1,17 @@
 export default function Signin() {
     return (
-        <div className="min-h-screen  bg-neutral-950 text-white flex justify-center">
-            <div className="max-w-screen-xl border-black mt-0 m-0 sm:m-5 bg-neutral-950 shadow sm:rounded-lg flex justify-center flex-1">
-                <div className="lg:w-1/2 xl:w-4/12 p-6 sm:p-6">
+        <div className="min-h-screen  bg-neutral-900 text-white  flex justify-center">
+            <div className="max-w-screen-xl  sm:m-5 bg-neutral-900   sm:rounded-lg flex justify-center flex-1">
+                <div className="lg:w-1/2 xl:w-5/12 mt-2 mb-4 shadow-blue-900 shadow-inner bg-neutral-900  rounded-lg p-6 sm:p-6">
 
-                    <div className="mt-12 flex flex-col items-center">
-                        <h1 className="text-2xl  xl:text-3xl font-extrabold">
+                    <div className="  flex flex-col items-center">
+                        <h1 className=" text-2xl  xl:text-3xl font-extrabold">
                             Get Started
                         </h1>
                         <div className="w-full flex-1 mt-8">
-                            <div className="flex flex-col b items-center ">
+                            <div className="flex flex-col b mb-8 items-center ">
                                 <a href="#"
-                                    className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700">
+                                    className="shadow-blue-900  w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700">
                                     <div className=" p-2 rounded-full">
                                         <svg className="w-4" viewBox="0 0 533.5 544.3">
                                             <path
@@ -34,7 +34,7 @@ export default function Signin() {
                                 </a>
 
                                 <a  href="#"
-                                    className="w-full max-w-xs font-bold shadow-sm rounded-lg py-3 hover:bg-blue-700 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
+                                    className="shadow-blue-900  w-full max-w-xs font-bold shadow-sm rounded-lg py-3 hover:bg-blue-700 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5">
                                     <div className=" p-1 rounded-full">
                                         <svg className="w-6" viewBox="0 0 32 32">
                                             <path fillRule="evenodd"
@@ -47,19 +47,19 @@ export default function Signin() {
                                 </a>
                             </div>
 
-                            <div className="my-8 border-b text-center">
+                            {/* <div className="my-8 border-b text-center">
                                 <div
                                     className="leading-none px-5  text-sm text-white tracking-wide font-medium bg-neutral-950 transform translate-y-1/2">
                                     Or sign in with e-mail
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="mx-auto max-w-xs">
                                 <input
-                                    className="w-full px-8 py-4 rounded-lg font-medium bg-neutral-900 border border-gray-200 placeholder-white text-sm focus:outline-none focus:border-gray-400 focus:bg-neutral-950"
+                                    className="w-full px-8 py-4 rounded-lg font-medium bg-neutral-900 border border-gray-600 placeholder-white text-sm focus:outline-none focus:border-gray-400 focus:bg-neutral-950"
                                     type="email" placeholder="Email" />
                                 <input
-                                    className="w-full px-8 py-4 rounded-lg font-medium bg-neutral-900 border border-gray-200 placeholder-white text-sm focus:outline-none focus:border-gray-400 focus:bg-neutral-950 mt-5"
+                                    className="w-full px-8 py-4 rounded-lg font-medium bg-neutral-900 border border-gray-600 placeholder-white text-sm focus:outline-none focus:border-gray-400 focus:bg-neutral-950 mt-5"
                                     type="password" placeholder="Password" />
                                 <button
                                     className="mt-5 tracking-wide font-semibold bg-blue-500 text-gray-100 w-full py-4 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none">
@@ -87,7 +87,7 @@ export default function Signin() {
                         </div>
                     </div>
                 </div>
-                <div className="flex-1 bg-neutral-950 text-center hidden lg:flex">
+                <div className="flex-1 bg-neutral-900 text-center hidden lg:flex">
                     <div className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat bg-designer-life">
                     </div>
                 </div>
