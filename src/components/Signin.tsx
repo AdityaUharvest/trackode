@@ -8,24 +8,19 @@ const SignInButton = () => {
   const { data: session, status } = useSession();
 
   const handleSignIn = async () => {
-    // Show a loading toast
     const loadingToast = toast.info("Hold on... Letting you in!", {
       autoClose: false,
     });
 
     try {
-      // Initiate sign-in
       await signIn("google", { callbackUrl: "/" });
     } catch (error) {
-      // Show an error toast if sign-in fails
       toast.error("Sign in failed. Please try again.");
     } finally {
-      // Dismiss the loading toast
       toast.dismiss(loadingToast);
     }
   };
 
-  // Only show the success toast when the session is authenticated
   useEffect(() => {
     if (status === "authenticated") {
       toast.success("You're successfully signed in!");
@@ -36,7 +31,7 @@ const SignInButton = () => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handleSignIn(); // Move sign-in logic here
+        handleSignIn();
       }}
       className="shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700"
     >
