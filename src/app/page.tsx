@@ -4,8 +4,19 @@ import 'flowbite';
 import { useSession } from 'next-auth/react';
 import '@/app/globals.css';
 import Faq from "@/components/Faq";
+import Link from "next/link";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 export default function Home() {
     const { data: session, status } = useSession();
+    useEffect(
+        ()=>{
+            if (status === "authenticated") {
+                toast.success("You're successfully signed in!");
+              }
+        },[status]
+
+    )
     return (
         <div className="overflow-x-hidden text-white bg-neutral-950 white:bg-white white:text-black">
 
@@ -14,39 +25,40 @@ export default function Home() {
                     <div className="max-w-2xl mx-auto text-center">
 
                         <p className="mt-5 text-4xl font-bold leading-tight text-white-900 white:text-black sm:leading-tight sm:text-5xl lg:text-6xl lg:leading-tight font-pj">
-                            <span className="text-blue-400">Track </span>Grow 
+                            <span className="text-blue-400 transition-shadow">Track </span>Grow 
                             <span className="relative inline-flex sm:inline">
                                 <span className="bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] blur-lg filter opacity-30 w-full h-full absolute inset-0"></span>
-                                <span className="relative">  Analyze  </span>
+                                <span className="relative ml-5">Analyze  </span>
                             </span>
                         </p>
-                        <div className="text-center font-[650] text-gray-500 dark:text-darkText-400 md:text-3xl"><p><span className="dark:text-white"> Track</span><span className="text-codolioBase">ode </span>helps you navigate and track your journey to success</p></div>
+                        <div className="text-center font-[650] text-gray-500 dark:text-darkText-400 md:text-3xl"><p><span className="dark:text-white"> Trac</span><span className="text-blue-900">kode </span>helps you navigate and track your journey to success</p></div>
 
                         <div className="px-8 sm:items-center sm:justify-center sm:px-0 sm:space-x-5 sm:flex mt-9 white:text-white text-white p-8">
                             {session?(
-                                <a
+                                <Link
                                 href="/admin-dashboard"
                                 title=""
-                                className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold white-text-white text-white transition-all  bg-blue-900 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-blue-400"
+                                className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold white-text-white text-white transition-all  bg-blue-900 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-blue-400"
                                 role="button"
                             >
                                 Get Started
-                            </a>
+                            </Link>
                             ):
                             (
-                                <a
+                                <Link
                                 href="/signin"
                                 title=""
-                                className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold white-text-white text-white transition-all  bg-blue-900 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-blue-400"
+                                className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold white-text-white text-white transition-all  bg-blue-900 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-blue-400"
                                 role="button"
                             >
                                 Get Started
-                            </a> 
+
+                            </Link> 
                             )
                             }
                             
 
-                            <a
+                            <Link
                                 href="#"
                                 title=""
                                 className="inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-lg font-bold text-white transition-all  border-2 border-gray-400 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:bg-gray-900 focus:bg-gray-900 hover:text-blue-400 focus:text-white hover:border-gray-900 focus:border-gray-900"
@@ -62,7 +74,7 @@ export default function Home() {
                                     />
                                 </svg>
                                 Dashboard
-                            </a>
+                            </Link>
                         </div>
 
                         {/* <p className="mt-8 text-base text-gray-500 font-inter">Its better to start late than never !!</p> */}
@@ -79,7 +91,7 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
-                {/* <div className="flex flex-col gap-4 text-center"><h3 className="text-3xl font-semibold text-center sm:text-start md:text-4xl dark:text-white lg:text-5xl">Simplify Your Prep</h3><p className="text-center sm:text-start font-[550] md:text-lg lg:text-xl text-gray text-gray-500 dark:text-darkText-400">Say goodbye to last-minute stress.Track all your questions and notes in one place for easy review and revision.</p><a className="font-semibold text-center text-btnBlue sm:text-start" href="/question-tracker">Try Question Tracker -&gt;</a></div> */}
+                {/* <div className="flex flex-col gap-4 text-center"><h3 className="text-3xl font-semibold text-center sm:text-start md:text-4xl dark:text-white lg:text-5xl">Simplify Your Prep</h3><p className="text-center sm:text-start font-[550] md:text-lg lg:text-xl text-gray text-gray-500 dark:text-darkText-400">Say goodbye to last-minute stress.Track all your questions and notes in one place for easy review and revision.</p><Link className="font-semibold text-center text-btnBlue sm:text-start" href="/question-tracker">Try Question Tracker -&gt;</a></div> */}
                 <div className="flex flex-col gap-2 text-center ps-5 pr-5 pb-28"><h3 className="text-3xl font-semibold dark:text-blue-400 sm:text-5xl">Your Favourite Platform</h3><p className="text-center font-[550] text-darkText-400 sm:text-xl md:text-3xl text-blue-200">Effortless coding & contests with Trackode</p></div>
             </section>
             <Faq/>

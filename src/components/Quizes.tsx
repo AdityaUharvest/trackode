@@ -1,5 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
+import PastQuizes from "./PastQuizes";
+import RunningQuizes from "./RunningQuizes";
 export default function Quizes() {
      const [isOpen, setIsOpen] = useState(false);
     
@@ -11,24 +16,23 @@ export default function Quizes() {
         onClick={toggleDropdown}
       >
         <span className="font-medium">Quizes</span>
-        <span className="bg-green-900 px-2 py-1 text-sm rounded-md">
+        <span className="bg-green-600 px-2 py-1 text-sm rounded-md">
           Quiz is active
         </span>
       </button>
 
       {/* Dropdown Content */}
       {isOpen && (
-        <div className="absolute left-0 w-full bg-gray-900 text-white mt-2 rounded-lg shadow-lg border border-gray-700 ">
+        <div className="right-0   bg-neutral-900 text-white mt-2 pb-10 rounded-lg shadow-lg border border-gray-700 ">
           <ul className="py-2 px-4 space-y-2">
-            <li className="hover:bg-gray-700 rounded px-3 py-2">
-              Item 1: Basic Concepts
+            <li className=" rounded px-3 py-2">
+              <RunningQuizes />
+              <PastQuizes />
+              <button onClick={()=>{
+                toast.success("We are taking you to the quiz page")
+              }} className="mt-2 float-right hover:bg-gray-950 shadow-sm-light hover:shadow-blue-900  bg-slate-900 rounded-lg p-2">New + </button>
             </li>
-            <li className="hover:bg-gray-700 rounded px-3 py-2">
-              Item 2: Getting Started
-            </li>
-            <li className="hover:bg-gray-700 rounded px-3 py-2">
-              Item 3: Core Principles
-            </li>
+            
           </ul>
         </div>
       )} 

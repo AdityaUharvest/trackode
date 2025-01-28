@@ -1,12 +1,14 @@
 'use client'
 import {useEffect, useState} from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 const Navbar: React.FC = () => {
   const {data: session, status} = useSession();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
   const [isLoggedin, setLoggedin]=useState(false);
   const [user, setUser] = useState<{ name: string; email: string; image: string } | null>(null);
+  console.log(session);
   useEffect(() => {
     if(session){
       setLoggedin(true);
@@ -24,7 +26,8 @@ const Navbar: React.FC = () => {
   return (
     <nav className="bg-black border-white-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a
+        <Link
+          
           href="/"
           className="flex items-center space-x-3 rtl:space-x-reverse"
         >
@@ -37,7 +40,7 @@ const Navbar: React.FC = () => {
           <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
             Trackode
           </span>
-        </a>
+        </Link>
        
         <div className="flex items-center md:order-2 space-x-3 rtl:space-x-reverse">
           {/* Profile button */}
@@ -58,12 +61,12 @@ const Navbar: React.FC = () => {
           </button>
           ):
           (
-            <a
+            <Link
                 href="/signin"
                 className="block p-1 bg-blue-900  text-white rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white md:p-2 dark:text-white md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:mr-2 sm:mr-1"
               >
                 Sign in
-            </a>
+            </Link>
           )}
           
           
@@ -83,28 +86,28 @@ const Navbar: React.FC = () => {
               </div>
               <ul className="py-2 ">
                 <li>
-                  <a
+                  <Link
                     href="/admin-dashboard"
                     className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                   >
                     Dashboard
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                   >
                     Settings
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     href="#"
                     className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                   >
                     Sign out
-                  </a>
+                  </Link>
                 </li>
                 
                 
@@ -146,36 +149,36 @@ const Navbar: React.FC = () => {
               
             </li>
             <li>
-              <a
+              <Link
                 href="#"
                 className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-blue-400"
               >
                 Profile Tracker
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="#"
                 className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Question Tracker
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="#"
                 className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Quiz Tracker
-              </a>
+              </Link>
             </li>
             <li>
-              <a
+              <Link
                 href="#"
                 className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white"
               >
                 Contact
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
