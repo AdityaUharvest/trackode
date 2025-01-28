@@ -7,16 +7,41 @@ import Faq from "@/components/Faq";
 import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { useState } from "react";
 export default function Home() {
     const { data: session, status } = useSession();
-    useEffect(
-        ()=>{
-            if (status === "authenticated") {
-                toast.success("You're successfully signed in!");
-              }
-        },[status]
+    const [isFirstVisit, setIsFirstVisit] = useState(false);
 
-    )
+    useEffect(() => {
+        const firstVisit = localStorage.getItem("isFirstVisit");
+    
+        if (firstVisit === null) {
+          // If it's the user's first visit, show the toast and set it in localStorage
+          localStorage.setItem("isFirstVisit", "true");
+          setIsFirstVisit(true);
+        } else {
+          // If it's not the first visit, do not show toast
+          setIsFirstVisit(false);
+        }
+      }, []);
+    
+      // Show toast on successful sign-in, only once
+      useEffect(() => {
+        if (status === "authenticated" && isFirstVisit) {
+          toast.success("You're successfully signed in!");
+          if (session?.user) {
+            toast.success(`Welcome ${session.user.name?.split(' ')[0]} Enjoy your journey with Trackode!`);
+          }
+        }
+      }, [status, isFirstVisit]);
+    
+      // Reset first visit flag on sign-out
+      useEffect(() => {
+        if (status === "unauthenticated") {
+          localStorage.removeItem("isFirstVisit");
+          setIsFirstVisit(false);
+        }
+      }, [status]);
     return (
         <div className="overflow-x-hidden text-white bg-neutral-950 white:bg-white white:text-black">
 

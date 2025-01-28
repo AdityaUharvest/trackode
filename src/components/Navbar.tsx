@@ -2,6 +2,10 @@
 import {useEffect, useState} from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
+import { toast } from "react-toastify";
+import { redirect } from "next/dist/server/api-utils";
+import { timeEnd } from "console";
 const Navbar: React.FC = () => {
   const {data: session, status} = useSession();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -12,6 +16,7 @@ const Navbar: React.FC = () => {
   useEffect(() => {
     if(session){
       setLoggedin(true);
+      localStorage.setItem("isFirstVisit", "true");
       setUser(
         {
           name: session?.user?.name || '',
@@ -23,6 +28,7 @@ const Navbar: React.FC = () => {
   },[session]);
   
   
+
   return (
     <nav className="bg-black border-white-200 dark:bg-gray-900">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -102,12 +108,19 @@ const Navbar: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="#"
+                <button
+                    onClick={()=>{
+                      setLoggedin(false);
+                      signOut({callbackUrl: '/'});
+                      toast.success("Signed out successfully");
+                      localStorage.setItem("isFirstVisit", "true");
+                      
+                    }}
                     className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
                   >
                     Sign out
-                  </Link>
+                  </button>
+                  
                 </li>
                 
                 
