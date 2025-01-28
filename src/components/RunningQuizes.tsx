@@ -36,6 +36,7 @@ export default function RunningQuizes() {
                 toast.warning("Quiz Stopped");
               }} className ="bg-red-500 hover:bg-red-950 px-3 py-1 rounded-lg">Stop</button> :<button onClick={() => {
                 setStarted(!started)
+                toast.success("Quiz Started");
               }}
               className="bg-green-500 hover:bg-green-950 px-3 py-1 rounded-lg">Start</button>
               }
