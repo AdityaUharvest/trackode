@@ -28,9 +28,9 @@ export default function Home() {
       // Show toast on successful sign-in, only once
       useEffect(() => {
         if (status === "authenticated" && isFirstVisit) {
-          toast.success("You're successfully signed in!");
+         
           if (session?.user) {
-            toast.success(`Welcome ${session.user.name?.split(' ')[0]} Enjoy your journey with Trackode!`);
+            toast.success(`Welcome ${session.user.name?.split(' ')[0]} enjoy your journey with trackode!`);
           }
         }
       }, [status, isFirstVisit]);

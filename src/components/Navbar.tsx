@@ -4,15 +4,12 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { toast } from "react-toastify";
-import { redirect } from "next/dist/server/api-utils";
-import { timeEnd } from "console";
 const Navbar: React.FC = () => {
   const {data: session, status} = useSession();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
   const [isLoggedin, setLoggedin]=useState(false);
   const [user, setUser] = useState<{ name: string; email: string; image: string } | null>(null);
-  console.log(session);
   useEffect(() => {
     if(session){
       setLoggedin(true);
@@ -58,12 +55,20 @@ const Navbar: React.FC = () => {
             aria-expanded={isDropdownOpen}
           >
             <span className="sr-only">Open user menu</span>
-            <img
+            {user?.image?(
+              <img
               className="w-8 h-8 rounded-full"
               src={user?.image}
               alt="user photo"
               loading="lazy"
             />
+            ):
+            (
+              <img className="w-8 h-8 rounded-full" src="trackode.png" alt="user photo"/>
+      
+            )
+          }
+            
           </button>
           ):
           (
@@ -110,9 +115,14 @@ const Navbar: React.FC = () => {
                 <li>
                 <button
                     onClick={()=>{
+                      toast.success("Signed out successfully",{
+                        autoClose: 3000,
+                        closeOnClick:false
+                      });
                       setLoggedin(false);
+                      
                       signOut({callbackUrl: '/'});
-                      toast.success("Signed out successfully");
+                      
                       localStorage.setItem("isFirstVisit", "true");
                       
                     }}

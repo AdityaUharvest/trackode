@@ -10,8 +10,12 @@
   },
   "dependencies": {
     "@shadcn/ui": "^0.0.4",
+    "axios": "^1.7.9",
+    "bcr": "^1.0.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "flowbite": "^3.0.0",
+    "mon": "^0.0.8",
     "mongoose": "^8.9.5",
     "moongoose": "^0.0.5",
     "next": "15.1.6",
@@ -23,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

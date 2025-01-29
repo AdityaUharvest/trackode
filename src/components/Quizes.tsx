@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-
+import Link from "next/link";
 import PastQuizes from "./PastQuizes";
 import RunningQuizes from "./RunningQuizes";
 export default function Quizes() {
@@ -28,9 +28,7 @@ export default function Quizes() {
             <li className=" rounded px-3 py-2">
               <RunningQuizes />
               <PastQuizes />
-              <button onClick={()=>{
-                toast.success("We are taking you to the quiz page")
-              }} className="mt-2 float-right hover:bg-gray-950 shadow-sm-light hover:shadow-blue-900  bg-slate-900 rounded-lg p-2">New + </button>
+              <Link href="/quiz-setup" className="mt-2 float-right hover:bg-gray-950 shadow-sm-light hover:shadow-blue-900  bg-slate-900 rounded-lg p-2">New + </Link>
             </li>
             
           </ul>

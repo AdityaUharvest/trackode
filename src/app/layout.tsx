@@ -1,10 +1,9 @@
 "use client"
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-// import "./globals.css"; // If you have global Tailwind styles
 import { SessionProvider } from "next-auth/react"
-import { ToastContainer } from "react-toastify"; // ✅ Import ToastContainer
-import "react-toastify/dist/ReactToastify.css"; // ✅ Import CSS for styling
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 import './globals.css';
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
