@@ -12,7 +12,7 @@ function TimePicker({ value, onChange, label }: any) {
   };
 
   return (
-    <div className="flex sm:w-full flex-col">
+    <div className="flex  flex-col">
       <label className="text-gray-300 text-sm font-medium mb-1">{label}</label>
       <div className="flex gap-2">
         <select
@@ -85,7 +85,7 @@ function QuizSetup() {
   return (
     <div className="flex flex-col  bg-neutral-900 lg:flex-row min-h-screen">
       {/* Dashboard Section */}
-      <div className="flex-1 w-1/3 p-6 bg-slate-900 rounded-lg m-2">
+      <div className="flex-1 sm:w-full lg:w-1/3 p-6 bg-slate-900 rounded-lg m-2">
         <h1 className="text-2xl text-white font-bold mb-6">Quiz Details</h1>
         <form onSubmit={submitHandler} className="space-y-6">
           <div>
@@ -175,7 +175,7 @@ function QuizSetup() {
           </button>
         </form>
       </div>
-      <div className="flex-2 w-2/3 p-6 bg-slate-900 rounded-lg m-4">
+      <div className="flex-2 sm:w-full w-2/3 p-6 bg-slate-900 rounded-lg m-4">
         Question will be here 
       </div>
       {/* Creating questions */}
