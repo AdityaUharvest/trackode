@@ -25,18 +25,21 @@ export const authOptions = {
           const user = await User.findOne({ email });
       
           if (!user) {
+            console.log("No user found with this email");
             throw new CredentialsSignin("No user found with this email");
           }
       
           const isMatch = await bcrypt.compare(password, user.password);
       
           if (isMatch) {
+            console.log("Password is correct");
             return user;
           } else {
+            console.log("Password is incorrect");
             throw new CredentialsSignin(Error('Password is incorrect'));
           }
         } catch (error) {
-          
+          console.log("Error signing in", error);
           throw new CredentialsSignin("Please check your email and password");
         }
       },
@@ -83,6 +86,6 @@ export const authOptions = {
   
 };
 
-// ✅ Export `handlers` for API routes (Next.js App Router)
+
 export const { handlers, signIn, signOut, auth } = NextAuth(authOptions);
-export default NextAuth(authOptions);
+
