@@ -12,7 +12,7 @@ function TimePicker({ value, onChange, label }: any) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex sm:w-full flex-col">
       <label className="text-gray-300 text-sm font-medium mb-1">{label}</label>
       <div className="flex gap-2">
         <select
