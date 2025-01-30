@@ -88,9 +88,9 @@ function QuizSetup() {
   };
 
   return (
-    <div className="flex flex-col  bg-neutral-900 lg:flex-row min-h-screen">
+    <div className="flex flex-col lg:flex-row bg-neutral-900  min-h-screen">
       {/* Dashboard Section */}
-      <div className="flex-1 sm:w-full lg:w-1/3 p-6 bg-slate-900 rounded-lg m-2">
+      <div className="flex-1 lg:w-1/2 sm:w-full p-6 bg-slate-900 rounded-lg m-2">
         <h1 className="text-2xl text-white font-bold mb-6">Quiz Details</h1>
         <form onSubmit={submitHandler} className="space-y-6">
           <div>
@@ -135,6 +135,7 @@ function QuizSetup() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <TimePicker
+              
               label="Start Time"
               value={startTime}
               onChange={setStartTime}
@@ -180,7 +181,7 @@ function QuizSetup() {
           </button>
         </form>
       </div>
-      <div className="flex-2 sm:w-full w-2/3 p-6 bg-slate-900 rounded-lg m-4">
+      <div className=" sm:w-full lg:w-1/2  p-6 bg-slate-900 rounded-lg m-4">
         Question will be here 
       </div>
     </div>
