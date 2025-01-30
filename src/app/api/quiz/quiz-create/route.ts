@@ -1,8 +1,7 @@
 import connectDB  from "@/lib/util";
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
-import {useSession} from 'next-auth/react';
-import User from "@/app/model/User";
+
 export async function POST(request: NextRequest) {
     await connectDB();
     const {name,startDate,endDate ,endTime ,startTime,totalMarks,totalQuestions,user}=await request.json();

@@ -22,7 +22,7 @@ export async function POST(
     console.log(question);
     console.log(correctAnswer);
     // now we have all the data
-    const question = new Question({
+    const questions = new Question({
 
     });
     
