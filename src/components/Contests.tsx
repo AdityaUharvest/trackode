@@ -10,8 +10,8 @@ export default function Contests() {
         className="w-full bg-neutral-900 text-white px-4 hover:bg-gray-950 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-400"
         onClick={toggleDropdown}
       >
-        <span className="font-medium">Contests</span>
-        <span className="bg-red-900 px-2 py-1 text-sm rounded-md">
+        <span className="font-bold text-xl">Contests</span>
+        <span className="bg-red-900 px-2 py-1  rounded-md">
           Not started !!
         </span>
       </button>

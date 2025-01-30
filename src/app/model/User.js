@@ -63,7 +63,10 @@ const user = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    
+    slug:{
+        type:String,
+        required:true,
+    }
 });
 const User = mongoose.models.User || mongoose.model("User", user);
 export default User;

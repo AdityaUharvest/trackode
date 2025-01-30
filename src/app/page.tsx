@@ -16,16 +16,13 @@ export default function Home() {
         const firstVisit = localStorage.getItem("isFirstVisit");
     
         if (firstVisit === null) {
-          // If it's the user's first visit, show the toast and set it in localStorage
+          
           localStorage.setItem("isFirstVisit", "true");
           setIsFirstVisit(true);
         } else {
-          // If it's not the first visit, do not show toast
           setIsFirstVisit(false);
         }
       }, []);
-    
-      // Show toast on successful sign-in, only once
       useEffect(() => {
         if (status === "authenticated" && isFirstVisit) {
          
@@ -35,7 +32,6 @@ export default function Home() {
         }
       }, [status, isFirstVisit]);
     
-      // Reset first visit flag on sign-out
       useEffect(() => {
         if (status === "unauthenticated") {
           localStorage.removeItem("isFirstVisit");

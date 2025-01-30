@@ -2,13 +2,11 @@
 import SignInButton from "@/components/Signin";
 // import { auth } from '@/auth';
 // import { useSession } from "next-auth/react"
-import axios from "axios";
 import  Link  from "next/link";
 import {useState} from "react"
 import {toast} from "react-toastify"
 import { redirect, useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { set } from "mongoose";
 export default function Signin(){
     // const session = await auth();
     
@@ -41,7 +39,7 @@ export default function Signin(){
           if (response?.ok && response?.url) {
             setTimeout(() => {
               router.push('/');
-            }, 3000);
+            }, 2000);
           } else {
             toast.error(response?.error || "Sign in failed. Please try again.");
           }

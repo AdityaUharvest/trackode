@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import './globals.css';
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
+import { Analytics } from "@vercel/analytics/react"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
@@ -25,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <SessionProvider>
         <ToastContainer position="top-center" autoClose={3000} />
+        
         <Navbar />
         <div className="min-h-screen">{children}</div>
         <Footer />

@@ -7,7 +7,8 @@ import connectDB from "@/lib/util"
 export async function POST(req: NextRequest) {
     await connectDB();
     if (req.method === "POST") {
-        const { email, name, phone, password } = await req.json(); // Using json() for the body
+        const { email, name, phone, password } = await req.json(); 
+        // req.body is not in the nextrequest type but it is available in nextapirequest
         
         try {
             // Check if the user is already registered
@@ -20,6 +21,7 @@ export async function POST(req: NextRequest) {
                     }
                 );
             } else {
+                // Hash the password
                 const hashedPassword = await bcrypt.hash(password, 10);
 
                 const user = new User({
@@ -36,7 +38,7 @@ export async function POST(req: NextRequest) {
                         message:"Successfully Created",
                         success: true,
                     },
-                    { status: 201 } // Sending success status
+                
                 );
             }
         } catch (error) {
@@ -46,13 +48,13 @@ export async function POST(req: NextRequest) {
                     success: false,
                     error: `${error}`,
                 },
-                { status: 500 } // Internal Server Error status
+                
             );
         }
     } else {
         return NextResponse.json(
             { message: "Trackode naam sun ke hack kar lega kya fire hai main" },
-            { status: 405 } // Method Not Allowed status
+            { status: 405 } 
         );
     }
 }

@@ -15,8 +15,8 @@ export default function Quizes() {
         className="w-full bg-neutral-900 hover:bg-gray-950 text-white px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-400"
         onClick={toggleDropdown}
       >
-        <span className="font-medium">Quizes</span>
-        <span className="bg-green-600 px-2 py-1 text-sm rounded-md">
+        <span className="font-bold text-xl">Quizes</span>
+        <span className="bg-green-600 px-2 py-1  rounded-md">
           Quiz is active
         </span>
       </button>
@@ -27,8 +27,8 @@ export default function Quizes() {
           <ul className="py-2 px-4 space-y-2">
             <li className=" rounded px-3 py-2">
               <RunningQuizes />
-              <PastQuizes />
-              <Link href="/quiz-setup" className="mt-2 float-right hover:bg-gray-950 shadow-sm-light hover:shadow-blue-900  bg-slate-900 rounded-lg p-2">New + </Link>
+              {/* <PastQuizes /> */}
+              {/* <Link href="/quiz-setup" className="mt-2 float-right hover:bg-gray-950 shadow-sm-light hover:shadow-blue-900  bg-slate-900 rounded-lg p-2">New + </Link> */}
             </li>
             
           </ul>

@@ -1,7 +1,9 @@
 "use client"
 import React from 'react';
 import ProfileLeftCard from './ProfileLeftCard';
-
+import axios from 'axios';
+import { useSession } from 'next-auth/react';
+import { toast } from 'react-toastify';
 function TimePicker({ value, onChange, label }: any) {
   const hours = [...Array(24).keys()];
   const minutes = [...Array(60).keys()];
@@ -53,16 +55,18 @@ function QuizSetup() {
   const [endTime, setEndTime] = React.useState({ hours: 12, minutes: 0 });
   const [totalMarks, setTotalMarks] = React.useState('');
   const [totalQuestions, setTotalQuestions] = React.useState('');
-
+  const { data: session, status } = useSession();
+  const user = session?.user?.id || " ";
   const submitHandler = async (e: any) => {
     e.preventDefault();
+    if (!name || !startDate || !endDate || !totalMarks || !totalQuestions) {
+      toast.error('Please fill all fields');
+      return;
+    }
     try {
-      const res = await fetch('/api/quiz/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const res = await axios.post(
+        '/api/quiz/quiz-create', 
+        {
           name,
           startDate,
           endDate,
@@ -70,12 +74,13 @@ function QuizSetup() {
           endTime,
           totalMarks,
           totalQuestions,
-        }),
-      });
-      if (res.ok) {
-        alert('Quiz Created Successfully');
+          user,
+        }
+      )
+      if (res.data.success) {
+        toast.success(res.data.message);
       } else {
-        alert('Error Occurred');
+        toast.error(res.data.message);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -178,7 +183,6 @@ function QuizSetup() {
       <div className="flex-2 w-2/3 p-6 bg-slate-900 rounded-lg m-4">
         Question will be here 
       </div>
-      {/* Creating questions */}
     </div>
   );
 }
