@@ -198,7 +198,7 @@ export default function RunningQuizes() {
                   <div className="flex items-center justify-between w-full pr-4">
                     <div className="flex items-center gap-4">
                       <span className="font-bold text-xl">{quiz.name}</span>
-                      <Badge variant={quiz.active ? "success" : "danger"}>
+                      <Badge variant={quiz.active ? "default" : "destructive"}>
                         {quiz.active ? "Active" : "Inactive"}
                       </Badge>
                     </div>
