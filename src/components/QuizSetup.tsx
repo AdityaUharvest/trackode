@@ -4,6 +4,8 @@ import ProfileLeftCard from './ProfileLeftCard';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { toast } from 'react-toastify';
+import { Router } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 function TimePicker({ value, onChange, label }: any) {
   const hours = [...Array(24).keys()];
   const minutes = [...Array(60).keys()];
@@ -48,6 +50,7 @@ function TimePicker({ value, onChange, label }: any) {
 }
 
 function QuizSetup() {
+  const router = useRouter();
   const [name, setName] = React.useState('');
   const [startDate, setStartDate] = React.useState('');
   const [endDate, setEndDate] = React.useState('');
@@ -79,6 +82,7 @@ function QuizSetup() {
       )
       if (res.data.success) {
         toast.success(res.data.message);
+        router.push('/admin-dashboard');
       } else {
         toast.error(res.data.message);
       }
