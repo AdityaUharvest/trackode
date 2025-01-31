@@ -73,7 +73,7 @@ const Navbar: React.FC = () => {
           ) : (
             <Link
               href="/signin"
-              className={`block p-1 rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white md:p-2 ${theme === "light" ? "bg-blue-900 text-white" : "bg-gray-700 text-white"}`}
+              className={`block p-1 rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white md:p-2 ${theme === "light" ? "bg-blue-900 text-white" : "bg-blue-900 text-white"}`}
             >
               Sign in
             </Link>
