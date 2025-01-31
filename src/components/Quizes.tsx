@@ -33,14 +33,14 @@ export default function Quizes() {
 
       {/* Dropdown Content */}
       {isOpen && (
-        <div className={`right-0 ${dropdownBgColor} text-${theme === "dark" ? "white" : "black"} mt-2 pb-10 rounded-lg shadow-lg border ${dropdownBorderColor}`}>
-          <ul className="py-2 px-4 space-y-2">
-            <li className="rounded px-3 py-2">
+        <div className={`right-0 ${dropdownBgColor} text-${theme === "dark" ? "white" : "black"} mt-2  rounded-xl shadow-lg border ${dropdownBorderColor}`}>
+         
+           
               <RunningQuizes />
               {/* <PastQuizes /> */}
               {/* <Link href="/quiz-setup" className="mt-2 float-right hover:bg-gray-950 shadow-sm-light hover:shadow-blue-900  bg-slate-900 rounded-lg p-2">New + </Link> */}
-            </li>
-          </ul>
+  
+          
         </div>
       )}
     </div>
