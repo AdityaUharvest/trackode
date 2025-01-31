@@ -88,9 +88,9 @@ function QuizSetup() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row bg-neutral-900  min-h-screen">
+    <div className="flex flex-col lg:flex-row bg-neutral-950  min-h-screen">
       {/* Dashboard Section */}
-      <div className="flex-1 lg:w-1/2 sm:w-full p-6 bg-slate-900 rounded-lg m-2">
+      <div className="flex-1 lg:w-1/2 sm:w-full p-6 bg-neutral-900 rounded-lg m-2">
         <h1 className="text-2xl text-white font-bold mb-6">Quiz Details</h1>
         <form onSubmit={submitHandler} className="space-y-6">
           <div>
@@ -181,7 +181,7 @@ function QuizSetup() {
           </button>
         </form>
       </div>
-      <div className=" sm:w-full lg:w-1/2  p-6 bg-slate-900 rounded-lg m-4">
+      <div className=" sm:w-full lg:w-1/2  p-6 bg-neutral-900 rounded-lg m-2">
         Question will be here 
       </div>
     </div>

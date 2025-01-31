@@ -1,105 +1,102 @@
-'use client'
-import {useEffect, useState} from "react";
+'use client';
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { toast } from "react-toastify";
+import { useTheme } from "./ThemeContext"; // Ensure this path is correct
+import { Moon, Sun } from "lucide-react";
+
 const Navbar: React.FC = () => {
-  const {data: session, status} = useSession();
+  const { data: session, status } = useSession();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
-  const [isLoggedin, setLoggedin]=useState(false);
+  const [isLoggedin, setLoggedin] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; image: string } | null>(null);
+  const { theme, toggleTheme } = useTheme(); // Use the theme context
+
   useEffect(() => {
-    if(session){
+    if (session) {
       setLoggedin(true);
       localStorage.setItem("isFirstVisit", "true");
-      setUser(
-        {
-          name: session?.user?.name || '',
-          email: session?.user?.email||'',
-          image: session?.user?.image||''
-        }
-      );
+      setUser({
+        name: session?.user?.name || '',
+        email: session?.user?.email || '',
+        image: session?.user?.image || ''
+      });
     }
-  },[session]);
-  
-  
+  }, [session]);
 
   return (
-    <nav className="bg-black border-white-200 dark:bg-gray-900">
+    <nav className={`border-white-200 ${theme === "light" ? "bg-amber-50" : "bg-neutral-900"}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link
-          
-          href="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
+        <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
             src="trackode.png"
-            className="h-8 bg-black rounded-lg fill-blue-900"
+            className="h-8 rounded-lg"
             alt="Trackode Logo"
-          
           />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">
+          <span className={`self-center text-2xl font-semibold whitespace-nowrap ${theme === "light" ? "text-black" : "text-white"}`}>
             Trackode
           </span>
         </Link>
-       
+
         <div className="flex items-center md:order-2 space-x-3 rtl:space-x-reverse">
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full ${theme === "light" ? "bg-gray-200" : "bg-gray-700"}`}
+          >
+            {theme === "light" ? <Moon size={20} className="text-black" /> : <Sun size={20} className="text-white" />}
+          </button>
+
           {/* Profile button */}
           {isLoggedin ? (
             <button
-            type="button"
-            className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-black"
-            onClick={() => setDropdownOpen(!isDropdownOpen)}
-            aria-expanded={isDropdownOpen}
-          >
-            <span className="sr-only">Open user menu</span>
-            {user?.image?(
-              <img
-              className="w-8 h-8 rounded-full"
-              src={user?.image}
-              alt="user photo"
-              loading="lazy"
-            />
-            ):
-            (
-              <img className="w-8 h-8 rounded-full" src="trackode.png" alt="user photo"/>
-      
-            )
-          }
-            
-          </button>
-          ):
-          (
+              type="button"
+              className={`flex text-sm rounded-full focus:ring-4 ${theme === "light" ? "bg-gray-200" : "bg-gray-700"}`}
+              onClick={() => setDropdownOpen(!isDropdownOpen)}
+              aria-expanded={isDropdownOpen}
+            >
+              <span className="sr-only">Open user menu</span>
+              {user?.image ? (
+                <img
+                  className="w-8 h-8 rounded-full"
+                  src={user?.image}
+                  alt="user photo"
+                  loading="lazy"
+                />
+              ) : (
+                <img className="w-8 h-8 rounded-full" src="trackode.png" alt="user photo" />
+              )}
+            </button>
+          ) : (
             <Link
-                href="/signin"
-                className="block p-1 bg-blue-900  text-white rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white md:p-2 dark:text-white md:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white md:mr-2 sm:mr-1"
-              >
-                Sign in
+              href="/signin"
+              className={`block p-1 rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white md:p-2 ${theme === "light" ? "bg-blue-900 text-white" : "bg-gray-700 text-white"}`}
+            >
+              Sign in
             </Link>
           )}
-          
-          
+
           {/* Dropdown menu */}
-          
           {isDropdownOpen && (
             <div
-              className="z-50 my-4 text-base list-none bg-black divide-y divide-black rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600 absolute right-4 top-12 test-white"
+              className={`z-50 my-4 text-base list-none divide-y rounded-lg shadow absolute right-4 top-12 ${theme === "light" ? "bg-amber-50 text-black" : "bg-gray-700 text-white"}`}
             >
               <div className="px-4 py-3">
-                <span className="block text-sm text-white dark:text-white">
-                 {user?.name}
+                <span className={`block text-sm ${theme === "light" ? "text-black" : "text-white"}`}>
+                  {user?.name}
                 </span>
-                <span className="block text-sm text-gray-500 truncate dark:text-gray-400">
+                <span className="block text-sm text-gray-500 truncate">
                   {user?.email}
                 </span>
               </div>
-              <ul className="py-2 ">
+              <ul className="py-2">
                 <li>
                   <Link
                     href="/admin-dashboard"
-                    className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
                   >
                     Dashboard
                   </Link>
@@ -107,33 +104,27 @@ const Navbar: React.FC = () => {
                 <li>
                   <Link
                     href="#"
-                    className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
                   >
                     Settings
                   </Link>
                 </li>
                 <li>
-                <button
-                    onClick={()=>{
-                      toast.success("Signed out successfully",{
+                  <button
+                    onClick={() => {
+                      toast.success("Signed out successfully", {
                         autoClose: 3000,
-                        closeOnClick:false
+                        closeOnClick: false
                       });
                       setLoggedin(false);
-                      
-                      signOut({callbackUrl: '/'});
-                      
+                      signOut({ callbackUrl: '/' });
                       localStorage.setItem("isFirstVisit", "true");
-                      
                     }}
-                    className="block px-4 py-2 text-sm text-white hover:bg-blue-400 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                    className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
                   >
                     Sign out
                   </button>
-                  
                 </li>
-                
-                
               </ul>
             </div>
           )}
@@ -141,7 +132,7 @@ const Navbar: React.FC = () => {
           {/* Mobile menu toggle */}
           <button
             onClick={() => setNavOpen(!isNavOpen)}
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+            className={`inline-flex items-center p-2 w-10 h-10 justify-center text-sm rounded-lg md:hidden focus:outline-none focus:ring-2 ${theme === "light" ? "text-gray-500 hover:bg-gray-100 focus:ring-gray-200" : "text-gray-400 hover:bg-gray-700 focus:ring-gray-600"}`}
           >
             <span className="sr-only">Open main menu</span>
             <svg
@@ -163,42 +154,42 @@ const Navbar: React.FC = () => {
 
         {/* Navigation links */}
         <div
-          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 bg-black ${
-            isNavOpen ? "block" : "hidden"
-          }`}
+          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-amber-50" : "bg-neutral-900"} ${isNavOpen ? "block" : "hidden"}`}
         >
-          <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-black rounded-lg bg-black md:space-x-8 md:flex-row md:mt-0 md:border-0 md:bg-black dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-amber-50 text-black" : "bg-neutral-900 text-white"}`}>
             <li>
+              <Link
+                href="#"
+                className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+              >
+                Profile Tracker
+              </Link>
+            </li>
+            
+            <li>
+            {isLoggedin ? (
+                 <Link
+                 href="admin-dashboard"
+                 className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+               >
+                 Quiz Tracker
+               </Link>
+              ):
+              (
+                <Link
+                href="signin"
+                className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+              >
+                Quiz Tracker
+              </Link>
+              )
+              }
               
             </li>
             <li>
               <Link
                 href="#"
-                className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-blue-400"
-              >
-                Profile Tracker
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Question Tracker
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white"
-              >
-                Quiz Tracker
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="#"
-                className="block py-2 px-3 text-white rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white"
+                className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
                 Contact
               </Link>

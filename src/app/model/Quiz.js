@@ -48,10 +48,7 @@ const quizSchema = new mongoose.Schema(
             type: Boolean,
             default: false
         },
-        slug:{
-            type:String,
-            required:true,
-        }
+        
     },
     { timestamps: true }
 );

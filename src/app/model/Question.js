@@ -11,7 +11,7 @@ const schema = new mongoose.Schema(
             required: true,
         },
         correctAnswer: {
-            type: Number,
+            type: String,
             required: true,
         },
         image: {
@@ -25,10 +25,7 @@ const schema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Quiz",
         },
-        slug:{
-            type:String,
-            required:true,
-        }
+        
 
 
     },

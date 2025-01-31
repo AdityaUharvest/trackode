@@ -4,8 +4,11 @@ import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect } from "react";
+import { useTheme, Theme } from "./ThemeContext"; // Import your theme context
+
 const SignInButton = () => {
   const { data: session, status } = useSession();
+  const { theme } = useTheme(); // Access the current theme
 
   const handleSignIn = async () => {
     const loadingToast = toast.info("Hold on... Letting you in!", {
@@ -27,13 +30,18 @@ const SignInButton = () => {
     }
   }, [status]);
 
+  const buttonStyles: { [key in Theme]: string } = {
+    light: "shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-amber-50 text-neutral-900 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-600",
+    dark: "shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700",
+  };
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         handleSignIn();
       }}
-      className="shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700"
+      className={buttonStyles[theme]} // Apply styles based on the theme
     >
       <div className="p-2 rounded-full">
         <svg className="w-4" viewBox="0 0 533.5 544.3">
