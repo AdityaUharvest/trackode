@@ -252,7 +252,7 @@ export default function RunningQuizes() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="flex gap-4 sm:p-0 sm:text-xs pt-1">
+                  <div className="flex lg:gap-4 sm:gap-2 sm:p-0 sm:text-xs pt-1">
                     <Button
                       onClick={() => handleAddQuestion(index, quiz._id)}
                       className={`${
@@ -373,7 +373,7 @@ export default function RunningQuizes() {
                                   } p-3 flex items-center gap-2`}
                                 >
                                   <Check size={16} />
-                                  Save Changes
+                                  Save
                                 </Button>
                               </div>
                             </div>
