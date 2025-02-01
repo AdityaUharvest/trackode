@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
@@ -9,23 +9,21 @@ import { Moon, Sun } from "lucide-react";
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
+  
+  // console.log();
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
-  const [isLoggedin, setLoggedin] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; image: string } | null>(null);
   const { theme, toggleTheme } = useTheme(); // Use the theme context
 
-  useEffect(() => {
-    if (session) {
-      setLoggedin(true);
-      localStorage.setItem("isFirstVisit", "true");
-      setUser({
-        name: session?.user?.name || '',
-        email: session?.user?.email || '',
-        image: session?.user?.image || ''
-      });
-    }
-  }, [session]);
+  // Handle sign-out
+  const handleSignOut = async () => {
+    toast.success("Signed out successfully", {
+      autoClose: 3000,
+      closeOnClick: false,
+    });
+    await signOut({ callbackUrl: '/' });
+    localStorage.setItem("isFirstVisit", "true");
+  };
 
   return (
     <nav className={`border-white-200 ${theme === "light" ? "bg-amber-50" : "bg-neutral-900"}`}>
@@ -51,7 +49,7 @@ const Navbar: React.FC = () => {
           </button>
 
           {/* Profile button */}
-          {isLoggedin ? (
+          {status === "authenticated" ? (
             <button
               type="button"
               className={`flex text-sm rounded-full focus:ring-4 ${theme === "light" ? "bg-gray-200" : "bg-gray-700"}`}
@@ -59,12 +57,12 @@ const Navbar: React.FC = () => {
               aria-expanded={isDropdownOpen}
             >
               <span className="sr-only">Open user menu</span>
-              {user?.image ? (
+              {session.user?.image ? (
                 <img
                   className="w-8 h-8 rounded-full"
-                  src={user?.image}
+                  src={session.user.image}
                   alt="user photo"
-                  loading="lazy"
+                  
                 />
               ) : (
                 <img className="w-8 h-8 rounded-full" src="trackode.png" alt="user photo" />
@@ -80,16 +78,16 @@ const Navbar: React.FC = () => {
           )}
 
           {/* Dropdown menu */}
-          {isDropdownOpen && (
+          {isDropdownOpen && status === "authenticated" && (
             <div
               className={`z-50 my-4 text-base list-none divide-y rounded-lg shadow absolute right-4 top-12 ${theme === "light" ? "bg-amber-50 text-black" : "bg-gray-700 text-white"}`}
             >
               <div className="px-4 py-3">
                 <span className={`block text-sm ${theme === "light" ? "text-black" : "text-white"}`}>
-                  {user?.name}
+                  {session.user?.name}
                 </span>
                 <span className="block text-sm text-gray-500 truncate">
-                  {user?.email}
+                  {session.user?.email}
                 </span>
               </div>
               <ul className="py-2">
@@ -111,15 +109,7 @@ const Navbar: React.FC = () => {
                 </li>
                 <li>
                   <button
-                    onClick={() => {
-                      toast.success("Signed out successfully", {
-                        autoClose: 3000,
-                        closeOnClick: false
-                      });
-                      setLoggedin(false);
-                      signOut({ callbackUrl: '/' });
-                      localStorage.setItem("isFirstVisit", "true");
-                    }}
+                    onClick={handleSignOut}
                     className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
                   >
                     Sign out
@@ -165,26 +155,22 @@ const Navbar: React.FC = () => {
                 Profile Tracker
               </Link>
             </li>
-            
             <li>
-            {isLoggedin ? (
-                 <Link
-                 href="admin-dashboard"
-                 className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
-               >
-                 Quiz Tracker
-               </Link>
-              ):
-              (
+              {status === "authenticated" ? (
                 <Link
-                href="signin"
-                className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
-              >
-                Quiz Tracker
-              </Link>
-              )
-              }
-              
+                  href="/admin-dashboard"
+                  className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+                >
+                  Quiz Tracker
+                </Link>
+              ) : (
+                <Link
+                  href="/signin"
+                  className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+                >
+                  Quiz Tracker
+                </Link>
+              )}
             </li>
             <li>
               <Link

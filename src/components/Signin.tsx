@@ -8,6 +8,7 @@ import { useTheme, Theme } from "./ThemeContext"; // Import your theme context
 
 const SignInButton = () => {
   const { data: session, status } = useSession();
+  console.log(session);
   const { theme } = useTheme(); // Access the current theme
 
   const handleSignIn = async () => {
@@ -43,8 +44,10 @@ const SignInButton = () => {
       }}
       className={buttonStyles[theme]} // Apply styles based on the theme
     >
-      <div className="p-2 rounded-full">
-        <svg className="w-4" viewBox="0 0 533.5 544.3">
+      <button type="submit" className="ml-4 flex flex-row gap-2">
+      <div className="p-1 rounded-full">
+     
+        <svg className="w-6" viewBox="0 0 533.5 544.3">
           <path
             d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z"
             fill="#4285f4"
@@ -62,10 +65,14 @@ const SignInButton = () => {
             fill="#ea4335"
           />
         </svg>
+        
       </div>
-      <button type="submit" className="ml-4">
+      <p className='ml-1 mt-1'>
         Sign In with Google
-      </button>
+      </p>
+        
+        </button>
+      
     </form>
   );
 };

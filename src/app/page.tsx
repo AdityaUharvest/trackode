@@ -13,7 +13,7 @@ export default function Home() {
   const { data: session, status } = useSession();
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const { theme, toggleTheme } = useTheme(); // Use the theme context
-
+  
   useEffect(() => {
     const firstVisit = localStorage.getItem("isFirstVisit");
     if (firstVisit === null) {
