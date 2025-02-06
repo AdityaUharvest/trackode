@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
                 });
             }
 
+            // console.log(`\n\nQuiz ID: ${quizzes}\n\n`);
             return NextResponse.json({
                 message: "Quizzes found",
                 success: true,
