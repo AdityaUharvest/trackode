@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
 import connectDB from "@/lib/util";
+import Question from "@/app/model/Question";
 
 export async function GET(req: NextRequest) {
     await connectDB();
@@ -23,6 +24,7 @@ export async function GET(req: NextRequest) {
         });
 
     } catch (error) {
+        console.log(`Error in quiz-get: ${error}`);
         return NextResponse.json({
             message: "Error Occurred",
             success: false,

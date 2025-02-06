@@ -10,6 +10,7 @@ function TimePicker({ value, onChange, label }: any) {
   const hours = [...Array(24).keys()];
   const minutes = [...Array(60).keys()];
   const { theme } = useTheme(); // Get the current theme
+  const session = useSession();
 
   const handleChange = (e: any, type: any) => {
     const newValue = { ...value, [type]: e.target.value };
@@ -68,7 +69,7 @@ function QuizSetup() {
   const [totalMarks, setTotalMarks] = React.useState('');
   const [totalQuestions, setTotalQuestions] = React.useState('');
   const { data: session, status } = useSession();
-  const user = session?.user?.id || " ";
+  const user = session?.user?.email;
   const { theme } = useTheme(); // Get the current theme
 
   const submitHandler = async (e: any) => {
@@ -88,6 +89,7 @@ function QuizSetup() {
           startAt: `${startDate}T${startTime.hours}:${startTime.minutes}:00`,
           endAt: `${endDate}T${endTime.hours}:${endTime.minutes}:00`,
           totalMarks,
+          description: 'Quiz description',
           totalQuestions,
           email: user,
         }),
