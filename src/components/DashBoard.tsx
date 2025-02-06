@@ -13,17 +13,12 @@ export default function ProfileCard() {
       <ProfileLeftCard />
       
       {/* Dashboard Section */}
-      <div className={`lg:w-2/3 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-white'} mt-5 mr-3 mb-4 rounded-xl p-4 flex flex-col`}>
+      <div className={`lg:w-2/3 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-white'} mt-5 mr-3 mb-4 rounded-xl p-2 flex flex-col`}>
         <div className="flex justify-between items-center">
-          <h1 className="text-xl font-bold text-center lg:text-left">Dashboard</h1>
-          <button 
-            onClick={toggleTheme} 
-            className="px-4 py-2 rounded-lg border border-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-          >
-            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-          </button>
+          <h1 className="text-xl ml-3 mt-1 font-bold text-center lg:text-left">Dashboard</h1>
+          
         </div>
-        <div className='mb-10 mt-2 p-2'>
+        <div className=' mt-1 p-1'>
           <Quizes />
           {/* <Contests /> */}
         </div>

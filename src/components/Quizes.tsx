@@ -22,7 +22,7 @@ export default function Quizes() {
   return (
     <div>
       <button
-        className={`w-full ${buttonBgColor} ${buttonHoverBgColor} text-${theme === "dark" ? "white" : "black"} px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-400`}
+        className={`w-full ${buttonBgColor} ${buttonHoverBgColor} text-${theme === "dark" ? "white" : "black"} px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-900`}
         onClick={toggleDropdown}
       >
         <span className="font-bold text-lg">Quizes</span>
