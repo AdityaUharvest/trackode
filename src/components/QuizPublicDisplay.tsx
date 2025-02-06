@@ -5,23 +5,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { QuizTypes } from '../../types/types';
 
-interface Quiz {
-    name: string;
-    description: string;
-    startDate: string;
-    endDate: string;
-    duration: number;
-    totalQuestions: number;
-    totalMarks: number;
-    isPaid: boolean;
-    price: string;
-    negativeMarking: boolean;
-    shuffleOptions: boolean;
-}
+
 
 interface QuizPublicDisplayProps {
-    quiz: Quiz;
+    quiz: QuizTypes;
 }
 
 const QuizPublicDisplay: React.FC<QuizPublicDisplayProps> = ({ quiz }) => {
