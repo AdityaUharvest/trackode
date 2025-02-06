@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     } = await request.json();
 
     console.log(`\n\nemail: ${email}\n\n`);
-
+    console.log(email)
     if (!name || !description || !startAt || !endAt || !totalMarks || !totalQuestions || !email) {
         return NextResponse.json({
             message: "Please provide all the fields",
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
     }
     try {
-        const foundUser = await User.findOne({ email });
+        const foundUser = await User.findById(email);
         if (!foundUser) {
             return NextResponse.json({
                 message: "User not found",
