@@ -92,11 +92,14 @@ export default function RunningQuizes() {
 
   const handleSubmitQuestion = async () => {
     try {
+      console.log(newQuestion)
+      console.log(quizId)
+      
       const response = await axios.post(
-        `/api/questions`,
+        "/api/questions",
         {
-          newQuestion,
-          quizId
+          newq:newQuestion,
+          quizId:quizId
         }
         
       );

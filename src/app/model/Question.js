@@ -1,18 +1,19 @@
 import mongoose from "mongoose";
+import Quiz from "./Quiz";
 
-const schema = new mongoose.Schema(
+const questionSchema = new mongoose.Schema(
     {
         question: {
             type: String,
-            required: true,
+            required: true
         },
         options: {
-            type: [String],
-            required: true,
+            type: [String], // Array of strings for multiple options
+            required: true
         },
         correctAnswer: {
-            type: [String], // Supports multiple correct answers
-            required: true,
+            type: String, // Supports multiple correct answers
+            required: true
         },
         difficulty: {
             type: String,
@@ -25,30 +26,31 @@ const schema = new mongoose.Schema(
             default: "MCQ"
         },
         image: {
-            type: String,
+            type: String, // Optional image URL
         },
         explanation: {
-            type: String,
+            type: String, // Explanation for the answer
         },
         quiz: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Quiz",
+            required: true
         },
-        order: { // Order of the question in the quiz
-            type: Number,
+        order: { 
+            type: Number, // Order of the question in the quiz
             default: 0
         },
         timeLimit: {
-            type: Number,
+            type: Number, // Time limit in seconds (if applicable)
             default: 0
         },
         category: {
-            type: String,
-            required: true
+            type: String, // Category for better organization
         }
     },
     { timestamps: true }
 );
 
-const Question = mongoose.models.Question || mongoose.model("Question", schema);
+// Export the model
+const Question = mongoose.models.Question || mongoose.model("Question", questionSchema);
 export default Question;

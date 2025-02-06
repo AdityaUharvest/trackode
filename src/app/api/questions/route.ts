@@ -7,8 +7,10 @@ export async function POST(req: NextRequest, { params }: any) {
   try {
     await connectDB();
 
-    const { id, options, question, correctAnswer, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
-
+    const {  quizId,newq, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
+    const id= quizId;
+    
+    // console.log(quizId);
     if (!id) {
       return NextResponse.json({
         message: "Please provide quiz id",
@@ -16,7 +18,7 @@ export async function POST(req: NextRequest, { params }: any) {
       }, { status: 400 });
     }
 
-    if (!options || !question || !correctAnswer) {
+    if (!newq.options || !newq.question || !newq.correctAnswer) {
       return NextResponse.json({
         message: "Missing required fields",
         success: false,
@@ -24,17 +26,18 @@ export async function POST(req: NextRequest, { params }: any) {
     }
 
     const newQuestionData = {
-      options,
-      question,
-      correctAnswer,
-      category,
-      difficulty: difficulty || "Medium",
-      questionType: questionType || "MCQ",
-      image: image || "",
-      explanation: explanation || "",
-      order: order || 0,
-      timeLimit: timeLimit || 0,
-      quiz: id
+      options: newq.options,
+      question: newq.question,
+      correctAnswer: newq.correctAnswer,
+      category: category,
+      difficulty: difficulty,
+      questionType: questionType,
+      image: image,
+      explanation: explanation,
+      shuffleOptions: shuffleOptions || false,
+      order: order,
+      timeLimit: timeLimit,
+      quiz:quizId
     };
 
     const quiz = await Quiz.findById(id);
@@ -46,7 +49,10 @@ export async function POST(req: NextRequest, { params }: any) {
       });
     }
 
-    const newQuestion = new Question(newQuestionData);
+    const newQuestion = new Question(
+      newQuestionData
+    )
+      
     await newQuestion.save();
 
     await Quiz.findByIdAndUpdate(
@@ -104,6 +110,7 @@ export async function DELETE(request: NextRequest) {
   await connectDB();
 
   const { id } = await request.json();
+  console.log(id);
   if (!id) {
     return NextResponse.json({
       message: "Please provide question id",
@@ -139,8 +146,9 @@ export async function DELETE(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   await connectDB();
-
-  const { id, options, question, correctAnswer, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await request.json();
+  const {  questionId,newQuestion, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await request.json();
+  const id= questionId;
+  console.log(newQuestion)
   if (!id) {
     return NextResponse.json({
       message: "Please provide question id",
@@ -149,22 +157,22 @@ export async function PUT(request: NextRequest) {
   }
 
   // update that field only which is provided
-  const questionData = {
-    options,
-    question,
-    correctAnswer,
-    category,
-    difficulty,
-    questionType,
-    image,
-    explanation,
-    shuffleOptions,
-    order,
-    timeLimit
+  const newQuestionData = {
+    options: newQuestion.options,
+    question: newQuestion.question,
+    correctAnswer: newQuestion.correctAnswer,
+    category: category,
+    difficulty: difficulty,
+    questionType: questionType,
+    image: image,
+    explanation: explanation,
+    shuffleOptions: shuffleOptions || false,
+    order: order,
+    timeLimit: timeLimit,
   };
 
   try {
-    const question = await Question.findByIdAndUpdate(id, questionData, { new: true });
+    const question = await Question.findByIdAndUpdate(id, newQuestionData, { new: true });
 
     if (!question) {
       return NextResponse.json({
