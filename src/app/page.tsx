@@ -146,17 +146,11 @@ export default function Home() {
             <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-neutral-950" : "bg-white"}`}></div>
             <div className="relative mx-auto">
               <div className="lg:max-w-6xl lg:mx-auto">
-                {/* <Image
-                  className="transform scale-110"
-                  src="https://cdn.rareblocks.xyz/collection/clarity/images/hero/2/illustration.png"
-                  alt=""
-                  width={800}
-                  height={600}
-                /> */}
                 <img
+                  className="transform scale-110"
                   src="https://cdn.rareblocks.xyz/collection/clarity/images/hero/2/illustration.png"
                   alt=""
-                  className="transform scale-110"
+                  
                 />
               </div>
             </div>

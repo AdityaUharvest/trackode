@@ -60,7 +60,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      // This callback is called when a user successfully signs in
       if (account?.provider === "google") {
         await connectDB();
         console.log(profile)

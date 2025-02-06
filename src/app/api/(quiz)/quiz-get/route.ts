@@ -1,34 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
-import connectDB from "@/lib/util";
 import Question from "@/app/model/Question";
+import connectDB from "@/lib/util";
+import { auth } from "@/auth";
+import mongoose from "mongoose";
 
 export async function GET(req: NextRequest) {
     await connectDB();
 
-    try {
-        // Fetch quizzes and populate the 'questions' field with full question objects
-        const quiz = await Quiz.find().populate('questions');
+    if (req.method === "GET") {
+        try {
+            const session = await auth();
+            console.log(session);
+            if (!session?.user?.id) {
+                return NextResponse.json({
+                    message: "Unauthorized",
+                    success: false,
+                }
+            );
+            }
 
-        if (quiz.length === 0) {
+            // Convert string MongoDB ID to ObjectId
+            const userId = new mongoose.Types.ObjectId(session.user.id);
+            console.log(userId)
+            // Find quizzes for this user
+            const quizzes = await Quiz.find({ createdBy: userId }).populate('questions');
+
+            console.log('Searching for quizzes with userId:', userId);
+
+            if (!quizzes || quizzes.length === 0) {
+                return NextResponse.json({
+                    message: "No quizzes found for this user",
+                    success: false,
+                    debug: {
+                        searchedId: userId.toString(),
+                        sessionUserId: session.user.id
+                    }
+                });
+            }
+
             return NextResponse.json({
-                message: "No quiz found",
-                success: false,
+                message: "Quizzes found",
+                success: true,
+                quizzes,
             });
+
+        } catch (error) {
+            console.error('Error in GET quiz:', error);
+            return NextResponse.json({
+                message: "Error Occurred",
+                success: false,
+                error: `${error}`,
+            }, { status: 500 });
         }
-
+    } else {
         return NextResponse.json({
-            message: "Quiz found",
-            success: true,
-            quiz,
-        });
-
-    } catch (error) {
-        console.log(`Error in quiz-get: ${error}`);
-        return NextResponse.json({
-            message: "Error Occurred",
+            message: "Method not allowed",
             success: false,
-            error: `${error}`,
-        });
+        }, { status: 405 });
     }
 }
