@@ -14,21 +14,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
+
         await connectDB();
 
         const { email, password } = credentials;
 
-        // Find the user by email
+
         const user = await User.findOne({ email });
         if (!user) {
           throw new Error("User not found");
         }
 
+
         // Compare the provided password with the hashed password in the database
         const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+       
+
         if (!isPasswordMatch) {
           throw new Error("Password is not correct");
         }
+
 
         // Return the user object with their profile data
         return {
@@ -37,6 +43,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           name: user.name,
           image: user.image, // Add any other fields you need
         };
+
+        // return user object with their profile data
+        return user
+
       },
     }),
   ],

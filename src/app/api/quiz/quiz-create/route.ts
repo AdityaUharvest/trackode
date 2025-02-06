@@ -1,10 +1,10 @@
-import connectDB  from "@/lib/util";
+import connectDB from "@/lib/util";
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
 
 export async function POST(request: NextRequest) {
     await connectDB();
-    const {name,startDate,endDate ,endTime ,startTime,totalMarks,totalQuestions,user}=await request.json();
+    const { name, startDate, endDate, endTime, startTime, totalMarks, totalQuestions, user } = await request.json();
     const endTimee = `${endTime.hours}:${endTime.minutes}`;
     const startTimee = `${startTime.hours}:${startTime.minutes}`
     if (request.method === "POST") {
@@ -14,35 +14,36 @@ export async function POST(request: NextRequest) {
                     name,
                     startDate,
                     endDate,
-                    endTime:endTimee,
-                    startTime:startTimee,
+                    endTime: endTimee,
+                    startTime: startTimee,
                     totalMarks,
                     totalQuestions,
-                    isActive : false,
-                    createdBy:user,
+                    isActive: false,
+                    createdBy: user,
                 }
             )
             quiz.save();
             return NextResponse.json(
                 {
-                    message:"Quiz Created",
-                    success:true,
+                    message: "Quiz Created",
+                    success: true,
                 }
             )
         } catch (error) {
             return NextResponse.json(
                 {
-                    message:"Error Occured",
-                    success:false,
-                    error:`${error}`
+                    message: "Error Occured",
+                    success: false,
+                    error: `${error}`
                 }
             )
         }
     }
     else {
         return NextResponse.json(
-            { message: "Method not allowed", 
-            success:false
+            {
+                message: "Method not allowed",
+                success: false
             }
         );
     }
