@@ -1,36 +1,38 @@
 import mongoose from "mongoose";
-import Question from "./Question";
-import User from "./User";
+
 const quizSchema = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: true
+            required: true,
+            trim: true
         },
-        startDate: {
-            type: Date,
-            required: true
-        },
-        endDate: {
-            type: Date,
-            required: true
-        },
-        startTime: {
+        description: {
             type: String,
             required: true
         },
-        endTime: {
-            type: String,
+        startAt: {
+            type: Date,
+            required: true
+        },
+        endAt: {
+            type: Date,
             required: true
         },
         totalMarks: {
             type: Number,
-            required: true
+            required: true,
+            min: 0
         },
         totalQuestions: {
             type: Number,
-            required: true
+            required: true,
+            min: 1
         },
+        duration: { type: Number, default: 0 }, // In minutes (0 = no limit)
+        negativeMarking: { type: Boolean, default: false },
+        isPaid: { type: Boolean, default: false },
+        price: { type: Number, default: 0 },
         questions: [
             {
                 type: mongoose.Schema.Types.ObjectId,
@@ -39,16 +41,17 @@ const quizSchema = new mongoose.Schema(
         ],
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            ref: "User",
+            required: true
         },
         active: {
             type: Boolean,
-        },
-        published: {
-            type: Boolean,
             default: false
         },
-        
+        published: { // Quiz is published and visible to users
+            type: Boolean,
+            default: false
+        }
     },
     { timestamps: true }
 );
