@@ -13,38 +13,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        
+
         await connectDB();
-        const password=credentials.password;
+        const password = credentials.password;
         const email = credentials.email;
-        
+
 
         // logic to verify if the user exists
-        const user = await User.findOne({email});
-        if(!user){
+        const user = await User.findOne({ email });
+        if (!user) {
           throw new Error("User not found");
-
         }
-        
-        const isPasswordMatch = bcrypt.compare(user.password,password)
-        if (!isPasswordMatch){
+
+        const isPasswordMatch = bcrypt.compare(user.password, password)
+        if (!isPasswordMatch) {
           throw new Error("Password is not correct");
 
         }
         // return user object with their profile data
         return user
       },
-      
-
     }),
   ],
   pages: {
     signIn: "/signin", // Custom sign-in page
     error: "/signin", // Redirect to sign-in page on errors
   },
-  session:{
-    strategy:"jwt",
-    maxAge:30*24*60*60,
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
 
   callbacks: {
