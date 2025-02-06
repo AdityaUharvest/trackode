@@ -33,6 +33,7 @@ const quizSchema = new mongoose.Schema(
         negativeMarking: { type: Boolean, default: false },
         isPaid: { type: Boolean, default: false },
         price: { type: Number, default: 0 },
+        
         questions: [
             {
                 type: mongoose.Schema.Types.ObjectId,
