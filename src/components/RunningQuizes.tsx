@@ -93,8 +93,12 @@ export default function RunningQuizes() {
   const handleSubmitQuestion = async () => {
     try {
       const response = await axios.post(
-        `/api/questions/questions-create/${quizId}`,
-        newQuestion
+        `/api/questions`,
+        {
+          newQuestion,
+          quizId
+        }
+        
       );
       if (response.data.success) {
         const updatedQuizes = [...quizes];
@@ -139,8 +143,11 @@ export default function RunningQuizes() {
   const handleUpdateQuestion = async (quizIndex: number, questionId: string) => {
     try {
       const response = await axios.put(
-        `/api/questions/question-update/${questionId}`,
-        newQuestion
+        `/api/questions`,{
+          newQuestion,
+          questionId
+        }
+        
       );
       if (!response.data.success) {
         toast.error(response.data.message);
@@ -171,7 +178,10 @@ export default function RunningQuizes() {
   const handleDeleteQuestion = async (quizIndex: number, questionId: string) => {
     try {
       const response = await axios.delete(
-        `/api/questions/questions-delete/${questionId}`
+        '/api/questions',
+        {
+          data: { id: questionId }
+        }
       );
       const updatedQuizes = [...quizes];
       updatedQuizes[quizIndex].questions = updatedQuizes[quizIndex].questions?.filter(
