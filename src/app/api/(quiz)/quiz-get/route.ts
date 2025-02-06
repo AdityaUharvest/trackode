@@ -11,12 +11,13 @@ export async function GET(req: NextRequest) {
     if (req.method === "GET") {
         try {
             const session = await auth();
-            
+            console.log(session);
             if (!session?.user?.id) {
                 return NextResponse.json({
                     message: "Unauthorized",
                     success: false,
-                }, { status: 401 });
+                }
+            );
             }
 
             // Convert string MongoDB ID to ObjectId

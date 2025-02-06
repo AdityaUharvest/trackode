@@ -69,6 +69,7 @@ function QuizSetup() {
   const [totalQuestions, setTotalQuestions] = React.useState('');
   const { data: session, status } = useSession();
   const user = session?.user?.id || " ";
+  console.log(user);
   const { theme } = useTheme(); // Get the current theme
 
   const submitHandler = async (e: any) => {
@@ -91,6 +92,7 @@ function QuizSetup() {
           totalQuestions,
           email: user,
         }),
+        
       });
       const data = await res.json();
       if (!res.ok) {

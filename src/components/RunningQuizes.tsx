@@ -56,7 +56,7 @@ export default function RunningQuizes() {
   const getQuizes = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("/api/quiz/quiz-get");
+      const response = await axios.get("/api/quiz-get");
       console.log(response)
       if (response.data.success) {
         const quizesWithQuestions = response.data.quizzes.map((quiz: Quiz) => ({
