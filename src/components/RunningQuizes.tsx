@@ -206,7 +206,7 @@ export default function RunningQuizes() {
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="lg:text-lg">Running Quizes</CardTitle>
+            <CardTitle className="lg:text-base">Running Quizes</CardTitle>
             <CardDescription
               className={theme === "dark" ? "text-gray-300" : "text-gray-600"}
             >
@@ -248,7 +248,7 @@ export default function RunningQuizes() {
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full pr-4">
                     <div className="flex items-center gap-4">
-                      <span className="font-bold lg:text-lg">{quiz.name}</span>
+                      <span className="font-bold lg:text-base">{quiz.name}</span>
                       <Badge
                         variant={quiz.active ? "outline" : "destructive"}
                         className={
