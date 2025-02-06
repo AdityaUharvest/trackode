@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
+// import { useSession } from "next-auth/react";
 import {
   Card,
   CardContent,
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { useTheme } from "@/components/ThemeContext"; // Assuming you have a ThemeContext
+import { useSession } from "next-auth/react";
 
 interface Quiz {
   _id: string;
@@ -38,6 +40,7 @@ interface Question {
 }
 
 export default function RunningQuizes() {
+  const {data:session, status}= useSession();
   const { theme } = useTheme(); // Use the theme context
   const [quizes, setQuizes] = useState<Quiz[]>([]);
   const [quizId, setQuizId] = useState("");
@@ -54,8 +57,9 @@ export default function RunningQuizes() {
     try {
       setIsLoading(true);
       const response = await axios.get("/api/quiz/quiz-get");
+      console.log(response)
       if (response.data.success) {
-        const quizesWithQuestions = response.data.quiz.map((quiz: Quiz) => ({
+        const quizesWithQuestions = response.data.quizzes.map((quiz: Quiz) => ({
           ...quiz,
           questions: quiz.questions || [], // Ensure questions is always an array
         }));

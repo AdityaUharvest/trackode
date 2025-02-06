@@ -1,9 +1,10 @@
-import NextAuth from "next-auth"
-import Google from "next-auth/providers/google"
-import Credentials from "next-auth/providers/credentials"
-import connectDB from "./lib/util"
-import User from "@/app/model/User"
-import bcrypt from "bcryptjs"
+import NextAuth from "next-auth";
+import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import connectDB from "./lib/util";
+import User from "@/app/model/User";
+import bcrypt from "bcryptjs";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Google,
@@ -15,47 +16,91 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
 
         await connectDB();
-        const password = credentials.password;
-        const email = credentials.email;
+
+        const { email, password } = credentials;
 
 
-        // logic to verify if the user exists
         const user = await User.findOne({ email });
         if (!user) {
           throw new Error("User not found");
         }
 
-        const isPasswordMatch = bcrypt.compare(user.password, password)
+
+        // Compare the provided password with the hashed password in the database
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+       
+
         if (!isPasswordMatch) {
           throw new Error("Password is not correct");
-
         }
+
+
+        // Return the user object with their profile data
+        return {
+          id: user._id.toString(), // Ensure `id` is included
+          email: user.email,
+          name: user.name,
+          image: user.image, // Add any other fields you need
+        };
+
         // return user object with their profile data
         return user
+
       },
     }),
   ],
   pages: {
-    signIn: "/signin", // Custom sign-in page
-    error: "/signin", // Redirect to sign-in page on errors
+    signIn: "/signin",
+    error: "/signin",
   },
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
-
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // This callback is called when a user successfully signs in
+      if (account?.provider === "google") {
+        await connectDB();
+        console.log(profile)
+        // Check if the user already exists in the database
+        const existingUser = await User.findOne({ email: profile?.email });
+        
+        if (existingUser===null) {
+          // Create a new user in the database if they don't exist
+          const newUser = new User({
+            name: profile?.name,
+            email: profile?.email,
+            image: profile?.picture,
+            provider: "google",
+            password:"null" // Optional: Store the provider
+          });
+
+          await newUser.save();
+ 
+          // Update the user object with the new user's ID
+          user.id = newUser._id.toString();
+          
+        } else {
+          // Update the user object with the existing user's ID
+          user.id = existingUser._id.toString();
+        }
+      }
+
+      return true; // Allow the sign-in
+    },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id; // Add user ID to the token
+        token.id = user.id; // Add the `id` field to the token
       }
       return token;
     },
     async session({ session, token }) {
       if (token?.id) {
-        session.user.id = token.id; // Add user ID to the session
+        session.user.id = token.id; // Add the `id` field to the session
       }
       return session;
     },
   },
-})
+});
