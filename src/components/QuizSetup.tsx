@@ -10,6 +10,7 @@ function TimePicker({ value, onChange, label }: any) {
   const hours = [...Array(24).keys()];
   const minutes = [...Array(60).keys()];
   const { theme } = useTheme(); // Get the current theme
+  const session = useSession();
 
   const handleChange = (e: any, type: any) => {
     const newValue = { ...value, [type]: e.target.value };
@@ -89,6 +90,7 @@ function QuizSetup() {
           startAt: `${startDate}T${startTime.hours}:${startTime.minutes}:00`,
           endAt: `${endDate}T${endTime.hours}:${endTime.minutes}:00`,
           totalMarks,
+          description: 'Quiz description',
           totalQuestions,
           email: user,
         }),

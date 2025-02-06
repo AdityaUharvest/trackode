@@ -21,6 +21,8 @@ export async function POST(request: NextRequest) {
         email,
     } = await request.json();
 
+    console.log(`\n\nemail: ${email}\n\n`);
+
     if (!name || !description || !startAt || !endAt || !totalMarks || !totalQuestions || !email) {
         return NextResponse.json({
             message: "Please provide all the fields",
@@ -28,7 +30,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 });
     }
     try {
-        const foundUser = await User.findById({ email: email });
+        const foundUser = await User.findOne({ email });
         if (!foundUser) {
             return NextResponse.json({
                 message: "User not found",
@@ -46,8 +48,10 @@ export async function POST(request: NextRequest) {
         const quiz = new Quiz({
             name,
             description,
-            startAt,
-            endAt,
+            // startDate: new Date(startAt) || new Date(),
+            // endDate: new Date(endAt) || new Date(),
+            // startAt: new Date(),
+            // endAt: new Date(),
             totalMarks,
             totalQuestions,
             duration: duration || 0,

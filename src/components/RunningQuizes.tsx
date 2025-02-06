@@ -40,7 +40,7 @@ interface Question {
 }
 
 export default function RunningQuizes() {
-  const {data:session, status}= useSession();
+  const { data: session, status } = useSession();
   const { theme } = useTheme(); // Use the theme context
   const [quizes, setQuizes] = useState<Quiz[]>([]);
   const [quizId, setQuizId] = useState("");
@@ -200,9 +200,8 @@ export default function RunningQuizes() {
 
   return (
     <Card
-      className={`w-full mx-auto ${
-        theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"
-      }`}
+      className={`w-full mx-auto ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"
+        }`}
     >
       <CardHeader>
         <div className="flex justify-between items-center">
@@ -216,11 +215,10 @@ export default function RunningQuizes() {
           </div>
           <Link href="/quiz-setup">
             <Button
-              className={`${
-                theme === "dark"
+              className={`${theme === "dark"
                   ? "bg-blue-800 hover:bg-blue-950"
                   : "bg-blue-600 hover:bg-blue-700"
-              } p-2 flex items-center gap-2`}
+                } p-2 flex items-center gap-2`}
             >
               <Plus size={16} />
               New Quiz
@@ -232,16 +230,14 @@ export default function RunningQuizes() {
         {isLoading ? (
           <div className="flex justify-center py-8">
             <div
-              className={`animate-spin rounded-full h-8 w-8 border-b-2 ${
-                theme === "dark" ? "border-primary" : "border-blue-600"
-              }`}
+              className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"
+                }`}
             ></div>
           </div>
         ) : quizes.length === 0 ? (
           <div
-            className={`text-center py-8 ${
-              theme === "dark" ? "text-gray-300" : "text-gray-600"
-            }`}
+            className={`text-center py-8 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+              }`}
           >
             No quizes available. Create one to get started!
           </div>
@@ -272,31 +268,28 @@ export default function RunningQuizes() {
                   <div className="flex lg:gap-4 sm:gap-2 sm:p-0 sm:text-xs pt-1">
                     <Button
                       onClick={() => handleAddQuestion(index, quiz._id)}
-                      className={`${
-                        theme === "dark"
+                      className={`${theme === "dark"
                           ? "bg-blue-800 hover:bg-blue-950"
                           : "bg-blue-600 hover:bg-blue-700"
-                      } lg:p-5 flex items-center`}
+                        } lg:p-5 flex items-center`}
                     >
                       <Plus size={5} />
                       Add
                     </Button>
                     <Button
-                      className={`${
-                        theme === "dark"
+                      className={`${theme === "dark"
                           ? "bg-blue-800 hover:bg-blue-950"
                           : "bg-blue-600 hover:bg-blue-700"
-                      } lg:p-5 sm:p-2 lg:text-base sm:text-xs flex items-center`}
+                        } lg:p-5 sm:p-2 lg:text-base sm:text-xs flex items-center`}
                     >
                       <NotebookPen size={16} />
                       Result
                     </Button>
                     <Button
-                      className={`${
-                        theme === "dark"
+                      className={`${theme === "dark"
                           ? "bg-blue-800 hover:bg-blue-950"
                           : "bg-blue-600 hover:bg-blue-700"
-                      } lg:p-5 lg:text-base sm:text-sm flex items-center`}
+                        } lg:p-5 lg:text-base sm:text-sm flex items-center`}
                     >
                       <Settings size={16} />
                     </Button>
@@ -308,19 +301,17 @@ export default function RunningQuizes() {
                       {quiz.questions.map((q, qIndex) => (
                         <div
                           key={q._id}
-                          className={`border rounded-lg p-4 ${
-                            theme === "dark"
+                          className={`border rounded-lg p-4 ${theme === "dark"
                               ? "border-blue-800 bg-neutral-800"
                               : "border-blue-600 bg-amber-100"
-                          }`}
+                            }`}
                         >
                           {editingQuestionId === q._id ? (
                             <div className="space-y-4">
                               <div>
                                 <label
-                                  className={`block text-sm font-medium mb-2 ${
-                                    theme === "dark" ? "text-white" : "text-black"
-                                  }`}
+                                  className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"
+                                    }`}
                                 >
                                   Question
                                 </label>
@@ -329,19 +320,17 @@ export default function RunningQuizes() {
                                   onChange={(e) =>
                                     setNewQuestion({ ...newQuestion, question: e.target.value })
                                   }
-                                  className={`w-full ${
-                                    theme === "dark"
+                                  className={`w-full ${theme === "dark"
                                       ? "bg-neutral-900 border-blue-800 text-white"
                                       : "bg-white border-blue-600 text-black"
-                                  }`}
+                                    }`}
                                 />
                               </div>
 
                               <div className="space-y-3">
                                 <label
-                                  className={`block text-sm font-medium ${
-                                    theme === "dark" ? "text-white" : "text-black"
-                                  }`}
+                                  className={`block text-sm font-medium ${theme === "dark" ? "text-white" : "text-black"
+                                    }`}
                                 >
                                   Options
                                 </label>
@@ -350,11 +339,10 @@ export default function RunningQuizes() {
                                     <Input
                                       value={option}
                                       onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
-                                      className={`${
-                                        theme === "dark"
+                                      className={`${theme === "dark"
                                           ? "bg-neutral-900 border-blue-800 text-white"
                                           : "bg-white border-blue-600 text-black"
-                                      }`}
+                                        }`}
                                     />
                                     <input
                                       type="radio"
@@ -372,22 +360,20 @@ export default function RunningQuizes() {
                               <div className="flex justify-end gap-2">
                                 <Button
                                   onClick={() => setEditingQuestionId(null)}
-                                  className={`${
-                                    theme === "dark"
+                                  className={`${theme === "dark"
                                       ? "bg-neutral-700 hover:bg-neutral-600"
                                       : "bg-gray-300 hover:bg-gray-400"
-                                  } p-3 flex items-center gap-2`}
+                                    } p-3 flex items-center gap-2`}
                                 >
                                   <X size={16} />
                                   Cancel
                                 </Button>
                                 <Button
                                   onClick={() => handleUpdateQuestion(index, q._id!)}
-                                  className={`${
-                                    theme === "dark"
+                                  className={`${theme === "dark"
                                       ? "bg-blue-800 hover:bg-blue-950"
                                       : "bg-blue-600 hover:bg-blue-700"
-                                  } p-3 flex items-center gap-2`}
+                                    } p-3 flex items-center gap-2`}
                                 >
                                   <Check size={16} />
                                   Save
@@ -399,20 +385,18 @@ export default function RunningQuizes() {
                             <div>
                               <div className="flex justify-between items-start mb-3">
                                 <h3
-                                  className={`m-2 ml-4 ${
-                                    theme === "dark" ? "text-white" : "text-black"
-                                  }`}
+                                  className={`m-2 ml-4 ${theme === "dark" ? "text-white" : "text-black"
+                                    }`}
                                 >
                                   Q.({qIndex + 1}) {q.question}
                                 </h3>
                                 <div className="flex gap-2">
                                   <Button
                                     onClick={() => handleEditQuestion(q._id!, quiz)}
-                                    className={`${
-                                      theme === "dark"
+                                    className={`${theme === "dark"
                                         ? "bg-blue-800 hover:bg-blue-950"
                                         : "bg-blue-600 hover:bg-blue-700"
-                                    } p-2`}
+                                      } p-2`}
                                   >
                                     <Edit size={10} />
                                   </Button>
@@ -432,8 +416,8 @@ export default function RunningQuizes() {
                                         option === q.correctAnswer
                                           ? "text-green-500"
                                           : theme === "dark"
-                                          ? "text-white"
-                                          : "text-black"
+                                            ? "text-white"
+                                            : "text-black"
                                       }
                                     >
                                       ({optionIndex + 1}) {option}
@@ -462,25 +446,22 @@ export default function RunningQuizes() {
                   {/* Add New Question Form */}
                   {activeQuizIndex === index && !editingQuestionId && (
                     <div
-                      className={`mt-4 border rounded-lg p-6 ${
-                        theme === "dark"
+                      className={`mt-4 border rounded-lg p-6 ${theme === "dark"
                           ? "border-blue-800 bg-neutral-800"
                           : "border-blue-600 bg-amber-100"
-                      }`}
+                        }`}
                     >
                       <h4
-                        className={`font-bold lg:text-xl sm:text-base mb-4 ${
-                          theme === "dark" ? "text-white" : "text-black"
-                        }`}
+                        className={`font-bold lg:text-xl sm:text-base mb-4 ${theme === "dark" ? "text-white" : "text-black"
+                          }`}
                       >
                         Add New Question
                       </h4>
                       <div className="space-y-4">
                         <div>
                           <label
-                            className={`block lg:text-base font-medium mb-2 ${
-                              theme === "dark" ? "text-white" : "text-black"
-                            }`}
+                            className={`block lg:text-base font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"
+                              }`}
                           >
                             Question
                           </label>
@@ -490,19 +471,17 @@ export default function RunningQuizes() {
                               setNewQuestion({ ...newQuestion, question: e.target.value })
                             }
                             placeholder="Enter your question"
-                            className={`w-full ${
-                              theme === "dark"
+                            className={`w-full ${theme === "dark"
                                 ? "bg-neutral-900 border-blue-800 text-white"
                                 : "bg-white border-blue-600 text-black"
-                            }`}
+                              }`}
                           />
                         </div>
 
                         <div className="space-y-3">
                           <label
-                            className={`block lg:text-base font-medium ${
-                              theme === "dark" ? "text-white" : "text-black"
-                            }`}
+                            className={`block lg:text-base font-medium ${theme === "dark" ? "text-white" : "text-black"
+                              }`}
                           >
                             Options
                           </label>
@@ -512,11 +491,10 @@ export default function RunningQuizes() {
                                 value={option}
                                 onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
                                 placeholder={`Option ${optionIndex + 1}`}
-                                className={`${
-                                  theme === "dark"
+                                className={`${theme === "dark"
                                     ? "bg-neutral-900 border-blue-800 text-white"
                                     : "bg-white border-blue-600 text-black"
-                                }`}
+                                  }`}
                               />
                               <input
                                 type="radio"
@@ -534,11 +512,10 @@ export default function RunningQuizes() {
                         <div className="flex justify-end">
                           <Button
                             onClick={handleSubmitQuestion}
-                            className={`${
-                              theme === "dark"
+                            className={`${theme === "dark"
                                 ? "bg-blue-800 hover:bg-blue-950"
                                 : "bg-blue-600 hover:bg-blue-700"
-                            } p-5 lg:text-lg flex items-center gap-2`}
+                              } p-5 lg:text-lg flex items-center gap-2`}
                           >
                             <Save size={16} />
                             Save Question

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Question from "./Question";
+import User from "./User";
+
 const quizSchema = new mongoose.Schema(
     {
         name: {
@@ -13,11 +15,11 @@ const quizSchema = new mongoose.Schema(
         },
         startDate: {
             type: Date,
-            required: true
+            // required: true
         },
         endDate: {
             type: Date,
-            required: true
+            // required: true
         },
         totalMarks: {
             type: Number,

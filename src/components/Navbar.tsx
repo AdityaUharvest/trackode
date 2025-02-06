@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useTheme } from "./ThemeContext"; // Ensure this path is correct
 import { Moon, Sun } from "lucide-react";
+import Image from "next/image";
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();

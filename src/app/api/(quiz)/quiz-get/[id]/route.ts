@@ -5,6 +5,7 @@ export async function GET(req: NextRequest, { params }: any) {
     await connectDB();
     try {
         const { id } = params;
+        console.log(`\n\nQuiz ID: ${id}\n\n`);
         if (req.method === "GET") {
             try {
                 const quiz = await Quiz.findOne({ _id: id });
