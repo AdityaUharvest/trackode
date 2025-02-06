@@ -34,10 +34,6 @@ const schema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Quiz",
         },
-        shuffleOptions: {
-            type: Boolean,
-            default: false
-        },
         order: { // Order of the question in the quiz
             type: Number,
             default: 0
