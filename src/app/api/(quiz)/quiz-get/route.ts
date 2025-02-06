@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
-// import Question from "@/app/model/Question";
+import Question from "@/app/model/Question";
 import connectDB from "@/lib/util";
 import { auth } from "@/auth";
 import mongoose from "mongoose";
