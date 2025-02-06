@@ -15,7 +15,7 @@ export default function ProfileCard() {
       {/* Dashboard Section */}
       <div className={`lg:w-3/4 ${theme === 'dark' ? 'bg-neutral-800' : 'bg-white'} mt-5 mr-3 mb-4 rounded-xl p-2 flex flex-col`}>
         <div className="flex justify-between items-center">
-          <h1 className="text-xl ml-3 mt-1 font-bold text-center lg:text-left">Dashboard</h1>
+          <h1 className="lg:text-xl sm:text-base ml-3 mt-1 font-bold text-center lg:text-left">Dashboard</h1>
           
         </div>
         <div className=' mt-1 p-1'>

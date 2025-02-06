@@ -26,11 +26,9 @@ export default function Quizes() {
         className={`w-full ${buttonBgColor} ${buttonHoverBgColor} text-${theme === "dark" ? "white" : "black"} px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-900`}
         onClick={toggleDropdown}
       >
-        <span className="font-bold text-lg">My Quizes</span>
-        <div className="flex flex-row gap-2">
-        <span className="bg-green-600 text-white px-2 py-1 rounded-md">
-          Quiz is active
-        </span>
+        <span className="lg:font-bold lg:text-lg sm:text-xs">My Quiz</span>
+        <div className="flex flex-row lg:gap-2 sm:gap-1">
+        
         <Link href="/quiz-setup">
             <Button
               className={`${theme === "dark"
@@ -48,7 +46,7 @@ export default function Quizes() {
 
       {/* Dropdown Content */}
       {isOpen && (
-        <div className={`right-0 ${dropdownBgColor} text-${theme === "dark" ? "white" : "black"} mt-2  rounded-xl shadow-lg border ${dropdownBorderColor}`}>
+        <div className={`right-0 ${dropdownBgColor} text-${theme === "dark" ? "white" : "black"} mt-2 p-0  rounded-sm shadow-lg border ${dropdownBorderColor}`}>
          
            
               <RunningQuizes />

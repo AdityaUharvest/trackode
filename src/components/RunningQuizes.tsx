@@ -265,31 +265,32 @@ export default function RunningQuizes() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="flex lg:gap-4 sm:gap-2 sm:p-0 sm:text-xs pt-1">
+                  <div className="flex gap-1 ml-0 sm:p-0  sm:text-end pt-1">
                     <Button
                       onClick={() => handleAddQuestion(index, quiz._id)}
-                      className={`${theme === "dark"
-                          ? "bg-blue-800 hover:bg-blue-950"
+                      className={` sm:text-end ${theme === "dark"
+                          ? "bg-blue-800 text-white hover:bg-blue-950"
                           : "bg-blue-600 hover:bg-blue-700"
-                        } lg:p-5 flex items-center`}
+                        } lg:p-5 lg:text-base flex items-center`}
                     >
-                      <Plus size={5} />
-                      Add
+                      Question
+                      <Plus size={1} />
+                     
                     </Button>
                     <Button
                       className={`${theme === "dark"
-                          ? "bg-blue-800 hover:bg-blue-950"
+                          ? "bg-blue-800 text-white hover:bg-blue-950"
                           : "bg-blue-600 hover:bg-blue-700"
-                        } lg:p-5 sm:p-2 lg:text-base sm:text-xs flex items-center`}
+                        } lg:p-5 lg:text-base sm:text-end flex items-center`}
                     >
-                      <NotebookPen size={16} />
+                      <NotebookPen size={2} />
                       Result
                     </Button>
                     <Button
                       className={`${theme === "dark"
-                          ? "bg-blue-800 hover:bg-blue-950"
+                          ? "bg-blue-800 text-white hover:bg-blue-950"
                           : "bg-blue-600 hover:bg-blue-700"
-                        } lg:p-5 lg:text-base sm:text-sm flex items-center`}
+                        } lg:p-5 lg:text-base sm:text-end flex items-center`}
                     >
                       <Settings size={16} />
                     </Button>
@@ -302,7 +303,7 @@ export default function RunningQuizes() {
                         <div
                           key={q._id}
                           className={`border rounded-lg p-4 ${theme === "dark"
-                              ? "border-blue-800 bg-neutral-800"
+                              ? "border-blue-800 text-white bg-neutral-800"
                               : "border-blue-600 bg-amber-100"
                             }`}
                         >
@@ -310,7 +311,7 @@ export default function RunningQuizes() {
                             <div className="space-y-4">
                               <div>
                                 <label
-                                  className={`block text-sm font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"
+                                  className={`block text- font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"
                                     }`}
                                 >
                                   Question
