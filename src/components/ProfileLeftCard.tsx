@@ -23,7 +23,7 @@ function ProfileLeftCard() {
   }, [session]);
 
   return (
-    <div className={`w-full lg:mb-64 lg:w-1/3 ${theme === 'dark' ? 'bg-neutral-900' : 'bg-amber-50'} flex flex-col items-center p-2`}>
+    <div className={`w-full lg:mb-64 lg:w-1/4 ${theme === 'dark' ? 'bg-neutral-900' : 'bg-amber-50'} flex flex-col items-center p-2`}>
       <div className="max-w-xs mt-3 w-full">
         <div className={`shadow-xl rounded-lg py-6 px-16 ${theme === 'dark' ? 'text-white bg-neutral-800' : 'text-gray-900 bg-white'}`}>
           <div className="photo-wrapper p-2">
@@ -35,41 +35,39 @@ function ProfileLeftCard() {
             />
           </div>
           <div className="p-2 text-center">
-            <h3 className="text-lg font-extrabold">{user?.name}</h3>
-            <p className="text-sm font-bold">{user?.email}</p>
+            <h3 className="text-base font-bold">{user?.name}</h3>
+            <p className="text-sm ">{user?.email}</p>
           </div>
-          <table className="text-xs my-3">
+          <table className="text-xs my-">
             <tbody>
-              <tr>
+              {/* <tr>
                 <td className="px-2 py-2 font-semibold">Linkedin</td>
                 <td className="px-2 py-2">---</td>
-              </tr>
-              <tr>
+              </tr> */}
+              {/* <tr>
                 <td className="px-2 py-2 font-semibold">Github</td>
                 <td className="px-2 py-2">---</td>
               </tr>
-              <tr>
-                <td className="px-2 py-2 font-semibold">GeeksforGeeks</td>
                 <td className="px-2 py-2">---</td>
               </tr>
               <tr>
                 <td className="px-2 py-2 font-semibold">Leetcode</td>
                 <td className="px-2 py-2">---</td>
-              </tr>
-              <tr>
+              </tr> */}
+              {/* <tr>
                 <td className="px-2 py-2 font-semibold">Email</td>
                 <td className="px-2 py-2">{user?.email}</td>
-              </tr>
+              </tr> */}
             </tbody>
           </table>
-          <div className="text-center my-3">
+          {/* <div className="text-center my-3">
             <a
               className="text-xs text-indigo-500 italic hover:underline hover:text-indigo-600 font-medium"
               href="#"
             >
               Edit Functionality will be added soon
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
