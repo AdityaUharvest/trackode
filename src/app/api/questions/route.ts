@@ -7,8 +7,14 @@ export async function POST(req: NextRequest, { params }: any) {
   try {
     await connectDB();
 
-    const { id } = params;
-    const { options, question, correctAnswer, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
+    const { id, options, question, correctAnswer, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
+
+    if (!id) {
+      return NextResponse.json({
+        message: "Please provide quiz id",
+        success: false
+      }, { status: 400 });
+    }
 
     if (!options || !question || !correctAnswer) {
       return NextResponse.json({
