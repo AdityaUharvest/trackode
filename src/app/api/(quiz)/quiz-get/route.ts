@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
-import Question from "@/app/model/Question";
 import connectDB from "@/lib/util";
 
 export async function GET(req: NextRequest) {
@@ -30,5 +29,4 @@ export async function GET(req: NextRequest) {
             error: `${error}`,
         });
     }
-
 }
