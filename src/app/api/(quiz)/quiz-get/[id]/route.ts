@@ -4,11 +4,11 @@ import connectDB from "@/lib/util";
 export async function GET(req: NextRequest, { params }: any) {
     await connectDB();
     try {
-        const { id } = params;
-        console.log(`\n\nQuiz ID: ${id}\n\n`);
+        const { id } = await params;
+        console.log(id);
         if (req.method === "GET") {
             try {
-                const quiz = await Quiz.findOne({ _id: id });
+                const quiz = await Quiz.findById(id).populate("questions");
                 if (!quiz) {
                     return NextResponse.json({
                         message: "No quiz found",

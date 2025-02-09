@@ -3,34 +3,30 @@ import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
 import User from "@/app/model/User";
 
+
 export async function POST(request: NextRequest) {
     await connectDB();
 
     const {
         name,
-        description,
-        startAt,
-        endAt,
+        instructions,
+        startDate,
+        endDate,
+        startTime,
+        endTime,
         totalMarks,
         totalQuestions,
-        duration,
-        negativeMarking,
         shuffleOptions,
-        isPaid,
-        price,
         email,
     } = await request.json();
-
-    console.log(`\n\nemail: ${email}\n\n`);
-    console.log(email)
-    if (!name || !description || !startAt || !endAt || !totalMarks || !totalQuestions || !email) {
-        return NextResponse.json({
-            message: "Please provide all the fields",
-            success: false
-        }, { status: 400 });
-    }
+    
+    console.log(instructions)
+    const start= `${startTime.hours}:${startTime.minutes}`
+    const end= `${endTime.hours}:${endTime.minutes}`
+    
     try {
-        const foundUser = await User.findById(email);
+        const foundUser = await User.findOne({email});
+        
         if (!foundUser) {
             return NextResponse.json({
                 message: "User not found",
@@ -38,30 +34,20 @@ export async function POST(request: NextRequest) {
             }, { status: 404 });
         }
 
-        if (new Date(startAt) >= new Date(endAt) || new Date(startAt) <= new Date()) {
-            return NextResponse.json({
-                message: "Start date must be less than end date and greater than current date",
-                success: false
-            }, { status: 400 });
-        }
 
         const quiz = new Quiz({
             name,
-            description,
-            // startDate: new Date(startAt) || new Date(),
-            // endDate: new Date(endAt) || new Date(),
-            // startAt: new Date(),
-            // endAt: new Date(),
+            startDate,
+            endDate,
+            startTime:start,
+            endTime:end,
             totalMarks,
             totalQuestions,
-            duration: duration || 0,
-            negativeMarking: negativeMarking || false,
             shuffleOptions: shuffleOptions || false,
-            isPaid: isPaid || false,
-            price: price || 0,
             createdBy: foundUser._id,
             active: false,
-            published: false,
+            instructions,
+           
         });
 
         await quiz.save();

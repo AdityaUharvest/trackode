@@ -8,7 +8,7 @@ import { useTheme, Theme } from "./ThemeContext"; // Import your theme context
 
 const SignInButton = () => {
   const { data: session, status } = useSession();
-  console.log(session);
+  
   const { theme } = useTheme(); // Access the current theme
 
   const handleSignIn = async () => {

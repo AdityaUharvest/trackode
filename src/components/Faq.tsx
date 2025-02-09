@@ -31,7 +31,7 @@ export default function Faq() {
   return (
     <div>
       <div
-        className={`py-16 mb-10 rounded-3xl px-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-12 ${
+        className={` py-16 mb-5 rounded-3xl px-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-12 ${
           theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
         }`}
       >

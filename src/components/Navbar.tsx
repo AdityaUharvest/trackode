@@ -28,14 +28,14 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={`border-white-200 ${theme === "light" ? "bg-amber-50" : "bg-neutral-900"}`}>
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
             src="trackode.png"
             className="h-8 rounded-lg"
             alt="Trackode Logo"
           />
-          <span className={`self-center text-2xl font-semibold whitespace-nowrap ${theme === "light" ? "text-black" : "text-white"}`}>
+          <span className={`self-center text-xl font-bold font-mono whitespace-nowrap ${theme === "light" ? "text-black" : "text-white"}`}>
             Trackode
           </span>
         </Link>
@@ -84,7 +84,7 @@ const Navbar: React.FC = () => {
               className={`z-50 my-4 text-base list-none divide-y rounded-lg shadow absolute right-4 top-12 ${theme === "light" ? "bg-amber-50 text-black" : "bg-gray-700 text-white"}`}
             >
               <div className="px-4 py-3">
-                <span className={`block text-sm ${theme === "light" ? "text-black" : "text-white"}`}>
+                <span className={`block font-sans font-bold text-base ${theme === "light" ? "text-black" : "text-white"}`}>
                   {session.user?.name}
                 </span>
                 <span className="block text-sm text-gray-500 truncate">
@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
                 <li>
                   <Link
                     href="/admin-dashboard"
-                    className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
+                    className={`block px-4 font-bold  py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
                   >
                     Dashboard
                   </Link>
@@ -103,18 +103,19 @@ const Navbar: React.FC = () => {
                 <li>
                   <Link
                     href="#"
-                    className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
+                    className={`block px-4 py-2  font-bold  text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
                   >
                     Settings
                   </Link>
                 </li>
                 <li>
-                  <button
+                  <Link
+                    href="#"
                     onClick={handleSignOut}
-                    className={`block px-4 py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-600"}`}
+                    className={`block px-4 py-2  font-bold text-sm hover:bg-blue-700 ${theme === "light" ? "text-black hover:bg-blue-200" : "text-white hover:bg-blue-600"}`}
                   >
                     Sign out
-                  </button>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -151,7 +152,7 @@ const Navbar: React.FC = () => {
             <li>
               <Link
                 href="#"
-                className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+                className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
                 Profile Tracker
               </Link>
@@ -160,14 +161,14 @@ const Navbar: React.FC = () => {
               {status === "authenticated" ? (
                 <Link
                   href="/admin-dashboard"
-                  className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+                  className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
                 >
                   Quiz Tracker
                 </Link>
               ) : (
                 <Link
                   href="/signin"
-                  className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+                  className={`block py-2 px-3 rounded-sm font-sans hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
                 >
                   Quiz Tracker
                 </Link>
@@ -176,7 +177,7 @@ const Navbar: React.FC = () => {
             <li>
               <Link
                 href="#"
-                className={`block py-2 px-3 rounded-sm hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+                className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
                 Contact
               </Link>

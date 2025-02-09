@@ -3,76 +3,103 @@ import Quiz from "@/app/model/Quiz";
 import Question from "@/app/model/Question";
 import connectDB from "@/lib/util";
 
+
+
 export async function POST(req: NextRequest, { params }: any) {
   try {
     await connectDB();
 
-    const {  quizId,newq, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
-    const id= quizId;
-    
-    // console.log(quizId);
-    if (!id) {
+    const { quizId, questions, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
+    console.log(quizId)
+    console.log(questions)
+    if (!quizId) {
       return NextResponse.json({
         message: "Please provide quiz id",
-        success: false
+        success: false,
+      }, { status: 400 });
+    }
+    
+    // const quest= JSON.parse(questions);
+    
+    if (!questions || questions.length === 0) {
+      return NextResponse.json({
+        message: "Please provide questions",
+        success: false,
       }, { status: 400 });
     }
 
-    if (!newq.options || !newq.question || !newq.correctAnswer) {
-      return NextResponse.json({
-        message: "Missing required fields",
-        success: false,
-      });
-    }
-
-    const newQuestionData = {
-      options: newq.options,
-      question: newq.question,
-      correctAnswer: newq.correctAnswer,
-      category: category,
-      difficulty: difficulty,
-      questionType: questionType,
-      image: image,
-      explanation: explanation,
-      shuffleOptions: shuffleOptions || false,
-      order: order,
-      timeLimit: timeLimit,
-      quiz:quizId
-    };
-
-    const quiz = await Quiz.findById(id);
-
+    const quiz = await Quiz.findById(quizId);
     if (!quiz) {
       return NextResponse.json({
         message: "Quiz not found",
         success: false,
-      });
+      }, { status: 404 });
+    }
+    
+    const savedQuestions = [];
+    const errors = [];
+    
+    // Loop through each question and save it
+    for (const questionData of questions) {
+     
+      if (!questionData.options || !questionData.question || !questionData.correctAnswer) {
+        errors.push({
+          message: "Missing required fields for a question",
+          question: questionData,
+        });
+        continue;
+      }
+
+      const newQuestionData = {
+        options: questionData.options,
+        question: questionData.question,
+        correctAnswer: questionData.correctAnswer,
+        category: category,
+        difficulty: difficulty,
+        questionType: questionType,
+        image: image,
+        explanation: explanation,
+        shuffleOptions: shuffleOptions || false,
+        order: order,
+        timeLimit: timeLimit,
+        quiz: quizId,
+      };
+
+      try {
+        const newQuestion = new Question(newQuestionData);
+        await newQuestion.save();
+        savedQuestions.push(newQuestion._id);
+      } catch (error) {
+        errors.push({
+          message: "Failed to save a question",
+          question: questionData,
+          error
+        });
+      }
     }
 
-    const newQuestion = new Question(
-      newQuestionData
-    )
-      
-    await newQuestion.save();
-
-    await Quiz.findByIdAndUpdate(
-      id,
-      { $push: { questions: newQuestion._id } },
-      { new: true }
-    );
+    // Update the quiz with the new question IDs
+    if (savedQuestions.length > 0) {
+      await Quiz.findByIdAndUpdate(
+        quizId,
+        { $push: { questions: { $each: savedQuestions } } },
+        { new: true }
+      );
+    }
 
     return NextResponse.json({
-      message: "Question added successfully",
+      message: `Successfully added ${savedQuestions.length} questions. ${errors.length} questions failed.`,
       success: true,
-      questionId: newQuestion._id,
+      savedQuestions,
+      errors,
     });
 
   } catch (error: any) {
-    console.error("Error adding question:", error);
+    console.error("Error adding questions:", error);
     return NextResponse.json({
-      message: error.message || "Failed to add question",
-      success: false
-    });
+      message: error.message || "Failed to add questions",
+      success: false,
+    }, { status: 500 });
   }
 }
 
@@ -148,7 +175,7 @@ export async function PUT(request: NextRequest) {
   await connectDB();
   const {  questionId,newQuestion, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await request.json();
   const id= questionId;
-  console.log(newQuestion)
+  
   if (!id) {
     return NextResponse.json({
       message: "Please provide question id",

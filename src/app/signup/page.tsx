@@ -31,7 +31,7 @@ export default function SignUp() {
       name,
     });
 
-    console.log("on submit", response);
+    
     if (response.data.success) {
       toast.success(response.data.message || "Successfully Registered");
       setTimeout(() => {

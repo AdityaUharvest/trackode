@@ -1,0 +1,17 @@
+
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { NextRequest,NextResponse } from 'next/server';
+export async function POST(req: NextRequest) {
+  const { prompt } = await req.json();
+  const genAI = new GoogleGenerativeAI('AIzaSyCo1kW_BPaqR5-XECMsdkckzKfz3NIvRic');
+  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+
+  try {
+    const result = await model.generateContent(prompt);
+    const instructions = result.response.text();
+    
+   return NextResponse.json({ instructions });
+  } catch (error) {
+   return NextResponse.json({ message: 'Failed to generate' });
+  }
+}

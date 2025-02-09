@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     if (req.method === "GET") {
         try {
             const session = await auth();
-            console.log(session);
+            
             if (!session?.user?.id) {
                 return NextResponse.json({
                     message: "Unauthorized",
@@ -22,24 +22,21 @@ export async function GET(req: NextRequest) {
 
             // Convert string MongoDB ID to ObjectId
             const userId = new mongoose.Types.ObjectId(session.user.id);
-            console.log(userId)
+           
             // Find quizzes for this user
             const quizzes = await Quiz.find({ createdBy: userId }).populate('questions');
 
-            console.log('Searching for quizzes with userId:', userId);
+            
 
             if (!quizzes || quizzes.length === 0) {
                 return NextResponse.json({
                     message: "No quizzes found for this user",
                     success: false,
-                    debug: {
-                        searchedId: userId.toString(),
-                        sessionUserId: session.user.id
-                    }
+                    
                 });
             }
 
-            // console.log(`\n\nQuiz ID: ${quizzes}\n\n`);
+           
             return NextResponse.json({
                 message: "Quizzes found",
                 success: true,

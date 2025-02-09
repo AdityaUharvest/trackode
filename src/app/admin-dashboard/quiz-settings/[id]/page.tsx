@@ -131,10 +131,10 @@ export default function Page({ params }: any) {
   }
 
   return (
-    <div className={`p-6 ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"}`}>
-      <div className="flex gap-6">
-        {/* Left Side: Quiz Details */}
-        <Card className={`w-1/2 ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
+    <div className={`p-6  flex ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"}`}>
+      {/* Left Half: Quiz Details */}
+      <div className="w-1/2 pr-3">
+        <Card className={`h-full ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-2xl">
@@ -292,13 +292,15 @@ export default function Page({ params }: any) {
             </div>
           </CardContent>
         </Card>
+      </div>
 
-        {/* Right Side: Questions */}
-        <Card className={`w-1/2 ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
+      {/* Right Half: Questions */}
+      <div className="w-1/2 pl-3">
+        <Card className={`h-full ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
           <CardHeader>
             <CardTitle className="text-2xl">Questions</CardTitle>
           </CardHeader>
-          <CardContent className="overflow-y-auto max-h-[calc(100vh-200px)]">
+          <CardContent className="overflow-y-auto max-h-[calc(167vh-200px)]">
             <div className="space-y-4">
               {quiz.questions?.map((q, index) => (
                 <QuestionCard

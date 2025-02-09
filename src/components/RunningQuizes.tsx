@@ -1,29 +1,17 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen } from "lucide-react";
+import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen, Image as ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-// import { useSession } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { useTheme } from "@/components/ThemeContext"; // Assuming you have a ThemeContext
 import { useSession } from "next-auth/react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
+import { useTheme } from "@/components/ThemeContext";
 
 interface Quiz {
   _id: string;
@@ -37,11 +25,193 @@ interface Question {
   question: string;
   options: string[];
   correctAnswer: string;
+  imageUrl?: string;
 }
 
-export default function RunningQuizes() {
+const API_BASE_URL = "/api";
+
+const QuestionForm: React.FC<{
+  newQuestion: Question;
+  setNewQuestion: (question: Question) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+  theme: string;
+}> = ({ newQuestion, setNewQuestion, onSubmit, onCancel, theme }) => {
+  const handleOptionChange = (index: number, value: string) => {
+    const updatedOptions = [...newQuestion.options];
+    updatedOptions[index] = value;
+    setNewQuestion({ ...newQuestion, options: updatedOptions });
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await axios.post(`${API_BASE_URL}/upload-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      if (response.data.success) {
+        setNewQuestion({ ...newQuestion, imageUrl: response.data.imageUrl });
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error("Failed to upload image");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to upload image");
+    }
+  };
+
+  return (
+    <div className={`mt-4 border rounded-lg p-6 ${theme === "dark" ? "border-blue-800 bg-neutral-800" : "border-blue-600 bg-amber-100"}`}>
+      <h4 className={`font-bold lg:text-xl sm:text-base mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Add New Question</h4>
+      <div className="space-y-4">
+        <div>
+          <label className={`block lg:text-base font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"}`}>Question</label>
+          <Textarea
+            value={newQuestion.question}
+            onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
+            placeholder="Enter your question"
+            className={`w-full ${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+          />
+        </div>
+        <div className="space-y-3">
+          <label className={`block lg:text-base font-medium ${theme === "dark" ? "text-white" : "text-black"}`}>Options</label>
+          {newQuestion.options.map((option, optionIndex) => (
+            <div key={optionIndex} className="flex gap-2 items-center">
+              <Input
+                value={option}
+                onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
+                placeholder={`Option ${optionIndex + 1}`}
+                className={`${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+              />
+              <input
+                type="radio"
+                name="correctAnswer"
+                checked={newQuestion.correctAnswer === option}
+                onChange={() => setNewQuestion({ ...newQuestion, correctAnswer: option })}
+                className="ml-2 accent-blue-800"
+              />
+            </div>
+          ))}
+        </div>
+        <div>
+          <label className={`block lg:text-base font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"}`}>Upload Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                handleImageUpload(e.target.files[0]);
+              }
+            }}
+            className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+          />
+          {newQuestion.imageUrl && (
+            <div className="mt-2">
+              <img src={newQuestion.imageUrl} alt="Question Image" className="w-32 h-32 object-cover rounded-lg" />
+            </div>
+          )}
+        </div>
+        <div className="flex justify-end gap-2">
+          <Button
+            onClick={onCancel}
+            className=" text-white p-3 bg-red-600 hover:bg-red-900 flex items-center gap-2"
+          >
+            <X size={16} />
+            Cancel
+          </Button>
+          <Button
+            onClick={onSubmit}
+            className={`${theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} p-3 text-white flex items-center gap-2`}
+          >
+            <Save size={16} />
+            Save Question
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const PreviewModal: React.FC<{
+  questions: Question[];
+  onConfirm: () => void;
+  onCancel: () => void;
+  theme: string;
+  editableQuestions: Question[];
+  setEditableQuestions: (questions: Question[]) => void;
+}> = ({ questions, onConfirm, onCancel, theme, editableQuestions, setEditableQuestions }) => {
+  const handleQuestionChange = (index: number, value: string) => {
+    const updatedQuestions = [...editableQuestions];
+    updatedQuestions[index].question = value;
+    setEditableQuestions(updatedQuestions);
+  };
+
+  const handleOptionChange = (questionIndex: number, optionIndex: number, value: string) => {
+    const updatedQuestions = [...editableQuestions];
+    updatedQuestions[questionIndex].options[optionIndex] = value;
+    setEditableQuestions(updatedQuestions);
+  };
+
+  const handleCorrectAnswerChange = (questionIndex: number, correctAnswer: string) => {
+    const updatedQuestions = [...editableQuestions];
+    updatedQuestions[questionIndex].correctAnswer = correctAnswer;
+    setEditableQuestions(updatedQuestions);
+  };
+
+  return (
+    <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${theme === "dark" ? "text-white" : "text-black"}`}>
+      <div className={`rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto ${theme === "dark" ? "bg-neutral-800" : "bg-amber-100"}`}>
+        <h2 className="text-xl font-bold mb-4">Preview Generated Questions</h2>
+        <div className="space-y-4">
+          {editableQuestions.map((q, index) => (
+            <div key={index} className={`border rounded-lg p-4 ${theme === "dark" ? "border-blue-800" : "border-blue-600"}`}>
+              <div className="space-y-2">
+               Question ({index+1})
+                <Textarea
+                  value={q.question}
+                  onChange={(e) => handleQuestionChange(index, e.target.value)}
+                  placeholder="Enter your question"
+                  className={`w-full ${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                />
+                {q.options.map((option, optionIndex) => (
+                  <div key={optionIndex} className="flex items-center gap-2">
+                    ({optionIndex+1})
+                    <Input
+                      value={option}
+                      onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
+                      placeholder={`Option ${optionIndex + 1}`}
+                      className={`${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                    />
+                    <input
+                      type="radio"
+                      name={`correctAnswer-${index}`}
+                      checked={q.correctAnswer === option}
+                      onChange={() => handleCorrectAnswerChange(index, option)}
+                      className="ml-2 accent-blue-800"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-end gap-4 mt-6">
+          <Button onClick={onCancel} className="bg-gray-500 hover:bg-gray-600">
+            Cancel
+          </Button>
+          <Button onClick={onConfirm} className="bg-blue-600 hover:bg-blue-700">
+            Confirm and Submit
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+const RunningQuizes: React.FC = () => {
   const { data: session, status } = useSession();
-  const { theme } = useTheme(); // Use the theme context
+  const { theme } = useTheme();
   const [quizes, setQuizes] = useState<Quiz[]>([]);
   const [quizId, setQuizId] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -51,21 +221,25 @@ export default function RunningQuizes() {
     question: "",
     options: ["", "", "", ""],
     correctAnswer: "",
+    imageUrl: "",
   });
-
-  const getQuizes = async () => {
+  const [bulkQuestionCount, setBulkQuestionCount] = useState(2);
+  const [isGeneratingBulkQuestions, setIsGeneratingBulkQuestions] = useState(false);
+  const [previewQuestions, setPreviewQuestions] = useState<Question[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
+  const [editablePreviewQuestions, setEditablePreviewQuestions] = useState<Question[]>([]);
+  const getQuizes = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("/api/quiz-get");
-      console.log(response)
+      const response = await axios.get(`${API_BASE_URL}/quiz-get`);
       if (response.data.success) {
         const quizesWithQuestions = response.data.quizzes.map((quiz: Quiz) => ({
           ...quiz,
-          questions: quiz.questions || [], // Ensure questions is always an array
+          questions: quiz.questions || [],
         }));
         setQuizes(quizesWithQuestions);
       } else {
-        toast.error(response.data.message);
+        toast.success("You can start by creating a new quiz");
       }
     } catch (error) {
       console.error(error);
@@ -73,11 +247,11 @@ export default function RunningQuizes() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     getQuizes();
-  }, [setQuizes]);
+  }, [getQuizes]);
 
   const handleAddQuestion = (index: number, quizid: string) => {
     setActiveQuizIndex(activeQuizIndex === index ? null : index);
@@ -86,31 +260,25 @@ export default function RunningQuizes() {
       question: "",
       options: ["", "", "", ""],
       correctAnswer: "",
+      imageUrl: "",
     });
     setEditingQuestionId(null);
   };
 
   const handleSubmitQuestion = async () => {
     try {
-      console.log(newQuestion)
-      console.log(quizId)
-      
-      const response = await axios.post(
-        "/api/questions",
-        {
-          newq:newQuestion,
-          quizId:quizId
-        }
-        
-      );
+      const response = await axios.post(`${API_BASE_URL}/questions`, {
+        questions: [newQuestion],
+        quizId: quizId,
+      });
       if (response.data.success) {
         const updatedQuizes = [...quizes];
         if (!updatedQuizes[activeQuizIndex!].questions) {
-          updatedQuizes[activeQuizIndex!].questions = []; // Initialize questions as an empty array if it's null/undefined
+          updatedQuizes[activeQuizIndex!].questions = [];
         }
         const newQuestionWithId = {
           ...newQuestion,
-          id: response.data.questionId, // Use the ID from the server response
+          id: response.data.questionId,
         };
         updatedQuizes[activeQuizIndex!].questions?.push(newQuestionWithId);
         setQuizes(updatedQuizes);
@@ -119,6 +287,7 @@ export default function RunningQuizes() {
           question: "",
           options: ["", "", "", ""],
           correctAnswer: "",
+          imageUrl: "",
         });
       } else {
         toast.error(response.data.message);
@@ -129,10 +298,76 @@ export default function RunningQuizes() {
     }
   };
 
-  const handleOptionChange = (index: number, value: string) => {
-    const updatedOptions = [...newQuestion.options];
-    updatedOptions[index] = value;
-    setNewQuestion({ ...newQuestion, options: updatedOptions });
+  const handleGenerateBulkQuestions = async (quizIndex: number, quizId: string) => {
+    try {
+      setIsGeneratingBulkQuestions(true);
+      const response = await axios.post(`${API_BASE_URL}/generate-instructions`, {
+        prompt: `Generate ${bulkQuestionCount} questions in about ${quizes[quizIndex].name}. Each question should include:
+
+        A clear and concise question.
+        
+        Four options, with one being the correct answer.
+        
+        The correct answer should be explicitly specified using the key correctAnswer and must be one of the options (not a/b/c/d).
+        
+        Do not include any topics, explanations, or additional text outside the array. Ensure the response is in plain key value format without any markdown formatting (e.g., no json).
+        All the question should be inside an array of objects { } with key value pairs. Each question should be separated by a comma.`,
+      });
+  
+      if (response.data) {
+        let generatedQuestions = response.data.instructions;
+  
+        // If the response is a string, parse it into an array
+        
+          try {
+            generatedQuestions = JSON.parse(generatedQuestions);
+          } catch (error) {
+            console.error("Failed to parse generated questions:", error);
+            toast.error("Server is busy try again");
+            return;
+          }
+        
+  
+        // Validate the response
+        if (!Array.isArray(generatedQuestions)) {
+          console.error("Generated questions is not an array:", generatedQuestions);
+          toast.error("AI server is busy try again");
+          return;
+        }
+  
+        // Show preview of generated questions
+        setPreviewQuestions(generatedQuestions);
+        setEditablePreviewQuestions([...generatedQuestions]); // Initialize editable state
+        setQuizId(quizId);
+        setShowPreview(true);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to generate questions");
+    } finally {
+      setIsGeneratingBulkQuestions(false);
+    }
+  };
+
+  const handleConfirmPreview = async (quizId: any) => {
+    console.log("Confirming preview questions:", editablePreviewQuestions);
+    console.log("Quiz ID:", quizId);
+    try {
+      const response = await axios.post(`${API_BASE_URL}/questions`, {
+        questions: editablePreviewQuestions,
+        quizId,
+      });
+      if (response.data.success) {
+        toast.success("Questions added successfully!");
+        setShowPreview(false);
+        
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to add questions");
+    }
   };
 
   const handleEditQuestion = (questionId: string, quiz: Quiz) => {
@@ -145,19 +380,15 @@ export default function RunningQuizes() {
 
   const handleUpdateQuestion = async (quizIndex: number, questionId: string) => {
     try {
-      const response = await axios.put(
-        `/api/questions`,{
-          newQuestion,
-          questionId
-        }
-        
-      );
+      const response = await axios.put(`${API_BASE_URL}/questions`, {
+        newQuestion,
+        questionId,
+      });
       if (!response.data.success) {
         toast.error(response.data.message);
       }
       const updatedQuizes = [...quizes];
-      const questionIndex =
-        updatedQuizes[quizIndex].questions?.findIndex((q) => q._id === questionId) ?? -1;
+      const questionIndex = updatedQuizes[quizIndex].questions?.findIndex((q) => q._id === questionId) ?? -1;
       if (questionIndex !== -1 && updatedQuizes[quizIndex].questions) {
         updatedQuizes[quizIndex].questions[questionIndex] = {
           ...newQuestion,
@@ -169,6 +400,7 @@ export default function RunningQuizes() {
           question: "",
           options: ["", "", "", ""],
           correctAnswer: "",
+          imageUrl: "",
         });
         toast.success("Question updated successfully!");
       }
@@ -180,16 +412,11 @@ export default function RunningQuizes() {
 
   const handleDeleteQuestion = async (quizIndex: number, questionId: string) => {
     try {
-      const response = await axios.delete(
-        '/api/questions',
-        {
-          data: { id: questionId }
-        }
-      );
+      const response = await axios.delete(`${API_BASE_URL}/questions`, {
+        data: { id: questionId },
+      });
       const updatedQuizes = [...quizes];
-      updatedQuizes[quizIndex].questions = updatedQuizes[quizIndex].questions?.filter(
-        (q) => q._id !== questionId
-      );
+      updatedQuizes[quizIndex].questions = updatedQuizes[quizIndex].questions?.filter((q) => q._id !== questionId);
       setQuizes(updatedQuizes);
       toast.success("Question deleted successfully!");
     } catch (error) {
@@ -199,48 +426,28 @@ export default function RunningQuizes() {
   };
 
   return (
-    <Card
-      className={`w-full mx-auto ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"
-        }`}
-    >
+    <Card className={`w-full mx-auto ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"}`}>
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
             <CardTitle className="lg:text-base">Running Quizes</CardTitle>
-            <CardDescription
-              className={theme === "dark" ? "text-gray-300" : "text-gray-600"}
-            >
-              Manage your active quizes
-            </CardDescription>
+            <CardDescription className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>Manage your active quizes</CardDescription>
           </div>
-          <Link href="/quiz-setup">
-            <Button
-              className={`${theme === "dark"
-                  ? "bg-blue-800 hover:bg-blue-950"
-                  : "bg-blue-600 hover:bg-blue-700"
-                } p-2 flex items-center gap-2`}
-            >
+          {/* <Link href="/quiz-setup">
+            <Button className={`${theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} p-2 text-white flex items-center gap-2`}>
               <Plus size={16} />
               New Quiz
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <div
-              className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"
-                }`}
-            ></div>
+            <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"}`}></div>
           </div>
         ) : quizes.length === 0 ? (
-          <div
-            className={`text-center py-8 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
-              }`}
-          >
-            No quizes available. Create one to get started!
-          </div>
+          <div className={`text-center py-8 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>No quizes available. Create one to get started!</div>
         ) : (
           <Accordion type="single" collapsible className="w-full">
             {quizes.map((quiz, index) => (
@@ -251,13 +458,7 @@ export default function RunningQuizes() {
                       <span className="font-bold lg:text-base">{quiz.name}</span>
                       <Badge
                         variant={quiz.active ? "outline" : "destructive"}
-                        className={
-                          quiz.active
-                            ? theme === "dark"
-                              ? "bg-green-500 hover:bg-green-700"
-                              : "bg-green-600 hover:bg-green-700"
-                            : ""
-                        }
+                        className={quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700" : "bg-green-600 hover:bg-green-700") : ""}
                       >
                         {quiz.active ? "Active" : "Inactive"}
                       </Badge>
@@ -265,139 +466,78 @@ export default function RunningQuizes() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div className="flex gap-1 ml-0 sm:p-0  sm:text-end pt-1">
+                  <div className="flex gap-1 ml-0 sm:p-0 sm:text-end pt-1">
                     <Button
                       onClick={() => handleAddQuestion(index, quiz._id)}
-                      className={` sm:text-end ${theme === "dark"
-                          ? "bg-blue-800 text-white hover:bg-blue-950"
-                          : "bg-blue-600 hover:bg-blue-700"
-                        } lg:p-5 lg:text-base flex items-center`}
+                      className={`sm:text-end ${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-5 lg:text-base flex items-center`}
                     >
                       Question
                       <Plus size={1} />
-                     
                     </Button>
                     <Button
-                      className={`${theme === "dark"
-                          ? "bg-blue-800 text-white hover:bg-blue-950"
-                          : "bg-blue-600 hover:bg-blue-700"
-                        } lg:p-5 lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-5 lg:text-base sm:text-end flex items-center`}
                     >
                       <NotebookPen size={2} />
                       Result
                     </Button>
-                    <Button
-                      className={`${theme === "dark"
-                          ? "bg-blue-800 text-white hover:bg-blue-950"
-                          : "bg-blue-600 hover:bg-blue-700"
-                        } lg:p-5 lg:text-base sm:text-end flex items-center`}
+                    <Link 
+                    href={`admin-dashboard/quiz-settings/${quiz._id}`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-5 h-1 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
                     >
                       <Settings size={16} />
+                    </Link>
+                  </div>
+
+                  {/* Bulk Question Generation */}
+                  <div className="mt-4 flex items-center gap-4">
+                    <Input
+                      type="number"
+                      value={bulkQuestionCount}
+                      onChange={(e) => setBulkQuestionCount(Number(e.target.value))}
+                      placeholder="Number of questions"
+                      className="w-32"
+                    />
+                    <Button
+                      onClick={() => handleGenerateBulkQuestions(index, quiz._id)}
+                      disabled={isGeneratingBulkQuestions}
+                      className="flex bg-green-600 text-white hover:bg-green-700 items-center gap-2"
+                    >
+                      {
+                      isGeneratingBulkQuestions ? (
+                        <>
+                          <Loader2 className="animate-spin" />
+                          <span>Cheers ✨✨</span>
+                        </>
+                      ) : (
+                        <>Generate {bulkQuestionCount} Questions</>
+                      )
+                    }
                     </Button>
                   </div>
 
-                  {/* Display Existing Questions */}
                   {quiz.questions && quiz.questions.length > 0 && (
                     <div className="mt-4 space-y-4">
                       {quiz.questions.map((q, qIndex) => (
                         <div
                           key={q._id}
-                          className={`border rounded-lg p-4 ${theme === "dark"
-                              ? "border-blue-800 text-white bg-neutral-800"
-                              : "border-blue-600 bg-amber-100"
-                            }`}
+                          className={`border rounded-lg p-4 ${theme === "dark" ? "border-blue-800 text-white bg-neutral-800" : "border-blue-600 bg-amber-100"}`}
                         >
                           {editingQuestionId === q._id ? (
-                            <div className="space-y-4">
-                              <div>
-                                <label
-                                  className={`block text- font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"
-                                    }`}
-                                >
-                                  Question
-                                </label>
-                                <Textarea
-                                  value={newQuestion.question}
-                                  onChange={(e) =>
-                                    setNewQuestion({ ...newQuestion, question: e.target.value })
-                                  }
-                                  className={`w-full ${theme === "dark"
-                                      ? "bg-neutral-900 border-blue-800 text-white"
-                                      : "bg-white border-blue-600 text-black"
-                                    }`}
-                                />
-                              </div>
-
-                              <div className="space-y-3">
-                                <label
-                                  className={`block text-sm font-medium ${theme === "dark" ? "text-white" : "text-black"
-                                    }`}
-                                >
-                                  Options
-                                </label>
-                                {newQuestion.options.map((option, optionIndex) => (
-                                  <div key={optionIndex} className="flex gap-2 items-center">
-                                    <Input
-                                      value={option}
-                                      onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
-                                      className={`${theme === "dark"
-                                          ? "bg-neutral-900 border-blue-800 text-white"
-                                          : "bg-white border-blue-600 text-black"
-                                        }`}
-                                    />
-                                    <input
-                                      type="radio"
-                                      name="correctAnswer"
-                                      checked={newQuestion.correctAnswer === option}
-                                      onChange={() =>
-                                        setNewQuestion({ ...newQuestion, correctAnswer: option })
-                                      }
-                                      className="ml-2 accent-blue-800"
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-
-                              <div className="flex justify-end gap-2">
-                                <Button
-                                  onClick={() => setEditingQuestionId(null)}
-                                  className={`${theme === "dark"
-                                      ? "bg-neutral-700 hover:bg-neutral-600"
-                                      : "bg-gray-300 hover:bg-gray-400"
-                                    } p-3 flex items-center gap-2`}
-                                >
-                                  <X size={16} />
-                                  Cancel
-                                </Button>
-                                <Button
-                                  onClick={() => handleUpdateQuestion(index, q._id!)}
-                                  className={`${theme === "dark"
-                                      ? "bg-blue-800 hover:bg-blue-950"
-                                      : "bg-blue-600 hover:bg-blue-700"
-                                    } p-3 flex items-center gap-2`}
-                                >
-                                  <Check size={16} />
-                                  Save
-                                </Button>
-                              </div>
-                            </div>
+                            <QuestionForm
+                              newQuestion={newQuestion}
+                              setNewQuestion={setNewQuestion}
+                              onSubmit={() => handleUpdateQuestion(index, q._id!)}
+                              onCancel={() => setEditingQuestionId(null)}
+                              theme={theme}
+                            />
                           ) : (
-                            // Display Question
                             <div>
                               <div className="flex justify-between items-start mb-3">
-                                <h3
-                                  className={`m-2 ml-4 ${theme === "dark" ? "text-white" : "text-black"
-                                    }`}
-                                >
-                                  Q.({qIndex + 1}) {q.question}
-                                </h3>
+                                <h3 className={`m-2 ml-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Q.({qIndex + 1}) {q.question}</h3>
                                 <div className="flex gap-2">
                                   <Button
                                     onClick={() => handleEditQuestion(q._id!, quiz)}
-                                    className={`${theme === "dark"
-                                        ? "bg-blue-800 hover:bg-blue-950"
-                                        : "bg-blue-600 hover:bg-blue-700"
-                                      } p-2`}
+                                    className={`${theme === "dark" ? "bg-blue-800 hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-2`}
                                   >
                                     <Edit size={10} />
                                   </Button>
@@ -409,30 +549,19 @@ export default function RunningQuizes() {
                                   </Button>
                                 </div>
                               </div>
+                              {q.imageUrl && (
+                                <div className="mt-2">
+                                  <img src={q.imageUrl} alt="Question Image" className="w-32 h-32 object-cover rounded-lg" />
+                                </div>
+                              )}
                               <div className="space-y-2 pl-4">
                                 {q.options.map((option, optionIndex) => (
                                   <div key={optionIndex} className="flex items-center gap-2">
-                                    <span
-                                      className={
-                                        option === q.correctAnswer
-                                          ? "text-green-500"
-                                          : theme === "dark"
-                                            ? "text-white"
-                                            : "text-black"
-                                      }
-                                    >
-                                      ({optionIndex + 1}) {option}
+                                    <span className={option === q.correctAnswer ? "text-green-500" : theme === "dark" ? "text-white" : "text-black"}>
+                                     ({optionIndex+1}) {option}
                                     </span>
                                     {option === q.correctAnswer && (
-                                      <Badge
-                                        className={
-                                          theme === "dark"
-                                            ? "bg-green-800"
-                                            : "bg-green-600"
-                                        }
-                                      >
-                                        Correct
-                                      </Badge>
+                                      <Badge className={theme === "dark" ? "bg-green-800 text-white" : "bg-green-600 text-white"}>Correct</Badge>
                                     )}
                                   </div>
                                 ))}
@@ -444,86 +573,14 @@ export default function RunningQuizes() {
                     </div>
                   )}
 
-                  {/* Add New Question Form */}
                   {activeQuizIndex === index && !editingQuestionId && (
-                    <div
-                      className={`mt-4 border rounded-lg p-6 ${theme === "dark"
-                          ? "border-blue-800 bg-neutral-800"
-                          : "border-blue-600 bg-amber-100"
-                        }`}
-                    >
-                      <h4
-                        className={`font-bold lg:text-xl sm:text-base mb-4 ${theme === "dark" ? "text-white" : "text-black"
-                          }`}
-                      >
-                        Add New Question
-                      </h4>
-                      <div className="space-y-4">
-                        <div>
-                          <label
-                            className={`block lg:text-base font-medium mb-2 ${theme === "dark" ? "text-white" : "text-black"
-                              }`}
-                          >
-                            Question
-                          </label>
-                          <Textarea
-                            value={newQuestion.question}
-                            onChange={(e) =>
-                              setNewQuestion({ ...newQuestion, question: e.target.value })
-                            }
-                            placeholder="Enter your question"
-                            className={`w-full ${theme === "dark"
-                                ? "bg-neutral-900 border-blue-800 text-white"
-                                : "bg-white border-blue-600 text-black"
-                              }`}
-                          />
-                        </div>
-
-                        <div className="space-y-3">
-                          <label
-                            className={`block lg:text-base font-medium ${theme === "dark" ? "text-white" : "text-black"
-                              }`}
-                          >
-                            Options
-                          </label>
-                          {newQuestion.options.map((option, optionIndex) => (
-                            <div key={optionIndex} className="flex gap-2 items-center">
-                              <Input
-                                value={option}
-                                onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
-                                placeholder={`Option ${optionIndex + 1}`}
-                                className={`${theme === "dark"
-                                    ? "bg-neutral-900 border-blue-800 text-white"
-                                    : "bg-white border-blue-600 text-black"
-                                  }`}
-                              />
-                              <input
-                                type="radio"
-                                name="correctAnswer"
-                                checked={newQuestion.correctAnswer === option}
-                                onChange={() =>
-                                  setNewQuestion({ ...newQuestion, correctAnswer: option })
-                                }
-                                className="ml-2 accent-blue-800"
-                              />
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="flex justify-end">
-                          <Button
-                            onClick={handleSubmitQuestion}
-                            className={`${theme === "dark"
-                                ? "bg-blue-800 hover:bg-blue-950"
-                                : "bg-blue-600 hover:bg-blue-700"
-                              } p-5 lg:text-lg flex items-center gap-2`}
-                          >
-                            <Save size={16} />
-                            Save Question
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+                    <QuestionForm
+                      newQuestion={newQuestion}
+                      setNewQuestion={setNewQuestion}
+                      onSubmit={handleSubmitQuestion}
+                      onCancel={() => setActiveQuizIndex(null)}
+                      theme={theme}
+                    />
                   )}
                 </AccordionContent>
               </AccordionItem>
@@ -531,6 +588,20 @@ export default function RunningQuizes() {
           </Accordion>
         )}
       </CardContent>
+
+      {/* Preview Modal */}
+      {showPreview && (
+        <PreviewModal
+          questions={previewQuestions}
+          onConfirm={() => handleConfirmPreview(quizId)}
+          onCancel={() => setShowPreview(false)}
+          theme={theme}
+          editableQuestions={editablePreviewQuestions}
+          setEditableQuestions={setEditablePreviewQuestions}
+        />
+      )}
     </Card>
   );
-}
+};
+
+export default RunningQuizes;

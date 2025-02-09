@@ -62,7 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
         await connectDB();
-        console.log(profile)
+        
         // Check if the user already exists in the database
         const existingUser = await User.findOne({ email: profile?.email });
         

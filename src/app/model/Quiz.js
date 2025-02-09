@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Question from "./Question";
 import User from "./User";
+import { type } from "os";
 
 const quizSchema = new mongoose.Schema(
     {
@@ -11,7 +12,7 @@ const quizSchema = new mongoose.Schema(
         },
         description: {
             type: String,
-            required: true
+            
         },
         startDate: {
             type: Date,
@@ -20,6 +21,13 @@ const quizSchema = new mongoose.Schema(
         endDate: {
             type: Date,
             // required: true
+        },
+        startTime:{
+            type: String,
+            
+        },
+        endTime:{
+            type:String,
         },
         totalMarks: {
             type: Number,
@@ -31,10 +39,11 @@ const quizSchema = new mongoose.Schema(
             required: true,
             min: 1
         },
-        duration: { type: Number, default: 0 }, // In minutes (0 = no limit)
-        negativeMarking: { type: Boolean, default: false },
-        isPaid: { type: Boolean, default: false },
-        price: { type: Number, default: 0 },
+        instructions: {
+            type: String,
+            
+        },
+       
         shuffleOptions: {
             type: Boolean,
             default: false
@@ -54,10 +63,6 @@ const quizSchema = new mongoose.Schema(
             type: Boolean,
             default: false
         },
-        published: { // Quiz is published and visible to users
-            type: Boolean,
-            default: false
-        }
     },
     { timestamps: true }
 );
