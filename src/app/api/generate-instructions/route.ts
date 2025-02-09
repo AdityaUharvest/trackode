@@ -4,7 +4,7 @@ import { NextRequest,NextResponse } from 'next/server';
 export async function POST(req: NextRequest) {
   const { prompt } = await req.json();
   const genAI = new GoogleGenerativeAI('AIzaSyCo1kW_BPaqR5-XECMsdkckzKfz3NIvRic');
-  const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
   try {
     const result = await model.generateContent(prompt);

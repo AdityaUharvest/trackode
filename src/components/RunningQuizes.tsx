@@ -141,7 +141,8 @@ const PreviewModal: React.FC<{
   theme: string;
   editableQuestions: Question[];
   setEditableQuestions: (questions: Question[]) => void;
-}> = ({ questions, onConfirm, onCancel, theme, editableQuestions, setEditableQuestions }) => {
+  isLoading: boolean;
+}> = ({ questions, onConfirm, onCancel, theme, editableQuestions, setEditableQuestions,isLoading }) => {
   const handleQuestionChange = (index: number, value: string) => {
     const updatedQuestions = [...editableQuestions];
     updatedQuestions[index].question = value;
@@ -201,9 +202,24 @@ const PreviewModal: React.FC<{
           <Button onClick={onCancel} className="bg-gray-500 hover:bg-gray-600">
             Cancel
           </Button>
-          <Button onClick={onConfirm} className="bg-blue-600 hover:bg-blue-700">
-            Confirm and Submit
-          </Button>
+          
+            <Button 
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+            >
+            {isLoading ? (
+              <>
+              <Loader2 className="animate-spin" />
+              <span>Submitting...</span>
+              </>
+            ) 
+            : 
+            (
+              "Confirm and Submit"
+            )
+            }
+            </Button>
         </div>
       </div>
     </div>
@@ -299,45 +315,58 @@ const RunningQuizes: React.FC = () => {
   };
 
   const handleGenerateBulkQuestions = async (quizIndex: number, quizId: string) => {
+    
     try {
       setIsGeneratingBulkQuestions(true);
       const response = await axios.post(`${API_BASE_URL}/generate-instructions`, {
         prompt: `Generate ${bulkQuestionCount} questions in about ${quizes[quizIndex].name}. Each question should include:
-
-        A clear and concise question.
-        
-        Four options, with one being the correct answer.
-        
-        The correct answer should be explicitly specified using the key correctAnswer and must be one of the options (not a/b/c/d).
-        
-        Do not include any topics, explanations, or additional text outside the array. Ensure the response is in plain key value format without any markdown formatting (e.g., no json).
-        All the question should be inside an array of objects { } with key value pairs. Each question should be separated by a comma.`,
+          A clear and concise question.
+          Four options, with one being the correct answer.
+          The correct answer should be explicitly specified using the key correctAnswer and must be one of the options (not a/b/c/d).
+          Return the response as a plain array of objects without any formatting or markdown.
+          Format: [{question: "", options: [], correctAnswer: ""}, {...}]`,
       });
   
       if (response.data) {
         let generatedQuestions = response.data.instructions;
-  
-        // If the response is a string, parse it into an array
         
+        
+        if (typeof generatedQuestions === "string") {
+          
+          generatedQuestions = generatedQuestions.replace(/```(json)?\s*|\s*```/g, '');
+          
           try {
             generatedQuestions = JSON.parse(generatedQuestions);
           } catch (error) {
             console.error("Failed to parse generated questions:", error);
-            toast.error("Server is busy try again");
+            toast.error("Failed to generate questions");
             return;
           }
-        
+        }
   
-        // Validate the response
+        
         if (!Array.isArray(generatedQuestions)) {
           console.error("Generated questions is not an array:", generatedQuestions);
-          toast.error("AI server is busy try again");
+          toast.error("AI server is busy, try again");
           return;
         }
   
-        // Show preview of generated questions
+        
+        const isValidQuestions = generatedQuestions.every(q => 
+          q.question && 
+          Array.isArray(q.options) && 
+          q.options.length === 4 && 
+          q.correctAnswer && 
+          q.options.includes(q.correctAnswer)
+        );
+  
+        if (!isValidQuestions) {
+          toast.error("Generated questions are not in the correct format");
+          return;
+        }
+  
         setPreviewQuestions(generatedQuestions);
-        setEditablePreviewQuestions([...generatedQuestions]); // Initialize editable state
+        setEditablePreviewQuestions([...generatedQuestions]);
         setQuizId(quizId);
         setShowPreview(true);
       }
@@ -350,6 +379,7 @@ const RunningQuizes: React.FC = () => {
   };
 
   const handleConfirmPreview = async (quizId: any) => {
+    setIsLoading(true);
     console.log("Confirming preview questions:", editablePreviewQuestions);
     console.log("Quiz ID:", quizId);
     try {
@@ -367,6 +397,9 @@ const RunningQuizes: React.FC = () => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to add questions");
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -482,7 +515,7 @@ const RunningQuizes: React.FC = () => {
                     </Button>
                     <Link 
                     href={`admin-dashboard/quiz-settings/${quiz._id}`}
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-5 h-1 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-2 lg:h-1  rounded-lg text-white lg:text-base sm:text-end flex items-center`}
                     >
                       <Settings size={16} />
                     </Link>
@@ -506,7 +539,7 @@ const RunningQuizes: React.FC = () => {
                       isGeneratingBulkQuestions ? (
                         <>
                           <Loader2 className="animate-spin" />
-                          <span>Cheers ✨✨</span>
+                          <span>Generating ✨</span>
                         </>
                       ) : (
                         <>Generate {bulkQuestionCount} Questions</>
@@ -598,6 +631,7 @@ const RunningQuizes: React.FC = () => {
           theme={theme}
           editableQuestions={editablePreviewQuestions}
           setEditableQuestions={setEditablePreviewQuestions}
+          isLoading={isLoading}
         />
       )}
     </Card>
