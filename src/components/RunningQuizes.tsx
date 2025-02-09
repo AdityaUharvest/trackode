@@ -546,7 +546,7 @@ const RunningQuizes: React.FC = () => {
                     </Button>
                     <Link 
                     href={`admin-dashboard/quiz-settings/${quiz._id}`}
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-2 lg:h-1  rounded-lg text-white lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-10 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
                     >
                       <Settings size={16} />
                     </Link>
