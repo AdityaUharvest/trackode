@@ -1,411 +1,323 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import axios from "axios";
-import { Edit, Save, X, Trash2, Check, Share, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useTheme } from "@/components/ThemeContext";
+"use client"
+import React, { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
+import { useTheme } from '@/components/ThemeContext';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
-interface Quiz {
-  _id: string;
-  name: string;
-  active: boolean;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  endTime: string;
-  totalMarks: number;
-  totalQuestions: number;
-  instructions: string;
-  shuffleOptions: boolean;
-  questions?: Question[];
-}
-
-interface Question {
-  _id?: string;
-  question: string;
-  options: string[];
-  correctAnswer: string;
-  imageUrl?: string;
-}
-
-const API_BASE_URL = "/api";
-
-export default function Page({ params }: any) {
-  const quizId = params.id; // Access the quizId from params
+const TimePicker = ({ value, onChange, label }: any) => {
+  const hours = [...Array(24).keys()];
+  const minutes = [...Array(60).keys()];
   const { theme } = useTheme();
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isEditingQuiz, setIsEditingQuiz] = useState(false);
-  const [updatedQuiz, setUpdatedQuiz] = useState<Quiz | null>(null);
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [isPublished, setIsPublished] = useState(false);
-  const [shareLink, setShareLink] = useState("");
-
-  // Fetch quiz data
-  useEffect(() => {
-    const fetchQuiz = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/quiz-get/${quizId}`);
-        if (response.data.success) {
-          setQuiz(response.data.quiz);
-          setUpdatedQuiz(response.data.quiz); // Initialize updatedQuiz with fetched data
-          setIsPublished(response.data.quiz.active);
-        } else {
-          toast.error(response.data.message);
-        }
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to fetch quiz");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuiz();
-  }, [quizId]);
-
-  // Handle input changes for quiz fields
-  const handleQuizChange = (field: keyof Quiz, value: string | number | boolean) => {
-    setUpdatedQuiz((prev) => ({
-      ...prev!,
-      [field]: value,
-    }));
-  };
-
-  // Update the entire quiz
-  const handleUpdateQuiz = async () => {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/quiz/${quizId}`, updatedQuiz);
-      if (response.data.success) {
-        setQuiz(updatedQuiz);
-        toast.success("Quiz updated successfully!");
-        setIsEditingQuiz(false);
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to update quiz");
-    }
-  };
-
-  // Publish quiz
-  const handlePublishQuiz = async () => {
-    try {
-      setIsPublishing(true);
-      const response = await axios.put(`${API_BASE_URL}/quiz/${quizId}/publish`);
-      if (response.data.success) {
-        setIsPublished(true);
-        setShareLink(`${window.location.origin}/quiz/${quizId}`);
-        toast.success("Quiz published successfully!");
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to publish quiz");
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"}`}></div>
-      </div>
-    );
-  }
-
-  if (!quiz) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p className={`text-xl ${theme === "dark" ? "text-white" : "text-black"}`}>Quiz not found.</p>
-      </div>
-    );
-  }
 
   return (
-    <div className={`p-6 ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"}`}>
-      <div className="flex gap-6">
-        {/* Left Side: Quiz Details */}
-        <Card className={`w-1/2 ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-2xl">
-                {isEditingQuiz ? (
-                  <Input
-                    value={updatedQuiz?.name || ""}
-                    onChange={(e) => handleQuizChange("name", e.target.value)}
-                    className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                  />
-                ) : (
-                  quiz.name
-                )}
-              </CardTitle>
-              <div className="flex gap-2">
-                {isEditingQuiz ? (
-                  <>
-                    <Button onClick={handleUpdateQuiz} className="bg-green-600 hover:bg-green-700">
-                      <Save size={16} className="mr-2" />
-                      Save
-                    </Button>
-                    <Button onClick={() => setIsEditingQuiz(false)} className="bg-gray-500 hover:bg-gray-600">
-                      <X size={16} className="mr-2" />
-                      Cancel
-                    </Button>
-                  </>
-                ) : (
-                  <Button onClick={() => setIsEditingQuiz(true)} className="bg-blue-600 hover:bg-blue-700">
-                    <Edit size={16} className="mr-2" />
-                    Edit Quiz
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {/* Quiz Status */}
-              <div className="flex items-center gap-4">
-                <Badge variant={isPublished ? "outline" : "destructive"} className={isPublished ? "bg-green-600" : "bg-red-600"}>
-                  {isPublished ? "Published" : "Draft"}
-                </Badge>
-                {!isPublished && (
-                  <Button onClick={handlePublishQuiz} disabled={isPublishing} className="bg-blue-600 hover:bg-blue-700">
-                    {isPublishing ? (
-                      <>
-                        <Loader2 className="animate-spin mr-2" />
-                        Publishing...
-                      </>
-                    ) : (
-                      "Publish Quiz"
-                    )}
-                  </Button>
-                )}
-                {isPublished && (
-                  <Button
-                    onClick={() => {
-                      navigator.clipboard.writeText(shareLink);
-                      toast.success("Link copied to clipboard!");
-                    }}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <Share size={16} className="mr-2" />
-                    Share Quiz
-                  </Button>
-                )}
-              </div>
+    <div className="flex flex-col">
+      <label className={`text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+        {label}
+      </label>
+      <div className="flex gap-2">
+        <select
+          title="Hours"
+          className="w-full mt-1 py-2 rounded-lg bg-amber-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
+          value={value.hours}
+          onChange={(e) => onChange({ ...value, hours: e.target.value })}
+        >
+          {hours.map((hour) => (
+            <option key={hour} value={hour}>
+              {hour < 10 ? `0${hour}` : hour}
+            </option>
+          ))}
+        </select>
+        <span className="self-center">:</span>
+        <select
+          title="Minutes"
+          className="w-full mt-1 py-2 rounded-lg bg-amber-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
+          value={value.minutes}
+          onChange={(e) => onChange({ ...value, minutes: e.target.value })}
+        >
+          {minutes.map((minute) => (
+            <option key={minute} value={minute}>
+              {minute < 10 ? `0${minute}` : minute}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
+};
 
-              {/* Quiz Details */}
-              {isEditingQuiz ? (
-                <div className="space-y-4">
-                  <div>
-                    <label className="block font-medium mb-2">Start Date</label>
-                    <Input
-                      type="date"
-                      value={updatedQuiz?.startDate?.split("T")[0] || ""}
-                      onChange={(e) => handleQuizChange("startDate", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">End Date</label>
-                    <Input
-                      type="date"
-                      value={updatedQuiz?.endDate?.split("T")[0] || ""}
-                      onChange={(e) => handleQuizChange("endDate", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">Start Time</label>
-                    <Input
-                      type="time"
-                      value={updatedQuiz?.startTime || ""}
-                      onChange={(e) => handleQuizChange("startTime", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">End Time</label>
-                    <Input
-                      type="time"
-                      value={updatedQuiz?.endTime || ""}
-                      onChange={(e) => handleQuizChange("endTime", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">Total Marks</label>
-                    <Input
-                      type="number"
-                      value={updatedQuiz?.totalMarks || 0}
-                      onChange={(e) => handleQuizChange("totalMarks", Number(e.target.value))}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">Total Questions</label>
-                    <Input
-                      type="number"
-                      value={updatedQuiz?.totalQuestions || 0}
-                      onChange={(e) => handleQuizChange("totalQuestions", Number(e.target.value))}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">Instructions</label>
-                    <Textarea
-                      value={updatedQuiz?.instructions || ""}
-                      onChange={(e) => handleQuizChange("instructions", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">Shuffle Options</label>
-                    <input
-                      type="checkbox"
-                      checked={updatedQuiz?.shuffleOptions || false}
-                      onChange={(e) => handleQuizChange("shuffleOptions", e.target.checked)}
-                      className="ml-2 accent-blue-800"
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <p><strong>Start Date:</strong> {quiz.startDate?.split("T")[0]}</p>
-                  <p><strong>End Date:</strong> {quiz.endDate?.split("T")[0]}</p>
-                  <p><strong>Start Time:</strong> {quiz.startTime}</p>
-                  <p><strong>End Time:</strong> {quiz.endTime}</p>
-                  <p><strong>Total Marks:</strong> {quiz.totalMarks}</p>
-                  <p><strong>Total Questions:</strong> {quiz.totalQuestions}</p>
-                  <p><strong>Instructions:</strong> {quiz.instructions}</p>
-                  <p><strong>Shuffle Options:</strong> {quiz.shuffleOptions ? "Yes" : "No"}</p>
-                </div>
+const QuizSetup = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const { theme } = useTheme();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    startDate: '',
+    endDate: '',
+    startTime: { hours: 10, minutes: 0 },
+    endTime: { hours: 12, minutes: 0 },
+    totalMarks: '',
+    totalQuestions: '',
+    instructions: '',
+    generatedInstructions: ''
+  });
+
+  const generateInstructions = async () => {
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-instructions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+
+          prompt: `Generate clear,  concise instructions for a quiz with the following details:
+            Quiz Name: ${formData.name}
+            Duration: ${formData.endTime.hours - formData.startTime.hours} hours
+            Total Marks: ${formData.totalMarks}
+            Total Questions: ${formData.totalQuestions}
+            Format the instructions as a numbered list and include important points about timing, marking scheme, and submission requirements. also write a thank you note at the end. and this is an online quiz so make sure to mention that students should not use any external resources. also mention the consequences of cheating. also tell them that it is being monitored by AI.`
+
+        })
+      });
+      const data = await response.json();
+
+      // Clean up the instructions by removing markdown asterisks
+      let cleanInstructions = data?.instructions?.replace(/\*\*/g, '');
+
+      setFormData(prev => ({
+        ...prev,
+        instructions: cleanInstructions || '',
+        generatedInstructions: cleanInstructions || ''
+      }));
+    } catch (error) {
+      toast.error('Failed to generate instructions');
+    }
+    setIsGenerating(false);
+  };
+
+  const handleSubmit = async (e: any) => {
+    if (!formData.name || !formData.startDate || !formData.endDate || !formData.totalMarks || !formData.totalQuestions || !formData.instructions) {
+      toast.error('Please fill all the fields');
+      setTimeout(() => {
+        toast.dismiss();
+        return;
+      }, 3000);
+
+    }
+    e.preventDefault();
+    try {
+
+     
+      const response = await fetch('/api/quiz-create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+
+          email: session?.user?.email
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        toast.success('Quiz created successfully');
+        router.push('/admin-dashboard');
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast.error('Failed to create quiz');
+    }
+  };
+
+  const steps = [
+    {
+      title: "Basic Details",
+      content: (
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Quiz Name</label>
+            <input
+              className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              placeholder="Enter Quiz Name"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Marks</label>
+              <input
+                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                type="number"
+                value={formData.totalMarks}
+                onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
+                placeholder="Enter Total Marks"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Total Questions</label>
+              <input
+                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                type="number"
+                value={formData.totalQuestions}
+                onChange={(e) => setFormData({ ...formData, totalQuestions: e.target.value })}
+                placeholder="Enter Total Questions"
+              />
+            </div>
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Schedule",
+      content: (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Start Date</label>
+              <input
+                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">End Date</label>
+              <input
+                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                type="date"
+                value={formData.endDate}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <TimePicker
+              label="Start Time"
+              value={formData.startTime}
+              onChange={(newTime: any) => setFormData({ ...formData, startTime: newTime })}
+            />
+            <TimePicker
+              label="End Time"
+              value={formData.endTime}
+              onChange={(newTime: any) => setFormData({ ...formData, endTime: newTime })}
+            />
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Instructions",
+      content: (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-medium">Quiz Instructions</h3>
+            <Button
+              onClick={generateInstructions}
+              disabled={isGenerating}
+              className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700"
+            >
+              {isGenerating && <Loader2 className="animate-spin" />}
+              Generate with AI ✨
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Card className="p-4">
+              <h4 className="text-sm font-medium mb-2">Sample Format</h4>
+              <div className="text-sm space-y-2">
+                <p>1. Time limit: {formData.endTime.hours - formData.startTime.hours} Hours</p>
+                <p>2. Total marks: {formData.totalMarks}</p>
+                <p>3. All questions are mandatory {formData.totalQuestions}</p>
+                <p>4. No negative marking</p>
+                <p>5. Submit before the deadline</p>
+              </div>
+            </Card>
+            <Card className="p-4">
+              <h4 className="text-sm font-medium mb-2">Generated Instructions</h4>
+              <div className="text-sm">
+                {formData.generatedInstructions || "Click 'Generate' to create instructions"}
+              </div>
+            </Card>
+          </div>
+          <textarea
+            className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900 h-32"
+            value={formData.instructions}
+            onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+            placeholder="Enter or modify instructions here..."
+          />
+        </div>
+      )
+    }
+  ];
+
+  return (
+    <div className={`container mx-auto p-6 ${theme === "dark" ? "bg-neutral-900" : "bg-amber-50"}`}>
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            {steps.map((step, index) => (
+              <Button
+                key={index}
+                onClick={() => setCurrentStep(index + 1)}
+                className="flex-1 mx-2 bg-blue-800 hover:bg-blue-700 hover:text-white text-white"
+              >
+                {step.title}
+              </Button>
+            ))}
+          </div>
+          <div className="h-2 bg-gray-200 ml-2 mr-2 rounded">
+            <div
+              className="h-full bg-blue-600 rounded  transition-all duration-300"
+              style={{ width: `${(currentStep / steps.length) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="p-6">
+            {steps[currentStep - 1].content}
+
+            <div className="flex justify-between mt-6">
+              {currentStep > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                >
+                  Previous
+                </Button>
               )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Right Side: Questions */}
-        <Card className={`w-1/2 ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
-          <CardHeader>
-            <CardTitle className="text-2xl">Questions</CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-y-auto max-h-[calc(100vh-200px)]">
-            <div className="space-y-4">
-              {quiz.questions?.map((q, index) => (
-                <QuestionCard
-                  key={q._id}
-                  question={q}
-                  index={index}
-                  onUpdate={(updatedQuestion) => handleUpdateQuestion(q._id!, updatedQuestion)}
-                  onDelete={() => handleDeleteQuestion(q._id!)}
-                  theme={theme}
-                />
-              ))}
+              {currentStep < steps.length ? (
+                <Button
+                  type="button"
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  className="ml-auto bg-blue-700 hover:bg-blue-800 text-white"
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="ml-auto bg-green-400 hover:bg-green-500 text-white"
+                >
+                  Create Quiz
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
     </div>
   );
-}
-
-const QuestionCard: React.FC<{
-  question: Question;
-  index: number;
-  onUpdate: (updatedQuestion: Question) => void;
-  onDelete: () => void;
-  theme: string;
-}> = ({ question, index, onUpdate, onDelete, theme }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [updatedQuestion, setUpdatedQuestion] = useState(question);
-
-  const handleSave = () => {
-    onUpdate(updatedQuestion);
-    setIsEditing(false);
-  };
-
-  return (
-    <Card className={`${theme === "dark" ? "bg-neutral-700" : "bg-amber-100"}`}>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start">
-          <h3 className="font-bold text-lg">Q.{index + 1}</h3>
-          <div className="flex gap-2">
-            {isEditing ? (
-              <>
-                <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                  <Save size={16} className="mr-2" />
-                  Save
-                </Button>
-                <Button onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-600">
-                  <X size={16} className="mr-2" />
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button onClick={() => setIsEditing(true)} className="bg-blue-600 hover:bg-blue-700">
-                  <Edit size={16} className="mr-2" />
-                  Edit
-                </Button>
-                <Button onClick={onDelete} className="bg-red-600 hover:bg-red-700">
-                  <Trash2 size={16} className="mr-2" />
-                  Delete
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
-        {isEditing ? (
-          <div className="space-y-4 mt-4">
-            <Textarea
-              value={updatedQuestion.question}
-              onChange={(e) => setUpdatedQuestion({ ...updatedQuestion, question: e.target.value })}
-              className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-            />
-            {updatedQuestion.options.map((option, optionIndex) => (
-              <div key={optionIndex} className="flex items-center gap-2">
-                <Input
-                  value={option}
-                  onChange={(e) => {
-                    const updatedOptions = [...updatedQuestion.options];
-                    updatedOptions[optionIndex] = e.target.value;
-                    setUpdatedQuestion({ ...updatedQuestion, options: updatedOptions });
-                  }}
-                  className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
-                />
-                <input
-                  type="radio"
-                  name={`correctAnswer-${index}`}
-                  checked={updatedQuestion.correctAnswer === option}
-                  onChange={() => setUpdatedQuestion({ ...updatedQuestion, correctAnswer: option })}
-                  className="ml-2 accent-blue-800"
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2 mt-4">
-            <p>{question.question}</p>
-            {question.options.map((option, optionIndex) => (
-              <div key={optionIndex} className="flex items-center gap-2">
-                <span className={option === question.correctAnswer ? "text-green-500" : ""}>
-                  ({optionIndex + 1}) {option}
-                </span>
-                {option === question.correctAnswer && <Badge className="bg-green-600">Correct</Badge>}
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
 };
+
+export default QuizSetup;
