@@ -315,7 +315,6 @@ const RunningQuizes: React.FC = () => {
   };
 
   const handleGenerateBulkQuestions = async (quizIndex: number, quizId: string) => {
-    
     try {
       setIsGeneratingBulkQuestions(true);
       const response = await axios.post(`${API_BASE_URL}/generate-instructions`, {
@@ -329,30 +328,51 @@ const RunningQuizes: React.FC = () => {
   
       if (response.data) {
         let generatedQuestions = response.data.instructions;
-        
-        
+        let parsedQuestions = [];
+  
+        // Clean up the response if it contains markdown or JSON formatting
         if (typeof generatedQuestions === "string") {
-          
+          // Remove markdown code blocks if present
           generatedQuestions = generatedQuestions.replace(/```(json)?\s*|\s*```/g, '');
           
           try {
-            generatedQuestions = JSON.parse(generatedQuestions);
+            // Try to parse the entire response first
+            parsedQuestions = JSON.parse(generatedQuestions);
           } catch (error) {
-            console.error("Failed to parse generated questions:", error);
-            toast.error("Failed to generate questions");
-            return;
+            console.warn("Failed to parse complete response, attempting to salvage partial response");
+            
+            try {
+              // Try to find the last complete array bracket
+              const lastValidBracket = generatedQuestions.lastIndexOf(']');
+              if (lastValidBracket !== -1) {
+                // Extract the portion up to the last valid bracket
+                const truncatedJson = generatedQuestions.substring(0, lastValidBracket + 1);
+                parsedQuestions = JSON.parse(truncatedJson);
+              } else {
+                // If no complete array is found, try to extract individual questions
+                const questionMatches = generatedQuestions.match(/\{[^{}]*\}/g);
+                if (questionMatches) {
+                  parsedQuestions = questionMatches.map(q => {
+                    try {
+                      return JSON.parse(q);
+                    } catch {
+                      return null;
+                    }
+                  }).filter(q => q !== null);
+                }
+              }
+            } catch (innerError) {
+              console.error("Failed to salvage partial response:", innerError);
+              toast.error(`Failed to parse questions. Successfully generated: 0/${bulkQuestionCount}`);
+              return;
+            }
           }
         }
   
-        
-        if (!Array.isArray(generatedQuestions)) {
-          console.error("Generated questions is not an array:", generatedQuestions);
-          toast.error("AI server is busy, try again");
-          return;
-        }
-  
-        
-        const isValidQuestions = generatedQuestions.every(q => 
+        // Validate each question individually
+        const validQuestions = parsedQuestions.filter(q => 
+          q && 
+          typeof q === 'object' &&
           q.question && 
           Array.isArray(q.options) && 
           q.options.length === 4 && 
@@ -360,18 +380,29 @@ const RunningQuizes: React.FC = () => {
           q.options.includes(q.correctAnswer)
         );
   
-        if (!isValidQuestions) {
-          toast.error("Generated questions are not in the correct format");
+        if (validQuestions.length === 0) {
+          toast.error(`No valid questions were generated. Please try again.`);
           return;
         }
   
-        setPreviewQuestions(generatedQuestions);
-        setEditablePreviewQuestions([...generatedQuestions]);
+        // Show success/warning message based on number of questions generated
+        if (validQuestions.length < bulkQuestionCount) {
+          toast.warning(
+            `Partially successful: Generated ${validQuestions.length}/${bulkQuestionCount} questions`
+          );
+        } else {
+          toast.success(
+            `Successfully generated ${validQuestions.length} questions`
+          );
+        }
+  
+        setPreviewQuestions(validQuestions);
+        setEditablePreviewQuestions([...validQuestions]);
         setQuizId(quizId);
         setShowPreview(true);
       }
     } catch (error) {
-      console.error(error);
+      console.error("API error:", error);
       toast.error("Failed to generate questions");
     } finally {
       setIsGeneratingBulkQuestions(false);
