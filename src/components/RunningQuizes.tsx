@@ -352,13 +352,13 @@ const RunningQuizes: React.FC = () => {
                 // If no complete array is found, try to extract individual questions
                 const questionMatches = generatedQuestions.match(/\{[^{}]*\}/g);
                 if (questionMatches) {
-                  parsedQuestions = questionMatches.map(q => {
+                  parsedQuestions = questionMatches.map((q:any) => {
                     try {
                       return JSON.parse(q);
                     } catch {
                       return null;
                     }
-                  }).filter(q => q !== null);
+                  }).filter((q:any) => q !== null);
                 }
               }
             } catch (innerError) {
@@ -370,7 +370,7 @@ const RunningQuizes: React.FC = () => {
         }
   
         // Validate each question individually
-        const validQuestions = parsedQuestions.filter(q => 
+        const validQuestions = parsedQuestions.filter((q:any) => 
           q && 
           typeof q === 'object' &&
           q.question && 
