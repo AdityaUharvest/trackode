@@ -93,7 +93,7 @@ export default function Page({ params }: any) {
       toast.error("Failed to update quiz");
     }
   };
-
+  
   // Publish quiz
   const handlePublishQuiz = async () => {
     try {
@@ -307,8 +307,8 @@ export default function Page({ params }: any) {
                   key={q._id}
                   question={q}
                   index={index}
-                  onUpdate={(updatedQuestion) => handleUpdateQuestion(q._id!, updatedQuestion)}
-                  onDelete={() => handleDeleteQuestion(q._id!)}
+                  // onUpdate={(updatedQuestion) => handleUpdateQuestion(q._id!, updatedQuestion)}
+                  // onDelete={() => handleDeleteQuestion(q._id!)}
                   theme={theme}
                 />
               ))}
@@ -323,15 +323,16 @@ export default function Page({ params }: any) {
 const QuestionCard: React.FC<{
   question: Question;
   index: number;
-  onUpdate: (updatedQuestion: Question) => void;
-  onDelete: () => void;
+  // onUpdate: (updatedQuestion: Question) => void;
+  // onDelete: () => void;
   theme: string;
-}> = ({ question, index, onUpdate, onDelete, theme }) => {
+// }> = ({ question, index, onUpdate, onDelete, theme }) => {
+}> = ({ question, index, theme }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [updatedQuestion, setUpdatedQuestion] = useState(question);
 
   const handleSave = () => {
-    onUpdate(updatedQuestion);
+    // onUpdate(updatedQuestion);
     setIsEditing(false);
   };
 
@@ -358,10 +359,10 @@ const QuestionCard: React.FC<{
                   <Edit size={16} className="mr-2" />
                   Edit
                 </Button>
-                <Button onClick={onDelete} className="bg-red-600 hover:bg-red-700">
+                {/* <Button onClick={onDelete} className="bg-red-600 hover:bg-red-700">
                   <Trash2 size={16} className="mr-2" />
                   Delete
-                </Button>
+                </Button> */}
               </>
             )}
           </div>
