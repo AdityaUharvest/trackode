@@ -174,7 +174,7 @@ export default function QuizPage({ params }: any) {
         toast.success(response.data.message);
         setTimeout(() => {
           router.push(`/dashboard`);
-        }, 3000);
+        }, 1500);
       }
     } catch (error) {
       console.error("Error submitting quiz:", error);
