@@ -29,7 +29,7 @@ export default function QuizPage({ params }: any) {
   // Redirect unauthenticated users to login page
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/login");
+      router.push("/signin");
     }
   }, [status, router]);
 
