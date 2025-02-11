@@ -11,9 +11,9 @@ export async function GET(req:NextRequest){
         const userId= searchParams.get('userId');
         
         
-        const attempted = await Attempted.find({student:userId,quiz:id});
+        const attempted = await Attempted.findOne({student:userId,quiz:id});
         console.log("attempted",attempted)
-        if (!attempted==null){
+        if (attempted){
             return NextResponse.json(
                 {
                     success:true,
