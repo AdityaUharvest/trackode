@@ -26,6 +26,13 @@ export default function QuizPage({ params }: any) {
 
   const id = params.id;
 
+  // Redirect unauthenticated users to login page
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
   // Disable right-click
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
@@ -42,20 +49,25 @@ export default function QuizPage({ params }: any) {
     console.error = () => {};
   }, []);
 
-  // Enter full-screen mode
+  // Enter full-screen mode with confirmation
   const enterFullScreen = () => {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    } else if ((elem as any).mozRequestFullScreen) {
-      // Firefox
-      (elem as any).mozRequestFullScreen();
-    } else if ((elem as any).webkitRequestFullscreen) {
-      // Chrome, Safari, and Opera
-      (elem as any).webkitRequestFullscreen();
-    } else if ((elem as any).msRequestFullscreen) {
-      // IE/Edge
-      (elem as any).msRequestFullscreen();
+    const confirmation = window.confirm("The quiz will start in full-screen mode. Do you want to proceed?");
+    if (confirmation) {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if ((elem as any).mozRequestFullScreen) {
+        // Firefox
+        (elem as any).mozRequestFullScreen();
+      } else if ((elem as any).webkitRequestFullscreen) {
+        // Chrome, Safari, and Opera
+        (elem as any).webkitRequestFullscreen();
+      } else if ((elem as any).msRequestFullscreen) {
+        // IE/Edge
+        (elem as any).msRequestFullscreen();
+      }
+    } else {
+      toast.warning("You must enter full-screen mode to start the quiz.");
     }
   };
 
