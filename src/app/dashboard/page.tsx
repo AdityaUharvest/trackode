@@ -166,7 +166,7 @@ export default async function StudentDashboard() {
                   <div key={index} className="flex items-start gap-4">
                     <div className="w-2 h-2 mt-2 rounded-full bg-blue-600"></div>
                     <div>
-                      <p className="text-gray-300">Completed Quiz: {quiz.quiz.name}</p>
+                      <p className="text-gray-300">Completed Quiz: {quiz.quiz?.name}</p>
                       <p className="text-sm text-gray-400">
                       <FormattedDateTime date={quiz.attemptedAt} />
                       </p>
