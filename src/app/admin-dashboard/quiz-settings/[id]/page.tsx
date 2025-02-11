@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useTheme } from "@/components/ThemeContext";
-
+import Link from "next/link";
 interface Quiz {
   _id: string;
   name: string;
@@ -155,9 +155,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     } 
   };
   const handleUpdateQuestion = async (questionId: string, updatedQuestion: Question) => {
-    console.log(updatedQuestion);
-    const response = await axios.put(`${API_BASE_URL}/question/${quizId}`, {updatedQuestion})
+    
+    const response = await axios.put(`${API_BASE_URL}/questions`, {questionId,newQuestion:updatedQuestion})
+    
     if(response.data.success){
+      toast.success("Question Updated Successfully");
       console.log("Question Updated Successfully");
     }
     // const updatedQuestions = quiz?.questions?.map((q) => (q._id === questionId ? updatedQuestion : q));
@@ -203,7 +205,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               <div className="flex gap-2">
                 {isEditingQuiz ? (
                   <>
-                    <Button onClick={handleUpdateQuiz} className="bg-green-600 hover:bg-green-700">
+                    <Button onClick={handleUpdateQuiz} className="bg-green-600 text-white hover:bg-green-700">
                       <Save size={16} className="mr-2" />
                       Save
                     </Button>
@@ -356,8 +358,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                   <p><strong>Start Time:</strong> {quiz.startTime}</p>
                   <p><strong>End Time:</strong> {quiz.endTime}</p>
                   <p><strong>Total Marks:</strong> {quiz.totalMarks}</p>
+                  
                   <p><strong>Total Questions:</strong> {quiz.totalQuestions}</p>
-                  <p><strong>Instructions:</strong> {quiz.instructions}</p>
+                  <p style={{ whiteSpace: 'pre-line' }}>
+                    <strong>Instructions:</strong> {quiz.instructions}
+                  </p>
                   <p><strong>Shuffle Options:</strong> {quiz.shuffleOptions ? "Yes" : "No"}</p>
                 </div>
               )}
@@ -367,13 +372,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       </div>
 
       {/* Right Half: Questions */}
+      
       <div className="lg:w-1/2 sm:w-full mt-2 lg:pl-3">
         <Card className={`h-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <CardHeader>
             <CardTitle className="text-xl">Questions</CardTitle>
             
           </CardHeader>
-          <CardContent className="overflow-y-auto max-h-[calc(167vh-200px)]">
+          {
+      quiz.questions?.length === 0 && (
+        <Link href ="/admin-dashboard" className="bg-blue-600  ml-8 mr-8 justify-center flex text-white hover:bg-blue-700 p-2 rounded-lg">
+        Go to Dashboard
+        </Link>
+      )
+      
+      }
+          <CardContent className="overflow-y-auto max-h-[calc(250vh-200px)] min-h-[calc(150vh-200px)]">
             <div className="space-y-4">
               {quiz.questions?.map((q, index) => (
                 <QuestionCard
@@ -410,7 +424,7 @@ const QuestionCard: React.FC<{
   const [updatedQuestion, setUpdatedQuestion] = useState(question);
 
   const handleSave = () => {
-    // onUpdate(updatedQuestion);
+    onUpdate(updatedQuestion);
     setIsEditing(false);
   };
 
@@ -422,18 +436,18 @@ const QuestionCard: React.FC<{
           <div className="flex gap-2">
             {isEditing ? (
               <>
-                <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                <Button onClick={handleSave} className="bg-green-600 text-white hover:bg-green-700">
                   <Save size={16} className="mr-2" />
                   Save
                 </Button>
-                <Button onClick={() => setIsEditing(false)} className="bg-gray-500 hover:bg-gray-600">
+                <Button onClick={() => setIsEditing(false)} className="bg-gray-500 text-white hover:bg-gray-600">
                   <X size={16} className="mr-2" />
                   Cancel
                 </Button>
               </>
             ) : (
               <>
-                <Button onClick={() => setIsEditing(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => setIsEditing(true)} className="bg-blue-600 text-white hover:bg-blue-700">
                   <Edit size={16} className="mr-2" />
                   Edit
                 </Button>
@@ -450,10 +464,10 @@ const QuestionCard: React.FC<{
             <Textarea
               value={updatedQuestion.question}
               onChange={(e) => setUpdatedQuestion({ ...updatedQuestion, question: e.target.value })}
-              className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
+              className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"} text-sm`}
             />
             {updatedQuestion.options.map((option, optionIndex) => (
-              <div key={optionIndex} className="flex items-center gap-2">
+              <div key={optionIndex} className="flex text-xs items-center gap-2">
                 <Input
                   value={option}
                   onChange={(e) => {
@@ -461,14 +475,14 @@ const QuestionCard: React.FC<{
                     updatedOptions[optionIndex] = e.target.value;
                     setUpdatedQuestion({ ...updatedQuestion, options: updatedOptions });
                   }}
-                  className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
+                  className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"} text-xs`}
                 />
                 <input
                   type="radio"
                   name={`correctAnswer-${index}`}
                   checked={updatedQuestion.correctAnswer === option}
                   onChange={() => setUpdatedQuestion({ ...updatedQuestion, correctAnswer: option })}
-                  className="ml-2 accent-blue-800"
+                  className="ml-2 text-sm accent-blue-800"
                 />
               </div>
             ))}

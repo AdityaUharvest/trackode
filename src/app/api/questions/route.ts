@@ -175,7 +175,7 @@ export async function PUT(request: NextRequest) {
   await connectDB();
   const {  questionId,newQuestion, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await request.json();
   const id= questionId;
-  
+  console.log(newQuestion)
   if (!id) {
     return NextResponse.json({
       message: "Please provide question id",

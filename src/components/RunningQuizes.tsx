@@ -522,7 +522,7 @@ const RunningQuizes: React.FC = () => {
                       <span className="font-bold lg:text-base">{quiz.name}</span>
                       <Badge
                         variant={quiz.active ? "outline" : "destructive"}
-                        className={quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700" : "bg-green-600 hover:bg-green-700") : ""}
+                        className={quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700 text-white" : "bg-green-600 text-white hover:bg-green-700") : ""}
                       >
                         {quiz.active ? "Active" : "Inactive"}
                       </Badge>
@@ -539,15 +539,16 @@ const RunningQuizes: React.FC = () => {
                       <Plus size={1} />
                     </Button>
                     <Link href = {`quiz-result/${quiz._id}`}
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-10 rounded-lg sm:p-2 lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 text-white hover:bg-blue-700"} p-3 h-9 rounded-lg sm:p-2 lg:text-base sm:text-end flex items-center`}
                     >
                       Results
                       
                     </Link>
                     <Link 
                     href={`admin-dashboard/quiz-settings/${quiz._id}`}
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-10 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-9 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
                     >
+                      Publish 
                       <Settings size={16} />
                     </Link>
                   </div>
