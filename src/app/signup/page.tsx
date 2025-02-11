@@ -48,17 +48,17 @@ export default function SignUp() {
   return (
     <div
       className={`min-h-screen ${
-        theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+        theme === "dark" ? "bg-gray-900" : "bg-gray-50"
       } flex justify-center`}
     >
       <div
         className={`max-w-screen-xl sm:m-5 ${
-          theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+          theme === "dark" ? "bg-gray-900" : "bg-gray-50"
         } sm:rounded-lg flex justify-center flex-1`}
       >
         <div
           className={`lg:w-1/2 xl:w-5/12 mt-2 mb-4 shadow-blue-900 shadow-inner ${
-            theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+            theme === "dark" ? "bg-gray-900" : "bg-gray-50"
           } rounded-lg p-6 sm:p-6`}
         >
           <div className="flex flex-col items-center">
@@ -78,7 +78,7 @@ export default function SignUp() {
                 <form method="post" onSubmit={submitHandler}>
                   <input
                     className={`w-full px-8 py-4 rounded-lg font-medium ${
-                      theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+                      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
                     } border ${
                       theme === "dark" ? "border-gray-600" : "border-gray-400"
                     } ${
@@ -86,7 +86,7 @@ export default function SignUp() {
                     } placeholder-${
                       theme === "dark" ? "gray-400" : "gray-600"
                     } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-neutral-950" : "focus:bg-amber-100"
+                      theme === "dark" ? "focus:bg-gray-950" : "focus:bg-amber-100"
                     }`}
                     type="text"
                     name="name"
@@ -99,7 +99,7 @@ export default function SignUp() {
                   />
                   <input
                     className={`w-full mt-3 px-8 py-4 rounded-lg font-medium ${
-                      theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+                      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
                     } border ${
                       theme === "dark" ? "border-gray-600" : "border-gray-400"
                     } ${
@@ -107,7 +107,7 @@ export default function SignUp() {
                     } placeholder-${
                       theme === "dark" ? "gray-400" : "gray-600"
                     } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-neutral-950" : "focus:bg-amber-100"
+                      theme === "dark" ? "focus:bg-gray-950" : "focus:bg-amber-100"
                     }`}
                     type="email"
                     name="email"
@@ -120,7 +120,7 @@ export default function SignUp() {
                   />
                   <input
                     className={`w-full px-8 py-4 rounded-lg font-medium ${
-                      theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+                      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
                     } border ${
                       theme === "dark" ? "border-gray-600" : "border-gray-400"
                     } ${
@@ -128,7 +128,7 @@ export default function SignUp() {
                     } placeholder-${
                       theme === "dark" ? "gray-400" : "gray-600"
                     } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-neutral-950" : "focus:bg-amber-100"
+                      theme === "dark" ? "focus:bg-gray-950" : "focus:bg-amber-100"
                     } mt-5`}
                     type="password"
                     name="password"
@@ -141,7 +141,7 @@ export default function SignUp() {
                   />
                   <input
                     className={`w-full px-8 py-4 rounded-lg font-medium ${
-                      theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+                      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
                     } border ${
                       theme === "dark" ? "border-gray-600" : "border-gray-400"
                     } ${
@@ -149,7 +149,7 @@ export default function SignUp() {
                     } placeholder-${
                       theme === "dark" ? "gray-400" : "gray-600"
                     } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-neutral-950" : "focus:bg-amber-100"
+                      theme === "dark" ? "focus:bg-gray-950" : "focus:bg-amber-100"
                     } mt-5`}
                     type="text"
                     name="phone"
@@ -206,7 +206,7 @@ export default function SignUp() {
         </div>
         <div
           className={`flex-1 ${
-            theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+            theme === "dark" ? "bg-gray-900" : "bg-gray-50"
           } text-center hidden lg:flex`}
         >
           <div className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat bg-designer-life"></div>

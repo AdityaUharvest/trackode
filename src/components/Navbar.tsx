@@ -27,7 +27,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`border-white-200 ${theme === "light" ? "bg-amber-50" : "bg-neutral-900"}`}>
+    <nav className={`border-white-200 ${theme === "light" ? "bg-gray-50" : "bg-gray-950"}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
             className="h-8 rounded-lg"
             alt="Trackode Logo"
           />
-          <span className={`self-center text-xl font-bold font-mono whitespace-nowrap ${theme === "light" ? "text-black" : "text-white"}`}>
+          <span className={`self-center lg:text-xl sm:text-sm font-bold font-mono whitespace-nowrap ${theme === "light" ? "text-black" : "text-white"}`}>
             Trackode
           </span>
         </Link>
@@ -81,7 +81,7 @@ const Navbar: React.FC = () => {
           {/* Dropdown menu */}
           {isDropdownOpen && status === "authenticated" && (
             <div
-              className={`z-50 my-4 text-base list-none divide-y rounded-lg shadow absolute right-4 top-12 ${theme === "light" ? "bg-amber-50 text-black" : "bg-gray-700 text-white"}`}
+              className={`z-50 my-4 text-base list-none divide-y rounded-lg shadow absolute right-4 top-12 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-700 text-white"}`}
             >
               <div className="px-4 py-3">
                 <span className={`block font-sans font-bold text-base ${theme === "light" ? "text-black" : "text-white"}`}>
@@ -95,7 +95,7 @@ const Navbar: React.FC = () => {
                 <li>
                   <Link
                     href="/admin-dashboard"
-                    className={`block px-4 font-bold  py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
+                    className={`block px-4 font-medium  py-2 text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
                   >
                     Dashboard
                   </Link>
@@ -103,7 +103,7 @@ const Navbar: React.FC = () => {
                 <li>
                   <Link
                     href="#"
-                    className={`block px-4 py-2  font-bold  text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
+                    className={`block px-4 py-2  font-medium  text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
                   >
                     Settings
                   </Link>
@@ -112,7 +112,7 @@ const Navbar: React.FC = () => {
                   <Link
                     href="#"
                     onClick={handleSignOut}
-                    className={`block px-4 py-2  font-bold text-sm hover:bg-blue-700 ${theme === "light" ? "text-black hover:bg-blue-200" : "text-white hover:bg-blue-600"}`}
+                    className={`block px-4 py-2  font-medium text-sm hover:bg-blue-700 ${theme === "light" ? "text-black hover:bg-blue-200" : "text-white hover:bg-blue-600"}`}
                   >
                     Sign out
                   </Link>
@@ -146,9 +146,9 @@ const Navbar: React.FC = () => {
 
         {/* Navigation links */}
         <div
-          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-amber-50" : "bg-neutral-900"} ${isNavOpen ? "block" : "hidden"}`}
+          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-gray-50" : "bg-gray-950"} ${isNavOpen ? "block" : "hidden"}`}
         >
-          <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-amber-50 text-black" : "bg-neutral-900 text-white"}`}>
+          <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-950 text-white"}`}>
             <li>
               <Link
                 href="#"

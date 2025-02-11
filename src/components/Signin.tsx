@@ -32,8 +32,8 @@ const SignInButton = () => {
   }, [status]);
 
   const buttonStyles: { [key in Theme]: string } = {
-    light: "shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-amber-50 text-neutral-900 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-600",
-    dark: "shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-neutral-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700",
+    light: "shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-gray-50 text-neutral-900 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-600",
+    dark: "shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 bg-gray-900 text-white flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline hover:bg-blue-700",
   };
 
   return (

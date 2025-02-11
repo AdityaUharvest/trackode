@@ -21,7 +21,7 @@ const TimePicker = ({ value, onChange, label }: any) => {
       <div className="flex gap-2">
         <select
           title="Hours"
-          className="w-full mt-1 py-2 rounded-lg bg-amber-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
+          className="w-full mt-1 py-2 rounded-lg bg-gray-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
           value={value.hours}
           onChange={(e) => onChange({ ...value, hours: e.target.value })}
         >
@@ -34,7 +34,7 @@ const TimePicker = ({ value, onChange, label }: any) => {
         <span className="self-center">:</span>
         <select
           title="Minutes"
-          className="w-full mt-1 py-2 rounded-lg bg-amber-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
+          className="w-full mt-1 py-2 rounded-lg bg-gray-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
           value={value.minutes}
           onChange={(e) => onChange({ ...value, minutes: e.target.value })}
         >
@@ -119,7 +119,7 @@ const QuizSetup = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-
+          duration: formData.endTime.hours - formData.startTime.hours,
           email: session?.user?.email
         })
       });
@@ -143,7 +143,7 @@ const QuizSetup = () => {
           <div>
             <label className="block text-sm font-medium mb-1">Quiz Name</label>
             <input
-              className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+              className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -154,7 +154,7 @@ const QuizSetup = () => {
             <div>
               <label className="block text-sm font-medium mb-1">Total Marks</label>
               <input
-                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
                 type="number"
                 value={formData.totalMarks}
                 onChange={(e) => setFormData({ ...formData, totalMarks: e.target.value })}
@@ -164,7 +164,7 @@ const QuizSetup = () => {
             <div>
               <label className="block text-sm font-medium mb-1">Total Questions</label>
               <input
-                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
                 type="number"
                 value={formData.totalQuestions}
                 onChange={(e) => setFormData({ ...formData, totalQuestions: e.target.value })}
@@ -183,7 +183,7 @@ const QuizSetup = () => {
             <div>
               <label className="block text-sm font-medium mb-1">Start Date</label>
               <input
-                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
@@ -192,7 +192,7 @@ const QuizSetup = () => {
             <div>
               <label className="block text-sm font-medium mb-1">End Date</label>
               <input
-                className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+                className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
@@ -248,7 +248,7 @@ const QuizSetup = () => {
             </Card>
           </div>
           <textarea
-            className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900 h-32"
+            className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900 h-32"
             value={formData.instructions}
             onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
             placeholder="Enter or modify instructions here..."
@@ -259,7 +259,7 @@ const QuizSetup = () => {
   ];
 
   return (
-    <div className={`container mx-auto p-6 ${theme === "dark" ? "bg-neutral-900" : "bg-amber-50"}`}>
+    <div className={`container mx-auto p-6 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">

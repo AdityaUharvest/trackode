@@ -18,9 +18,10 @@ export async function POST(request: NextRequest) {
         totalQuestions,
         shuffleOptions,
         email,
+        duration
     } = await request.json();
     
-    console.log(instructions)
+    console.log(duration)
     const start= `${startTime.hours}:${startTime.minutes}`
     const end= `${endTime.hours}:${endTime.minutes}`
     
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest) {
             createdBy: foundUser._id,
             active: false,
             instructions,
+            duration: duration || 0
            
         });
 

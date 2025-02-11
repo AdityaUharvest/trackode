@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGO_URI; // Ensure this is set in your .env file
+const MONGODB_URI = process.env.MONGODB_URI; // Ensure this is set in your .env file
 
 if (!MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable inside .env");
@@ -26,8 +26,6 @@ async function connectDB() {
   if (!cached.promise) {
     // If no connection promise exists, create a new one
     const opts = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       bufferCommands: false, // Disable Mongoose buffering
     };
 

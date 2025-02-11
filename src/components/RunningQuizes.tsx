@@ -63,7 +63,7 @@ const QuestionForm: React.FC<{
   };
 
   return (
-    <div className={`mt-4 border rounded-lg p-6 ${theme === "dark" ? "border-blue-800 bg-neutral-800" : "border-blue-600 bg-amber-100"}`}>
+    <div className={`mt-4 border rounded-lg p-6 ${theme === "dark" ? "border-blue-800 bg-gray-800" : "border-blue-600 bg-amber-100"}`}>
       <h4 className={`font-bold lg:text-xl sm:text-base mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Add New Question</h4>
       <div className="space-y-4">
         <div>
@@ -72,7 +72,7 @@ const QuestionForm: React.FC<{
             value={newQuestion.question}
             onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
             placeholder="Enter your question"
-            className={`w-full ${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+            className={`w-full ${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
           />
         </div>
         <div className="space-y-3">
@@ -83,7 +83,7 @@ const QuestionForm: React.FC<{
                 value={option}
                 onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
                 placeholder={`Option ${optionIndex + 1}`}
-                className={`${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                className={`${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
               />
               <input
                 type="radio"
@@ -105,7 +105,7 @@ const QuestionForm: React.FC<{
                 handleImageUpload(e.target.files[0]);
               }
             }}
-            className="w-full px-4 py-2 rounded-lg bg-amber-50 text-gray-900"
+            className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
           />
           {newQuestion.imageUrl && (
             <div className="mt-2">
@@ -163,7 +163,7 @@ const PreviewModal: React.FC<{
 
   return (
     <div className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 ${theme === "dark" ? "text-white" : "text-black"}`}>
-      <div className={`rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto ${theme === "dark" ? "bg-neutral-800" : "bg-amber-100"}`}>
+      <div className={`rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto ${theme === "dark" ? "bg-gray-800" : "bg-amber-100"}`}>
         <h2 className="text-xl font-bold mb-4">Preview Generated Questions</h2>
         <div className="space-y-4">
           {editableQuestions.map((q, index) => (
@@ -174,7 +174,7 @@ const PreviewModal: React.FC<{
                   value={q.question}
                   onChange={(e) => handleQuestionChange(index, e.target.value)}
                   placeholder="Enter your question"
-                  className={`w-full ${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                  className={`w-full ${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
                 />
                 {q.options.map((option, optionIndex) => (
                   <div key={optionIndex} className="flex items-center gap-2">
@@ -183,7 +183,7 @@ const PreviewModal: React.FC<{
                       value={option}
                       onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
                       placeholder={`Option ${optionIndex + 1}`}
-                      className={`${theme === "dark" ? "bg-neutral-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                      className={`${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
                     />
                     <input
                       type="radio"
@@ -239,7 +239,7 @@ const RunningQuizes: React.FC = () => {
     correctAnswer: "",
     imageUrl: "",
   });
-  const [bulkQuestionCount, setBulkQuestionCount] = useState(2);
+  const [bulkQuestionCount, setBulkQuestionCount] = useState(5);
   const [isGeneratingBulkQuestions, setIsGeneratingBulkQuestions] = useState(false);
   const [previewQuestions, setPreviewQuestions] = useState<Question[]>([]);
   const [showPreview, setShowPreview] = useState(false);
@@ -490,7 +490,7 @@ const RunningQuizes: React.FC = () => {
   };
 
   return (
-    <Card className={`w-full mx-auto ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"}`}>
+    <Card className={`w-full mx-auto ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-black"}`}>
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
@@ -538,12 +538,12 @@ const RunningQuizes: React.FC = () => {
                       Question
                       <Plus size={1} />
                     </Button>
-                    <Button
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-5 lg:text-base sm:text-end flex items-center`}
+                    <Link href = {`quiz-result/${quiz._id}`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-10 rounded-lg sm:p-2 lg:text-base sm:text-end flex items-center`}
                     >
-                      <NotebookPen size={2} />
-                      Result
-                    </Button>
+                      Results
+                      
+                    </Link>
                     <Link 
                     href={`admin-dashboard/quiz-settings/${quiz._id}`}
                       className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-10 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
@@ -584,7 +584,7 @@ const RunningQuizes: React.FC = () => {
                       {quiz.questions.map((q, qIndex) => (
                         <div
                           key={q._id}
-                          className={`border rounded-lg p-4 ${theme === "dark" ? "border-blue-800 text-white bg-neutral-800" : "border-blue-600 bg-amber-100"}`}
+                          className={`border rounded-lg p-4 ${theme === "dark" ? "border-blue-800 text-white bg-gray-800" : "border-blue-600 bg-amber-100"}`}
                         >
                           {editingQuestionId === q._id ? (
                             <QuestionForm

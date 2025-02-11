@@ -32,7 +32,7 @@ export default function Faq() {
     <div>
       <div
         className={` py-16 mb-5 rounded-3xl px-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-12 ${
-          theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+          theme === "dark" ? "bg-gray-900" : "bg-gray-50"
         }`}
       >
         {/* Header Section */}

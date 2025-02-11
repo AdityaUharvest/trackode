@@ -16,9 +16,9 @@ export default function Quizes() {
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   // Determine the background colors based on the theme
-  const buttonBgColor = theme === "dark" ? "bg-neutral-900" : "bg-amber-50";
-  const dropdownBgColor = theme === "dark" ? "bg-neutral-900" : "bg-amber-50";
-  const buttonHoverBgColor = theme === "dark" ? "hover:bg-gray-950" : "hover:bg-amber-100";
+  const buttonBgColor = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
+  const dropdownBgColor = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
+  const buttonHoverBgColor = theme === "dark" ? "hover:bg-gray-900" : "hover:bg-amber-100";
   const dropdownBorderColor = theme === "dark" ? "border-gray-700" : "border-amber-200";
 
   return (

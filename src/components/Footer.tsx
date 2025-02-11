@@ -9,8 +9,8 @@ export default function Footer() {
       <footer
         className={`border-t-2 ${
           theme === "dark"
-            ? "bg-neutral-900 border-neutral-600"
-            : "bg-amber-50 border-gray-300"
+            ? "bg-gray-900 border-neutral-600"
+            : "bg-gray-50 border-gray-300"
         }`}
       >
         <div className="container px-6 py-6 mx-auto mt-3">

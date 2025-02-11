@@ -35,8 +35,9 @@ interface Question {
 
 const API_BASE_URL = "/api";
 
-export default function Page({ params }: any) {
-  const quizId = params.id; // Access the quizId from params
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = React.use(params);
+  const quizId = resolvedParams.id;
   const { theme } = useTheme();
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +81,8 @@ export default function Page({ params }: any) {
   // Update the entire quiz
   const handleUpdateQuiz = async () => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/quiz/${quizId}`, updatedQuiz);
+      const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`, {updatedQuiz});
+      console.log(response);
       if (response.data.success) {
         setQuiz(updatedQuiz);
         toast.success("Quiz updated successfully!");
@@ -96,12 +98,14 @@ export default function Page({ params }: any) {
   
   // Publish quiz
   const handlePublishQuiz = async () => {
+    
     try {
       setIsPublishing(true);
-      const response = await axios.put(`${API_BASE_URL}/quiz/${quizId}/publish`);
+      const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`,{updatedQuiz: { ...updatedQuiz, active:true}});
       if (response.data.success) {
         setIsPublished(true);
-        setShareLink(`${window.location.origin}/quiz/${quizId}`);
+        setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
+        console.log(shareLink);
         toast.success("Quiz published successfully!");
       } else {
         toast.error(response.data.message);
@@ -113,7 +117,55 @@ export default function Page({ params }: any) {
       setIsPublishing(false);
     }
   };
-
+  const handleUnPublishQuiz = async () => {
+    
+    try {
+      setIsPublishing(true);
+      const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`,{updatedQuiz: { ...updatedQuiz, active:false}});
+      if (response.data.success) {
+        setIsPublished(false);
+        setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
+        console.log(shareLink);
+        toast.error("Quiz Unpublished successfully!");
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to publish quiz");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+  const handleDeleteQuiz = async () => {
+   
+    try {
+      
+      const response = await axios.delete(`${API_BASE_URL}/quiz-update/${quizId}`);
+      if (response.data.success) {
+        
+        toast.success("Quiz Deleted successfully!");
+        window.location.href = "/admin-dashboard"
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to Delete quiz");
+    } 
+  };
+  const handleUpdateQuestion = async (questionId: string, updatedQuestion: Question) => {
+    console.log(updatedQuestion);
+    const response = await axios.put(`${API_BASE_URL}/question/${quizId}`, {updatedQuestion})
+    if(response.data.success){
+      console.log("Question Updated Successfully");
+    }
+    // const updatedQuestions = quiz?.questions?.map((q) => (q._id === questionId ? updatedQuestion : q));
+    setQuiz((prev) => ({
+      ...prev!,
+      questions: prev?.questions?.map((q) => (q._id === questionId ? updatedQuestion : q)),
+    }));
+  }
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -131,10 +183,10 @@ export default function Page({ params }: any) {
   }
 
   return (
-    <div className={`p-6  flex ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-amber-50 text-black"}`}>
+    <div className={`p-6  lg:flex ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-black"}`}>
       {/* Left Half: Quiz Details */}
-      <div className="w-1/2 pr-3">
-        <Card className={`h-full ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
+      <div className="lg:w-1/2 md:w-1/2 sm:w-full  pr-3">
+        <Card className={`h-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="text-2xl">
@@ -142,7 +194,7 @@ export default function Page({ params }: any) {
                   <Input
                     value={updatedQuiz?.name || ""}
                     onChange={(e) => handleQuizChange("name", e.target.value)}
-                    className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                    className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                   />
                 ) : (
                   quiz.name
@@ -161,7 +213,7 @@ export default function Page({ params }: any) {
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={() => setIsEditingQuiz(true)} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={() => setIsEditingQuiz(true)} className="bg-blue-600 text-white hover:bg-blue-700">
                     <Edit size={16} className="mr-2" />
                     Edit Quiz
                   </Button>
@@ -173,11 +225,22 @@ export default function Page({ params }: any) {
             <div className="space-y-6">
               {/* Quiz Status */}
               <div className="flex items-center gap-4">
-                <Badge variant={isPublished ? "outline" : "destructive"} className={isPublished ? "bg-green-600" : "bg-red-600"}>
-                  {isPublished ? "Published" : "Draft"}
-                </Badge>
+                {isPublished && (
+                  <Button onClick={handleUnPublishQuiz} disabled={isPublishing} className="bg-red-600 text-white hover:bg-red-700">
+                    {isPublishing ? (
+                      <>
+                        <Loader2 className="animate-spin mr-2" />
+                        Unpublishing...
+                      </>
+                    ) : (
+                      "Unpublish Quiz"
+                    )}
+                  </Button>
+                )}
+                
                 {!isPublished && (
-                  <Button onClick={handlePublishQuiz} disabled={isPublishing} className="bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={handlePublishQuiz} disabled={isPublishing} className="bg-blue-600 text-white hover:bg-blue-700">
+                  
                     {isPublishing ? (
                       <>
                         <Loader2 className="animate-spin mr-2" />
@@ -188,13 +251,22 @@ export default function Page({ params }: any) {
                     )}
                   </Button>
                 )}
+                {!isPublished && (
+                  <Button onClick={
+                    ()=>{
+                      prompt(`Are you sure you want to delete this quiz? Type "${quiz?.name}" to confirm.`) === `${quiz?.name}` && handleDeleteQuiz()
+                     }}  className="bg-red-600 text-white hover:bg-red-700">
+                    <Trash2></Trash2>
+                  </Button>
+                )}
+
                 {isPublished && (
                   <Button
                     onClick={() => {
                       navigator.clipboard.writeText(shareLink);
                       toast.success("Link copied to clipboard!");
                     }}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 text-white hover:bg-green-700"
                   >
                     <Share size={16} className="mr-2" />
                     Share Quiz
@@ -211,7 +283,7 @@ export default function Page({ params }: any) {
                       type="date"
                       value={updatedQuiz?.startDate?.split("T")[0] || ""}
                       onChange={(e) => handleQuizChange("startDate", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -220,7 +292,7 @@ export default function Page({ params }: any) {
                       type="date"
                       value={updatedQuiz?.endDate?.split("T")[0] || ""}
                       onChange={(e) => handleQuizChange("endDate", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -229,7 +301,7 @@ export default function Page({ params }: any) {
                       type="time"
                       value={updatedQuiz?.startTime || ""}
                       onChange={(e) => handleQuizChange("startTime", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -238,7 +310,7 @@ export default function Page({ params }: any) {
                       type="time"
                       value={updatedQuiz?.endTime || ""}
                       onChange={(e) => handleQuizChange("endTime", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -247,7 +319,7 @@ export default function Page({ params }: any) {
                       type="number"
                       value={updatedQuiz?.totalMarks || 0}
                       onChange={(e) => handleQuizChange("totalMarks", Number(e.target.value))}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -256,7 +328,7 @@ export default function Page({ params }: any) {
                       type="number"
                       value={updatedQuiz?.totalQuestions || 0}
                       onChange={(e) => handleQuizChange("totalQuestions", Number(e.target.value))}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -264,7 +336,7 @@ export default function Page({ params }: any) {
                     <Textarea
                       value={updatedQuiz?.instructions || ""}
                       onChange={(e) => handleQuizChange("instructions", e.target.value)}
-                      className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                      className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                     />
                   </div>
                   <div>
@@ -295,10 +367,11 @@ export default function Page({ params }: any) {
       </div>
 
       {/* Right Half: Questions */}
-      <div className="w-1/2 pl-3">
-        <Card className={`h-full ${theme === "dark" ? "bg-neutral-800" : "bg-white"}`}>
+      <div className="lg:w-1/2 sm:w-full mt-2 lg:pl-3">
+        <Card className={`h-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <CardHeader>
-            <CardTitle className="text-2xl">Questions</CardTitle>
+            <CardTitle className="text-xl">Questions</CardTitle>
+            
           </CardHeader>
           <CardContent className="overflow-y-auto max-h-[calc(167vh-200px)]">
             <div className="space-y-4">
@@ -307,11 +380,16 @@ export default function Page({ params }: any) {
                   key={q._id}
                   question={q}
                   index={index}
-                  // onUpdate={(updatedQuestion) => handleUpdateQuestion(q._id!, updatedQuestion)}
-                  // onDelete={() => handleDeleteQuestion(q._id!)}
+                  onUpdate={(updatedQuestion) => handleUpdateQuestion(q._id!, updatedQuestion)}
+                  
                   theme={theme}
                 />
-              ))}
+              )
+            )}
+              
+            
+              
+              
             </div>
           </CardContent>
         </Card>
@@ -323,11 +401,11 @@ export default function Page({ params }: any) {
 const QuestionCard: React.FC<{
   question: Question;
   index: number;
-  // onUpdate: (updatedQuestion: Question) => void;
-  // onDelete: () => void;
+  onUpdate: (updatedQuestion: Question) => void;
+  
   theme: string;
-// }> = ({ question, index, onUpdate, onDelete, theme }) => {
-}> = ({ question, index, theme }) => {
+}> = ({ question, index, onUpdate, theme }) => {
+// }> = ({ question, index, theme }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [updatedQuestion, setUpdatedQuestion] = useState(question);
 
@@ -337,7 +415,7 @@ const QuestionCard: React.FC<{
   };
 
   return (
-    <Card className={`${theme === "dark" ? "bg-neutral-700" : "bg-amber-100"}`}>
+    <Card className={`${theme === "dark" ? "bg-gray-700" : "bg-amber-100"}`}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <h3 className="font-bold text-lg">Q.{index + 1}</h3>
@@ -372,7 +450,7 @@ const QuestionCard: React.FC<{
             <Textarea
               value={updatedQuestion.question}
               onChange={(e) => setUpdatedQuestion({ ...updatedQuestion, question: e.target.value })}
-              className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+              className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
             />
             {updatedQuestion.options.map((option, optionIndex) => (
               <div key={optionIndex} className="flex items-center gap-2">
@@ -383,7 +461,7 @@ const QuestionCard: React.FC<{
                     updatedOptions[optionIndex] = e.target.value;
                     setUpdatedQuestion({ ...updatedQuestion, options: updatedOptions });
                   }}
-                  className={`w-full ${theme === "dark" ? "bg-neutral-900 text-white" : "bg-white text-black"}`}
+                  className={`w-full ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}
                 />
                 <input
                   type="radio"

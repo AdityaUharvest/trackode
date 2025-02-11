@@ -42,8 +42,8 @@ export default function Home() {
   }, [status]);
 
   return (
-    <div className={`overflow-x-hidden ${theme === "dark" ? "bg-neutral-950 text-white" : "bg-white text-black"}`}>
-      <section className={`pt-12 ${theme === "dark" ? "bg-neutral-950 text-white" : "bg-white text-black"} sm:pt-16`}>
+    <div className={`overflow-x-hidden ${theme === "dark" ? "bg-gray-950 text-white" : "bg-white text-black"}`}>
+      <section className={`pt-12 ${theme === "dark" ? "bg-gray-950 text-white" : "bg-white text-black"} sm:pt-16`}>
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
             <p className="mt-5 text-4xl font-bold leading-tight sm:leading-tight sm:text-5xl lg:text-6xl lg:leading-tight font-pj">
@@ -141,9 +141,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`pb-12 ${theme === "dark" ? "bg-neutral-950" : "bg-white"}`}>
+        <div className={`pb-12 ${theme === "dark" ? "bg-gray-950" : "bg-white"}`}>
           <div className="relative">
-            <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-neutral-950" : "bg-white"}`}></div>
+            <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-gray-950" : "bg-white"}`}></div>
             <div className="relative mx-auto">
               <div className="lg:max-w-6xl lg:mx-auto">
                 <img

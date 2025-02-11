@@ -26,7 +26,7 @@ function TimePicker({ value, onChange, label }: any) {
       <div className="flex gap-2">
         <select
           title="Hours"
-          className={`w-full mt-1 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-gray-900" : "bg-amber-50 text-gray-800"
+          className={`w-full mt-1 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
             } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
           value={value.hours}
           onChange={(e) => handleChange(e, 'hours')}
@@ -43,7 +43,7 @@ function TimePicker({ value, onChange, label }: any) {
         </span>
         <select
           title="Minutes"
-          className={`w-full mt-1 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-gray-900" : "bg-amber-50 text-gray-800"
+          className={`w-full mt-1 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
             } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
           value={value.minutes}
           onChange={(e) => handleChange(e, 'minutes')}
@@ -114,10 +114,10 @@ function QuizSetup() {
   };
 
   return (
-    <div className={`flex flex-col 0 lg:flex-row ${theme === "dark" ? "bg-neutral-950" : "bg-amber-50"
+    <div className={`flex flex-col 0 lg:flex-row ${theme === "dark" ? "bg-gray-950" : "bg-gray-50"
       } min-h-screen`}>
       {/* Dashboard Section */}
-      <div className={`flex-1  lg:w-1/2 sm:w-full p-6 ${theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+      <div className={`flex-1  lg:w-1/2 sm:w-full p-6 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"
         } rounded-lg m-2`}>
         <h1 className={`text-xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-gray-800"
           }`}>
@@ -130,7 +130,7 @@ function QuizSetup() {
               Quiz Name
             </label>
             <input
-              className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-black" : "bg-amber-50 text-gray-800"
+              className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-black" : "bg-gray-50 text-gray-800"
                 } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
               type="text"
               name="name"
@@ -149,7 +149,7 @@ function QuizSetup() {
               </label>
               <input
                 title="Start Date"
-                className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-gray-900" : "bg-amber-50 text-gray-800"
+                className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
                   } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                 type="date"
                 name="startDate"
@@ -165,7 +165,7 @@ function QuizSetup() {
               </label>
               <input
                 title="End Date"
-                className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-gray-900" : "bg-amber-50 text-gray-800"
+                className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
                   } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                 type="date"
                 name="endDate"
@@ -195,7 +195,7 @@ function QuizSetup() {
               Total Marks
             </label>
             <input
-              className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-gray-900" : "bg-amber-50 text-gray-800"
+              className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
                 } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
               type="text"
               name="total_marks"
@@ -212,7 +212,7 @@ function QuizSetup() {
               Total Questions
             </label>
             <input
-              className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-amber-50 text-gray-900" : "bg-amber-50 text-gray-800"
+              className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
                 } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
               type="text"
               name="total_questions"
@@ -231,7 +231,7 @@ function QuizSetup() {
           </button>
         </form>
       </div>
-      <div className={`sm:w-full lg:w-1/2 p-6 ${theme === "dark" ? "bg-neutral-900" : "bg-amber-50"
+      <div className={`sm:w-full lg:w-1/2 p-6 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"
         } rounded-lg m-2`}>
         <p className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"
           }`}>

@@ -23,9 +23,9 @@ function ProfileLeftCard() {
   }, [session]);
 
   return (
-    <div className={`w-full lg:mb-64 lg:w-1/4 ${theme === 'dark' ? 'bg-neutral-900' : 'bg-amber-50'} flex flex-col items-center p-2`}>
+    <div className={`w-full lg:mb-64 lg:w-1/4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex flex-col items-center p-2`}>
       <div className="max-w-xs mt-3 w-full">
-        <div className={`shadow-xl rounded-lg py-6 px-16 ${theme === 'dark' ? 'text-white bg-neutral-800' : 'text-gray-900 bg-white'}`}>
+        <div className={`shadow-xl rounded-lg py-6 px-16 ${theme === 'dark' ? 'text-white bg-gray-800' : 'text-gray-900 bg-white'}`}>
           <div className="photo-wrapper p-2">
             <img
               className="w-24 h-24 rounded-full mx-auto"
