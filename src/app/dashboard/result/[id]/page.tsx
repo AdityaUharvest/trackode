@@ -9,12 +9,12 @@ export default async function QuizResultPage({ params }:any) {
   await connectDB();
   const session = await auth();
   
-  
-  const result = await Attempted.findById(params.id)
-    .populate('quiz', 'title')
+  const {id} = await params;
+  console.log(id)
+  const result = await Attempted.findById(id).populate('quiz', 'title')
     .populate('student', 'name');
-
-  if (!result || (result.student as any)._id !== session?.user?.id) {
+  console.log(result)
+  if (!result || (result.student as any)._id.toString() !== session?.user?.id) {
   
     return notFound();
   }
