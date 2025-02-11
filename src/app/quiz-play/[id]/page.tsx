@@ -106,6 +106,10 @@ export default function QuizPage({ params }: any) {
     const fetchQuiz = async () => {
       try {
         const response = await axios.get(`/api/quiz-get/${id}`);
+        if(response.data.success.active === false){
+          toast.error("Quiz is not active");
+          router.push("/dashboard");
+        }
         setQuizData(response.data.quiz);
         setQuestionStatus(
           Array(response.data.quiz.questions.length).fill({
