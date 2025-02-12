@@ -148,7 +148,7 @@ export default function Home() {
               <div className="lg:max-w-6xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img
                   className="transform rounded-lg  shadow-lg hover:animate-pulse shadow-blue-800 scale-120"
-                  src="https://i.ibb.co/nsDyhs4p/pixelcut-export.png"
+                  src="https://i.ibb.co/Sp6tv4Q/image-2025-02-12-164106083.png"
                   alt="Dashboard image"
                   loading="lazy"
                 />
