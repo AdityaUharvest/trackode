@@ -67,13 +67,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const existingUser = await User.findOne({ email: profile?.email });
         
         if (existingUser===null) {
-          // Create a new user in the database if they don't exist
+          const password = await bcrypt.hash("null", 10);
           const newUser = new User({
             name: profile?.name,
             email: profile?.email,
             image: profile?.picture,
             provider: "google",
-            password:"null" // Optional: Store the provider
+            password:password // Optional: Store the provider
           });
 
           await newUser.save();

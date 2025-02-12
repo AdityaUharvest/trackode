@@ -83,7 +83,7 @@ export default function Home() {
               )}
               {session ? (
                 <Link
-                  href="/admin-dashboard"
+                  href="/dashboard"
                   title=""
                   className={`inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-lg font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
                     ? "text-white border-gray-400 hover:bg-blue-900 focus:bg-blue-900 focus:text-white focus:border-blue-900"
@@ -145,13 +145,14 @@ export default function Home() {
           <div className="relative">
             <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-gray-950" : "bg-white"}`}></div>
             <div className="relative mx-auto">
-              <div className="lg:max-w-6xl lg:mx-auto">
+              <div className="lg:max-w-6xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img
-                  className="transform scale-110"
-                  src="https://cdn.rareblocks.xyz/collection/clarity/images/hero/2/illustration.png"
-                  alt=""
-                  
+                  className="transform rounded-lg  shadow-lg hover:animate-pulse shadow-blue-800 scale-120"
+                  src="https://i.ibb.co/nsDyhs4p/pixelcut-export.png"
+                  alt="Dashboard image"
+                  loading="lazy"
                 />
+                
               </div>
             </div>
           </div>
