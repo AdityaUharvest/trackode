@@ -31,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         
         <Navbar />
         <div className="min-h-screen">{children}</div>
+        <Analytics />
         <Footer />
         </ThemeProvider>
         </SessionProvider>
