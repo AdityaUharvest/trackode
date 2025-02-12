@@ -10,14 +10,14 @@ export default function QuizHistory({ results }: any) {
         <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
           Recent Attempts
         </h2>
-        {results.length > 0 && (
+        {/* {results.length > 0 && (
           <a
             href="/dashboard/history"
             className={`text-blue-600 hover:text-blue-700 text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
           >
             View Full History →
           </a>
-        )}
+        )} */}
       </div>
       {results.length === 0 ? (
         <div className={`text-center p-8 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg`}>

@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
 import { useTheme } from "@/components/ThemeContext"; // Import the useTheme hook
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 export default function QuizPage({ params }: any) {
   const { data: session, status } = useSession();
@@ -200,7 +201,7 @@ export default function QuizPage({ params }: any) {
   if (!quizData) {
     return (
       <div className={`flex justify-center items-center h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
-        Loading...
+        <Loader2/>
       </div>
     );
   }
@@ -209,7 +210,18 @@ export default function QuizPage({ params }: any) {
     return (
       <div className={`min-h-screen flex items-center justify-center p-4 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
         <div className={`rounded-lg shadow-lg p-8 max-w-2xl w-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
-          <h1 className="text-3xl font-bold mb-6 text-center">{quizData.name} Instructions</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-xl font-bold mb-4 ">{quizData.name} Instructions</h1>
+
+          <button
+              onClick={() => setHasStarted(true)}
+              className={`p-2 rounded-lg mb-4 transition-colors ${
+                theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
+              } text-white`}
+            >
+              Start Quiz
+            </button>
+        </div>
           <div className="space-y-4">
             <ul className="list-disc list-inside space-y-2">
               <li>Navigate between questions using the question panel</li>
@@ -219,14 +231,7 @@ export default function QuizPage({ params }: any) {
             <div className="instructions" style={{ whiteSpace: "pre-line" }}>
               {quizData.instructions}
             </div>
-            <button
-              onClick={() => setHasStarted(true)}
-              className={`w-full py-3 rounded-lg transition-colors ${
-                theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
-              } text-white`}
-            >
-              Start Quiz
-            </button>
+            
           </div>
         </div>
       </div>

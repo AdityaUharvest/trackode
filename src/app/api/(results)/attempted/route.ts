@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
         const quizResults = await Attempted.find({ student: session?.user?.id })
           .populate('quiz')
           .sort({ attemptedAt: -1 })
-          .limit(5);
+          
         return NextResponse.json(quizResults);
     }
     catch (error) {
