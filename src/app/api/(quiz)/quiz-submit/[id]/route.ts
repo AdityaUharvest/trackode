@@ -48,6 +48,7 @@ export async function POST(req: NextRequest, { params }: any) {
   // Store result in database
   const result = await Attempted.create({
     student: session.user.id,
+    createdBy: quiz.createdBy,
     quiz: id,
     title:quiz.name,
     score,

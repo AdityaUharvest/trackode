@@ -5,9 +5,21 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
-import { useTheme } from "@/components/ThemeContext"; // Import the useTheme hook
+import { useTheme } from "@/components/ThemeContext";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+
+const requestFullscreen = (elem: HTMLElement) => {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if ((elem as any).mozRequestFullScreen) {
+    (elem as any).mozRequestFullScreen();
+  } else if ((elem as any).webkitRequestFullscreen) {
+    (elem as any).webkitRequestFullscreen();
+  } else if ((elem as any).msRequestFullscreen) {
+    (elem as any).msRequestFullscreen();
+  }
+};
 
 export default function QuizPage({ params }: any) {
   const { data: session, status } = useSession();
@@ -22,61 +34,115 @@ export default function QuizPage({ params }: any) {
   >([]);
   const [showCalculator, setShowCalculator] = useState(false);
   const [hasAttempted, setHasAttempted] = useState(false);
-
-  const { theme, toggleTheme } = useTheme(); // Use the theme context
-
+  const { theme, toggleTheme } = useTheme();
+  const [declarationsAgreed, setDeclarationsAgreed] = useState(false);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [fullScreenViolations, setFullScreenViolations] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
   const id = params.id;
+  const handleSubmitQuiz = async () => {
+    try {
+      const response = await axios.post(`/api/quiz-submit/${id}`, {
+        answers,
+        session,
+      });
 
-  // Redirect unauthenticated users to login page
+      if (response.data.success) {
+        setSubmitted(true);
+        toast.success(response.data.message);
+        setTimeout(() => {
+          router.push(`/dashboard`);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
+      toast.error("Failed to submit quiz.");
+    }
+  };
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      if (!document.fullscreenElement && hasStarted && !submitted) {
+        setFullScreenViolations(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 3) {
+            handleSubmitQuiz();
+            toast.error("Quiz submitted due to exiting full-screen 3 times.");
+            return 3;
+          } else {
+            toast.warn(`Warning ${newCount}/3: Please return to full-screen mode.`);
+            return newCount;
+          }
+        });
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (hasStarted && !submitted) {
+        if (e.key === 'Escape' || e.key === 'F11') {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullScreenChange);
+    document.addEventListener('keydown', handleKeyDown, true);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
+      document.removeEventListener('keydown', handleKeyDown, true);
+    };
+  }, [hasStarted, submitted, handleSubmitQuiz]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasStarted && !submitted) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasStarted, submitted]);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/signin");
     }
   }, [status, router]);
 
-  // Disable right-click
   useEffect(() => {
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
     };
+   
     document.addEventListener("contextmenu", handleContextMenu);
     return () => document.removeEventListener("contextmenu", handleContextMenu);
   }, []);
 
-  // Disable console
   useEffect(() => {
     console.log = () => {};
     console.warn = () => {};
     console.error = () => {};
   }, []);
 
-  // Enter full-screen mode with confirmation
-  const enterFullScreen = () => {
-    const confirmation = window.confirm("The quiz will start in full-screen mode. Do you want to proceed?");
-    if (confirmation) {
-      const elem = document.documentElement;
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if ((elem as any).mozRequestFullScreen) {
-        // Firefox
-        (elem as any).mozRequestFullScreen();
-      } else if ((elem as any).webkitRequestFullscreen) {
-        // Chrome, Safari, and Opera
-        (elem as any).webkitRequestFullscreen();
-      } else if ((elem as any).msRequestFullscreen) {
-        // IE/Edge
-        (elem as any).msRequestFullscreen();
-      }
-    } else {
-      toast.warning("You must enter full-screen mode to start the quiz.");
+  const handleStartQuiz = async () => {
+    try {
+      await requestFullscreen(document.documentElement);
+      setHasStarted(true);
+    } catch (error) {
+      toast.error("Failed to enter full-screen mode. Please try again.");
     }
   };
-
-  useEffect(() => {
-    if (hasStarted) {
-      enterFullScreen(); // Enter full-screen when the quiz starts
-    }
-  }, [hasStarted]);
 
   useEffect(() => {
     if (!id || !session?.user?.id) return;
@@ -87,10 +153,9 @@ export default function QuizPage({ params }: any) {
           params: { id, userId: session?.user?.id },
         });
 
-        if (response.data.success ) {
+        if (response.data.success) {
           setHasAttempted(true);
           toast.error("You have already attempted this quiz.");
-          
         }
       } catch (error) {
         console.error("Error checking quiz attempt:", error);
@@ -168,31 +233,31 @@ export default function QuizPage({ params }: any) {
     setCurrentQuestion(index);
   };
 
-  const handleSubmitQuiz = async () => {
-    try {
-      const response = await axios.post(`/api/quiz-submit/${id}`, {
-        answers,
-        session,
-      });
-
-      if (response.data.success) {
-        toast.success(response.data.message);
-        setTimeout(() => {
-          router.push(`/dashboard`);
-        }, 1500);
-      }
-    } catch (error) {
-      console.error("Error submitting quiz:", error);
-      toast.error("Failed to submit quiz.");
+  
+  const ReturnToFullscreenButton = () => {
+    if (!document.fullscreenElement && hasStarted && !submitted) {
+      return (
+        <div className="fixed top-4 right-4 z-50">
+          <button
+            onClick={() => requestFullscreen(document.documentElement)}
+            className={`px-4 py-2 rounded-lg ${
+              theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-600 hover:bg-red-700"
+            } text-white`}
+          >
+            Return to Fullscreen
+          </button>
+        </div>
+      );
     }
+    return null;
   };
 
   if (hasAttempted) {
     return (
       <div className={`flex flex-col justify-center items-center gap-2 h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
         <p className="text-xl text-white-600">You have already attempted this quiz.</p>
-        <Link href="/dashboard" className = "bg-blue-600 p-2 rounded-lg ">
-        Dashboard 
+        <Link href="/dashboard" className="bg-blue-600 p-2 rounded-lg">
+          Dashboard 
         </Link>
       </div>
     );
@@ -209,19 +274,20 @@ export default function QuizPage({ params }: any) {
   if (!hasStarted) {
     return (
       <div className={`min-h-screen flex items-center justify-center p-4 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
-        <div className={`rounded-lg shadow-lg p-8 max-w-2xl w-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-xl font-bold mb-4 ">{quizData.name} Instructions</h1>
 
-          <button
-              onClick={() => setHasStarted(true)}
+        <div className={`rounded-lg shadow-lg p-8 max-w-2xl w-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-xl font-bold mb-4">{quizData.name} Instructions</h1>
+            <button
+              onClick={handleStartQuiz}
+              disabled={!declarationsAgreed || !termsAgreed}
               className={`p-2 rounded-lg mb-4 transition-colors ${
                 theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
-              } text-white`}
+              } text-white ${(!declarationsAgreed || !termsAgreed) ? "opacity-50 cursor-not-allowed" : ""}`}
             >
-              Start Quiz
+              Start Quiz in Fullscreen
             </button>
-        </div>
+          </div>
           <div className="space-y-4">
             <ul className="list-disc list-inside space-y-2">
               <li>Navigate between questions using the question panel</li>
@@ -232,15 +298,35 @@ export default function QuizPage({ params }: any) {
               {quizData.instructions}
             </div>
             
+            <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"}`}>
+              <label className="flex items-center gap-2 mb-4">
+                <input
+                  type="checkbox"
+                  checked={declarationsAgreed}
+                  onChange={(e) => setDeclarationsAgreed(e.target.checked)}
+                  className={`form-checkbox h-4 w-4 ${theme === "dark" ? "text-blue-600" : "text-blue-600"}`}
+                />
+                <span>I hereby declare that I am not cheating. If found cheating, I understand I will be debarred.</span>
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={termsAgreed}
+                  onChange={(e) => setTermsAgreed(e.target.checked)}
+                  className={`form-checkbox h-4 w-4 ${theme === "dark" ? "text-blue-600" : "text-blue-600"}`}
+                />
+                <span>I agree to the terms and conditions of the quiz.</span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
     );
-  }
-
+}
   return (
     <div className={`min-h-screen p-6 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
       {/* Header */}
+      <ReturnToFullscreenButton/>
       <div className="flex justify-between items-center mb-8">
         <div className="text-xl font-bold">
           Time Remaining: {Math.floor(timeLeft / 60).toString().padStart(2, "0")}:

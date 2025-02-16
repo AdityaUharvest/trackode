@@ -67,27 +67,19 @@ export default function Footer() {
                 Privacy
               </a>
 
-              <a
-                href="#"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
-                  theme === "dark" ? "text-gray-300" : "text-gray-600"
-                }`}
-                aria-label="Cookies"
-              >
-                Cookies
-              </a>
+
             </div>
           </div>
 
           <hr
-            className={` border-t-2 md:my-6 ${
+            className={` lg:border-t-2 sm:border-t-1 mt-4 mb-5 md:my-6 ${
               theme === "dark" ? "border-neutral-500" : "border-gray-300"
             }`}
           />
 
-          <div className="flex flex-col items-center sm:flex-row sm:justify-between">
+          <div className="flex flex-col mb-3 items-center sm:flex-row sm:justify-between">
             <p
-              className={`text-sm ${
+              className={`text-sm mb-5 ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >

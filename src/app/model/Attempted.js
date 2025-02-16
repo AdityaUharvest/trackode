@@ -8,6 +8,7 @@ const resultSchema = new Schema({
     ref: 'User', 
     required: true 
   },
+  
   quiz: { 
     type: Schema.Types.ObjectId, 
     ref: 'Quiz', 
@@ -62,7 +63,8 @@ const resultSchema = new Schema({
   attempted:{
     type:Boolean,
     default:false
-  }
+  },
+  
 
 });
 

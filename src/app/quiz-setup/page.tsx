@@ -140,7 +140,7 @@ const QuizSetup = () => {
       title: "Basic Details",
       content: (
         <div className="space-y-4">
-          <div>
+          <div >
             <label className="block text-sm font-medium mb-1">Quiz Name</label>
             <input
               className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
@@ -230,7 +230,7 @@ const QuizSetup = () => {
             </Button>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <Card className="p-4">
+            <Card className={`p-4 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
               <h4 className="text-sm font-medium mb-2">Sample Format</h4>
               <div className="text-sm space-y-2">
                 <p>1. Time limit: {formData.endTime.hours - formData.startTime.hours} Hours</p>
@@ -240,7 +240,7 @@ const QuizSetup = () => {
                 <p>5. Submit before the deadline</p>
               </div>
             </Card>
-            <Card className="p-4">
+            <Card className={`p-4 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
               <h4 className="text-sm font-medium mb-2">Generated Instructions</h4>
               <div className="text-sm">
                 {formData.generatedInstructions || "Click 'Generate' to create instructions"}
@@ -248,7 +248,7 @@ const QuizSetup = () => {
             </Card>
           </div>
           <textarea
-            className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900 h-32"
+            className={`w-full px-4 py-2 rounded-lg bg-gray-50 h-32  ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}
             value={formData.instructions}
             onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
             placeholder="Enter or modify instructions here..."
@@ -260,9 +260,9 @@ const QuizSetup = () => {
 
   return (
     <div className={`container mx-auto p-6 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto ">
         <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
+          <div className={`flex justify-between  items-center mb-4 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
             {steps.map((step, index) => (
               <Button
                 key={index}
@@ -282,7 +282,7 @@ const QuizSetup = () => {
         </div>
 
         <Card>
-          <CardContent className="p-6">
+          <CardContent className={`p-6 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
             {steps[currentStep - 1].content}
 
             <div className="flex justify-between mt-6">
@@ -291,6 +291,7 @@ const QuizSetup = () => {
                   type="button"
                   variant="outline"
                   onClick={() => setCurrentStep(currentStep - 1)}
+                  className='bg-white text-black'
                 >
                   Previous
                 </Button>
