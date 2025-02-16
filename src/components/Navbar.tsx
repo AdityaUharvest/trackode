@@ -27,7 +27,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`border-white-200 ${theme === "light" ? "bg-gray-50" : "bg-gray-950"}`}>
+    <nav className={` sticky top-0 z-50 border-white-200 ${theme === "light" ? "bg-gray-50" : "bg-gray-950"}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img

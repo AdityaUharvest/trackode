@@ -145,10 +145,10 @@ export default function Home() {
           <div className="relative">
             <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-gray-950" : "bg-white"}`}></div>
             <div className="relative mx-auto">
-              <div className="lg:max-w-6xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
+              <div className="lg:max-w-3xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img
                   className="transform rounded-lg  shadow-lg hover:animate-pulse shadow-blue-800 scale-120"
-                  src="https://i.ibb.co/Sp6tv4Q/image-2025-02-12-164106083.png"
+                  src="homepage.png"
                   alt="Dashboard image"
                   loading="lazy"
                 />
@@ -165,6 +165,15 @@ export default function Home() {
           <p className={`text-center font-[550] sm:text-xl md:text-3xl ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
             Effortless coding & contests with Trackode
           </p>
+        </div>
+        <div className="lg:max-w-3xl  mb-14 ml-6 mr-6 justify-center flex lg:mx-auto">
+                <img
+                  className="transform rounded-lg  shadow-lg  shadow-blue-800 scale-120"
+                  src="homepage2.png"
+                  alt="Dashboard image"
+                  loading="lazy"
+                />
+                
         </div>
       </section>
       <Faq />
