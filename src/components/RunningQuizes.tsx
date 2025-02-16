@@ -259,7 +259,8 @@ const RunningQuizes: React.FC = () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to fetch quizes");
+     
+      
     } finally {
       setIsLoading(false);
     }

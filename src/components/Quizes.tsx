@@ -1,12 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
 import PastQuizes from "./PastQuizes";
 import RunningQuizes from "./RunningQuizes";
 import { useTheme } from "./ThemeContext"; // Adjust the import path as necessary
-import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen } from "lucide-react";
+import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Quizes() {
@@ -18,8 +18,8 @@ export default function Quizes() {
   // Determine the background colors based on the theme
   const buttonBgColor = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
   const dropdownBgColor = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
-  const buttonHoverBgColor = theme === "dark" ? "hover:bg-gray-900" : "hover:bg-amber-100";
-  const dropdownBorderColor = theme === "dark" ? "border-gray-700" : "border-amber-200";
+  const buttonHoverBgColor = theme === "dark" ? "hover:bg-gray-900" : "hover:bg-amber-50";
+  const dropdownBorderColor = theme === "dark" ? "border-gray-700" : "border-amber-50";
 
   return (
     <div>
@@ -35,7 +35,13 @@ export default function Quizes() {
           }
         }} // Handle keyboard events
       >
-        <span className="lg:font-bold lg:text-lg sm:text-xs">My Quiz</span>
+        <div className="flex items-center gap-2">
+          <span className="lg:font-bold lg:text-lg sm:text-xs">My Quiz</span>
+          <ChevronDown
+            size={20}
+            className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+          />
+        </div>
         <div className="flex flex-row lg:gap-2 sm:gap-1">
           <Link href="/quiz-setup">
             <Button

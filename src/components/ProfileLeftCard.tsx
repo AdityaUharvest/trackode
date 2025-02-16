@@ -76,7 +76,6 @@ function ProfileLeftCard() {
           </div> */}
         </div>
       </div>
-      <RunningQuizes/>
       <Card className='h-40 w-full bg- rounded-lg shadow-xl  flex items-center justify-center'>
         <Button className='text-white bg-blue-700 hover:bg-blue-800'>
           <Link 
@@ -87,6 +86,8 @@ function ProfileLeftCard() {
           
         </Button>
       </Card>
+      <RunningQuizes/>
+      
     </div>
   );
 }

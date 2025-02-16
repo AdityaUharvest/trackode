@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
             const recentParticipants = await Attempted.find({quiz:quizzes[quizzes.length-1]._id})
             if (!quizzes || quizzes.length === 0) {
                 return NextResponse.json({
-                    message: "No quizzes found for this user",
+                    message: "No quizzes found",
                     success: false,  
                 });
             }

@@ -69,7 +69,7 @@ export default function DashBoard() {
     activeQuizzes: activeQuizes,
     totalParticipants: participants.length,
     totalParticipantsInRecentQuizzes: recent.length,
-    avgScore: Math.round(totalmarks/participants.length),
+    avgScore: Math.round(totalmarks/participants.length)?Math.round(totalmarks/participants.length):0,
     
 
     
@@ -101,9 +101,10 @@ export default function DashBoard() {
         <div className="flex justify-between items-center">
           <h1 className="lg:text-xl sm:text-base ml-3 mt-1 font-bold text-center lg:text-left">Dashboard</h1>
         </div>
-
-        <div className='mt-1 p-1'>
+        {quizes.length>0?(
+          <div className='mt-1 p-1'>
           {/* Quick Stats Grid */}
+          
           <div className="grid grid-cols-1  md:grid-cols-5 gap-4 mb-6">
             <StatCard theme={theme} title="Created Quizzes " value={quizStats.totalQuizzes} />
             <StatCard theme={theme} title="Active Quizzes" value={quizStats.activeQuizzes} />
@@ -113,6 +114,8 @@ export default function DashBoard() {
           </div>
 
           {/* Charts Section */}
+          {participants.length>0?(
+            <div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Participation Chart */}
             <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -152,8 +155,7 @@ export default function DashBoard() {
               </ResponsiveContainer>
             </div>
           </div>
-
-          {/* Additional Insights */}
+        
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             {/* Answer Distribution */}
             <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -187,7 +189,7 @@ export default function DashBoard() {
               </ResponsiveContainer>
             </div>
 
-            {/* Recent Activity */}
+            
             <div className={`lg:col-span-2 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
               <h3 className={`mb-4 font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>Recent Quiz Attempts</h3>
               <div className="overflow-x-auto">
@@ -214,9 +216,14 @@ export default function DashBoard() {
               </div>
             </div>
           </div>
-
-          <Quizes />
+          </div>
+          ):(null)}
+          
         </div>
+        ):(null)}
+        
+        
+        <Quizes />
       </div>
     </div>
   );
