@@ -148,7 +148,7 @@ export default function Home() {
               <div className="lg:max-w-3xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img
                   className="transform rounded-lg  shadow-lg hover:animate-pulse shadow-blue-800 scale-120"
-                  src="homepage.png"
+                  src={`${theme === "dark"?"homepage.png":"homepagedark.png"}`}
                   alt="Dashboard image"
                   loading="lazy"
                 />
@@ -166,10 +166,10 @@ export default function Home() {
             Effortless coding & contests with Trackode
           </p>
         </div>
-        <div className="lg:max-w-3xl  mb-14 ml-6 mr-6 justify-center flex lg:mx-auto">
+        <div className="lg:max-w-4xl  mb-14 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img
                   className="transform rounded-lg  shadow-lg  shadow-blue-800 scale-120"
-                  src="homepage2.png"
+                  src={`${theme === "dark"?"homepage2.png":"homepage2dark.png"}`}
                   alt="Dashboard image"
                   loading="lazy"
                 />
