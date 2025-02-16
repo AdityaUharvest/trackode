@@ -35,8 +35,8 @@ function ProfileLeftCard() {
           <div className="photo-wrapper p-2">
             <img
               className="w-24 h-24 rounded-full mx-auto"
-              src={user?.image}
-              alt="user profile"
+              src={user?.image ||"/trackode.png"}
+              alt="profile"
               loading="lazy"
             />
           </div>
