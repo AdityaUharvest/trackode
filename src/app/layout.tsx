@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         
         <SessionProvider>
         <ThemeProvider>
-        <ToastContainer position="top-center" autoClose={3000} />
+        <ToastContainer position="top-right" autoClose={3000} />
         
         <Navbar />
         <div className="min-h-screen">{children}</div>

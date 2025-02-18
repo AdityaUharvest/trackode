@@ -9,28 +9,23 @@ import { useSession } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
 import axios from 'axios';
 import { useTheme } from '@/components/ThemeContext';
-
+import SkeletonLoader from '@/components/skeleton/student';
 export default function StudentDashboard() {
   const { theme, toggleTheme } = useTheme();
   const { data: session, status } = useSession();
   const [quizResults, setQuizResults] = React.useState([]);
-
+  const [loading, setLoading]= React.useState(true);
   useEffect(() => {
     const fetchQuizResults = async () => {
       const response = await axios.get("/api/attempted");
       setQuizResults(response.data);
+      setLoading(false);
     };
     fetchQuizResults();
   }, []);
 
-  if (status === "loading") {
-    return (
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
-        <div className={`text-gray-800 p-8 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm`}>
-          <Loader2 size={48} className="text-blue-600" />
-        </div>
-      </div>
-    );
+  if (status === "loading" || loading) {
+    return <SkeletonLoader theme={theme} />; // Display the skeleton while loading
   }
 
   if (!session?.user) {
