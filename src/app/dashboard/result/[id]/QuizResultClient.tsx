@@ -40,12 +40,12 @@ export default function QuizResultClient({ result }: { result: any }) {
           {/* Score Section */}
           <div className="mb-8">
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-green-700' : 'bg-green-600'}`}>
-                <p className="font-semibold">Score:</p>
-                <p className="text-2xl">{result.score}/{result.totalQuestions}</p>
+              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                <p className="font-semibold text-green-600">Score:</p>
+                <p className="text-xl">{result.score}/{result.totalQuestions}</p>
               </div>
-              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-blue-700' : 'bg-blue-600'}`}>
-                <p className="font-semibold">Date Attempted:</p>
+              <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                <p className="font-semibold text-blue-800">Date Attempted:</p>
                 <p>{new Date(result.attemptedAt).toLocaleDateString()}</p>
               </div>
             </div>
@@ -56,10 +56,10 @@ export default function QuizResultClient({ result }: { result: any }) {
             {result.answers.map((answer: any, index: number) => (
               <div
                 key={index}
-                className={`p-6 rounded-lg border-l-4 ${
+                className={`p-6 rounded-lg border-l-4 border-r-4 ${
                   answer.isCorrect
-                    ? theme === 'dark' ? 'border-green-600 bg-green-400' : 'border-green-600 bg-green-100'
-                    : theme === 'dark' ? 'border-red-600 bg-red-300 text-gray-900' : 'border-red-600 bg-red-100'
+                    ? theme === 'dark' ? 'border-green-400 bg-gray-950' : 'border-green-600 bg-green-100'
+                    : theme === 'dark' ? 'border-red-400 bg-gray-950 ' : 'border-red-600 bg-red-100'
                 }`}
               >
                 {/* Question UI */}
@@ -83,14 +83,14 @@ export default function QuizResultClient({ result }: { result: any }) {
                 {/* Answers */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm mb-1">Your Answer:</p>
+                    <p className="text-sm mb-1">Your Answer</p>
                     <p className={`p-2 rounded border ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
                       {answer.userAnswer}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm mb-1">Correct Answer:</p>
-                    <p className={`p-2 rounded border ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
+                    <p className="text-sm  mb-1">Correct Answer</p>
+                    <p className={`p-2 rounded border text-green-500 ${theme === 'dark' ? 'bg-gray-900 ' : 'bg-gray-200'}`}>
                       {answer.correctAnswer}
                     </p>
                   </div>
@@ -103,13 +103,13 @@ export default function QuizResultClient({ result }: { result: any }) {
                     disabled={generatingId === index}
                     variant="outline"
                     size="sm"
-                    className={`${theme === 'dark' ? 'text-white border-blue-600 bg-blue-500' : 'text-gray-900 bg-blue-500 text-white'}`}
+                    className={`${theme === 'dark' ? 'text-white border-blue-600 border-2 ' : ' bg-blue-600 hover:bg-blue-900 hover:text-white text-white'}`}
                   >
                     {generatingId === index ? 'Generating...' : 'Show Explanation'}
                   </Button>
 
                   {explanation[index] && (
-                    <div className={`mt-2 p-4 rounded-lg ${theme === 'dark' ? 'border-blue-600 text-gray-50 bg-blue-500' : 'bg-gray-100'}`}>
+                    <div className={`mt-2 p-4 rounded-lg ${theme === 'dark' ? 'border-blue-600 bg-gray-900 text-gray-50' : 'bg-gray-100'}`}>
                       <h4 className="font-semibold mb-2">Explanation</h4>
                       <p>{explanation[index]}</p>
                     </div>
