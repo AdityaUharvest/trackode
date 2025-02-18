@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '@/components/ThemeContext';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
@@ -28,10 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
         <ThemeProvider>
         <ToastContainer position="top-right" autoClose={3000} />
-        
+        <Analytics />
+        <SpeedInsights/>
         <Navbar />
         <div className="min-h-screen">{children}</div>
-        <Analytics />
+        
         <Footer />
         </ThemeProvider>
         </SessionProvider>
