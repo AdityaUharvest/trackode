@@ -12,7 +12,7 @@ const TimePicker = ({ value, onChange, label }: any) => {
   const hours = [...Array(24).keys()];
   const minutes = [...Array(60).keys()];
   const { theme } = useTheme();
-
+  
   return (
     <div className="flex flex-col">
       <label className={`text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
@@ -55,7 +55,7 @@ const QuizSetup = () => {
   const { theme } = useTheme();
   const [currentStep, setCurrentStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-
+  const [submiting, setSubmiting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     startDate: '',
@@ -102,6 +102,7 @@ const QuizSetup = () => {
   };
 
   const handleSubmit = async (e: any) => {
+    setSubmiting(true);
     if (!formData.name || !formData.startDate || !formData.endDate || !formData.totalMarks || !formData.totalQuestions || !formData.instructions) {
       toast.error('Please fill all the fields');
       setTimeout(() => {
@@ -126,6 +127,7 @@ const QuizSetup = () => {
       const data = await response.json();
       if (response.ok) {
         toast.success('Quiz created successfully');
+        
         router.push('/admin-dashboard');
       } else {
         throw new Error(data.message);
@@ -308,9 +310,11 @@ const QuizSetup = () => {
                 <Button
                   type="button"
                   onClick={handleSubmit}
+                  disabled={submiting}
                   className="ml-auto bg-green-400 hover:bg-green-500 text-white"
                 >
-                  Create Quiz
+                  {submiting ? "Creating.." : "Create Quiz"}
+                  
                 </Button>
               )}
             </div>

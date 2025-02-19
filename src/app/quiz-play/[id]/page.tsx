@@ -437,10 +437,12 @@ export default function QuizPage({ params }: any) {
 
           <button
             onClick={handleSubmitQuiz}
+            disabled={submitted}
             className={`w-full py-3 rounded-lg transition-colors ${
               theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-600 hover:bg-red-700"
             } text-white mt-6`}
           >
+            {submitted ? "Quiz Submitted" : "Submit Quiz"}
             Submit Quiz
           </button>
         </div>

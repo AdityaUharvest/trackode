@@ -6,6 +6,12 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTheme } from "@/components/ThemeContext"; // Adjust the import path as necessary
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sign In - Trackode",
+  description: "Log in to access admin and student dashboard , create and manage quizzes, view results and more.",
+};
 
 export default function Signin() {
   const router = useRouter();
