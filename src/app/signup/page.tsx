@@ -6,7 +6,12 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/ThemeContext"; // Adjust the import path as necessary
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Sign Up - Trackode",
+  description: "Sing up to access admin and student dashboard , create and manage quizzes, view results and more.",
+};
 export default function SignUp() {
   const router = useRouter();
   const [email, setEmail] = useState("");

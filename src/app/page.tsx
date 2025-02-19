@@ -8,7 +8,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useTheme } from "@/components/ThemeContext"; // Assuming you have a ThemeContext
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Trackode",
+  description: "Trackode helps you navigate and track your journey to success",
+};
 export default function Home() {
   const { data: session, status } = useSession();
   const [isFirstVisit, setIsFirstVisit] = useState(false);
