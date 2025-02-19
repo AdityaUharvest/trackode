@@ -1,4 +1,6 @@
 "use client"
+import Head from "next/head";
+import { ReactNode } from "react";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { SessionProvider } from "next-auth/react"
@@ -10,15 +12,7 @@ import { toast } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '@/components/ThemeContext';
 import { SpeedInsights } from "@vercel/speed-insights/next"
-export const metadata = {
-  title: "Trackode - Enhance Your Coding Skills",
-  description: "Trackode is a one-stop platform for coding, quizzes, and contest preparation.",
-  icons: {
-    icon: "/favicon.ico", 
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
-  },
-};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
@@ -33,11 +27,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   }, []);
   return (
     <html lang="en">
-      <head>
-        <link rel="apple-touch-icon" href="/favicon.ico" />
+      <Head>
+        <title>Trackode - Enhance Your Coding Skills</title>
+        <meta name="description" content="Trackode is a one-stop platform for coding, quizzes, and contest preparation." />
         <link rel="icon" href="/favicon.ico" sizes="any" />
-       
-      </head>
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/favicon.ico" />
+      </Head>
       <body>
         
         <SessionProvider>
