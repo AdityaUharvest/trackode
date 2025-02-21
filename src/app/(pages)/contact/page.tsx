@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTheme } from '../../components/ThemeContext';
+import { useTheme } from '../../../components/ThemeContext';
 import { toast } from "react-toastify";
 export default function ContactForm() {
   const { theme, toggleTheme } = useTheme();

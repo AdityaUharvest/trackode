@@ -1,11 +1,11 @@
 "use client";
-import SignInButton from "../../components/Signin";
+import SignInButton from "../../../components/Signin";
 import axios from "axios";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import { useTheme } from "../../components/ThemeContext"; // Adjust the import path as necessary
+import { useTheme } from "../../../components/ThemeContext"; // Adjust the import path as necessary
 
 export default function SignUp() {
   const router = useRouter();

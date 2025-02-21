@@ -2,8 +2,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useTheme } from '../../../../components/ThemeContext'; // Your theme context
-import { Button } from '../../../../components/ui/button';
+import { useTheme } from '@/components/ThemeContext'; // Your theme context
+import { Button } from '@/components/ui/button';
 
 export default function QuizResultClient({ result }: { result: any }) {
   const { theme } = useTheme(); // Use the theme context

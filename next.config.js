@@ -1,4 +1,8 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    MONGODB_URI: process.env.MONGO_URI,
+  },
   async headers() {
     return [
       {
@@ -12,3 +16,5 @@ module.exports = {
     ];
   },
 };
+
+module.exports = nextConfig;
