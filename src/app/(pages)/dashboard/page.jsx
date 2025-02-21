@@ -110,8 +110,8 @@ export default function StudentDashboard() {
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Overall Progress</h3>
-                    <p className="text-xl font-bold">
-                      {totalQuizzes > 0 ? `${highestPercentage}%` : 'N/A'}
+                    <p className="text-sm font-bold">
+                      {totalQuizzes > 0 ? `${averagePercentage}%` : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -122,8 +122,8 @@ export default function StudentDashboard() {
                     <span className="text-green-600 text-xl">🏆</span>
                   </div>
                   <div>
-                    <h3 className="text-gray-300 text-base">Highest Score</h3>
-                    <p className="text-xl font-bold">
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Highest Score</h3>
+                    <p className="text-sm font-bold">
                       {totalQuizzes > 0 ? `${highestPercentage}%` : 'N/A'}
                     </p>
                   </div>
@@ -135,8 +135,8 @@ export default function StudentDashboard() {
                     <span className="text-orange-600 text-xl">⏱</span>
                   </div>
                   <div>
-                    <h3 className="text-gray-300 text-base">Recent Performance</h3>
-                    <p className="text-xl font-bold">
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Recent Performance</h3>
+                    <p className="text-sm font-bold">
                       {totalQuizzes > 0 ? `${recentPercentage}%` : 'N/A'}
                     </p>
                   </div>
@@ -148,8 +148,8 @@ export default function StudentDashboard() {
                     <span className="text-purple-600 text-xl">📈</span>
                   </div>
                   <div>
-                    <h3 className="text-gray-300 text-base">Average Performance</h3>
-                    <p className="text-xl font-bold">
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Average Performance</h3>
+                    <p className="text-sm font-bold">
                       {totalQuizzes > 0 ? `${averagePercentage}%` : 'N/A'}
                       {accuracyTrend !== 'stable' && (
                         <span className={`text-sm ml-2 ${

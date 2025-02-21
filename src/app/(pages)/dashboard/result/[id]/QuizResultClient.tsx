@@ -30,7 +30,7 @@ export default function QuizResultClient({ result }: { result: any }) {
   };
 
   return (
-    <div className={`min-h-screen p-8 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+    <div className={`min-h-screen sm:text-sm lg:p-8 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="max-w-4xl mx-auto">
         <div className={`p-8 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <h1 className="text-2xl font-bold mb-4">
