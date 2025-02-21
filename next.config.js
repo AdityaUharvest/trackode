@@ -6,11 +6,11 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/",
+        source: "/sitemap.xml",
         headers: [
           {
-            key: "X-Robots-Tag",
-            value: "index, follow",
+            key: "Cache-Control",
+            value: "no-store, no-cache, must-revalidate, proxy-revalidate",
           },
         ],
       },
