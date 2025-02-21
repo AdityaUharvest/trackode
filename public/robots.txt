@@ -1,3 +1,9 @@
+# *
 User-agent: *
 Allow: /
+
+# Host
+Host: https://trackode.vercel.app
+
+# Sitemaps
 Sitemap: https://trackode.vercel.app/sitemap.xml
