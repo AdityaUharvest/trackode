@@ -38,8 +38,6 @@ export default function Signin() {
         setTimeout(() => {
           router.push("/");
         }, 2000);
-      } else {
-        toast.error(response?.error || "Sign in failed. Please try again.");
       }
     } catch (error) {
       toast.error("Sign in failed. Please try again.");

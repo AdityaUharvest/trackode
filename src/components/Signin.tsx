@@ -12,7 +12,7 @@ const SignInButton = () => {
   const { theme } = useTheme(); // Access the current theme
 
   const handleSignIn = async () => {
-    const loadingToast = toast.info("Hold on... Letting you in!", {
+    const loadingToast = toast.loading("Signing you in!", {
       autoClose: false,
     });
 

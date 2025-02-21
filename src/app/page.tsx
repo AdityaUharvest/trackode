@@ -28,7 +28,7 @@ export default function Home() {
     if (status === "authenticated" && isFirstVisit) {
       if (session?.user) {
         toast.success(
-          `Welcome ${session.user.name?.split(" ")[0]} enjoy your journey with trackode!`
+          `Welcome ${session.user.name?.split(" ")[0]}`
         );
       }
     }
