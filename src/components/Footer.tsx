@@ -1,5 +1,5 @@
 "use client";
-import { useTheme } from "@/components/ThemeContext"; // Assuming you have a ThemeContext
+import { useTheme } from "./ThemeContext"; // Assuming you have a ThemeContext
 
 export default function Footer() {
   const { theme } = useTheme(); // Use the theme context

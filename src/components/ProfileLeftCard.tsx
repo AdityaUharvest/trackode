@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useTheme } from '@/components/ThemeContext'; // Import ThemeContext
+import { useTheme } from './ThemeContext'; // Import ThemeContext
 import Quizes from './Quizes';
 import RunningQuizes from './RunningQuizes';
 import { Button } from './ui/button';

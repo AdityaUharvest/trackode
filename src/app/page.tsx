@@ -3,11 +3,11 @@
 import "flowbite";
 import { useSession } from "next-auth/react";
 import "@/app/globals.css";
-import Faq from "@/components/Faq";
+import Faq from "../components/Faq";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useTheme } from "@/components/ThemeContext"; // Assuming you have a ThemeContext
+import { useTheme } from "../components/ThemeContext"; // Assuming you have a ThemeContext
 
 export default function Home() {
   const { data: session, status } = useSession();

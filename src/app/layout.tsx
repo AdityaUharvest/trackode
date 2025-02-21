@@ -1,8 +1,8 @@
 "use client"
 import Head from "next/head";
 import { ReactNode } from "react";
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { SessionProvider } from "next-auth/react"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; 
@@ -10,7 +10,7 @@ import './globals.css';
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react"
-import { ThemeProvider } from '@/components/ThemeContext';
+import { ThemeProvider } from '../components/ThemeContext';
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

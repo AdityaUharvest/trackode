@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-import { useTheme } from '@/components/ThemeContext';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useTheme } from '../../components/ThemeContext';
+import { Card, CardContent } from '../../components/ui/card';
+import { Button } from '../../components/ui/button';
 import { Loader2 } from 'lucide-react';
 
 const TimePicker = ({ value, onChange, label }: any) => {

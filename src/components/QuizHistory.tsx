@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '@/components/ThemeContext'; // Import the useTheme hook
+import { useTheme } from './ThemeContext'; // Import the useTheme hook
 
 export default function QuizHistory({ results }: any) {
   const { theme } = useTheme(); // Access the current theme

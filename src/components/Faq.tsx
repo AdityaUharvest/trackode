@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useTheme } from "@/components/ThemeContext"; // Assuming you have a ThemeContext
+import { useTheme } from "./ThemeContext"; // Assuming you have a ThemeContext
 
 export default function Faq() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);

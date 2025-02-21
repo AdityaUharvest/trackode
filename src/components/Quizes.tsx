@@ -7,7 +7,7 @@ import PastQuizes from "./PastQuizes";
 import RunningQuizes from "./RunningQuizes";
 import { useTheme } from "./ThemeContext"; // Adjust the import path as necessary
 import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "./ui/button";
 
 export default function Quizes() {
   const [isOpen, setIsOpen] = useState(false);
