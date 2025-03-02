@@ -399,21 +399,21 @@ export default function LabFileCover() {
 
                 <div className="flex justify-between max-w-2xl mx-auto">
                   <div className="text-left ">
-                    <p className="text-xl font-bold mt-16">Submitted By:</p>
-                    <p className="text-xl mt-4">
+                    <p className="text-2xl font-bold mt-16">Submitted By:</p>
+                    <p className="text-2xl mt-4">
                       Name: {formData.submittedByName}
                     </p>
-                    <p className="text-xl">
+                    <p className="text-2xl">
                       Roll No.: {formData.submittedByRollNo}
                     </p>
                   </div>
 
                   <div className="text-right">
-                    <p className="text-xl font-bold mt-16">Submitted To:</p>
-                    <p className="text-xl mt-4">
+                    <p className="text-2xl font-bold mt-16">Submitted To:</p>
+                    <p className="text-2xl mt-4">
                       Faculty Name: {formData.submittedToName}
                     </p>
-                    <p className="text-xl">
+                    <p className="text-2xl">
                       Designation: {formData.submittedToDesignation}
                     </p>
                   </div>
