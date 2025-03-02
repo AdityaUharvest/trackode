@@ -7,11 +7,11 @@ import QuizResultClient from './QuizResultClient'; // Client component
 export default async function QuizResultPage({ params }: any) {
   await connectDB();
   const { id } = params;
-
+ 
   const result = await Attempted.findById(id)
     .populate('quiz', 'title')
     .populate('student', 'name');
-
+   
   if (!result) {
     return notFound();
   }

@@ -89,19 +89,24 @@ export default function QuizPage({ params }: any) {
     const handleFullScreenChange = () => {
       if (!document.fullscreenElement && hasStarted && !submitted) {
         // Immediately attempt to re-enter fullscreen
-        requestFullscreen(document.documentElement).catch(() => {
-          // Only count violation if re-entry fails
+        try {
+          requestFullscreen(document.documentElement)
+        } catch (error) {
           setFullScreenViolations(prev => {
             const newCount = prev + 1;
             if (newCount >= 3) {
               handleSubmitQuiz();
-              toast.error("Quiz submitted due to fullscreen violations");
+              
               return 3;
             }
             toast.error(`Fullscreen required (${newCount}/3 violations)`);
             return newCount;
           });
-        });
+       
+        }
+        
+          
+          
       }
     };
   
@@ -205,19 +210,12 @@ export default function QuizPage({ params }: any) {
   const handleStartQuiz = async () => {
     try {
       if (isMobile && !window.matchMedia("(display-mode: standalone)").matches) {
-        toast.error("Please install as PWA for secure attempt");
-        return;
+        toast.info("Please install as PWA for secure attempt");   
       }
 
       await requestFullscreen(document.documentElement);
 
-      if (screen.orientation?.lock) {
-        try {
-          await screen.orientation.lock("natural");
-        } catch (e) {
-          console.error("Orientation lock failed:", e);
-        }
-      }
+      
 
       setHasStarted(true);
     } catch (error) {
@@ -254,6 +252,7 @@ export default function QuizPage({ params }: any) {
       try {
         const response = await axios.get(`/api/quiz-get/${id}`);
         if(response.data.success.active === false){
+          console.log(response.data.success.active);
           toast.error("Quiz is not active");
           router.push("/dashboard");
         }
