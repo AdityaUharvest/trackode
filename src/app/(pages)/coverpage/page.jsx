@@ -404,7 +404,17 @@ export default function LabFileCover() {
 
       <style jsx global>{`
         @media print {
-          .print-controls {
+          .print-controls, nav,
+        footer,
+        header,
+        .navbar,
+        .footer,
+        .site-header,
+        .site-footer,
+        .navigation,
+        .menu,
+        .nav-container,
+        .footer-container{
             display: none !important;
           }
 
@@ -426,19 +436,7 @@ export default function LabFileCover() {
             box-sizing: border-box;
           }
         }
-        nav,
-        footer,
-        header,
-        .navbar,
-        .footer,
-        .site-header,
-        .site-footer,
-        .navigation,
-        .menu,
-        .nav-container,
-        .footer-container {
-          display: none !important;
-        }
+        
 
         /* Ensure the body takes full width on any device */
         body {
