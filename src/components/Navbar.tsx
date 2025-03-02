@@ -178,7 +178,7 @@ const Navbar: React.FC = () => {
             </li>
             <li>
               <Link
-                href="#"
+                href="/contact"
                 className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
                 Contact
