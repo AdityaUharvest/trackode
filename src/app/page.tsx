@@ -56,7 +56,7 @@ export default function Home() {
             <div className={`text-center font-[650] ${theme === "dark" ? "text-gray-500" : "text-darkText-400"} md:text-3xl`}>
               <p>
                 <span className={theme === "dark" ? "text-white" : "text-black"}>Trac</span>
-                <span className="text-blue-600">kode </span>
+                <span className="text-blue-500">kode </span>
                 helps you navigate and track your journey to success
               </p>
             </div>
@@ -66,7 +66,7 @@ export default function Home() {
                 <Link
                   href="/admin-dashboard"
                   title=""
-                  className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold text-white transition-all bg-blue-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-blue-950 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-blue-400"
+                  className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold text-white transition-all bg-blue-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
                   role="button"
                 >
                   Get Started
