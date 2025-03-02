@@ -28,11 +28,11 @@ export default function Home() {
     if (status === "authenticated" && isFirstVisit) {
       if (session?.user) {
         toast.success(
-          `Welcome ${session.user.name?.split(" ")[0]}`
+          `Welcome ${session.user.name?.split(" ")[0]}`,
         );
       }
     }
-  }, [status, isFirstVisit, session?.user]); // Add session?.user as a dependency
+  }, [isFirstVisit, session?.user, status]); // Add session?.user as a dependency
 
   useEffect(() => {
     if (status === "unauthenticated") {

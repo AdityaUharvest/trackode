@@ -105,7 +105,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       if (response.data.success) {
         setIsPublished(true);
         setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
-        console.log(shareLink);
+        
         toast.success("Quiz published successfully!");
       } else {
         toast.error(response.data.message);
@@ -265,7 +265,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                 {isPublished && (
                   <Button
                     onClick={() => {
-                      navigator.clipboard.writeText(shareLink);
+                      setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
                       toast.success("Link copied to clipboard!");
                     }}
                     className="bg-green-600 text-white hover:bg-green-700"
