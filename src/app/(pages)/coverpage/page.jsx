@@ -13,6 +13,7 @@ const initialFormData = {
   submittedToName: "",
   submittedToDesignation: "",
   session: "2024-25",
+  subjectCode: "",
 };
 
 const getOrdinalYear = (year) => {
@@ -81,6 +82,8 @@ export default function LabFileCover() {
 
   return (
     <div className="min-h-screen bg-white p-8 relative">
+      <p className="text-center text-xl print-controls mb-10 mt-8 font-bold animate-bounce text-blue-600">Cover Page Generator - GITM !</p>
+
       {!isSubmitted ? (
         <div className="max-w-2xl mx-auto">
           {/* Form Steps */}
@@ -201,7 +204,7 @@ export default function LabFileCover() {
                     <option>Project</option>
                   </select>
                 </div>
-
+                <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Subject Name
@@ -213,6 +216,19 @@ export default function LabFileCover() {
                     onChange={handleInputChange}
                     className="w-full p-2 border rounded-md"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Subject Code
+                  </label>
+                  <input
+                    type="text"
+                    name="subjectCode"
+                    value={formData.subjectCode}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-md"
+                  />
+                </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">
@@ -228,7 +244,7 @@ export default function LabFileCover() {
                 </div>
               </div>
             )}
-
+            
             {/* Step 3 */}
             {currentStep === 3 && (
               <div className="space-y-6">
@@ -317,8 +333,13 @@ export default function LabFileCover() {
               )}
             </div>
           </div>
+          <div className="">
+          <p className="text-center mt-10 text-xl text-blue-500 mb-4 font-bold">Sample Preview</p>
+          <img className="mx-auto border shadow-blue-600 shadow-md" src="coverpage.png" loading="lazy" ></img>
+          </div>
         </div>
-      ) : (
+      
+    ) : (
         /* Cover Page */
         <div>
           <div className="flex gap-4 mb-4 print-controls">
@@ -371,8 +392,9 @@ export default function LabFileCover() {
                   <h2 className="text-2xl font-bold">
                     {formData.fileType} File
                   </h2>
-                  <h2 className="text-2xl mt-4">of</h2>
+                  <h2 className="text-2xl mt-2">of</h2>
                   <p className="text-2xl mt-4">{formData.subjectName}</p>
+                  <p className="text-2xl mt-2">{formData.subjectCode}</p>
                 </div>
 
                 <div className="flex justify-between max-w-2xl mx-auto">
