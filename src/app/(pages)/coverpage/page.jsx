@@ -360,7 +360,7 @@ export default function LabFileCover() {
             <div className="a4-sheet">
               <div className="text-center  space-y-4">
                 <div className="mb-12">
-                  <h1 className="text-2xl font-serif font-bold uppercase">
+                  <h1 className="text-2xl  font-serif font-bold uppercase">
                     Goel Institute of Technology and Management, Lucknow
                   </h1>
                 </div>
@@ -442,19 +442,20 @@ export default function LabFileCover() {
 
           @page {
             size: A4;
-            margin-top:20mm;
+            margin-top:25mm;
+            margin:10mm;
           }
           #print-content {
             width: 100%;
             height: 100%;
             margin: 0;
-            padding: 0;
+            padding: 5;
           }
           .a4-sheet {
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto;
-            padding: 0mm;
+            padding: 7mm;
             box-sizing: border-box;
           }
         }
