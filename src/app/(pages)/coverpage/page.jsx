@@ -397,7 +397,7 @@ export default function LabFileCover() {
                   <p className="text-2xl mt-2">{formData.subjectCode}</p>
                 </div>
 
-                <div className="flex justify-between max-w-2xl mx-auto">
+                <div className="flex justify-between max-w-3xl mx-auto">
                   <div className="text-left ">
                     <p className="text-2xl font-bold mt-16">Submitted By:</p>
                     <p className="text-2xl mt-4">
