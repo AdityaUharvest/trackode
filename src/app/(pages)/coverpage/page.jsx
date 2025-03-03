@@ -470,9 +470,9 @@ export default function LabFileCover() {
         }
 
         /* Force page breaks to be respected on all devices */
-        .page-break {
+        /*.page-break {
           page-break-before: always;
-        }
+        }*/
       `}</style>
     </div>
   );
