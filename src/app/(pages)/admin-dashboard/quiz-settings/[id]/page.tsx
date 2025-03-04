@@ -125,7 +125,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       if (response.data.success) {
         setIsPublished(false);
         setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
-        console.log(shareLink);
+        
         toast.error("Quiz Unpublished successfully!");
       } else {
         toast.error(response.data.message);
@@ -264,15 +264,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
                 {isPublished && (
                   <Button
-                    onClick={() => {
-                      setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
-                      toast.success("Link copied to clipboard!");
-                    }}
-                    className="bg-green-600 text-white hover:bg-green-700"
-                  >
-                    <Share size={16} className="mr-2" />
-                    Share Quiz
-                  </Button>
+                  onClick={() => {
+                    const link = `${window.location.origin}/quiz-play/${quizId}`;
+                    navigator.clipboard.writeText(link)
+                      .then(() => {
+                        toast.success("Link copied to clipboard!");
+                      })
+                      .catch((error) => {
+                        console.error("Failed to copy:", error);
+                        toast.error("Failed to copy link");
+                      });
+                  }}
+                  className="bg-green-600 text-white hover:bg-green-700"
+                >
+                  <Share size={16} className="mr-2" />
+                  Share Quiz
+                </Button>
                 )}
               </div>
 
