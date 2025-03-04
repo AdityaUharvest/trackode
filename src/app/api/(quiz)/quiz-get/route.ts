@@ -24,8 +24,8 @@ export async function GET(req: NextRequest) {
             // Convert string MongoDB ID to ObjectId
             const userId = new mongoose.Types.ObjectId(session.user.id);
            
-            // Find quizzes for this user
-            const quizzes = await Quiz.find({ createdBy: userId }).populate('questions');
+            // Find quizzes for this user and return in descending order of createdAt
+            const quizzes = await Quiz.find({ createdBy: userId }).populate('questions').sort({ createdAt: -1 });
             
             let participants = await Attempted.find({quiz:{$in:quizzes.map(quiz=>quiz._id)}}).sort({attemptedAt:-1}).populate('student').populate('quiz')
             

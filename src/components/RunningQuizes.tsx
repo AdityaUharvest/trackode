@@ -495,7 +495,7 @@ const RunningQuizes: React.FC = () => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="lg:text-base">Running Quizes</CardTitle>
+            <CardTitle className="lg:text-base">Running Quizes 🏃‍♂️‍➡️</CardTitle>
             <CardDescription className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>Manage your active quizes</CardDescription>
           </div>
           {/* <Link href="/quiz-setup">
@@ -520,7 +520,7 @@ const RunningQuizes: React.FC = () => {
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex items-center justify-between w-full pr-4">
                     <div className="flex items-center gap-4">
-                      <span className="font-bold lg:text-base">{quiz.name}</span>
+                      <span className=" text-sm">{quiz.name}</span>
                       <Badge
                         variant={quiz.active ? "outline" : "destructive"}
                         className={quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700 text-white" : "bg-green-600 text-white hover:bg-green-700") : ""}
@@ -534,23 +534,23 @@ const RunningQuizes: React.FC = () => {
                   <div className="flex gap-1 ml-0 sm:p-0 sm:text-end pt-1">
                     <Button
                       onClick={() => handleAddQuestion(index, quiz._id)}
-                      className={`sm:text-end ${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-5 lg:text-base flex items-center`}
+                      className={`sm:text-end ${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} lg:p-2 lg:text-sm flex items-center`}
                     >
                       Question
-                      <Plus size={1} />
+                      <Plus className="ml-2" size={1} />
                     </Button>
                     <Link href = {`quiz-result/${quiz._id}`}
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 text-white hover:bg-blue-700"} p-3 h-9 rounded-lg sm:p-2 lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 text-white hover:bg-blue-700"} p-3 h-9 rounded-sm sm:p-2 text-sm flex items-center`}
                     >
                       Results
                       
                     </Link>
                     <Link 
                     href={`admin-dashboard/quiz-settings/${quiz._id}`}
-                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-9 rounded-lg text-white lg:text-base sm:text-end flex items-center`}
+                      className={`${theme === "dark" ? "bg-blue-800 text-white hover:bg-blue-950" : "bg-blue-600 hover:bg-blue-700"} p-3 h-9 rounded-sm text-white text-sm flex items-center`}
                     >
-                      Publish 
-                      <Settings size={16} />
+                      Publish <Settings className="ml-2" size={16} />
+                         
                     </Link>
                   </div>
 

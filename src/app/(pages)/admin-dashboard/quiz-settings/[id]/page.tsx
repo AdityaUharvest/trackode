@@ -191,7 +191,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         <Card className={`h-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle className="text-2xl">
+              <CardTitle className="text-xl">
                 {isEditingQuiz ? (
                   <Input
                     value={updatedQuiz?.name || ""}
@@ -359,7 +359,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 text-sm">
                   <p><strong>Start Date:</strong> {quiz.startDate?.split("T")[0]}</p>
                   <p><strong>End Date:</strong> {quiz.endDate?.split("T")[0]}</p>
                   <p><strong>Start Time:</strong> {quiz.startTime}</p>
@@ -394,7 +394,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       )
       
       }
-          <CardContent className="overflow-y-auto max-h-[calc(250vh-200px)] min-h-[calc(150vh-200px)]">
+          <CardContent className="overflow-y-auto text-sm max-h-[calc(250vh-200px)] min-h-[calc(150vh-200px)]">
             <div className="space-y-4">
               {quiz.questions?.map((q, index) => (
                 <QuestionCard
@@ -436,10 +436,10 @@ const QuestionCard: React.FC<{
   };
 
   return (
-    <Card className={`${theme === "dark" ? "bg-gray-700" : "bg-amber-100"}`}>
+    <Card className={`${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
-          <h3 className="font-bold text-lg">Q.{index + 1}</h3>
+          <h3 className="font-bold text-sm">Q.{index + 1}</h3>
           <div className="flex gap-2">
             {isEditing ? (
               <>
@@ -454,8 +454,8 @@ const QuestionCard: React.FC<{
               </>
             ) : (
               <>
-                <Button onClick={() => setIsEditing(true)} className="bg-blue-600 text-white hover:bg-blue-700">
-                  <Edit size={16} className="mr-2" />
+                <Button onClick={() => setIsEditing(true)} className="bg-blue-600 text-sm text-white hover:bg-blue-700">
+                  <Edit size={5} className="mr-2" />
                   Edit
                 </Button>
                 {/* <Button onClick={onDelete} className="bg-red-600 hover:bg-red-700">

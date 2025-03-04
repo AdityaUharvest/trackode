@@ -46,12 +46,13 @@ export default function DashBoard() {
   for (let i = 0; i < participants.length; i++) {
 
     const date = new Date(participants[i].attemptedAt);
+    if(i<5){
     recentData.push({
       name: participants[i].quiz.name,
       score: participants[i].correctAnswers / participants[i].totalQuestions * 100,
       studentName: participants[i].student.name,
       time: date.toLocaleString()
-    });
+    });}
   }
 
   const fetchQuiz = async () => {
@@ -86,10 +87,10 @@ export default function DashBoard() {
   };
 
   const StatCard = ({ title, value, trend, theme }) => (
-    <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+    <div className={`p-4   border-gray-50 rounded-lg ${theme === 'dark' ? 'bg-gray-800 shadow-xl shadow-gray-900' : 'bg-white shadow-xl shadow-slate-300'} shadow-lg`}>
       <h3 className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{title}</h3>
       <div className="flex items-baseline mt-2">
-        <span className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{value}</span>
+        <span className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>{value}</span>
         {trend && <span className="ml-2 text-sm text-green-500">{trend}</span>}
       </div>
     </div>
@@ -113,12 +114,12 @@ export default function DashBoard() {
         {quizes.length > 0 ? (
           <div className='mt-1 p-1'>
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <StatCard theme={theme} title="Created Quizzes " value={quizStats.totalQuizzes} />
               <StatCard theme={theme} title="Active Quizzes" value={quizStats.activeQuizzes} />
               <StatCard theme={theme} title="Total Registrations" value={quizStats.totalParticipants.toLocaleString()} trend="+12%" />
               <StatCard theme={theme} title="Recent Participations" value={quizStats.totalParticipantsInRecentQuizzes.toLocaleString()} trend="+4%" />
-              <StatCard theme={theme} title="Avg.Score" value={`${quizStats.avgScore}%`} />
+              
             </div>
 
             {/* Charts Section */}
@@ -166,39 +167,9 @@ export default function DashBoard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                   {/* Answer Distribution */}
-                  <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                    <h3 className={`mb-4 font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>Answer Distribution</h3>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart>
-                        <Pie
-                          data={quizStats.answerDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {quizStats.answerDistribution.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={index === 0 ? (theme === 'dark' ? '#3b82f6' : '#2563eb') : (theme === 'dark' ? '#64748b' : '#cbd5e1')}
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: theme === 'dark' ? '#1e293b' : '#fff',
-                            borderColor: theme === 'dark' ? '#334155' : '#cbd5e1'
-                          }}
-                        />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-
+                  
                   {/* Recent Quiz Attempts */}
-                  <div className={`lg:col-span-2 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                  <div className={`lg:col-span-3 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
                     <h3 className={`mb-4 font-semibold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>Recent Quiz Attempts</h3>
                     <div className="overflow-x-auto">
                       <table className="w-full">

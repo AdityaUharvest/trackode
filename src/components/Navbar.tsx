@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
             
           />
           
-          <span className={`self-center lg:text-xl sm:text-sm font-bold font-serif whitespace-nowrap ${theme === "light" ? "text-black" : "text-white"}`}>
+          <span className={`self-center lg:text-xl sm:text-sm font-bold whitespace-nowrap ${theme === "light" ? "text-gray-950" : "text-white"}`}>
             Trackode
           </span>
         </Link>
