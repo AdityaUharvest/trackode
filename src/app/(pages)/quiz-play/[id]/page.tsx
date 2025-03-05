@@ -88,57 +88,59 @@ export default function QuizPage({ params }: any) {
   useEffect(() => {
     const handleFullScreenChange = () => {
       if (!document.fullscreenElement && hasStarted && !submitted) {
+        // Immediately attempt to re-enter fullscreen
         try {
-          requestFullscreen(document.documentElement);
+          requestFullscreen(document.documentElement)
         } catch (error) {
-          setFullScreenViolations((prev) => {
+          setFullScreenViolations(prev => {
             const newCount = prev + 1;
             if (newCount >= 3) {
               handleSubmitQuiz();
+              
               return 3;
             }
             toast.error(`Fullscreen required (${newCount}/3 violations)`);
             return newCount;
           });
+       
         }
+        
+          
+          
       }
     };
-
+  
     const handleKeyDown = (e: KeyboardEvent) => {
       if (hasStarted && !submitted) {
+        // Block more comprehensive set of keys
         const blockedKeys = [
-          "Escape",
-          "F11",
-          "F4",
-          "Alt",
-          "Meta",
-          "Control",
-          "Tab",
-          "PrintScreen",
+          'Escape', 'F11', 'F4', 
+          'Alt', 'Meta', 'Control',
+          'Tab', 'PrintScreen'
         ];
-
-        if (
-          blockedKeys.includes(e.key) ||
-          (e.ctrlKey && ["w", "q", "tab"].includes(e.key.toLowerCase())) ||
-          (e.altKey && e.key !== "Alt")
-        ) {
+        
+        if (blockedKeys.includes(e.key) || 
+            e.ctrlKey && ['w', 'q', 'tab'].includes(e.key.toLowerCase()) ||
+            e.altKey && e.key !== 'Alt') {
           e.preventDefault();
           e.stopPropagation();
           toast.error("Function disabled during quiz");
         }
       }
     };
-
+  
+    // Add mouseleave detection
     const handleMouseLeave = (e: MouseEvent) => {
       if (hasStarted && !submitted && e.clientY < 0) {
         e.preventDefault();
         requestFullscreen(document.documentElement);
       }
     };
-
+  
+    // Add orientation change detection
     const handleOrientationChange = () => {
       if (hasStarted && !submitted) {
-        setFullScreenViolations((prev) => {
+        setFullScreenViolations(prev => {
           const newCount = prev + 1;
           if (newCount >= 3) {
             handleSubmitQuiz();
@@ -150,23 +152,25 @@ export default function QuizPage({ params }: any) {
         });
       }
     };
-
-    document.addEventListener("fullscreenchange", handleFullScreenChange);
-    document.addEventListener("webkitfullscreenchange", handleFullScreenChange);
-    document.addEventListener("mozfullscreenchange", handleFullScreenChange);
-    document.addEventListener("MSFullscreenChange", handleFullScreenChange);
-    document.addEventListener("keydown", handleKeyDown, true);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    window.addEventListener("orientationchange", handleOrientationChange);
-
+  
+    // Add all event listeners
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullScreenChange);
+    document.addEventListener('keydown', handleKeyDown, true);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('orientationchange', handleOrientationChange);
+  
     return () => {
-      document.removeEventListener("fullscreenchange", handleFullScreenChange);
-      document.removeEventListener("webkitfullscreenchange", handleFullScreenChange);
-      document.removeEventListener("mozfullscreenchange", handleFullScreenChange);
-      document.removeEventListener("MSFullscreenChange", handleFullScreenChange);
-      document.removeEventListener("keydown", handleKeyDown, true);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      window.removeEventListener("orientationchange", handleOrientationChange);
+      // Cleanup all listeners
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
+      document.removeEventListener('keydown', handleKeyDown, true);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('orientationchange', handleOrientationChange);
     };
   }, [hasStarted, submitted]);
 
@@ -174,12 +178,12 @@ export default function QuizPage({ params }: any) {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasStarted && !submitted) {
         e.preventDefault();
-        e.returnValue = "";
+        e.returnValue = '';
       }
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasStarted, submitted]);
 
   useEffect(() => {
@@ -192,7 +196,7 @@ export default function QuizPage({ params }: any) {
     const handleContextMenu = (e: MouseEvent) => {
       e.preventDefault();
     };
-
+   
     document.addEventListener("contextmenu", handleContextMenu);
     return () => document.removeEventListener("contextmenu", handleContextMenu);
   }, []);
@@ -206,10 +210,13 @@ export default function QuizPage({ params }: any) {
   const handleStartQuiz = async () => {
     try {
       if (isMobile && !window.matchMedia("(display-mode: standalone)").matches) {
-        toast.info("Please install as PWA for secure attempt");
+        toast.info("Please install as PWA for secure attempt");   
       }
 
       await requestFullscreen(document.documentElement);
+
+      
+
       setHasStarted(true);
     } catch (error) {
       toast.error("Failed to enter secure mode. Please try again.");
@@ -244,7 +251,8 @@ export default function QuizPage({ params }: any) {
     const fetchQuiz = async () => {
       try {
         const response = await axios.get(`/api/quiz-get/${id}`);
-        if (response.data.success.active === false) {
+        if(response.data.success.active === false){
+          console.log(response.data.success.active);
           toast.error("Quiz is not active");
           router.push("/dashboard");
         }
@@ -351,14 +359,10 @@ export default function QuizPage({ params }: any) {
 
   if (hasAttempted) {
     return (
-      <div
-        className={`flex flex-col justify-center items-center gap-2 h-screen ${
-          theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-        }`}
-      >
+      <div className={`flex flex-col justify-center items-center gap-2 h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
         <p className="text-xl text-white-600">You have already attempted this quiz.</p>
         <Link href="/dashboard" className="bg-blue-600 p-2 rounded-lg">
-          Dashboard
+          Dashboard 
         </Link>
       </div>
     );
@@ -366,28 +370,16 @@ export default function QuizPage({ params }: any) {
 
   if (!quizData) {
     return (
-      <div
-        className={`flex justify-center items-center h-screen ${
-          theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-        }`}
-      >
-        <Loader2 className="animate-spin" />
+      <div className={`flex justify-center items-center h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+        <Loader2 className="animate-spin"/>
       </div>
     );
   }
 
   if (!hasStarted) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center p-4 ${
-          theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-        }`}
-      >
-        <div
-          className={`rounded-lg shadow-lg p-8 max-w-2xl w-full ${
-            theme === "dark" ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+      <div className={`min-h-screen flex items-center justify-center p-4 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+        <div className={`rounded-lg shadow-lg p-8 max-w-2xl w-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-xl font-bold mb-4">{quizData.name} Instructions</h1>
             <button
@@ -395,18 +387,14 @@ export default function QuizPage({ params }: any) {
               disabled={!declarationsAgreed || !termsAgreed}
               className={`p-2 rounded-lg mb-4 transition-colors ${
                 theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
-              } text-white ${!declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : ""}`}
+              } text-white ${(!declarationsAgreed || !termsAgreed) ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               Start Quiz in Fullscreen
             </button>
           </div>
           <div className="space-y-4">
             {isMobile && (
-              <div
-                className={`p-3 mb-4 rounded-lg ${
-                  theme === "dark" ? "bg-red-900" : "bg-red-100"
-                }`}
-              >
+              <div className={`p-3 mb-4 rounded-lg ${theme === "dark" ? "bg-red-900" : "bg-red-100"}`}>
                 ⚠️ Mobile Restrictions:
                 <ul className="list-disc pl-5 mt-2">
                   <li>Screen recording/printscreen disabled</li>
@@ -424,20 +412,14 @@ export default function QuizPage({ params }: any) {
             <div className="instructions" style={{ whiteSpace: "pre-line" }}>
               {quizData.instructions}
             </div>
-
-            <div
-              className={`p-4 rounded-lg ${
-                theme === "dark" ? "bg-gray-700" : "bg-gray-100"
-              }`}
-            >
+            
+            <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"}`}>
               <label className="flex items-center gap-2 mb-4">
                 <input
                   type="checkbox"
                   checked={declarationsAgreed}
                   onChange={(e) => setDeclarationsAgreed(e.target.checked)}
-                  className={`form-checkbox h-4 w-4 ${
-                    theme === "dark" ? "text-blue-600" : "text-blue-600"
-                  }`}
+                  className={`form-checkbox h-4 w-4 ${theme === "dark" ? "text-blue-600" : "text-blue-600"}`}
                 />
                 <span>I hereby declare that I am not cheating. If found cheating, I understand I will be debarred.</span>
               </label>
@@ -446,9 +428,7 @@ export default function QuizPage({ params }: any) {
                   type="checkbox"
                   checked={termsAgreed}
                   onChange={(e) => setTermsAgreed(e.target.checked)}
-                  className={`form-checkbox h-4 w-4 ${
-                    theme === "dark" ? "text-blue-600" : "text-blue-600"
-                  }`}
+                  className={`form-checkbox h-4 w-4 ${theme === "dark" ? "text-blue-600" : "text-blue-600"}`}
                 />
                 <span>I agree to the terms and conditions of the quiz.</span>
               </label>
@@ -461,9 +441,7 @@ export default function QuizPage({ params }: any) {
 
   return (
     <div
-      className={`min-h-screen p-6 ${
-        theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
-      }`}
+      className={`min-h-screen p-6 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}
       style={{
         userSelect: "none",
         WebkitUserSelect: "none",
@@ -486,7 +464,7 @@ export default function QuizPage({ params }: any) {
         toast.error("Pasting disabled during quiz");
       }}
     >
-      <ReturnToFullscreenButton />
+      <ReturnToFullscreenButton/>
       <div className="flex justify-between items-center mb-8">
         <div className="text-xl font-bold">
           Time Remaining: {Math.floor(timeLeft / 60).toString().padStart(2, "0")}:
@@ -503,11 +481,7 @@ export default function QuizPage({ params }: any) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div
-          className={`lg:col-span-3 rounded-lg shadow-lg p-8 ${
-            theme === "dark" ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+        <div className={`lg:col-span-3 rounded-lg shadow-lg p-8 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <h3 className="text-xl font-bold mb-6">Question {currentQuestion + 1}</h3>
           <p className="mb-8">{quizData.questions[currentQuestion].question}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -561,11 +535,7 @@ export default function QuizPage({ params }: any) {
         </div>
 
         {/* Side Panel */}
-        <div
-          className={`rounded-lg shadow-lg p-6 ${
-            theme === "dark" ? "bg-gray-800" : "bg-white"
-          }`}
-        >
+        <div className={`rounded-lg shadow-lg p-6 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
           <h4 className="text-lg font-bold mb-4">Questions</h4>
           <div className="grid grid-cols-5 gap-2 mb-6">
             {quizData.questions.map((_: any, index: number) => (
@@ -579,4 +549,6 @@ export default function QuizPage({ params }: any) {
                       : "border-blue-600 bg-blue-50"
                     : questionStatus[index].answered
                     ? theme === "dark"
-                  
+                      ? "border-green-600 bg-green-900"
+                      : "border-green-500 bg-green-50"
+                    : questionStatus[index].marked
