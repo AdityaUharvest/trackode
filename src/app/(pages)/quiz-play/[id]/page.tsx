@@ -552,3 +552,163 @@ export default function QuizPage({ params }: any) {
                       ? "border-green-600 bg-green-900"
                       : "border-green-500 bg-green-50"
                     : questionStatus[index].marked
+                    ? theme === "dark"
+                      ? "border-orange-600 bg-orange-900"
+                      : "border-orange-400 bg-orange-50"
+                    : theme === "dark"
+                    ? "border-gray-700 bg-gray-700"
+                    : "border-gray-200 bg-gray-50"
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+
+          {showCalculator && (
+            <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
+              <ScientificCalculator theme={theme} />
+            </div>
+          )}
+
+<button
+        onClick={handleSubmitQuiz}
+        disabled={submitted || isSubmitting}
+        className={`w-full py-3 rounded-lg transition-colors ${
+          theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-600 hover:bg-red-700"
+        } text-white mt-6 disabled:opacity-75 disabled:cursor-not-allowed`}
+      >
+        {submitted ? (
+          "Quiz Submitted"
+        ) : isSubmitting ? (
+          <div className="flex items-center justify-center gap-2 select-none">
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Submitting...
+          </div>
+        ) : (
+          "Submit Quiz"
+        )}
+      </button>
+      <ScientificCalculator 
+        theme={theme}
+        onContextMenu={(e: any) => e.preventDefault()}
+        className="select-none"
+      />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Scientific Calculator Component
+const ScientificCalculator = ({ theme }: any) => {
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState("");
+
+  const handleMathFunctions = (expression: string) => {
+    // Replace mathematical functions with Math object equivalents
+    return expression
+      .replace(/sqrt\(/g, 'Math.sqrt(')
+      .replace(/pow\(/g, 'Math.pow(')
+      .replace(/sin\(/g, 'Math.sin(')
+      .replace(/cos\(/g, 'Math.cos(')
+      .replace(/tan\(/g, 'Math.tan(')
+      .replace(/log\(/g, 'Math.log10(') // Use log10 for base 10 logarithm
+      .replace(/π/g, 'Math.PI')
+      .replace(/e/g, 'Math.E');
+  };
+
+  const calculateResult = (expr: string) => {
+    try {
+      // Convert degrees to radians for trigonometric functions
+      const processedExpr = expr.replace(/(sin|cos|tan)\(([^)]+)\)/g, (_, func, angle) => {
+        const radians = (parseFloat(angle) * Math.PI) / 180;
+        return `Math.${func}(${radians})`;
+      });
+      
+      const finalExpression = handleMathFunctions(processedExpr);
+      return eval(finalExpression).toFixed(4);
+    } catch (error) {
+      return "Error";
+    }
+  };
+
+  const handleInput = (value: string) => {
+    if (value === "=") {
+      try {
+        const calculation = calculateResult(input);
+        setResult(calculation.toString());
+      } catch {
+        setResult("Error");
+      }
+    } else if (value === "C") {
+      setInput("");
+      setResult("");
+    } else if (value === "pow") {
+      setInput(prev => prev + "pow(");
+    } else if (value === "sqrt") {
+      setInput(prev => prev + "sqrt(");
+    } else if (["sin", "cos", "tan", "log"].includes(value)) {
+      setInput(prev => prev + `${value}(`);
+    } else {
+      setInput(prev => prev + value);
+    }
+  };
+
+  const scientificButtons = [
+    "7", "8", "9", "/", "sqrt",
+    "4", "5", "6", "*", "pow",
+    "1", "2", "3", "-", "log",
+    "0", ".", "=", "+", "sin",
+    "C", "cos", "tan", "(", ")"
+  ];
+
+  return (
+    <div className="select-none" onContextMenu={(e) => e.preventDefault()}>
+      <div className={`p-3 rounded-lg mb-4 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+        <div className={`text-right ${theme === "dark" ? "text-gray-300" : "text-gray-700"} min-h-[20px]`}>
+          {input || "0"}
+        </div>
+        <div className={`text-right font-bold text-xl ${theme === "dark" ? "text-white" : "text-black"} min-h-[28px]`}>
+          {result || "0"}
+        </div>
+      </div>
+      <div className="grid grid-cols-5 gap-2">
+        {scientificButtons.map((btn) => (
+          <button
+            key={btn}
+            onClick={() => handleInput(btn)}
+            className={`p-3 rounded-lg transition-colors ${
+              btn === "="
+                ? "col-span-2 bg-blue-600 hover:bg-blue-700 text-white"
+                : theme === "dark"
+                ? "bg-gray-700 hover:bg-gray-600 text-white"
+                : "bg-gray-200 hover:bg-gray-300 text-black"
+            }`}
+          >
+            {btn}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}; 
