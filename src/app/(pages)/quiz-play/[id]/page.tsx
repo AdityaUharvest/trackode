@@ -470,7 +470,7 @@ export default function QuizPage({ params }: any) {
         MozUserSelect: "none",
         msUserSelect: "none",
         WebkitTouchCallout: "none",
-        touchAction: isMobile ? "none" : "auto",
+        
       }}
       onContextMenu={(e) => e.preventDefault()}
       onCopy={(e) => {
