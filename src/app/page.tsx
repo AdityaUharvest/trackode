@@ -8,6 +8,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useTheme } from "../components/ThemeContext"; // Assuming you have a ThemeContext
+import SplitText from "../components/SplitText";
+import GradientText from "@/components/GradientText"
+const handleAnimationComplete = () => {
+  console.log('All letters have animated!');
+};
+
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -47,19 +53,45 @@ export default function Home() {
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
             <p className="mt-5 text-4xl font-bold leading-tight sm:leading-tight sm:text-5xl lg:text-6xl lg:leading-tight font-pj">
-              <span className="transition-shadow">Track </span>Grow
-              <span className="relative inline-flex sm:inline">
-                <span className="bg-gradient-to-r from-[#44BCFF] via-[#FF44EC] to-[#FF675E] blur-lg filter opacity-30 w-full h-full absolute inset-0"></span>
-                <span className="relative ml-3">Analyze </span>
+              <span>
+                <SplitText
+                  text="Track"
+                  className="text-3xl text-blue-600 font-semibold text-center"
+                  delay={150}
+                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                  easing="easeOutCubic"
+                  threshold={0.2}
+                  rootMargin="-50px"
+                  onLetterAnimationComplete={handleAnimationComplete}
+                />
               </span>
+              <span>
+                <SplitText
+                  text="Code Quiz "
+                  className="text-3xl  font-semibold text-center"
+                  delay={150}
+                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                  easing="easeOutCubic"
+                  threshold={0.2}
+                  rootMargin="-50px"
+                  onLetterAnimationComplete={handleAnimationComplete}
+                />
+
+
+                <GradientText
+                  colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+                  animationSpeed={15}
+                  showBorder={false}
+                  className="text-3xl font-semibold"
+                >
+                  Trackode Helps You Navigate and Track Your Journey to Success
+                </GradientText>
+              </span>
+
             </p>
-            <div className={`text-center font-[650] ${theme === "dark" ? "text-gray-500" : "text-darkText-400"} md:text-3xl`}>
-              <p>
-                <span className={theme === "dark" ? "text-white" : "text-black"}>Trac</span>
-                <span className="text-blue-500">kode </span>
-                helps you navigate and track your journey to success
-              </p>
-            </div>
+
 
             <div className="px-8 sm:items-center sm:justify-center sm:px-0 sm:space-x-5 sm:flex mt-9 p-8">
               {session ? (
@@ -148,18 +180,18 @@ export default function Home() {
               <div className="lg:max-w-3xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img
                   className="transform rounded-lg  shadow-lg hover:animate-pulse shadow-blue-800 scale-120"
-                  src={`${theme === "dark"?"homepage.png":"homepagedark.png"}`}
+                  src={`${theme === "dark" ? "homepage.png" : "homepagedark.png"}`}
                   alt="Dashboard image"
                   loading="lazy"
                 />
-                
+
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 text-center ps-5 pr-5 pb-28">
-          <h3 className={`text-3xl font-semibold sm:text-5xl ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+        <div className="flex flex-col  gap-2 text-center ps-5 pr-5 pb-28">
+          <h3 className={`text-2xl animate-pulse   font-semibold sm:text-3xl ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
             Your Favourite Platform
           </h3>
           <p className={`text-center font-[550] sm:text-xl md:text-3xl ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
@@ -167,13 +199,13 @@ export default function Home() {
           </p>
         </div>
         <div className="lg:max-w-4xl  mb-14 ml-6 mr-6 justify-center flex lg:mx-auto">
-                <img
-                  className="transform rounded-lg  shadow-lg  shadow-blue-800 scale-120"
-                  src={`${theme === "dark"?"homepage2.png":"homepage2dark.png"}`}
-                  alt="Dashboard image"
-                  loading="lazy"
-                />
-                
+          <img
+            className="transform rounded-lg  shadow-lg  shadow-blue-800 scale-120"
+            src={`${theme === "dark" ? "homepage2.png" : "homepage2dark.png"}`}
+            alt="Dashboard image"
+            loading="lazy"
+          />
+
         </div>
       </section>
       <Faq />

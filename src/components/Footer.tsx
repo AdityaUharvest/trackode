@@ -1,6 +1,6 @@
 "use client";
 import { useTheme } from "./ThemeContext"; // Assuming you have a ThemeContext
-
+import Link from "next/link";
 export default function Footer() {
   const { theme } = useTheme(); // Use the theme context
 
@@ -23,10 +23,12 @@ export default function Footer() {
                 src={theme === "dark" ? "https://i.ibb.co/WppJvVPk/image-2025-02-12-122350771.png" : "https://i.ibb.co/twvK9Wdm/image-2025-02-12-131158350.png"}
                 alt="Footer Logo"
               />
+              <Link className="mb-3 text-lg font-sans font-cur text-yellow-400" href="https://buymeacoffee.com/iamadityaupadhyay"><span className="text-green-300">Buy me</span> a coffee ☕</Link>
               
 
 
             <div className="flex flex-wrap justify-center mt-2 mx-4">
+              
               <a
                 href="/"
                 className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
