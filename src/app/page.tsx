@@ -48,15 +48,15 @@ export default function Home() {
   }, [status]);
 
   return (
-    <div className={`overflow-x-hidden ${theme === "dark" ? "bg-gray-950 text-white" : "bg-white text-black"}`}>
-      <section className={`pt-12 ${theme === "dark" ? "bg-gray-950 text-white" : "bg-white text-black"} sm:pt-16`}>
+    <div className={`overflow-x-hidden ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
+      <section className={`pt-12 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"} sm:pt-16`}>
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="max-w-2xl mx-auto text-center">
             <p className="mt-5 text-4xl font-bold leading-tight sm:leading-tight sm:text-5xl lg:text-6xl lg:leading-tight font-pj">
               <span>
                 <SplitText
                   text="Track"
-                  className="text-3xl text-blue-600 font-semibold text-center"
+                  className="text-4xl text-blue-600 font-semibold text-center"
                   delay={150}
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                   animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -69,7 +69,7 @@ export default function Home() {
               <span>
                 <SplitText
                   text="Code Quiz "
-                  className="text-3xl  font-semibold text-center"
+                  className="text-4xl  font-semibold text-center"
                   delay={150}
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                   animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -84,7 +84,7 @@ export default function Home() {
                   colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                   animationSpeed={15}
                   showBorder={false}
-                  className="text-3xl font-semibold"
+                  className="text-2xl font-semibold"
                 >
                   Trackode Helps You Navigate and Track Your Journey to Success
                 </GradientText>
@@ -173,9 +173,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className={`pb-12 ${theme === "dark" ? "bg-gray-950" : "bg-white"}`}>
+        <div className={`pb-12 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
           <div className="relative">
-            <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-gray-950" : "bg-white"}`}></div>
+            <div className={`absolute inset-0 h-2/3 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}></div>
             <div className="relative mx-auto">
               <div className="lg:max-w-3xl mt-7 mb-7 ml-6 mr-6 justify-center flex lg:mx-auto">
                 <img

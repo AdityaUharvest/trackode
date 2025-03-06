@@ -6,7 +6,6 @@ import { signOut } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useTheme } from "./ThemeContext"; // Ensure this path is correct
 import { Moon, Sun } from "lucide-react";
-import Image from "next/image";
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
@@ -27,7 +26,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={` sticky top-0 z-50 border-white-200 ${theme === "light" ? "bg-gray-50" : "bg-gray-950"}`}>
+    <nav className={` border-b-2  sticky top-0 z-50 border-white-200 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
@@ -148,9 +147,9 @@ const Navbar: React.FC = () => {
 
         {/* Navigation links */}
         <div
-          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-gray-50" : "bg-gray-950"} ${isNavOpen ? "block" : "hidden"}`}
+          className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-gray-50" : "bg-gray-900"} ${isNavOpen ? "block" : "hidden"}`}
         >
-          <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-950 text-white"}`}>
+          <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white"}`}>
             <li>
               <Link
                 href="#"

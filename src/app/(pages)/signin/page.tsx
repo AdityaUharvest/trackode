@@ -103,7 +103,7 @@ export default function Signin() {
                     } placeholder-${
                       theme === "dark" ? "gray-400" : "gray-600"
                     } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-gray-950" : "focus:bg-amber-100"
+                      theme === "dark" ? "focus:bg-gray-900" : "focus:bg-amber-100"
                     }`}
                     type="email"
                     name="email"
@@ -123,7 +123,7 @@ export default function Signin() {
                     } placeholder-${
                       theme === "dark" ? "gray-400" : "gray-600"
                     } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-gray-950" : "focus:bg-amber-100"
+                      theme === "dark" ? "focus:bg-gray-900" : "focus:bg-amber-100"
                     } mt-5`}
                     type="password"
                     name="password"

@@ -114,7 +114,7 @@ function QuizSetup() {
   };
 
   return (
-    <div className={`flex flex-col 0 lg:flex-row ${theme === "dark" ? "bg-gray-950" : "bg-gray-50"
+    <div className={`flex flex-col 0 lg:flex-row ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"
       } min-h-screen`}>
       {/* Dashboard Section */}
       <div className={`flex-1  lg:w-1/2 sm:w-full p-6 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"
