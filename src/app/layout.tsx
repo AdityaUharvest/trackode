@@ -12,8 +12,8 @@ import { toast } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '../components/ThemeContext';
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { metadata } from "./metadata";
 
- 
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
