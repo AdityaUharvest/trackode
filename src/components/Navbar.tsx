@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import { useTheme } from "./ThemeContext"; // Ensure this path is correct
 import { Moon, Sun } from "lucide-react";
 
+
+
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
   
@@ -37,7 +39,8 @@ const Navbar: React.FC = () => {
           />
           
           <span className={`self-center lg:text-xl sm:text-xl font-bold whitespace-nowrap ${theme === "light" ? "text-gray-950" : "text-white"}`}>
-            Trackode
+            <h1>  Trackode </h1>
+           
           </span>
         </Link>
 
