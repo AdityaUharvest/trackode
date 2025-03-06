@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-    siteUrl: 'https://trackode.vercel.app', // Replace with your actual domain
+    siteUrl: 'https://trackode.vercel.app',
     generateRobotsTxt: true,
     sitemapSize: 5000, 
-  };
+};

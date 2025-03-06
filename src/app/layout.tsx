@@ -12,7 +12,16 @@ import { toast } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '../components/ThemeContext';
 import { SpeedInsights } from "@vercel/speed-insights/next"
-
+import { Metadata } from 'next';
+ 
+export const metadata: Metadata = {
+  title: {
+    template: '%s | Trackode',
+    default: 'Trackode',
+  },
+  description: 'Trackode is a one-stop platform for coding, quizzes, and contest preparation.',
+  metadataBase: new URL('https://trackode.vercel.app/'),
+};
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
