@@ -126,7 +126,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         setIsPublished(false);
         setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
         
-        toast.error("Quiz Unpublished successfully!");
+        toast.info("Quiz Unpublished successfully!");
       } else {
         toast.error(response.data.message);
       }

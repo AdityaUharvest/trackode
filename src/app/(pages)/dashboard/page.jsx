@@ -28,21 +28,7 @@ export default function StudentDashboard() {
     return <SkeletonLoader theme={theme} />; // Display the skeleton while loading
   }
 
-  if (!session?.user) {
-    return (
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} flex items-center justify-center`}>
-        <div className={`text-center p-8 ml-5 mr-5  max-w-md ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-sm`}>
-          <h2 className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'}`}>Please login to view dashboard</h2>
-          <a 
-            href="/signin"
-            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Login Now
-          </a>
-        </div>
-      </div>
-    );
-  }
+ 
 
   // Calculate quiz statistics
   const totalQuizzes = quizResults.length;

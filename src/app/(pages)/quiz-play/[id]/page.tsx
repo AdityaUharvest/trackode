@@ -144,7 +144,6 @@ export default function QuizPage({ params }: any) {
           const newCount = prev + 1;
           if (newCount >= 3) {
             handleSubmitQuiz();
-            toast.error("Quiz submitted due to orientation changes");
             return 3;
           }
           toast.error(`Orientation change detected (${newCount}/3)`);
@@ -209,10 +208,7 @@ export default function QuizPage({ params }: any) {
 
   const handleStartQuiz = async () => {
     try {
-      if (isMobile && !window.matchMedia("(display-mode: standalone)").matches) {
-        toast.info("Please install as PWA for secure attempt");   
-      }
-
+      
       await requestFullscreen(document.documentElement);
 
       
@@ -243,7 +239,7 @@ export default function QuizPage({ params }: any) {
     };
 
     checkAttempt();
-  }, [id, session]);
+  }, [id,session?.user?.id]);
 
   useEffect(() => {
     if (!id || hasAttempted) return;
@@ -251,8 +247,9 @@ export default function QuizPage({ params }: any) {
     const fetchQuiz = async () => {
       try {
         const response = await axios.get(`/api/quiz-get/${id}`);
-        if(response.data.success.active === false){
-          console.log(response.data.success.active);
+        
+        if(response.data.active === false){
+          console.log(response.data.active);
           toast.error("Quiz is not active");
           router.push("/dashboard");
         }
@@ -361,7 +358,7 @@ export default function QuizPage({ params }: any) {
     return (
       <div className={`flex flex-col justify-center items-center gap-2 h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
         <p className="text-xl text-white-600">You have already attempted this quiz.</p>
-        <Link href="/dashboard" className="bg-blue-600 p-2 rounded-lg">
+        <Link href="/dashboard" className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg">
           Dashboard 
         </Link>
       </div>

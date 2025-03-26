@@ -318,96 +318,136 @@ const RunningQuizes: React.FC = () => {
   const handleGenerateBulkQuestions = async (quizIndex: number, quizId: string) => {
     try {
       setIsGeneratingBulkQuestions(true);
-      const response = await axios.post(`${API_BASE_URL}/generate-instructions`, {
-        prompt: `Generate ${bulkQuestionCount} questions in about ${quizes[quizIndex].name}. Each question should include:
-          A clear and concise question.
-          Four options, with one being the correct answer.
-          The correct answer should be explicitly specified using the key correctAnswer and must be one of the options (not a/b/c/d).
-          Return the response as a plain array of objects without any formatting or markdown.
-          Format: [{question: "", options: [], correctAnswer: ""}, {...}]`,
-      });
-  
-      if (response.data) {
-        let generatedQuestions = response.data.instructions;
-        let parsedQuestions = [];
-  
-        // Clean up the response if it contains markdown or JSON formatting
-        if (typeof generatedQuestions === "string") {
-          // Remove markdown code blocks if present
-          generatedQuestions = generatedQuestions.replace(/```(json)?\s*|\s*```/g, '');
+      
+      // First try to generate all requested questions
+      let response;
+      try {
+        response = await axios.post(`${API_BASE_URL}/generate-instructions`, {
+          prompt: `Generate ${bulkQuestionCount} questions about ${quizes[quizIndex].name}. Each question should include:
+            A clear and concise question.
+            Four options, with one being the correct answer.
+            The correct answer should be explicitly specified using the key correctAnswer and must be one of the options (not a/b/c/d).
+            Return the response as a plain array of objects without any formatting or markdown.
+            Format: [{question: "", options: [], correctAnswer: ""}, {...}]`,
+        });
+      } catch (initialError) {
+        console.warn("Failed to generate all questions at once, trying smaller batches", initialError);
+        
+        // If initial request fails, try with smaller batches
+        const batchSize = 10;
+        let successfullyGenerated: any[] = [];
+        
+        for (let i = 0; i < Math.ceil(bulkQuestionCount / batchSize); i++) {
+          const currentBatchSize = Math.min(batchSize, bulkQuestionCount - (i * batchSize));
+          if (currentBatchSize <= 0) break;
           
           try {
-            // Try to parse the entire response first
-            parsedQuestions = JSON.parse(generatedQuestions);
-          } catch (error) {
-            console.warn("Failed to parse complete response, attempting to salvage partial response");
+            const batchResponse = await axios.post(`${API_BASE_URL}/generate-instructions`, {
+              prompt: `Generate ${currentBatchSize} questions about ${quizes[quizIndex].name}. Each question should include:
+                A clear and concise question.
+                Four options, with one being the correct answer.
+                The correct answer should be explicitly specified using the key correctAnswer and must be one of the options (not a/b/c/d).
+                Return the response as a plain array of objects without any formatting or markdown.
+                Format: [{question: "", options: [], correctAnswer: ""}, {...}]`,
+            });
             
-            try {
-              // Try to find the last complete array bracket
-              const lastValidBracket = generatedQuestions.lastIndexOf(']');
-              if (lastValidBracket !== -1) {
-                // Extract the portion up to the last valid bracket
-                const truncatedJson = generatedQuestions.substring(0, lastValidBracket + 1);
-                parsedQuestions = JSON.parse(truncatedJson);
-              } else {
-                // If no complete array is found, try to extract individual questions
-                const questionMatches = generatedQuestions.match(/\{[^{}]*\}/g);
-                if (questionMatches) {
-                  parsedQuestions = questionMatches.map((q:any) => {
-                    try {
-                      return JSON.parse(q);
-                    } catch {
-                      return null;
-                    }
-                  }).filter((q:any) => q !== null);
-                }
-              }
-            } catch (innerError) {
-              console.error("Failed to salvage partial response:", innerError);
-              toast.error(`Failed to parse questions. Successfully generated: 0/${bulkQuestionCount}`);
-              return;
+            if (batchResponse.data) {
+              const batchQuestions = parseGeneratedQuestions(batchResponse.data.instructions);
+              successfullyGenerated = [...successfullyGenerated, ...batchQuestions];
             }
+          } catch (batchError) {
+            console.error(`Failed to generate batch ${i + 1}`, batchError);
+            // Continue to next batch even if this one fails
           }
         }
-  
-        // Validate each question individually
-        const validQuestions = parsedQuestions.filter((q:any) => 
-          q && 
-          typeof q === 'object' &&
-          q.question && 
-          Array.isArray(q.options) && 
-          q.options.length === 4 && 
-          q.correctAnswer && 
-          q.options.includes(q.correctAnswer)
-        );
-  
-        if (validQuestions.length === 0) {
-          toast.error(`No valid questions were generated. Please try again.`);
+        
+        if (successfullyGenerated.length > 0) {
+          processValidQuestions(successfullyGenerated, quizId);
           return;
-        }
-  
-        // Show success/warning message based on number of questions generated
-        if (validQuestions.length < bulkQuestionCount) {
-          toast.warning(
-            `Partially successful: Generated ${validQuestions.length}/${bulkQuestionCount} questions`
-          );
         } else {
-          toast.success(
-            `Successfully generated ${validQuestions.length} questions`
-          );
+          throw initialError;
         }
+      }
   
-        setPreviewQuestions(validQuestions);
-        setEditablePreviewQuestions([...validQuestions]);
-        setQuizId(quizId);
-        setShowPreview(true);
+      // Original processing if the initial request succeeded
+      if (response.data) {
+        const parsedQuestions = parseGeneratedQuestions(response.data.instructions);
+        processValidQuestions(parsedQuestions, quizId);
       }
     } catch (error) {
       console.error("API error:", error);
-      toast.error("Failed to generate questions");
+      toast.error("Failed to generate questions. Please try with a smaller number or try again later.");
     } finally {
       setIsGeneratingBulkQuestions(false);
     }
+  };
+  
+  // Helper function moved inside component or exported separately
+  const parseGeneratedQuestions = (generatedQuestions: any): any[] => {
+    let parsedQuestions = [];
+    
+    if (typeof generatedQuestions === "string") {
+      generatedQuestions = generatedQuestions.replace(/```(json)?\s*|\s*```/g, '');
+      
+      try {
+        parsedQuestions = JSON.parse(generatedQuestions);
+      } catch (error) {
+        console.warn("Failed to parse complete response, attempting partial parse");
+        
+        try {
+          const lastValidBracket = generatedQuestions.lastIndexOf(']');
+          if (lastValidBracket !== -1) {
+            const truncatedJson = generatedQuestions.substring(0, lastValidBracket + 1);
+            parsedQuestions = JSON.parse(truncatedJson);
+          } else {
+            const questionMatches = generatedQuestions.match(/\{[^{}]*\}/g);
+            if (questionMatches) {
+              parsedQuestions = questionMatches.map((q: any) => {
+                try {
+                  return JSON.parse(q);
+                } catch {
+                  return null;
+                }
+              }).filter((q: any) => q !== null);
+            }
+          }
+        } catch (innerError) {
+          console.error("Failed to salvage partial response:", innerError);
+          return [];
+        }
+      }
+    }
+    
+    return parsedQuestions;
+  };
+  
+  // Process questions function
+  const processValidQuestions = (parsedQuestions: any[], quizId: string) => {
+    const validQuestions = parsedQuestions.filter((q: any) => 
+      q && 
+      typeof q === 'object' &&
+      q.question && 
+      Array.isArray(q.options) && 
+      q.options.length === 4 && 
+      q.correctAnswer && 
+      q.options.includes(q.correctAnswer)
+    );
+  
+    if (validQuestions.length === 0) {
+      toast.error(`No valid questions were generated. Please try again.`);
+      return;
+    }
+  
+    if (validQuestions.length < bulkQuestionCount) {
+      toast.warning(`Generated ${validQuestions.length}/${bulkQuestionCount} questions`);
+    } else {
+      toast.success(`Successfully generated ${validQuestions.length} questions`);
+    }
+  
+    setPreviewQuestions(validQuestions);
+    setEditablePreviewQuestions([...validQuestions]);
+    setQuizId(quizId);
+    setShowPreview(true);
   };
 
   const handleConfirmPreview = async (quizId: any) => {

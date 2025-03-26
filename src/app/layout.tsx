@@ -37,14 +37,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/favicon.ico" />
       </Head>
       <body>
-        
+      
         <SessionProvider>
+        
         <ThemeProvider>
-        <ToastContainer position="top-right" autoClose={3000} />
+        
         <Analytics />
         <SpeedInsights/>
+
         <Navbar />
-        <div className="min-h-screen">{children}</div>
+        <ToastContainer position="top-right" autoClose={3000}/>
+          <div className="min-h-screen">{children}</div>
+        
+        
         
         <Footer />
         </ThemeProvider>

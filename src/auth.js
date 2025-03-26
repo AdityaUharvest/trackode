@@ -25,15 +25,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!isPasswordMatch) {
           throw new Error("Password is not correct");
         }
-        // Return the user object with their profile data
+     
         return {
-          id: user._id.toString(), // Ensure `id` is included
+          id: user._id.toString(), 
           email: user.email,
           name: user.name,
-          image: user.image, // Add any other fields you need
+          image: user.image,
         };
-        // return user object with their profile data
-        return user
+        
 
       },
     }),
@@ -46,6 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
+  useSecureCookies: process.env.NODE_ENV === "production",
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {

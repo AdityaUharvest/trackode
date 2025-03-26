@@ -6,11 +6,13 @@ import { toast } from "react-toastify";
 import { useSession } from 'next-auth/react';
 export default function ContactForm() {
   const {data:session}= useSession();
+  const userName = session?.user?.name?session.user.name:'';
+  const userEmail = session?.user?.email?session.user.email:'';;
   const { theme, toggleTheme } = useTheme();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
+    name: `${userName}`,
+    email:`${userEmail}`,
+    message: 'Hi there, I love this platform!....',
   });
   const [status, setStatus] = useState('');
 
@@ -64,7 +66,7 @@ export default function ContactForm() {
             type="text"
             id="name"
             name="name"
-            value={session?.user?.name?session.user.name:formData.name}
+            value={formData.name}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
@@ -85,7 +87,7 @@ export default function ContactForm() {
             type="email"
             id="email"
             name="email"
-            value={session?.user?.email?session?.user?.email:formData.email}
+            value={formData.email}
             onChange={handleChange}
             required
             className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 
@@ -105,7 +107,7 @@ export default function ContactForm() {
           <textarea
             id="message"
             name="message"
-            value="Hi there, I would like...."
+            value={formData.message}
             onChange={handleChange}
             required
             rows={4}
