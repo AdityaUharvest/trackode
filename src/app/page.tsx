@@ -163,7 +163,7 @@ export default function Home() {
             Effortless coding & contests with Trackode
           </p>
         </div>
-        <div className="sm:items-center sm:justify-center mb-7 sm:px-0 sm:space-x-5 sm:flex  ">
+        <div className="sm:items-center sm:justify-center mb-7 sm:px-0 sm:space-x-5 sm:flex  p-4 ">
         <Link
                   href="/dashboard/quiz-list"
                   title=""
