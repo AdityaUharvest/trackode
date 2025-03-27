@@ -160,8 +160,7 @@ const QuizDashboard = () => {
     });
   };
 
-  const q = quizResults.filter((r: any) => r.attempted !== false).length;
-  console.log(q);
+  
 
   const getStatusBadge = (active: boolean) => {
     return active ? (
