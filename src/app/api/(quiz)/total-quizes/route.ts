@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     console.log("userAttempts", userAttempts);
     // Map quizzes with all required data
     const quizzesWithData = quizzes.map(quiz => {
-      const quizId = quiz._id.toString();
+      const quizId = quiz?.id.toString();
       return {
         ...quiz,
         totalRegistrations: registrationMap.get(quizId) || 0,

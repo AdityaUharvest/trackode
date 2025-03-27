@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 import PerformanceChart from './PerformanceChart';
 
 interface Quiz {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   totalRegistrations: number;
@@ -350,7 +350,7 @@ const QuizDashboard = () => {
               </thead>
               <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 {filteredQuizzes.map((quiz) => (
-                  <tr key={quiz.id} className={tableStyles[theme].row}>
+                  <tr key={quiz._id} className={tableStyles[theme].row}>
                     <td className="px-6 py-4">
                       <div className={`text-sm ${textStyles[theme].primary}`}>{quiz.name}</div>
                       <div className={`text-sm ${textStyles[theme].secondary}`}>{quiz.description}</div>
@@ -391,7 +391,7 @@ const QuizDashboard = () => {
                     </td>
                     <td className="px-6 py-4">
                       {quiz.active ? (
-                        <Link href={`/quiz-play/${quiz._id}`}>
+                        <Link href={`/quiz-play/${quiz?._id}`}>
                           <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                             quiz.userPlayed 
                               ? theme === 'dark' 
