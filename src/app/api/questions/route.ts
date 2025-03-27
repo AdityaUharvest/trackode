@@ -107,67 +107,31 @@ export async function GET(request: NextRequest) {
   // This function is used to get all questions of a particular quiz
   await connectDB();
 
+  const id = request.json(); // quiz id
+  if (!id) {
+    return NextResponse.json({
+      message: "Please provide quiz id",
+      success: false
+    }, { status: 400 });
+  }
+
   try {
-    // Extract quiz ID from request
-    const { id } = await request.json();
-    
-    if (!id) {
-      return NextResponse.json({
-        message: "Please provide quiz id",
-        success: false
-      }, { status: 400 });
-    }
+    const questions = await Question.find({ quiz: id });
 
-    // Find the quiz to check if it should be shuffled
-    const quiz = await Quiz.findById(id);
-    console.log(quiz);
-    if (!quiz) {
-      return NextResponse.json({
-        message: "Quiz not found",
-        success: false
-      }, { status: 404 });
-    }
-
-    // Get all questions for this quiz
-    let questions = await Question.find({ quiz: id });
-
-    // If quiz is marked as shuffled, randomize the order
-    if (quiz.shuffleOptions || quiz.shuffleQuestions) {
-      // Fisher-Yates shuffle algorithm
-      for (let i = questions.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [questions[i], questions[j]] = [questions[j], questions[i]];
-      }
-
-      // If individual question options should be shuffled
-      if (quiz.shuffleOptions) {
-        questions = questions.map(question => {
-          // Fisher-Yates shuffle for options
-          const options = [...question.options];
-          for (let i = options.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [options[i], options[j]] = [options[j], options[i]];
-          }
-          return { ...question._doc, options };
-        });
-      }
-    }
-    console.log(questions);
     return NextResponse.json({
       message: "Questions found",
       success: true,
-      questions,
-      isShuffled: quiz.shuffleQuestions || false
+      questions
     });
 
   } catch (error) {
-    console.error("Error fetching questions:", error);
     return NextResponse.json({
-      message: error instanceof Error ? error.message : "Failed to get questions",
+      message: error || "Failed to get questions",
       success: false
-    }, { status: 500 });
+    });
   }
 }
+
 
 export async function DELETE(request: NextRequest) {
   await connectDB();

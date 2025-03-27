@@ -334,7 +334,7 @@ const RunningQuizes: React.FC = () => {
         console.warn("Failed to generate all questions at once, trying smaller batches", initialError);
         
         // If initial request fails, try with smaller batches
-        const batchSize = 10;
+        const batchSize = 15;
         let successfullyGenerated: any[] = [];
         
         for (let i = 0; i < Math.ceil(bulkQuestionCount / batchSize); i++) {

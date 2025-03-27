@@ -200,8 +200,9 @@ const QuizDashboard = () => {
 
   useEffect(() => {
     const fetchQuizResults = async () => {
-      const response = await axios.get("/api/attempted");
+      const response = await axios.get("/api/attempted-public");
       setQuizResults(response.data);
+      console.log(response.data);
       setLoading(false);
     };
     fetchQuizResults();
@@ -219,12 +220,12 @@ const QuizDashboard = () => {
     <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
       <div className="container mx-auto px-4 py-8">
         {/* Enhanced Stats Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
           {/* Completion Rate */}
-          <div className={`p-4 rounded-xl shadow-sm border ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
-            <h3 className={`text-lg ml-16 font-semibold mb-4 ${textStyles[theme].primary}`}>Completion</h3>
+          <div className={`p-4 grid grid-cols-1 rounded-xl shadow-sm border ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
+            <h3 className={`text-lg  text-center font-semibold mb-4 ${textStyles[theme].primary}`}>Completion</h3>
             {/* Circular Progress */}
-            <div className="relative ml-16 w-24 h-24 mb-4">
+            <div className="relative ">
               <svg className="w-full h-full" viewBox="0 0 100 100">
                 {/* Background circle */}
                 <circle
@@ -259,9 +260,7 @@ const QuizDashboard = () => {
                   {userStats.completedQuizzes>0?userStats.completedQuizzes:0} / {userStats.totalQuizzes}
                 </span>
               </div>
-              <div className={`items-center ml-3 ${theme === 'dark' ? 'text-green-400' : 'text-green-600'}`}>
-                {getAchievementLevel()}
-              </div>
+              
             </div>
           </div>
 
@@ -279,6 +278,16 @@ const QuizDashboard = () => {
               {getTrendIcon(userStats.accuracyTrend)}
               <span className={`text-sm ml-1 capitalize ${textStyles[theme].secondary}`}>{userStats.accuracyTrend}</span>
             </div>
+          </div>
+          <div className={`p-6 rounded-xl shadow-sm border ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
+            <h3 className={`text-lg font-semibold mb-4 ${textStyles[theme].primary}`}>Achievement✨</h3>
+            <div className="flex items-end">
+              <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                {getAchievementLevel()} ✅
+              </p>
+             
+            </div>
+            
           </div>
 
           {/* Highest Score */}
