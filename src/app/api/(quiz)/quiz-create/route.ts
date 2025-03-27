@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
         totalQuestions,
         shuffleOptions,
         email,
+        publicc,
         duration
     } = await request.json();
     
@@ -48,6 +49,7 @@ export async function POST(request: NextRequest) {
             createdBy: foundUser._id,
             active: false,
             instructions,
+            public: publicc || false,
             duration: duration || 0
            
         });

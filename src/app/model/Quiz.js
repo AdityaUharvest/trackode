@@ -65,7 +65,11 @@ const quizSchema = new mongoose.Schema(
         },
         duration :{
             type: Number, 
-        }
+        },
+        public: {
+            type: Boolean,
+            default: false
+        },
     },
     { timestamps: true }
 );

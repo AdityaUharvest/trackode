@@ -342,7 +342,7 @@ export default function QuizPage({ params }: any) {
         setSubmitted(true);
         toast.success(response.data.message);
         setTimeout(() => {
-          if (screen.orientation?.unlock) screen.orientation.unlock();
+          screen.orientation.unlock();
           router.push(`/dashboard`);
         }, 1500);
       }

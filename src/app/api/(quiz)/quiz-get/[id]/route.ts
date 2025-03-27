@@ -1,72 +1,82 @@
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
 import connectDB from "@/lib/util";
+import Question from "@/app/model/Question";
 
 // Fisher–Yates shuffle algorithm
 function shuffleArray<T>(array: T[]): T[] {
-  let currentIndex = array.length;
+  const newArray = [...array]; // Create a copy to avoid mutating the original
+  let currentIndex = newArray.length;
   let randomIndex: number;
 
-  // While there remain elements to shuffle...
   while (currentIndex !== 0) {
-    // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex],
-      array[currentIndex],
+    [newArray[currentIndex], newArray[randomIndex]] = [
+      newArray[randomIndex],
+      newArray[currentIndex],
     ];
   }
 
-  return array;
+  return newArray;
 }
 
 export async function GET(req: NextRequest, { params }: any) {
   await connectDB();
   try {
     const { id } = params;
-    console.log(id);
-    if (req.method === "GET") {
-      try {
-        const quiz = await Quiz.findById(id).populate("questions");
-        if (!quiz) {
-          return NextResponse.json({
-            message: "No quiz found",
-            success: false,
-          });
-        }
-
-        // Shuffle the questions array before sending the response
-        if(quiz.shuffleOptions){
-            quiz.questions = shuffleArray(quiz.questions);
-        }
-        
-
-        return NextResponse.json({
-          message: "Quiz found",
-          success: true,
-          quiz,
-        });
-      } catch (error) {
-        return NextResponse.json({
-          message: "Error occurred",
-          success: false,
-          error: `${error}`,
-        });
-      }
-    } else {
+    
+    if (!id) {
       return NextResponse.json({
-        message: "Method not allowed",
+        message: "Quiz ID is required",
         success: false,
+      }, { status: 400 });
+    }
+
+    const quiz = await Quiz.findById(id).populate("questions");
+    if (!quiz) {
+      return NextResponse.json({
+        message: "No quiz found",
+        success: false,
+      }, { status: 404 });
+    }
+
+    // Create a deep copy of the quiz to avoid modifying the original
+    const quizResponse = JSON.parse(JSON.stringify(quiz));
+
+    // Shuffle questions if needed
+    if (quiz.shuffleQuestions) {
+      quizResponse.questions = shuffleArray(quizResponse.questions);
+    }
+
+    // Shuffle options for each question if needed
+    if (quiz.shuffleOptions) {
+      quizResponse.questions = quizResponse.questions.map((question: any) => {
+        return {
+          ...question,
+          options: shuffleArray(question.options)
+        };
       });
     }
-  } catch (error) {
+    console.log(quizResponse);
+    console.log(quiz.shuffleQuestions);
+    console.log(quiz.shuffleOptions);
     return NextResponse.json({
-      message: "Unwanted error occurred",
-      success: false,
-      error: `${error}`,
+      message: "Quiz found",
+      success: true,
+      quiz: quizResponse,
+      shuffleInfo: {
+        questionsShuffled: quiz.shuffleQuestions,
+        optionsShuffled: quiz.shuffleOptions
+      }
     });
+
+  } catch (error) {
+    console.error("Error in GET /api/quiz:", error);
+    return NextResponse.json({
+      message: "Internal server error",
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    }, { status: 500 });
   }
 }

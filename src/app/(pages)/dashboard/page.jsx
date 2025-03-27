@@ -47,6 +47,7 @@ export default function StudentDashboard() {
       day: 'numeric'
     }),
     percentage: Number(((result.score / result.totalQuestions) * 100).toFixed(1)),
+    quiz: result.quiz?.name,
     fullDate: new Date(result.attemptedAt).toLocaleDateString(),
     score: result.score,
     total: result.totalQuestions
