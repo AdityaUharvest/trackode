@@ -13,11 +13,16 @@ export async function GET(req: NextRequest) {
     const session = await auth();
     const userId = session?.user?.id ? new mongoose.Types.ObjectId(session.user.id) : null;
 
-    // Find all quizzes
-    const quizzes = await Quiz.find({public:true}).lean()
+    // Find all public quizzes
+    const quizzes = await Quiz.find({ public: true }).lean();
     
     // Get all registration counts in a single query
     const registrationCounts = await Attempted.aggregate([
+      {
+        $match: {
+          quiz: { $in: quizzes.map(q => q._id) }
+        }
+      },
       {
         $group: {
           _id: "$quiz",
@@ -33,21 +38,25 @@ export async function GET(req: NextRequest) {
 
     // Get user's attempted quizzes if logged in
     let userAttempts = new Map();
-    if (userId) {
-      const attempts = await Attempted.find({ student: userId });
+    if (userId && quizzes.length > 0) {
+      const attempts = await Attempted.find({ 
+        student: userId,
+        quiz: { $in: quizzes.map(q => q._id) }
+      });
       userAttempts = new Map(
         attempts.map(attempt => [attempt.quiz.toString(), attempt])
       );
     }
-    console.log("userAttempts", userAttempts);
+
     // Map quizzes with all required data
     const quizzesWithData = quizzes.map(quiz => {
-      const quizId = quiz?._id.toString();
+      const quizId = quiz._id?.toString() || '';
       return {
         ...quiz,
+        _id: quizId, // Ensure _id is stringified
         totalRegistrations: registrationMap.get(quizId) || 0,
         userPlayed: userId ? userAttempts.has(quizId) : false,
-        userScore: userId ? (userAttempts.get(quizId)?.correctAnswers ||0) : 0,
+        userScore: userId ? (userAttempts.get(quizId)?.correctAnswers || 0) : 0,
         maxScore: userId ? (userAttempts.get(quizId)?.totalQuestions || 0) : 0
       };
     });
