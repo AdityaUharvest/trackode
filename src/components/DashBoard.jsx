@@ -186,7 +186,7 @@ export default function DashBoard() {
                             <tr key={item} className={theme === 'dark' ? 'border-b border-gray-800' : 'border-b border-gray-200'}>
                               <td className="py-3 text-sm">{item.studentName} </td>
                               <td className="py-3 text-sm">{item.name}</td>
-                              <td className="py-3 text-sm">{item.score}%</td>
+                              <td className="py-3 text-sm">{Math.round(item.score)}%</td>
                               <td className="py-3 text-sm">{item.time}</td>
                             </tr>
                           ))}
