@@ -15,21 +15,32 @@ export async function middleware(req: NextRequest) {
   const isProtected = protectedPaths.some(p => path.startsWith(p))
   
   if (isProtected) {
+    // Log for debugging (check your hosting provider's logs)
+    console.log(`Middleware processing protected route: ${path}`)
+    
     const token = await getToken({
       req,
-      secret: process.env.AUTH_SECRET,
-      secureCookie: process.env.NODE_ENV === 'production'
+      secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
+      secureCookie: 
+        process.env.NODE_ENV === 'production' ||
+        process.env.VERCEL_ENV === 'production' ||
+        process.env.HOSTNAME?.includes('vercel.app')
     })
+
+    console.log('Token exists:', !!token) // Debug log
 
     // If no token and path is protected, redirect to login
     if (!token) {
       const signInUrl = new URL('/signin', req.url)
       signInUrl.searchParams.set('callbackUrl', req.url)
+      console.log(`Redirecting to login from ${path}`) // Debug log
       return NextResponse.redirect(signInUrl)
     }
 
-    // Additional role-based checks (example for admin dashboard)
-    
+    // Optional: Add role-based checks here
+    // if (path.startsWith('/admin-dashboard') && token.role !== 'admin') {
+    //   return NextResponse.redirect(new URL('/unauthorized', req.url))
+    // }
   }
 
   return NextResponse.next()
@@ -37,6 +48,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|signin|signup).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|signin|signup|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
+  
 }
