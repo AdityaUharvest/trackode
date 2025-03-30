@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
 import connectDB from "@/lib/util";
-import Question from "@/app/model/Question";
+// import Question from "@/app/model/questions"
 
 // Fisher–Yates shuffle algorithm
 function shuffleArray<T>(array: T[]): T[] {

@@ -94,7 +94,14 @@ export default function Home() {
 
 
             <div className="px-8 sm:items-center sm:justify-center sm:px-0 sm:space-x-5 sm:flex mt-9 p-8">
-              
+                <Link
+                  href="/premium-mock-tests"
+                  title=""
+                  className="inline-flex mb-2 items-center justify-center w-full px-8 py-3 text-lg font-bold text-white  transition-all bg-green-500 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
+                  role="button"
+                >
+                  Premium Mock Tests
+                </Link>
                 <Link
                   href="/admin-dashboard"
                   title=""
@@ -167,7 +174,7 @@ export default function Home() {
         <Link
                   href="/dashboard/quiz-list"
                   title=""
-                  className={`inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-lg font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
+                  className={`animate-bounce inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-lg font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
                     ? "text-white border-gray-400 hover:bg-blue-900 focus:bg-blue-900 focus:text-white focus:border-blue-900 bg-blue-500"
                     : " border-gray-400 hover:bg-blue-800 focus:bg-blue-200 focus:text-black bg-blue-500 text-white focus:border-blue-200"
                     }`}

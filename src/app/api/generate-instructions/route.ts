@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     const result = await model.generateContent(prompt);
     const instructions = result.response.text();
     
-   return NextResponse.json({ instructions });
+    return NextResponse.json({ instructions });
   } catch (error) {
    return NextResponse.json({ message: 'Failed to generate' });
   }

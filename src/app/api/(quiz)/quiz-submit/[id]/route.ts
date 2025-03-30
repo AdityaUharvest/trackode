@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/util";
-import Question from "@/app/model/Question";
+import Question from "@/app/model/questions";
 import Quiz from "@/app/model/Quiz";
 import Result from "@/app/model/Attempted";
 import Attempted from "@/app/model/Attempted";
