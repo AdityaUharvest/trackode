@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
     '/quiz-setup',
     '/premium-mock-tests',
     '/mock-tests',
-    'playy'
+    '/playy'
   ]
 
   // Check if the current path is protected
