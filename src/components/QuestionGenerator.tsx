@@ -25,6 +25,7 @@ interface Section {
 
 interface QuestionGeneratorProps {
   isPublished: boolean;
+  mockTest:string
 }
 
 interface EditingQuestion extends Question {
@@ -43,7 +44,9 @@ const sections: Section[] = [
 const CHUNK_SIZE = 10; // Process questions in chunks of 10
 const API_TIMEOUT = 30000; // 30 seconds timeout
 
-export default function QuestionGenerator({ isPublished }: QuestionGeneratorProps) {
+export default function QuestionGenerator({ isPublished,mockTest }: QuestionGeneratorProps,
+  
+) {
   const { theme } = useTheme();
   const params = useParams();
   const mockTestId = params.id as string;
@@ -274,6 +277,21 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
 
   return (
     <div className={containerClasses}>
+       <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">{mockTest}</h1>
+
+        {isPublished ?(
+          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+            Published
+          </span>
+        ):(
+          <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
+            Unpublished
+          </span>
+        )
+        }
+       
+      </div>
       <div className="flex gap-4 mb-6">
         <Button 
           className={`mr-2 ${isPublished ? 
