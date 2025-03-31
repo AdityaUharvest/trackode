@@ -137,22 +137,28 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
       setIsGenerating(true);
       setErrorMessage('');
       
-      const res = await axios.post('/api/generate-instructions', { 
-        prompt: `Generate 25 ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
-        - "text": "question text"
-        - "options": ["option1", "option2", "option3", "option4"]
-        - "correctAnswer": index (0-3)
-        - "explanation": "optional explanation"`
-      });
+      const batchSize = 5; // Generate 5 questions at a time
+      const totalQuestions = 25;
+      let generatedQuestions: Question[] = [];
       
-      const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
-      
-      if (parsedQuestions.length > 0) {
-        setQuestions(parsedQuestions);
-        setSuccessMessage(`Successfully generated ${parsedQuestions.length} questions!`);
-      } else {
-        setErrorMessage('No valid questions could be parsed from the response');
+      for (let i = 0; i < totalQuestions / batchSize; i++) {
+        const res = await axios.post('/api/generate-instructions', { 
+          prompt: `Generate ${batchSize} ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
+          - "text": "question text"
+          - "options": ["option1", "option2", "option3", "option4"]
+          - "correctAnswer": index (0-3)
+          - "explanation": "optional explanation"`
+        });
+        
+        const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
+        generatedQuestions = [...generatedQuestions, ...parsedQuestions];
+        
+        // Update UI with progress
+        setQuestions(generatedQuestions);
+        setSuccessMessage(`Generated ${generatedQuestions.length}/${totalQuestions} questions...`);
       }
+      
+      setSuccessMessage(`Successfully generated ${generatedQuestions.length} questions!`);
     } catch (error) {
       console.error('Failed to generate questions', error);
       setErrorMessage('Failed to generate questions. Please try again.');
