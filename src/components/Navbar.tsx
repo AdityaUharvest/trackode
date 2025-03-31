@@ -30,7 +30,7 @@ const Navbar: React.FC = () => {
   return (
     <div>
       <Link href="/premium-mock-tests">
-      <div className={`flex animate-pulse justify-center border-2 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
+      <div className={`flex p-2 animate-pulse justify-center border-2 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
       <GradientText
                         colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                         animationSpeed={2}
