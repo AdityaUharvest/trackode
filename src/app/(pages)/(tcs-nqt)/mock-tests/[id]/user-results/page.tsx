@@ -133,15 +133,15 @@ export default function UserQuizResult() {
         {/* Header with user info and overall score */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-2xl font-bold mb-2">{result.quizTitle} - Results</h1>
+            <h1 className="sm:text-sm lg:text-lg font-bold mb-2">{result.quizTitle} - Results</h1>
             <p className="text-lg">User: {result.userName}</p>
             <p className="text-sm text-gray-500">
               Completed: {new Date(result.completedAt).toLocaleString()}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex justify-between gap-4">
             <div className="text-right">
-              <p className="text-xl font-bold">
+              <p className="text-lg font-bold">
                 Score: {result.totalScore}/{result.totalQuestions}
               </p>
               <p className="text-lg">

@@ -46,7 +46,11 @@ const MockTestCreator: React.FC = () => {
 
     try {
       const response = await axios.post<{ id: string }>('/api/mock-tests', formData);
-      router.push(`/mock-tests/${response.data.id}/questions`);
+      if(response.status == 200) {
+        toast.success('Mock test created successfully!');
+        router.push(`/mock-tests/${response.data.id}/questions`);
+      }
+      
     } catch (err) {
       setError('Failed to create mock test');
       toast.error('Failed to create mock test');
