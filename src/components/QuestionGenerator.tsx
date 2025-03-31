@@ -137,7 +137,7 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
       setIsGenerating(true);
       setErrorMessage('');
       
-      const res = await axios.post('/api/generate-instructions', { 
+      const res = await axios.post('/api/chat-gpt', { 
         prompt: `Generate 25 ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
         - "text": "question text"
         - "options": ["option1", "option2", "option3", "option4"]
