@@ -9,7 +9,7 @@ export async function GET(
   try {
     await connectDB();
     
-    const { id } = params;
+    const { id } =await params;
     const { searchParams } = new URL(request.url);
     const section = searchParams.get('section');
     
