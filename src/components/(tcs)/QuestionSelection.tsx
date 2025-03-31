@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import QuestionEditor from './QuestionEditor';
-
+import { toast } from 'react-toastify';
+import { Loader2 } from 'lucide-react';
 interface Question {
   _id?: string;
   text: string;
@@ -64,7 +65,7 @@ const QuestionSection: React.FC<QuestionSectionProps> = ({ mockTestId, section, 
         section,
         questions
       });
-      alert('Questions saved successfully!');
+      toast.success('Questions saved successfully!');
     } catch (err) {
       setError( 'Failed to save questions');
     }
@@ -90,7 +91,7 @@ const QuestionSection: React.FC<QuestionSectionProps> = ({ mockTestId, section, 
     }
   };
 
-  if (isLoading) return <div>Loading questions...</div>;
+  if (isLoading) return <div><Loader2 className="animate-spin" /></div>;
   if (error) return <div className="text-red-600">{error}</div>;
 
   return (

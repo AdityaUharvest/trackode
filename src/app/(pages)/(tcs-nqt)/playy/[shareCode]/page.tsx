@@ -228,7 +228,7 @@ export default function QuizPlayer() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 />
+        <Loader2 className="animate-spin"/>
         
       </div>
     );

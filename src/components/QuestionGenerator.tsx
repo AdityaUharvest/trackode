@@ -15,6 +15,7 @@ interface Question {
   section?: string;
   mockTestId?: string;
 }
+import { Loader2 } from 'lucide-react';
 
 interface Section {
   value: string;
@@ -292,7 +293,7 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
       )}
 
       {isLoading ? (
-        <div className="text-center py-8">Loading questions...</div>
+        <div className="text-center py-8"><Loader2 className="animate-spin" />...</div>
       ) : editingQuestion ? (
         <QuestionEditor
           question={editingQuestion}
