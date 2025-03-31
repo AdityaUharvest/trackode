@@ -6,8 +6,8 @@ import { signOut } from "next-auth/react";
 import { toast } from "react-toastify";
 import { useTheme } from "./ThemeContext"; // Ensure this path is correct
 import { Moon, Sun } from "lucide-react";
-
-
+// import Link from "next/link";
+import GradientText from "@/components/GradientText"
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
@@ -28,12 +28,30 @@ const Navbar: React.FC = () => {
   };
 
   return (
+    <div>
+      <Link href="/premium-mock-tests">
+      <div className={`flex animate-pulse justify-center border-2 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
+      <GradientText
+                        colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+                        animationSpeed={2}
+                        showBorder={false}
+                        className="text-sm font-semibold"
+                      >
+                       Premium Offer✨ TCS NQT Mock Test is free 🚀 till 31st July✨
+      </GradientText>
+      
+     
+      
+    
+    </div>
+      </Link>
+    
     <nav className={` border-b-2  sticky top-0 z-50 border-white-200 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
+      <div className="max-w-screen-xl  flex flex-wrap items-center justify-between mx-auto px-4 py-2">
         <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
           <img
             src="https://i.ibb.co/jvr3wb6b/trackode.png" 
-            className="h-8 rounded-lg"
+            className="h-7 rounded-lg"
             alt="Trackode Logo"
             
           />
@@ -152,13 +170,21 @@ const Navbar: React.FC = () => {
         <div
           className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-gray-50" : "bg-gray-900"} ${isNavOpen ? "block" : "hidden"}`}
         >
-          <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white"}`}>
+          <ul className={`flex  flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white"}`}>
             <li>
               <Link
-                href="#"
+                href="/premium-mock-tests"
+                className={`block  py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+              >
+                TCS NQT Mock Test
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/dashboard"
                 className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
-                Profile Tracker
+                Student Section
               </Link>
             </li>
             <li>
@@ -190,6 +216,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
     </nav>
+    </div>
   );
 };
 
