@@ -1,4 +1,4 @@
-import MockTest from '@/app/model/MockTest';
+import MockTest from '@/app/model/MoockTest'
 import connectDB from '@/lib/util';
 import { generateShareCode } from "@/app/api/generateShareCode"
 import { auth } from '@/auth';
@@ -13,7 +13,7 @@ export async function createMockTest(data: {
   const session = await auth();
   const shareCode = generateShareCode();
   
-  const mockTest = new MockTest({
+  const mockTest =  MockTest.create({
     ...data,
     isPublished: false,
     shareCode,
@@ -21,13 +21,12 @@ export async function createMockTest(data: {
     createdBy: session?.user?.id
   });
   
-  await mockTest.save();
+  
   return mockTest;
 }
 
 export async function getMockTest(id: string) {
   await connectDB();
-  console.log("Fetching mock test with ID:", id);
   return MockTest.findById(id);
 }
 

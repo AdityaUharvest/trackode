@@ -12,9 +12,14 @@ export default function MockTestQuestionsPage({ params }: any) {
   console.log(params)
   useEffect(() => {
     async function fetchMockTest() {
+      const {id}= await params;
       try {
+        console.log("hello")
         console.log("Fetching mock test with ID:", params.id);
         const data = await getMockTest(params.id);
+        if (!data) {
+          throw new Error("Mock test not found");
+        }
         console.log(params.id);
         console.log(data);
         setMockTest(data);
