@@ -9,8 +9,10 @@ export async function GET(
 ) {
   try {
     await connectDB();
+    const { shareCode } = await params;
+
     
-    const quiz = await MockTest.findOne({ shareCode: params.shareCode });
+    const quiz = await MockTest.findOne({ shareCode: shareCode });
     if (!quiz) {
       return NextResponse.json(
         { message: 'Quiz not found' },

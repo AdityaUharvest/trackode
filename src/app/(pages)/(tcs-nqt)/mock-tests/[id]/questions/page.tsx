@@ -12,7 +12,7 @@ export default async function MockTestQuestionsPage(
   const mockTest = await getMockTest(params.id);
   
   return (
-    <div className="container mx-auto p-4">
+    
       
 
       <QuestionGenerator
@@ -20,11 +20,7 @@ export default async function MockTestQuestionsPage(
      mockTest={mockTest.title}
      />
 
-      {/* {!mockTest.isPublished && (
-        <div className="mt-8">
-          <PublishControls mockTestId={params.id} />
-        </div>
-      )} */}
-    </div>
+      
+    
   );
 }

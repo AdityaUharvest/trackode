@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { SubmitConfirmationModal } from '@/components/(tcs)/SubmitConfirmationModal';
 import { QuizResultModal } from '@/components/(tcs)/QuizResultModal';
 import { SectionProgress } from '@/components/(tcs)/SectionProgress';
 import { QuestionTimer } from '@/components/(tcs)/QuestionTimer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Calculator, Maximize2, Minimize2 } from 'lucide-react';
 
 interface Question {
   _id: string;
@@ -24,24 +24,38 @@ interface Section {
   timeLimit?: number;
 }
 
+interface QuizProgress {
+  answers: Record<string, number>;
+  sectionTimes: Record<string, number>;
+  currentSection: string;
+  currentQuestionIndex: number;
+  startedAt: number;
+}
+
 export default function QuizPlayer() {
   const { shareCode } = useParams();
-  
   const router = useRouter();
+  const quizContainerRef = useRef<HTMLDivElement>(null);
   
+  // Quiz state
   const [quiz, setQuiz] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentSection, setCurrentSection] = useState<string>('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [sectionAnswers, setSectionAnswers] = useState<Record<string, Record<string, number>>>({});
+  const [sectionTimers, setSectionTimers] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [sectionTimeRemaining, setSectionTimeRemaining] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
+  const [startTime, setStartTime] = useState<number>(0);
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  // Calculator state
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calcInput, setCalcInput] = useState('');
 
   // Define sections based on TCS NQT pattern
   const sections: Section[] = [
@@ -53,12 +67,41 @@ export default function QuizPlayer() {
     { name: 'advanced-coding', label: 'Advanced Coding' }
   ];
 
+  // Load quiz progress from localStorage
+  useEffect(() => {
+    const savedProgress = localStorage.getItem(`quizProgress_${shareCode}`);
+    if (savedProgress) {
+      const progress: QuizProgress = JSON.parse(savedProgress);
+      setAnswers(progress.answers);
+      setSectionTimers(progress.sectionTimes);
+      setCurrentSection(progress.currentSection);
+      setCurrentQuestionIndex(progress.currentQuestionIndex);
+      setStartTime(progress.startedAt);
+      setQuizStarted(true);
+    }
+  }, [shareCode]);
+
+  // Save quiz progress to localStorage
+  useEffect(() => {
+    if (!quizStarted) return;
+
+    const progress: QuizProgress = {
+      answers,
+      sectionTimes: sectionTimers,
+      currentSection,
+      currentQuestionIndex,
+      startedAt: startTime
+    };
+
+    localStorage.setItem(`quizProgress_${shareCode}`, JSON.stringify(progress));
+  }, [answers, sectionTimers, currentSection, currentQuestionIndex, quizStarted, shareCode, startTime]);
+
+  // Fetch quiz data
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
         setIsLoading(true);
         const response = await axios.get(`/api/quiz/${shareCode}`);
-
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         
@@ -69,8 +112,11 @@ export default function QuizPlayer() {
         });
         setSectionAnswers(initialSectionAnswers);
         
-        // Start with first section
-        setCurrentSection(sections[0].name);
+        // Start with first section if no saved progress
+        if (!localStorage.getItem(`quizProgress_${shareCode}`)) {
+          setCurrentSection(sections[0].name);
+        }
+        
         setIsLoading(false);
       } catch (err) {
         setError('Failed to load quiz. Please check the link and try again.');
@@ -80,8 +126,8 @@ export default function QuizPlayer() {
 
     fetchQuizData();
   }, [shareCode]);
-  const [sectionTimers, setSectionTimers] = useState<Record<string, number>>({});
 
+  // Handle section timer
   useEffect(() => {
     if (!quizStarted || !currentSection) return;
   
@@ -90,77 +136,77 @@ export default function QuizPlayer() {
   
     // Use existing time if available, otherwise start with full time
     const initialTime = sectionTimers[currentSection] || section.timeLimit;
-    setSectionTimeRemaining(initialTime);
+    setSectionTimers(prev => ({
+      ...prev,
+      [currentSection]: initialTime
+    }));
     
     const timer = setInterval(() => {
-      setSectionTimeRemaining(prev => {
-        const newTime = prev - 1;
-        // Update the section timers state
-        setSectionTimers(prevTimers => ({
-          ...prevTimers,
-          [currentSection]: newTime
-        }));
+      setSectionTimers(prev => {
+        const newTime = prev[currentSection] - 1;
         
         if (newTime <= 0) {
           clearInterval(timer);
           handleSectionSubmit();
-          return 0;
+          return { ...prev, [currentSection]: 0 };
         }
-        return newTime;
+        
+        return { ...prev, [currentSection]: newTime };
       });
     }, 1000);
   
     return () => clearInterval(timer);
   }, [currentSection, quizStarted]);
-  
-  const changeSection = (sectionName: string) => {
-    // Save current section's remaining time
-    if (currentSection) {
-      setSectionTimers(prev => ({
-        ...prev,
-        [currentSection]: sectionTimeRemaining
-      }));
+
+  // Toggle fullscreen
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(e => {
+        console.error(`Error attempting to enable fullscreen: ${e.message}`);
+      });
+      setIsFullScreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullScreen(false);
+      }
     }
-    
-    // Switch to new section
-    setCurrentSection(sectionName);
-    setCurrentQuestionIndex(0);
   };
-  // useEffect(() => {
-  //   if (!quizStarted || !currentSection) return;
 
-  //   const section = sections.find(s => s.name === currentSection);
-  //   if (!section?.timeLimit) return;
-
-  //   setSectionTimeRemaining(section.timeLimit);
-    
-  //   const timer = setInterval(() => {
-  //     setSectionTimeRemaining(prev => {
-  //       if (prev <= 1) {
-  //         clearInterval(timer);
-  //         handleSectionSubmit();
-  //         return 0;
-  //       }
-  //       return prev - 1;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(timer);
-  // }, [currentSection, quizStarted]);
+  // Calculator functions
+  const handleCalcButtonClick = (value: string) => {
+    if (value === '=') {
+      try {
+        setCalcInput(eval(calcInput).toString());
+      } catch {
+        setCalcInput('Error');
+      }
+    } else if (value === 'C') {
+      setCalcInput('');
+    } else if (value === '⌫') {
+      setCalcInput(calcInput.slice(0, -1));
+    } else {
+      setCalcInput(prev => prev + value);
+    }
+  };
 
   const startQuiz = () => {
     setQuizStarted(true);
-    // Set overall quiz timer if needed
-    if (quiz?.durationMinutes) {
-      setTimeRemaining(quiz.durationMinutes * 60);
-    }
+    setStartTime(Date.now());
+  };
+
+  const changeSection = (sectionName: string) => {
+    setCurrentSection(sectionName);
+    setCurrentQuestionIndex(0);
   };
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
-    setAnswers(prev => ({
-      ...prev,
+    const newAnswers = {
+      ...answers,
       [questionId]: optionIndex
-    }));
+    };
+    
+    setAnswers(newAnswers);
     
     setSectionAnswers(prev => ({
       ...prev,
@@ -187,22 +233,26 @@ export default function QuizPlayer() {
     }
   };
 
- 
-
   const handleSectionSubmit = async () => {
     try {
-      await axios.post(`/api/quiz/${shareCode}/answers`, {
+      // Save section answers and time spent
+      await axios.post(`/api/quiz/${shareCode}/answers`,
+      {
         section: currentSection,
-        answers: sectionAnswers[currentSection]
-      });
+        answers: sectionAnswers[currentSection],
+        timeSpent: 
+        (sections.find(s => s.name === currentSection)?.timeLimit 
+          ? (sections.find(s => s.name === currentSection)!.timeLimit! - sectionTimers[currentSection])
+          : 0)
+      }
+    );
       
       // Move to next section or finish if last section
       const currentIndex = sections.findIndex(s => s.name === currentSection);
       if (currentIndex < sections.length - 1) {
-        setCurrentSection(sections[currentIndex + 1].name);
-        setCurrentQuestionIndex(0);
+        changeSection(sections[currentIndex + 1].name);
       } else {
-        setShowResultModal(true);
+        handleQuizSubmit();
       }
     } catch (err) {
       setError('Failed to save answers. Please try again.');
@@ -211,9 +261,17 @@ export default function QuizPlayer() {
 
   const handleQuizSubmit = async () => {
     try {
+      // Calculate total time spent
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      
       await axios.post(`/api/quiz/${shareCode}/complete`, {
-        answers: sectionAnswers
+        answers: sectionAnswers,
+        sectionTimes: sectionTimers,
+        totalTime
       });
+      
+      // Clear saved progress
+      localStorage.removeItem(`quizProgress_${shareCode}`);
       setShowResultModal(true);
     } catch (err) {
       setError('Failed to submit quiz. Please try again.');
@@ -229,7 +287,6 @@ export default function QuizPlayer() {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader2 className="animate-spin"/>
-        
       </div>
     );
   }
@@ -257,7 +314,6 @@ export default function QuizPlayer() {
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mx-4">
           <h1 className="text-2xl font-bold mb-3 text-center">{quiz?.title}</h1>
           
-          {/* Description as list */}
           {quiz?.description && Array.isArray(quiz.description) && (
             <div className="mb-6">
               <h2 className="font-semibold mb-2 text-gray-700">Description:</h2>
@@ -267,7 +323,7 @@ export default function QuizPlayer() {
                 ))}
               </ul>
             </div>
-          ) }
+          )}
   
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -292,13 +348,7 @@ export default function QuizPlayer() {
                 <li className="px-4 py-3 hover:bg-gray-50">
                   <div className="flex items-start">
                     <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-600">Each section must be completed in sequence</span>
-                  </div>
-                </li>
-                <li className="px-4 py-3 hover:bg-gray-50">
-                  <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-600">You cannot go back to previous sections</span>
+                    <span className="text-gray-600">Progress is saved automatically</span>
                   </div>
                 </li>
                 <li className="px-4 py-3 hover:bg-gray-50">
@@ -310,7 +360,7 @@ export default function QuizPlayer() {
                 <li className="px-4 py-3 hover:bg-gray-50">
                   <div className="flex items-start">
                     <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-600">Answers are auto-saved as you progress</span>
+                    <span className="text-gray-600">Use the calculator for numerical questions</span>
                   </div>
                 </li>
               </ul>
@@ -334,23 +384,72 @@ export default function QuizPlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" ref={quizContainerRef}>
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold">{quiz?.title}</h1>
           <div className="flex items-center space-x-4">
             {currentSectionData?.timeLimit && (
               <QuestionTimer 
-                timeRemaining={sectionTimeRemaining} 
+                timeRemaining={sectionTimers[currentSection] || 0}
                 onTimeUp={handleSectionSubmit}
               />
             )}
             <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
               {currentSectionData?.label}
             </span>
+            <button
+              onClick={() => setShowCalculator(!showCalculator)}
+              className="p-2 rounded-full hover:bg-gray-100"
+              title="Calculator"
+            >
+              <Calculator size={20} />
+            </button>
+            <button
+              onClick={toggleFullScreen}
+              className="p-2 rounded-full hover:bg-gray-100"
+              title={isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'}
+            >
+              {isFullScreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Calculator Modal */}
+      {showCalculator && (
+        <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50 border">
+          <div className="flex justify-between items-center mb-2">
+            <h3 className="font-medium">Calculator</h3>
+            <button 
+              onClick={() => setShowCalculator(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ×
+            </button>
+          </div>
+          <div className="bg-gray-100 p-2 mb-2 rounded text-right font-mono">
+            {calcInput || '0'}
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', '.', '=', '+', 'C', '⌫'].map((btn) => (
+              <button
+                key={btn}
+                onClick={() => handleCalcButtonClick(btn)}
+                className={`p-2 rounded ${
+                  ['C', '⌫'].includes(btn)
+                    ? 'bg-red-100 hover:bg-red-200'
+                    : btn === '='
+                    ? 'bg-blue-100 hover:bg-blue-200'
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                {btn}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Section Navigation */}
@@ -434,14 +533,14 @@ export default function QuizPlayer() {
           <div className="bg-white p-4 rounded-lg shadow">
             <h3 className="font-medium mb-3">Questions</h3>
             <div className="grid grid-cols-5 gap-2">
-              {currentQuestions.map((_, index) => (
+              {currentQuestions.map((q, index) => (
                 <button
-                  key={index}
+                  key={q._id}
                   onClick={() => goToQuestion(index)}
                   className={`w-10 h-10 rounded flex items-center justify-center ${
                     currentQuestionIndex === index
                       ? 'bg-blue-500 text-white'
-                      : answers[currentQuestions[index]._id] !== undefined
+                      : answers[q._id] !== undefined
                       ? 'bg-green-100 text-green-800'
                       : 'bg-gray-100'
                   }`}

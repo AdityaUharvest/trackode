@@ -8,7 +8,7 @@ import { Button } from './ui/button';
 import { useTheme } from './ThemeContext';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-
+import { useSession } from 'next-auth/react';
 interface Question {
   text: string;
   options: string[];
@@ -49,6 +49,8 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
 ) {
   const { theme } = useTheme();
   const params = useParams();
+  const { data: session } = useSession();
+
   const mockTestId = params.id as string;
   const [selectedSection, setSelectedSection] = useState(sections[0].value);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -83,7 +85,6 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
             text: q.text || q.question || '',
             options: Array.isArray(q.options) ? q.options : [],
             correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
-            explanation: q.explanation || ''
           })).filter(q => q.text && q.options.length >= 2);
         }
       } catch (e) {
@@ -108,7 +109,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
           text, 
           options, 
           correctAnswer,
-          explanation: lines.find(l => l.toLowerCase().includes('explanation'))?.replace(/.*explanation:/i, '').trim() || ''
+          
         };
       }).filter(q => q !== null) as Question[];
     }
@@ -118,7 +119,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         text: q.text || q.question || '',
         options: Array.isArray(q.options) ? q.options : [],
         correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
-        explanation: q.explanation || ''
+        
       })).filter(q => q.text && q.options.length >= 2);
     }
 
@@ -162,8 +163,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
             prompt: `Generate ${batchSize} ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
             - "text": "question text"
             - "options": ["option1", "option2", "option3", "option4"]
-            - "correctAnswer": index (0-3)
-            - "explanation": "optional explanation"`
+            - "correctAnswer": index (0-3)`
           }, {
             timeout: API_TIMEOUT
           });
@@ -192,24 +192,65 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
     }
   };
 
+  // const saveQuestions = async () => {
+  //   try {
+  //     setIsSubmitting(true);
+  //     setErrorMessage('');
+      
+  //     // First, delete existing questions for this section
+  //     await axios.delete(`/api/mock-tests/${mockTestId}/questions`, {
+  //       params: { section: selectedSection },
+  //       timeout: API_TIMEOUT
+  //     });
+  
+  //     // Then save all new questions in chunks
+  //     for (let i = 0; i < questions.length; i += CHUNK_SIZE) {
+  //       const chunk = questions.slice(i, i + CHUNK_SIZE);
+  //       await axios.post(`/api/mock-tests/${mockTestId}/questions`, {
+  //         section: selectedSection,
+  //         questions: chunk
+  //       }, {
+  //         timeout: API_TIMEOUT
+  //       });
+  //     }
+      
+  //     setSuccessMessage(`Successfully saved ${questions.length} questions!`);
+  //     setTimeout(() => setSuccessMessage(''), 3000);
+  //   } catch (error) {
+  //     console.error('Failed to save questions', error);
+  //     setErrorMessage('Failed to save questions. Please try again.');
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
   const saveQuestions = async () => {
     try {
       setIsSubmitting(true);
       setErrorMessage('');
       
-      // Save in chunks to avoid timeout
-      for (let i = 0; i < questions.length; i += CHUNK_SIZE) {
-        const chunk = questions.slice(i, i + CHUNK_SIZE);
-        await axios.post(`/api/mock-tests/${mockTestId}/questions`, {
+      // Submit all questions at once
+      const response = await axios.post(
+        `/api/mock-tests/${mockTestId}/questions`,
+        {
           section: selectedSection,
-          questions: chunk
-        }, {
+          questions: questions.map(q => ({
+            text: q.text,
+            options: q.options,
+            correctAnswer: q.correctAnswer
+            // Explanation will be generated later
+          }))
+        },
+        {
           timeout: API_TIMEOUT
-        });
+        }
+      );
+  
+      if (response.data.success) {
+        setSuccessMessage(`Successfully saved ${questions.length} questions!`);
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } else {
+        throw new Error('Failed to save questions');
       }
-      
-      setSuccessMessage('Questions saved successfully!');
-      setTimeout(() => setSuccessMessage(''), 3000);
     } catch (error) {
       console.error('Failed to save questions', error);
       setErrorMessage('Failed to save questions. Please try again.');
@@ -217,7 +258,6 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
       setIsSubmitting(false);
     }
   };
-
   const handleEdit = (index: number) => {
     setEditingQuestion({ ...questions[index], index });
   };
@@ -277,8 +317,15 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
 
   return (
     <div className={containerClasses}>
-       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{mockTest}</h1>
+      <div className='flex justify-between'>
+      <div className="flex gap-2 items-center p-2">
+      <img className="rounded-full w-9" src={session?.user?.image?session.user.image : `trackode.png`}>
+       </img>
+        <h1 className="text-xl font-bold ">Welcome {session?.user?.name} to {mockTest} </h1>
+      </div>
+       
+       <div className="p-2  items-center">
+      
 
         {isPublished ?(
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
@@ -292,7 +339,9 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         }
        
       </div>
-      <div className="flex gap-4 mb-6">
+      </div>
+      
+      <div className="flex p-2 gap-4 ">
         <Button 
           className={`mr-2 ${isPublished ? 
             'bg-red-600 hover:bg-red-700' : 
@@ -317,11 +366,11 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         <select
           value={selectedSection}
           onChange={(e) => setSelectedSection(e.target.value)}
-          className={selectClasses}
+          className={` ml-2 text-sm ${selectClasses}`}
           disabled={isGenerating || isSubmitting}
         >
           {sections.map(section => (
-            <option key={section.value} value={section.value}>
+            <option className='text-sm' key={section.value} value={section.value}>
               {section.label}
             </option>
           ))}
@@ -367,7 +416,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         />
       ) : (
         <>
-          <div className="space-y-4">
+          <div className="space-y-4 p-2">
             {questions.length === 0 ? (
               <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 No questions yet. Click "Generate Questions" to get started.
@@ -405,22 +454,18 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
                     ))}
                   </div>
                   
-                  {q.explanation && (
-                    <div className={explanationClasses}>
-                      <strong>Explanation:</strong> {q.explanation}
-                    </div>
-                  )}
+                  
                 </div>
               ))
             )}
           </div>
 
           {questions.length > 0 && (
-            <div className="flex justify-end">
+            <div className="flex mb-2 justify-end">
               <Button
                 onClick={saveQuestions}
                 disabled={isSubmitting}
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-green-600 mb-2 mr-2 text-white hover:bg-green-700"
               >
                 {isSubmitting ? (
                   <>

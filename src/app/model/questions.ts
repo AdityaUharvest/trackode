@@ -6,7 +6,7 @@ interface IQuestion extends Document {
   text: string;
   options: string[];
   correctAnswer: number;
-  explanation?: string;
+  
   difficulty: number;
   createdAt: Date;
 }
@@ -17,7 +17,7 @@ const QuestionSchema: Schema = new Schema({
   text: { type: String, required: true },
   options: { type: [String], required: true },
   correctAnswer: { type: Number, required: true },
-  explanation: String,
+  
   
   createdAt: { type: Date, default: Date.now }
 });

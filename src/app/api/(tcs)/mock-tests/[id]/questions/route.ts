@@ -4,8 +4,8 @@ import connectDB from '@/lib/util';
 
 export async function GET(
   request: NextRequest,
-  { params }: any
-  ) {
+  { params }:any
+) {
   try {
     await connectDB();
     
@@ -35,30 +35,40 @@ export async function POST(
   try {
     await connectDB();
     
+    const { id } =await params;
     const { section, questions } = await request.json();
     
+    // Validate input
+    if (!section || !questions || !Array.isArray(questions)) {
+      return NextResponse.json(
+        { message: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
     // Delete existing questions for this section
     await Question.deleteMany({ 
-      mockTestId: params.id, 
+      mockTestId: id, 
       section 
     });
     
-    // Prepare new questions
+    // Prepare new questions without explanations
     const questionDocs = questions.map((q: any) => ({
-      mockTestId: params.id,
+      mockTestId: id,
       section,
       text: q.text,
       options: q.options,
       correctAnswer: q.correctAnswer,
-      explanation: q.explanation || '',
-      
       createdAt: new Date()
     }));
     
-    // Save new questions
+    // Save all questions at once
     await Question.insertMany(questionDocs);
     
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      count: questionDocs.length 
+    });
   } catch (error) {
     console.error('Error saving questions:', error);
     return NextResponse.json(
