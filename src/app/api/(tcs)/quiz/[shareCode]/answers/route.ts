@@ -7,7 +7,7 @@ import { auth } from '@/auth';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { shareCode: string } }
+  { params }: any
 ) {
   try {
     await connectDB();
@@ -118,9 +118,9 @@ export async function POST(
   }
 }
 
-export async function PUT(
+export async function PUT(this: any, 
   request: NextRequest,
-  { params }: { params: { shareCode: string } }
+  { params }: any
 ) {
   try {
     await connectDB();
