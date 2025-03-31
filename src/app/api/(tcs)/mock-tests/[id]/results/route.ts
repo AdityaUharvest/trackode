@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import QuizAttempt from '@/app/model/QuizAttempt';
-import MockTest from '@/app/model/mockTest';
+import MockTest from '@/app/model/MockTest';
 import User from '@/app/model/User';
 import Question from '@/app/model/questions';
 

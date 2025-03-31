@@ -1,4 +1,4 @@
-import MockTest from '@/app/model/mockTest';
+import MockTest from '@/app/model/MockTest';
 import connectDB from '@/lib/util';
 import { generateShareCode } from "@/app/api/generateShareCode"
 import { auth } from '@/auth';
@@ -27,6 +27,7 @@ export async function createMockTest(data: {
 
 export async function getMockTest(id: string) {
   await connectDB();
+  console.log("Fetching mock test with ID:", id);
   return MockTest.findById(id);
 }
 

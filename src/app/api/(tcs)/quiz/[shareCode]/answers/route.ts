@@ -1,7 +1,7 @@
 import { NextResponse ,NextRequest} from 'next/server';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import connectDB from '@/lib/util';
-import MockTest from '@/app/model/mockTest';
+import MockTest from '@/app/model/MockTest';
 import { auth } from '@/auth';
 export async function POST(
   request: NextRequest,

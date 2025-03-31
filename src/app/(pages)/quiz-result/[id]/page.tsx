@@ -14,6 +14,7 @@ import {
   Legend,
 } from "chart.js";
 import { useTheme } from "@/components/ThemeContext";
+import { Loader2 } from "lucide-react";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -83,7 +84,7 @@ export default function QuizResults({ params }: any) {
     ],
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div><Loader2></Loader2></div>;
   if (error) return <div>{error}</div>;
 
   return (

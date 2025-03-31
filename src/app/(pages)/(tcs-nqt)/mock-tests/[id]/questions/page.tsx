@@ -9,11 +9,14 @@ export default function MockTestQuestionsPage({ params }: any) {
   const { theme, toggleTheme } = useTheme();
   const [mockTest, setMockTest] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-
+  console.log(params)
   useEffect(() => {
     async function fetchMockTest() {
       try {
+        console.log("Fetching mock test with ID:", params.id);
         const data = await getMockTest(params.id);
+        console.log(params.id);
+        console.log(data);
         setMockTest(data);
       } catch (error) {
         console.error("Error fetching mock test:", error);

@@ -1,5 +1,5 @@
 import { NextResponse ,NextRequest} from 'next/server';
-import MockTest from '@/app/model/mockTest';
+import MockTest from '@/app/model/MockTest';
 import Question from '@/app/model/questions';
 import connectDB from '@/lib/util';
 

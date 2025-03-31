@@ -1,4 +1,4 @@
-import { create } from 'domain';
+
 import mongoose, { Schema, Document } from 'mongoose';
 import User from './User';
 interface IMockTest extends Document {
@@ -25,4 +25,4 @@ const MockTestSchema: Schema = new Schema({
 
 });
 
-export default mongoose.models.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);
+export default mongoose.models?.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);

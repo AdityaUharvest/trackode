@@ -1,5 +1,5 @@
 import { NextResponse ,NextRequest} from 'next/server';
-import MockTest from '@/app/model/mockTest';
+import MockTest from '@/app/model/MockTest';
 import connectDB from '@/lib/util';
 export async function POST(
   request: Request,
