@@ -98,12 +98,12 @@ export default function Dashboard() {
       {/* Header */}
       <header className={`shadow ${headerBg}`}>
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className={`text-2xl font-bold ${textColor}`}>TCS NQT Dashboard</h1>
+          <h1 className={`sm:text-lg lg:text-xl font-bold ${textColor}`}>TCS NQT Dashboard</h1>
           <Link
             href="/mock-tests"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
-            Create New Mock Test
+            New Mock Test
           </Link>
         </div>
       </header>
@@ -143,7 +143,7 @@ export default function Dashboard() {
             >
               My Results
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab('stats')}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'stats'
@@ -152,7 +152,7 @@ export default function Dashboard() {
               }`}
             >
               Statistics
-            </button>
+            </button> */}
           </nav>
         </div>
 
@@ -293,12 +293,12 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className={`text-xl font-bold ${textColor}`}>My Mock Tests</h2>
+        <h2 className={`text-lg font-bold ${textColor}`}>My Mock Tests</h2>
         <Link
           href="/mock-tests"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
         >
-          Create New Mock Test
+          New Mock Test
         </Link>
       </div>
 
@@ -309,7 +309,7 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
             href="/mock-tests"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
-            Create Your First Mock Test
+            First Mock Test+
           </Link>
         </div>
       ) : (
@@ -389,17 +389,17 @@ function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, t
   
   return (
     <div>
-      <h2 className={`text-xl font-bold mb-6 ${textColor}`}>My Test Results</h2>
+      <h2 className={`text-lg font-bold mb-6 ${textColor}`}>My Test Results</h2>
 
       {attempts.length === 0 ? (
         <div className={`text-center py-12 ${textColor}`}>
           <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
-          <Link
+          {/* <Link
             href="/mock-tests"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
             Browse Mock Tests
-          </Link>
+          </Link> */}
         </div>
       ) : (
         <div className="space-y-8">

@@ -56,7 +56,7 @@ export default function Home() {
               <span>
                 <SplitText
                   text="Track"
-                  className="text-4xl text-blue-600 font-semibold text-center"
+                  className="text-3xl text-blue-600 font-semibold text-center"
                   delay={150}
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                   animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -69,7 +69,7 @@ export default function Home() {
               <span>
                 <SplitText
                   text="Code Quiz "
-                  className="text-4xl  font-semibold text-center"
+                  className="text-3xl  font-semibold text-center"
                   delay={150}
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                   animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -79,15 +79,16 @@ export default function Home() {
                   onLetterAnimationComplete={handleAnimationComplete}
                 />
 
-
+                <div className="font-bold">
                 <GradientText
                   colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                   animationSpeed={15}
                   showBorder={false}
-                  className="text-2xl font-semibold"
+                  className="text-xl lg:font-semibold sm:font-bold"
                 >
                   Trackode Helps You Navigate and Track Your Journey to Success
                 </GradientText>
+                </div>
               </span>
 
             </p>
