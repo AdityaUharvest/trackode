@@ -16,7 +16,8 @@ type MockTest = {
   title: string;
   createdAt: Date;
   isPublished: boolean;
-  participantCount: number;
+  attempts: number;
+  
 };
 
 type Attempt = {
@@ -228,7 +229,7 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
         <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'}`}>
           <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-purple-800'}`}>Average Score</h3>
           <p className={`mt-2 text-3xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-purple-600'}`}>
-            {stats ? `${stats.averageScore}%` : 'N/A'}
+            {stats && stats.averageScore!==null? `${stats.averageScore}%` : 'N/A'}
           </p>
         </div>
       </div>
@@ -356,7 +357,7 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
                     </span>
                   </td>
                   <td className={`px-6 py-4 whitespace-nowrap text-sm ${secondaryText}`}>
-                    {mock.participantCount || 0}
+                    {mock.attempts || 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
