@@ -6,6 +6,8 @@ import QuestionEditor from './(tcs)/QuestionEditor';
 import axios from 'axios';
 import { Button } from './ui/button';
 import { useTheme } from './ThemeContext';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 interface Question {
   text: string;
@@ -15,7 +17,6 @@ interface Question {
   section?: string;
   mockTestId?: string;
 }
-import { Loader2 } from 'lucide-react';
 
 interface Section {
   value: string;
@@ -38,6 +39,9 @@ const sections: Section[] = [
   { value: 'advanced-reasoning', label: 'Advanced Reasoning' },
   { value: 'advanced-coding', label: 'Advanced Coding' }
 ];
+
+const CHUNK_SIZE = 10; // Process questions in chunks of 10
+const API_TIMEOUT = 30000; // 30 seconds timeout
 
 export default function QuestionGenerator({ isPublished }: QuestionGeneratorProps) {
   const { theme } = useTheme();
@@ -66,16 +70,10 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
   const successClasses = `p-3 rounded ${theme === 'dark' ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-700'}`;
 
   const parseGeneratedQuestions = (generatedQuestions: any): Question[] => {
-    if (Array.isArray(generatedQuestions) && 
-        generatedQuestions.every(q => q.text && Array.isArray(q.options))) {
-      return generatedQuestions;
-    }
-
+    // First try to parse as complete JSON
     if (typeof generatedQuestions === 'string') {
-      let cleaned = generatedQuestions.trim();
-      cleaned = cleaned.replace(/```(json)?\s*|\s*```/g, '');
-      
       try {
+        const cleaned = generatedQuestions.replace(/```(json)?\s*|\s*```/g, '');
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed)) {
           return parsed.map(q => ({
@@ -85,50 +83,64 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
             explanation: q.explanation || ''
           })).filter(q => q.text && q.options.length >= 2);
         }
-      } catch (error) {
-        console.warn("Initial JSON parse failed, trying fallback methods", error);
+      } catch (e) {
+        console.warn("Initial JSON parse failed, trying fallback methods", e);
       }
 
-      const questionMatches = cleaned.match(/\{[^{}]*\}/g) || [];
-      const parsedQuestions: Question[] = [];
+      // Fallback for malformed JSON
+      const questionBlocks = generatedQuestions.split(/\n\s*\n/);
+      return questionBlocks.map(block => {
+        const lines = block.split('\n').filter(l => l.trim());
+        if (lines.length < 3) return null;
+        
+        const text = lines[0].replace(/^\d+\.\s*/, '').trim();
+        const options = lines.slice(1, 5)
+          .map(l => l.replace(/^[a-dA-D][\.\)]\s*/, '').trim());
+        const correctLine = lines.find(l => l.toLowerCase().includes('correct'));
+        const correctAnswer = correctLine 
+          ? options.indexOf(correctLine.replace(/.*correct.*?([a-dA-D])/i, '$1').toUpperCase())
+          : 0;
+          
+        return { 
+          text, 
+          options, 
+          correctAnswer,
+          explanation: lines.find(l => l.toLowerCase().includes('explanation'))?.replace(/.*explanation:/i, '').trim() || ''
+        };
+      }).filter(q => q !== null) as Question[];
+    }
 
-      for (const match of questionMatches) {
-        try {
-          const parsed = JSON.parse(match);
-          parsedQuestions.push({
-            text: parsed.text || parsed.question || '',
-            options: Array.isArray(parsed.options) ? parsed.options : [],
-            correctAnswer: typeof parsed.correctAnswer === 'number' ? parsed.correctAnswer : 0,
-            explanation: parsed.explanation || ''
-          });
-        } catch (error) {
-          console.warn("Failed to parse question object:", match, error);
-        }
-      }
-
-      return parsedQuestions.filter(q => q.text && q.options.length >= 2);
+    if (Array.isArray(generatedQuestions)) {
+      return generatedQuestions.map(q => ({
+        text: q.text || q.question || '',
+        options: Array.isArray(q.options) ? q.options : [],
+        correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
+        explanation: q.explanation || ''
+      })).filter(q => q.text && q.options.length >= 2);
     }
 
     console.error("Unsupported question format:", generatedQuestions);
     return [];
   };
 
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      try {
-        setIsLoading(true);
-        const res = await fetch(`/api/mock-tests/${mockTestId}/questions?section=${selectedSection}`);
-        const data = await res.json();
-        setQuestions(data);
-        setErrorMessage('');
-      } catch (error) {
-        console.error('Failed to load questions', error);
-        setErrorMessage('Failed to load questions. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchQuestions = async () => {
+    try {
+      setIsLoading(true);
+      const res = await axios.get(`/api/mock-tests/${mockTestId}/questions`, {
+        params: { section: selectedSection },
+        timeout: API_TIMEOUT
+      });
+      setQuestions(res.data);
+      setErrorMessage('');
+    } catch (error) {
+      console.error('Failed to load questions', error);
+      setErrorMessage('Failed to load questions. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchQuestions();
   }, [mockTestId, selectedSection]);
 
@@ -137,21 +149,37 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
       setIsGenerating(true);
       setErrorMessage('');
       
-      const res = await axios.post('/api/chat-gpt', { 
-        prompt: `Generate 25 ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
-        - "text": "question text"
-        - "options": ["option1", "option2", "option3", "option4"]
-        - "correctAnswer": index (0-3)
-        - "explanation": "optional explanation"`
-      });
+      // Generate in smaller batches
+      const batchSize = 5;
+      let allQuestions: Question[] = [];
       
-      const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
+      for (let i = 0; i < 5; i++) { // Generate up to 25 questions (5 batches of 5)
+        try {
+          const res = await axios.post('/api/chat-gpt', { 
+            prompt: `Generate ${batchSize} ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
+            - "text": "question text"
+            - "options": ["option1", "option2", "option3", "option4"]
+            - "correctAnswer": index (0-3)
+            - "explanation": "optional explanation"`
+          }, {
+            timeout: API_TIMEOUT
+          });
+          
+          const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
+          allQuestions = [...allQuestions, ...parsedQuestions];
+          
+          // Stop if we've got enough questions
+          if (allQuestions.length >= 25) break;
+        } catch (batchError) {
+          console.error(`Batch ${i+1} failed`, batchError);
+        }
+      }
       
-      if (parsedQuestions.length > 0) {
-        setQuestions(parsedQuestions);
-        setSuccessMessage(`Successfully generated ${parsedQuestions.length} questions!`);
+      if (allQuestions.length > 0) {
+        setQuestions(allQuestions.slice(0, 25)); // Limit to 25 questions max
+        setSuccessMessage(`Successfully generated ${allQuestions.length} questions!`);
       } else {
-        setErrorMessage('No valid questions could be parsed from the response');
+        setErrorMessage('No valid questions could be generated. Please try again.');
       }
     } catch (error) {
       console.error('Failed to generate questions', error);
@@ -166,10 +194,16 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
       setIsSubmitting(true);
       setErrorMessage('');
       
-      const response = await axios.post(`/api/mock-tests/${mockTestId}/questions`, {
-        section: selectedSection,
-        questions: questions
-      });
+      // Save in chunks to avoid timeout
+      for (let i = 0; i < questions.length; i += CHUNK_SIZE) {
+        const chunk = questions.slice(i, i + CHUNK_SIZE);
+        await axios.post(`/api/mock-tests/${mockTestId}/questions`, {
+          section: selectedSection,
+          questions: chunk
+        }, {
+          timeout: API_TIMEOUT
+        });
+      }
       
       setSuccessMessage('Questions saved successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -220,7 +254,8 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ isPublished: !isPublished })
+        body: JSON.stringify({ isPublished: !isPublished }),
+        signal: AbortSignal.timeout(API_TIMEOUT)
       });
       const data = await res.json();
 
@@ -245,6 +280,7 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
             'bg-red-600 hover:bg-red-700' : 
             'bg-green-600 hover:bg-green-700'} text-white`}
           onClick={handlePublish}
+          disabled={isGenerating || isSubmitting}
         >
           {isPublished ? 'Unpublish' : 'Publish'}
         </Button>
@@ -252,6 +288,7 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
           <Button 
             className="bg-blue-600 text-white hover:bg-blue-700"
             onClick={handleShareLink}
+            disabled={isGenerating || isSubmitting}
           >
             Share Link
           </Button>
@@ -276,24 +313,34 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
           disabled={isGenerating || isSubmitting}
           className="bg-blue-600 text-white hover:bg-blue-700"
         >
-          {isGenerating ? 'Generating...' : 'Generate Questions'}
+          {isGenerating ? (
+            <>
+              <Loader2 className="animate-spin mr-2" />
+              Generating...
+            </>
+          ) : 'Generate Questions'}
         </Button>
       </div>
 
       {errorMessage && (
+        toast.error(errorMessage),
         <div className={errorClasses}>
           {errorMessage}
         </div>
       )}
 
       {successMessage && (
+        toast.success(successMessage),
         <div className={successClasses}>
           {successMessage}
         </div>
       )}
 
       {isLoading ? (
-        <div className="text-center py-8"><Loader2 className="animate-spin" />...</div>
+        <div className="text-center py-8">
+          <Loader2 className="animate-spin mx-auto" size={32} />
+          <p className="mt-2">Loading questions...</p>
+        </div>
       ) : editingQuestion ? (
         <QuestionEditor
           question={editingQuestion}
@@ -357,7 +404,12 @@ export default function QuestionGenerator({ isPublished }: QuestionGeneratorProp
                 disabled={isSubmitting}
                 className="bg-green-600 text-white hover:bg-green-700"
               >
-                {isSubmitting ? 'Saving...' : 'Save Questions'}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2" />
+                    Saving...
+                  </>
+                ) : 'Save Questions'}
               </Button>
             </div>
           )}
