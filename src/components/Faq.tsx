@@ -45,7 +45,7 @@ export default function Faq() {
             Trackode FAQs
           </p>
           <p
-            className={`sm:text-4xl text-3xl font-extrabold ${
+            className={`sm:text-xl text-xl font-extrabold ${
               theme === "dark" ? "text-white" : "text-black"
             }`}
           >

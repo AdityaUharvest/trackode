@@ -29,32 +29,71 @@ export default function Footer() {
 
             <div className="flex flex-wrap justify-center mt-2 mx-4">
               
-              <a
-                href="/"
+              <Link
+                href="/dashboard"
                 className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="Home"
               >
-                Home
-              </a>
+                Student Dashboard
+              </Link>
+              <Link
+                href="/admin-dashboard"
+                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}
+                aria-label="Home"
+              >
+                Admin Dashboard
+              </Link>
 
-              <a
-                href="#"
+              <Link
+                href="/premium-mock-tests"
                 className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="About"
               >
-                About
-              </a>
+                TCS Mock Test
+              </Link>
+              <Link
+                href="/contact"
+                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}
+                aria-label="About"
+              >
+                Contact Us
+              </Link>
+              <Link
+                href="/signup"
+                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}
+                aria-label="About"
+              >
+                Join Us
+              </Link>
+              <Link
+                href="/signin"
+                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-600"
+                }`}
+                aria-label="About"
+              >
+                Sign in
+              </Link>
+              
 
               <a
-                href="#"
+                href="https://www.linkedin.com/in/iamadityaupadhyay/"
                 className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="Teams"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Teams
               </a>
@@ -140,4 +179,4 @@ export default function Footer() {
       </footer>
     </div>
   );
-}
+} 

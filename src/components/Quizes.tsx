@@ -36,7 +36,7 @@ export default function Quizes() {
         }} // Handle keyboard events
       >
         <div className="flex items-center gap-2">
-          <span className="lg:font-bold lg:text-lg sm:text-xs">My Quiz</span>
+          <span className="text-sm font-semibold">My Quiz</span>
           <ChevronDown
             size={20}
             className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}

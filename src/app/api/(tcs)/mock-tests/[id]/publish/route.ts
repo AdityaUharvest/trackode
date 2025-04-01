@@ -16,14 +16,22 @@ export async function POST(
         { message: 'Mock test not found' },
         { status: 404 }
       );
+    } 
+    let message = 'Mock test published successfully!';
+    if(mockTest.isPublished) {
+      message = 'Mock test unpublished successfully!';
     }
-    
     mockTest.isPublished = data.isPublished;
     await mockTest.save();
     
-    return NextResponse.json({
-      shareLink: `/playy/${mockTest.shareCode}`
-    });
+    return NextResponse.json(
+      {
+      shareLink: `/playy/${mockTest.shareCode}`,
+      message: message,
+      }
+      
+    
+  );
   } catch (error) {
     console.error('Error publishing mock test:', error);
     return NextResponse.json(

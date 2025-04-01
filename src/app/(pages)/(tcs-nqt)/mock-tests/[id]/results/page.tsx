@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
+import { useSession } from 'next-auth/react';
 import React from 'react';
 interface SectionStats {
   answered: number;
@@ -35,7 +36,7 @@ export default function QuizResultsDashboard({ params }: any) {
   const { theme } = useTheme();
   const { id } = useParams();
   const quizId = id;
-  
+  const { data: session } = useSession();
   const [attempts, setAttempts] = useState<UserAttempt[]>([]);
   const [filteredAttempts, setFilteredAttempts] = useState<UserAttempt[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -161,7 +162,7 @@ export default function QuizResultsDashboard({ params }: any) {
   return (
     <div className={`container mx-auto px-4 py-8 min-h-screen ${bgColor} ${textColor}`}>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold">{quizStats.quizTitle} Results</h1>
+        <h1 className="text-lg font-bold"> Welcome {session?.user?.name}</h1>
         <div className="flex items-center space-x-4">
           <Button variant="outline" onClick={() => window.print()} className={`gap-2 ${borderColor}`}>
             <Printer className="h-4 w-4" />
@@ -210,11 +211,11 @@ export default function QuizResultsDashboard({ params }: any) {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className={`p-4 rounded-lg shadow border ${cardBg} ${borderColor}`}>
           <h3 className={`text-sm font-medium ${secondaryText}`}>Total Attempts</h3>
-          <p className="text-2xl font-bold">{quizStats.totalParticipants}</p>
+          <p className="text-xl font-bold">{quizStats.totalParticipants}</p>
         </div>
         <div className={`p-4 rounded-lg shadow border ${cardBg} ${borderColor}`}>
           <h3 className={`text-sm font-medium ${secondaryText}`}>Average Answered</h3>
-          <p className="text-2xl font-bold">
+          <p className="text-xl font-bold">
             {attempts.length > 0 
               ? Math.round(attempts.reduce((sum, a) => sum + a.totalAnswered, 0) / attempts.length) 
               : 0}
@@ -222,7 +223,7 @@ export default function QuizResultsDashboard({ params }: any) {
         </div>
         <div className={`p-4 rounded-lg shadow border ${cardBg} ${borderColor}`}>
           <h3 className={`text-sm font-medium ${secondaryText}`}>Average Correct</h3>
-          <p className="text-2xl font-bold">
+          <p className="text-xl font-bold">
             {attempts.length > 0 
               ? Math.round(attempts.reduce((sum, a) => sum + a.totalCorrect, 0) / attempts.length) 
               : 0}
@@ -230,7 +231,7 @@ export default function QuizResultsDashboard({ params }: any) {
         </div>
         <div className={`p-4 rounded-lg shadow border ${cardBg} ${borderColor}`}>
           <h3 className={`text-sm font-medium ${secondaryText}`}>Average Accuracy</h3>
-          <p className="text-2xl font-bold">
+          <p className="text-xl font-bold">
             {attempts.length > 0 
               ? Math.round(attempts.reduce((sum, a) => sum + a.accuracy, 0) / attempts.length) 
               : 0}%

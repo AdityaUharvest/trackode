@@ -98,7 +98,7 @@ export default function Dashboard() {
   return (
     <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
-      <header className={`shadow ${headerBg}`}>
+      <header className={`${headerBg}`}>
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className={`sm:text-sm lg:text-lg font-bold ${textColor}`}>TCS NQT Dashboard</h1>
           <Link

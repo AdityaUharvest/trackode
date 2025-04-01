@@ -279,53 +279,39 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
     setSuccessMessage('Question updated successfully!');
     setTimeout(() => setSuccessMessage(''), 3000);
   };
-
+  const [copied , setCopied] = useState(false);
   const handleShareLink = async () => {
-    try {
-      await navigator.clipboard.writeText(shareLink);
-      setSuccessMessage('Share link copied to clipboard!');
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error) {
-      setErrorMessage('Failed to copy share link');
-    }
+    const shareLink =localStorage.getItem('shareLink')
+    navigator.clipboard.writeText(`${window.location.origin}${shareLink}`).then(
+      ()=>{
+        setSuccessMessage('Share link copied to clipboard!');
+        setCopied(true);
+        setTimeout(() => setSuccessMessage(''), 3000);
+      }
+    );
+
+    
   };
 
-  const handlePublish = async () => {
-    try {
-      const res = await fetch(`/api/mock-tests/${params.id}/publish`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ isPublished: !isPublished }),
-        signal: AbortSignal.timeout(API_TIMEOUT)
-      });
-      const data = await res.json();
-
-      const newShareLink = `${window.location.origin}${data.shareLink}`;
-      setShareLink(newShareLink);
-      await navigator.clipboard.writeText(newShareLink);
-      setSuccessMessage(`Mock test ${!isPublished ? 'published' : 'unpublished'} and share link copied to clipboard!`);
-      setTimeout(() => setSuccessMessage(''), 3000);
-      
-      window.location.reload();
-    } catch (error) {
-      console.error('Failed to publish mock test', error);
-      setErrorMessage('Failed to publish mock test. Please try again.');
-    }
-  };
+  
 
   return (
     <div className={containerClasses}>
-      <div className='flex justify-between'>
-      <div className="flex gap-2 items-center p-2">
-      <img className="rounded-full w-9" src={session?.user?.image?session.user.image : `trackode.png`}>
-       </img>
-        <h1 className="text-lg font-bold ">Welcome {session?.user?.name} ! </h1>
-      </div>
-       
-       <div className="p-2  items-center">
       
+      <div className="p-4 flex  justify-between  items-center">
+      
+       {isPublished && (
+          <Button 
+            className=" dark:bg-green-600 bg-white text-blue hover:bg-blue-700 hover:text-white"
+            onClick={handleShareLink}
+            disabled={isGenerating || isSubmitting || copied}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
+<path fill="#1976D2" d="M38.1,31.2L19.4,24l18.7-7.2c1.5-0.6,2.3-2.3,1.7-3.9c-0.6-1.5-2.3-2.3-3.9-1.7l-26,10C8.8,21.6,8,22.8,8,24s0.8,2.4,1.9,2.8l26,10c0.4,0.1,0.7,0.2,1.1,0.2c1.2,0,2.3-0.7,2.8-1.9C40.4,33.5,39.6,31.8,38.1,31.2z"></path><path fill="#1E88E5" d="M11 17A7 7 0 1 0 11 31 7 7 0 1 0 11 17zM37 7A7 7 0 1 0 37 21 7 7 0 1 0 37 7zM37 27A7 7 0 1 0 37 41 7 7 0 1 0 37 27z"></path>
+</svg>      {copied ? 'Copied' : 'Share'}
+            
+          </Button>
+      )}
 
         {isPublished ?(
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
@@ -337,32 +323,13 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
           </span>
         )
         }
+        
        
       </div>
-      </div>
       
-      <div className="flex p-2 gap-4 ">
-        <Button 
-          className={`mr-2 ${isPublished ? 
-            'bg-red-600 hover:bg-red-700' : 
-            'bg-green-600 hover:bg-green-700'} text-white`}
-          onClick={handlePublish}
-          disabled={isGenerating || isSubmitting}
-        >
-          {isPublished ? 'Unpublish' : 'Publish'}
-        </Button>
-        {isPublished && (
-          <Button 
-            className="bg-blue-600 text-white hover:bg-blue-700"
-            onClick={handleShareLink}
-            disabled={isGenerating || isSubmitting}
-          >
-            Share Link
-          </Button>
-        )}
-      </div>
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-2">
         <select
           value={selectedSection}
           onChange={(e) => setSelectedSection(e.target.value)}
@@ -387,7 +354,25 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
             </>
           ) : 'Generate Questions'}
         </Button>
+        </div>
+        {questions.length > 0 && (
+            <div className="flex mb-2 justify-end">
+              <Button
+                onClick={saveQuestions}
+                disabled={isSubmitting}
+                className="bg-green-600 mb-2 mr-2 text-white hover:bg-green-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2" />
+                    Saving...
+                  </>
+                ) : 'Save Questions'}
+              </Button>
+            </div>
+          )}
       </div>
+      
 
       {errorMessage && (
         toast.error(errorMessage),
@@ -416,7 +401,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         />
       ) : (
         <>
-          <div className="space-y-4 p-2">
+          <div className=" grid sm:grid-cols-2 p-3 gap-4">
             {questions.length === 0 ? (
               <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 No questions yet. Click "Generate Questions" to get started.
@@ -460,22 +445,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
             )}
           </div>
 
-          {questions.length > 0 && (
-            <div className="flex mb-2 justify-end">
-              <Button
-                onClick={saveQuestions}
-                disabled={isSubmitting}
-                className="bg-green-600 mb-2 mr-2 text-white hover:bg-green-700"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2" />
-                    Saving...
-                  </>
-                ) : 'Save Questions'}
-              </Button>
-            </div>
-          )}
+          
         </>
       )}
     </div>

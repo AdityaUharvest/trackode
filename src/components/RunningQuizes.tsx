@@ -571,7 +571,7 @@ const RunningQuizes: React.FC = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle className="lg:text-base">Running Quizzes 🏃</CardTitle>
+              <CardTitle className="text-sm">Running Quizzes</CardTitle>
               <CardDescription className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>
                 Manage your active quizzes
               </CardDescription>

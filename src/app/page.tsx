@@ -56,7 +56,7 @@ export default function Home() {
               <span>
                 <SplitText
                   text="Track"
-                  className="text-3xl text-blue-600 font-semibold text-center"
+                  className="text-2xl text-blue-600 font-semibold text-center"
                   delay={150}
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                   animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -69,7 +69,7 @@ export default function Home() {
               <span>
                 <SplitText
                   text="Code Quiz "
-                  className="text-3xl  font-semibold text-center"
+                  className="text-2xl  font-semibold text-center"
                   delay={150}
                   animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                   animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -84,7 +84,7 @@ export default function Home() {
                   colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
                   animationSpeed={15}
                   showBorder={false}
-                  className="text-xl lg:font-semibold sm:font-bold"
+                  className="text-lg lg:font-semibold sm:font-bold"
                 >
                   Trackode Helps You Navigate and Track Your Journey to Success
                 </GradientText>
@@ -98,7 +98,7 @@ export default function Home() {
               <Link
                 href="/premium-mock-tests"
                 title=""
-                className="inline-flex mb-2 items-center justify-center w-full px-8 py-3 text-lg font-bold text-white  transition-all bg-green-500 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
+                 className="inline-flex items-center justify-center w-full px-8 py-3 text-sm font-bold text-white transition-all bg-green-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
                 role="button"
               >
                 Premium Mock Tests
@@ -106,7 +106,7 @@ export default function Home() {
               <Link
                 href="/admin-dashboard"
                 title=""
-                className="inline-flex items-center justify-center w-full px-8 py-3 text-lg font-bold text-white transition-all bg-blue-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
+                className="inline-flex items-center justify-center w-full px-8 py-3 text-sm font-bold text-white transition-all bg-blue-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
                 role="button"
               >
                 Get Started
@@ -116,7 +116,7 @@ export default function Home() {
               <Link
                 href="/dashboard"
                 title=""
-                className={`inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-lg font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
+                className={`inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-sm font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
                   ? "text-white border-gray-400 hover:bg-blue-900 focus:bg-blue-900 focus:text-white focus:border-blue-900"
                   : "text-black border-gray-400 hover:bg-blue-200 focus:bg-blue-200 focus:text-black focus:border-blue-200"
                   }`}
@@ -163,11 +163,11 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col  gap-2 text-center ps-5 pr-5 pb-12">
-          <h3 className={`text-2xl animate-pulse   font-semibold sm:text-3xl ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+          <h3 className={`text-xl animate-pulse   font-semibold sm:text-xl ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
             Your Favourite Platform
           </h3>
 
-          <p className={`text-center font-[550] sm:text-xl md:text-3xl ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
+          <p className={`text-center font-[550] sm:text-sm md:text-xl ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
             Effortless coding & contests with Trackode
           </p>
         </div>
@@ -175,7 +175,7 @@ export default function Home() {
           <Link
             href="/dashboard/quiz-list"
             title=""
-            className={`animate-bounce inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-lg font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
+            className={`animate-pulse inline-flex items-center justify-center w-full px-6 py-3 mt-4 text-sm font-bold transition-all border-2 sm:w-auto sm:mt-0 rounded-xl font-pj focus:outline-none focus:ring-2 focus:ring-offset-2 ${theme === "dark"
               ? "text-white border-gray-400 hover:bg-blue-900 focus:bg-blue-900 focus:text-white focus:border-blue-900 bg-blue-500"
               : " border-gray-400 hover:bg-blue-800 focus:bg-blue-200 focus:text-black bg-blue-500 text-white focus:border-blue-200"
               }`}
@@ -198,6 +198,14 @@ export default function Home() {
             </svg>
             Explore Live Quizzes
           </Link>
+          <Link
+                href="/premium-mock-tests"
+                title=""
+                 className="inline-flex items-center justify-center w-full px-8 py-3 text-sm font-bold text-white transition-all bg-green-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
+                role="button"
+              >
+                Premium Mock Tests
+              </Link>
         </div>
 
 
