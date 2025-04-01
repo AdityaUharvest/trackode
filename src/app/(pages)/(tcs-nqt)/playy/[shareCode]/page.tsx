@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { SubmitConfirmationModal } from '@/components/(tcs)/SubmitConfirmationModal';
 import { QuizResultModal } from '@/components/(tcs)/QuizResultModal';
 import { SectionProgress } from '@/components/(tcs)/SectionProgress';
 import { QuestionTimer } from '@/components/(tcs)/QuestionTimer';
-import { Loader2, Calculator, Maximize2, Minimize2 } from 'lucide-react';
+import { Loader2, Calculator, Minimize2, Maximize2 } from 'lucide-react';
+import { useTheme } from '@/components/ThemeContext';
 
 interface Question {
   _id: string;
@@ -24,37 +25,26 @@ interface Section {
   timeLimit?: number;
 }
 
-interface QuizProgress {
-  answers: Record<string, number>;
-  sectionTimes: Record<string, number>;
-  currentSection: string;
-  currentQuestionIndex: number;
-  startedAt: number;
-}
-
 export default function QuizPlayer() {
+  const { theme, toggleTheme } = useTheme();
   const { shareCode } = useParams();
   const router = useRouter();
-  const quizContainerRef = useRef<HTMLDivElement>(null);
   
-  // Quiz state
   const [quiz, setQuiz] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentSection, setCurrentSection] = useState<string>('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [sectionAnswers, setSectionAnswers] = useState<Record<string, Record<string, number>>>({});
-  const [sectionTimers, setSectionTimers] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [sectionTimeRemaining, setSectionTimeRemaining] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
-  const [startTime, setStartTime] = useState<number>(0);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  // Calculator state
   const [showCalculator, setShowCalculator] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [calcInput, setCalcInput] = useState('');
 
   // Define sections based on TCS NQT pattern
@@ -67,36 +57,30 @@ export default function QuizPlayer() {
     { name: 'advanced-coding', label: 'Advanced Coding' }
   ];
 
-  // Load quiz progress from localStorage
+  // Load answers from localStorage on initial render
   useEffect(() => {
-    const savedProgress = localStorage.getItem(`quizProgress_${shareCode}`);
-    if (savedProgress) {
-      const progress: QuizProgress = JSON.parse(savedProgress);
-      setAnswers(progress.answers);
-      setSectionTimers(progress.sectionTimes);
-      setCurrentSection(progress.currentSection);
-      setCurrentQuestionIndex(progress.currentQuestionIndex);
-      setStartTime(progress.startedAt);
-      setQuizStarted(true);
+    const savedAnswers = localStorage.getItem(`quiz_${shareCode}_answers`);
+    if (savedAnswers) {
+      try {
+        const parsedAnswers = JSON.parse(savedAnswers);
+        setAnswers(parsedAnswers.answers || {});
+        setSectionAnswers(parsedAnswers.sectionAnswers || {});
+      } catch (e) {
+        console.error('Failed to parse saved answers', e);
+      }
     }
   }, [shareCode]);
 
-  // Save quiz progress to localStorage
+  // Save answers to localStorage whenever they change
   useEffect(() => {
-    if (!quizStarted) return;
+    if (quizStarted) {
+      localStorage.setItem(`quiz_${shareCode}_answers`, JSON.stringify({
+        answers,
+        sectionAnswers
+      }));
+    }
+  }, [answers, sectionAnswers, shareCode, quizStarted]);
 
-    const progress: QuizProgress = {
-      answers,
-      sectionTimes: sectionTimers,
-      currentSection,
-      currentQuestionIndex,
-      startedAt: startTime
-    };
-
-    localStorage.setItem(`quizProgress_${shareCode}`, JSON.stringify(progress));
-  }, [answers, sectionTimers, currentSection, currentQuestionIndex, quizStarted, shareCode, startTime]);
-
-  // Fetch quiz data
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
@@ -105,18 +89,13 @@ export default function QuizPlayer() {
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         
-        // Initialize section answers
         const initialSectionAnswers: Record<string, Record<string, number>> = {};
         sections.forEach(section => {
           initialSectionAnswers[section.name] = {};
         });
         setSectionAnswers(initialSectionAnswers);
         
-        // Start with first section if no saved progress
-        if (!localStorage.getItem(`quizProgress_${shareCode}`)) {
-          setCurrentSection(sections[0].name);
-        }
-        
+        setCurrentSection(sections[0].name);
         setIsLoading(false);
       } catch (err) {
         setError('Failed to load quiz. Please check the link and try again.');
@@ -127,77 +106,54 @@ export default function QuizPlayer() {
     fetchQuizData();
   }, [shareCode]);
 
-  // Handle section timer
+  const [sectionTimers, setSectionTimers] = useState<Record<string, number>>({});
+
   useEffect(() => {
     if (!quizStarted || !currentSection) return;
   
     const section = sections.find(s => s.name === currentSection);
     if (!section?.timeLimit) return;
   
-    // Use existing time if available, otherwise start with full time
     const initialTime = sectionTimers[currentSection] || section.timeLimit;
-    setSectionTimers(prev => ({
-      ...prev,
-      [currentSection]: initialTime
-    }));
+    setSectionTimeRemaining(initialTime);
     
     const timer = setInterval(() => {
-      setSectionTimers(prev => {
-        const newTime = prev[currentSection] - 1;
+      setSectionTimeRemaining(prev => {
+        const newTime = prev - 1;
+        setSectionTimers(prevTimers => ({
+          ...prevTimers,
+          [currentSection]: newTime
+        }));
         
         if (newTime <= 0) {
           clearInterval(timer);
           handleSectionSubmit();
-          return { ...prev, [currentSection]: 0 };
+          return 0;
         }
-        
-        return { ...prev, [currentSection]: newTime };
+        return newTime;
       });
     }, 1000);
   
     return () => clearInterval(timer);
   }, [currentSection, quizStarted]);
-
-  // Toggle fullscreen
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(e => {
-        console.error(`Error attempting to enable fullscreen: ${e.message}`);
-      });
-      setIsFullScreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-        setIsFullScreen(false);
-      }
+  
+  const changeSection = (sectionName: string) => {
+    if (currentSection) {
+      setSectionTimers(prev => ({
+        ...prev,
+        [currentSection]: sectionTimeRemaining
+      }));
     }
-  };
-
-  // Calculator functions
-  const handleCalcButtonClick = (value: string) => {
-    if (value === '=') {
-      try {
-        setCalcInput(eval(calcInput).toString());
-      } catch {
-        setCalcInput('Error');
-      }
-    } else if (value === 'C') {
-      setCalcInput('');
-    } else if (value === '⌫') {
-      setCalcInput(calcInput.slice(0, -1));
-    } else {
-      setCalcInput(prev => prev + value);
-    }
+    
+    setCurrentSection(sectionName);
+    setCurrentQuestionIndex(0);
   };
 
   const startQuiz = () => {
     setQuizStarted(true);
-    setStartTime(Date.now());
-  };
-
-  const changeSection = (sectionName: string) => {
-    setCurrentSection(sectionName);
-    setCurrentQuestionIndex(0);
+    if (quiz?.durationMinutes) {
+      setTimeRemaining(quiz.durationMinutes * 60);
+    }
   };
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
@@ -206,15 +162,16 @@ export default function QuizPlayer() {
       [questionId]: optionIndex
     };
     
-    setAnswers(newAnswers);
-    
-    setSectionAnswers(prev => ({
-      ...prev,
+    const newSectionAnswers = {
+      ...sectionAnswers,
       [currentSection]: {
-        ...prev[currentSection],
+        ...sectionAnswers[currentSection],
         [questionId]: optionIndex
       }
-    }));
+    };
+    
+    setAnswers(newAnswers);
+    setSectionAnswers(newSectionAnswers);
   };
 
   const goToQuestion = (index: number) => {
@@ -235,24 +192,16 @@ export default function QuizPlayer() {
 
   const handleSectionSubmit = async () => {
     try {
-      // Save section answers and time spent
-      await axios.post(`/api/quiz/${shareCode}/answers`,
-      {
+      await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
-        answers: sectionAnswers[currentSection],
-        timeSpent: 
-        (sections.find(s => s.name === currentSection)?.timeLimit 
-          ? (sections.find(s => s.name === currentSection)!.timeLimit! - sectionTimers[currentSection])
-          : 0)
-      }
-    );
+        answers: sectionAnswers[currentSection]
+      });
       
-      // Move to next section or finish if last section
       const currentIndex = sections.findIndex(s => s.name === currentSection);
       if (currentIndex < sections.length - 1) {
         changeSection(sections[currentIndex + 1].name);
       } else {
-        handleQuizSubmit();
+        setShowResultModal(true);
       }
     } catch (err) {
       setError('Failed to save answers. Please try again.');
@@ -261,22 +210,57 @@ export default function QuizPlayer() {
 
   const handleQuizSubmit = async () => {
     try {
-      // Calculate total time spent
-      const totalTime = Math.floor((Date.now() - startTime) / 1000);
-      
       await axios.post(`/api/quiz/${shareCode}/complete`, {
-        answers: sectionAnswers,
-        sectionTimes: sectionTimers,
-        totalTime
+        answers: sectionAnswers
       });
-      
-      // Clear saved progress
-      localStorage.removeItem(`quizProgress_${shareCode}`);
+      localStorage.removeItem(`quiz_${shareCode}_answers`);
       setShowResultModal(true);
     } catch (err) {
       setError('Failed to submit quiz. Please try again.');
     }
   };
+
+  // Calculator functions
+  const handleCalcButtonClick = (value: string) => {
+    if (value === '=') {
+      try {
+        setCalcInput(eval(calcInput).toString());
+      } catch {
+        setCalcInput('Error');
+      }
+    } else if (value === 'C') {
+      setCalcInput('');
+    } else if (value === '⌫') {
+      setCalcInput(prev => prev.slice(0, -1));
+    } else {
+      setCalcInput(prev => prev + value);
+    }
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(e => {
+        console.error(`Error attempting to enable fullscreen: ${e.message}`);
+      });
+      setIsFullScreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullScreen(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+    };
+  }, []);
 
   const currentQuestions = questions.filter(q => q.section === currentSection);
   const currentQuestion = currentQuestions[currentQuestionIndex];
@@ -285,7 +269,7 @@ export default function QuizPlayer() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className={`flex items-center justify-center h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <Loader2 className="animate-spin"/>
       </div>
     );
@@ -293,13 +277,13 @@ export default function QuizPlayer() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-red-500 text-center p-4 max-w-md">
+      <div className={`flex items-center justify-center h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`text-center p-4 max-w-md rounded-lg ${theme === 'dark' ? 'bg-gray-800 text-red-400' : 'bg-white text-red-500 shadow-md'}`}>
           <h2 className="text-xl font-bold mb-2">Error</h2>
           <p>{error}</p>
           <button 
             onClick={() => router.push('/')}
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+            className={`mt-4 px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
             Go Home
           </button>
@@ -310,14 +294,14 @@ export default function QuizPlayer() {
 
   if (!quizStarted) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] bg-gray-50 py-8">
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl mx-4">
+      <div className={`flex items-center justify-center min-h-[calc(100vh-4rem)] py-8 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`p-6 rounded-lg shadow-md w-full max-w-2xl mx-4 ${theme === 'dark' ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800'}`}>
           <h1 className="text-2xl font-bold mb-3 text-center">{quiz?.title}</h1>
           
           {quiz?.description && Array.isArray(quiz.description) && (
             <div className="mb-6">
-              <h2 className="font-semibold mb-2 text-gray-700">Description:</h2>
-              <ul className="list-disc pl-5 space-y-1 text-gray-600">
+              <h2 className="font-semibold mb-2">Description:</h2>
+              <ul className="list-disc pl-5 space-y-1">
                 {quiz.description.map((item:any, index:any) => (
                   <li key={index}>{item}</li>
                 ))}
@@ -327,13 +311,13 @@ export default function QuizPlayer() {
   
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h2 className="font-semibold mb-2 text-gray-700">Sections:</h2>
-              <ul className="space-y-2 border rounded-lg divide-y">
+              <h2 className="font-semibold mb-2">Sections:</h2>
+              <ul className={`space-y-2 rounded-lg divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
                 {sections.map(section => (
-                  <li key={section.name} className="px-4 py-3 flex justify-between hover:bg-gray-50">
-                    <span className="text-gray-800">{section.label}</span>
+                  <li key={section.name} className={`px-4 py-3 flex justify-between ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                    <span>{section.label}</span>
                     {section.timeLimit && (
-                      <span className="text-gray-500 text-sm bg-gray-100 px-2 py-1 rounded">
+                      <span className={`text-sm px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-500'}`}>
                         {Math.floor(section.timeLimit / 60)} mins
                       </span>
                     )}
@@ -343,24 +327,30 @@ export default function QuizPlayer() {
             </div>
   
             <div>
-              <h2 className="font-semibold mb-2 text-gray-700">Instructions:</h2>
-              <ul className="space-y-2 border rounded-lg divide-y">
-                <li className="px-4 py-3 hover:bg-gray-50">
+              <h2 className="font-semibold mb-2">Instructions:</h2>
+              <ul className={`space-y-2 rounded-lg divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+                <li className={`px-4 py-3 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
                   <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-600">Progress is saved automatically</span>
+                    <span className="mr-2">•</span>
+                    <span>Each section must be completed in sequence</span>
                   </div>
                 </li>
-                <li className="px-4 py-3 hover:bg-gray-50">
+                <li className={`px-4 py-3 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
                   <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-600">Time limits are enforced per section</span>
+                    <span className="mr-2">•</span>
+                    <span>You cannot go back to previous sections</span>
                   </div>
                 </li>
-                <li className="px-4 py-3 hover:bg-gray-50">
+                <li className={`px-4 py-3 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
                   <div className="flex items-start">
-                    <span className="text-gray-500 mr-2">•</span>
-                    <span className="text-gray-600">Use the calculator for numerical questions</span>
+                    <span className="mr-2">•</span>
+                    <span>Time limits are enforced per section</span>
+                  </div>
+                </li>
+                <li className={`px-4 py-3 ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                  <div className="flex items-start">
+                    <span className="mr-2">•</span>
+                    <span>Answers are auto-saved as you progress</span>
                   </div>
                 </li>
               </ul>
@@ -370,11 +360,11 @@ export default function QuizPlayer() {
           <div className="mt-8 text-center">
             <button
               onClick={startQuiz}
-              className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition font-medium"
+              className={`px-8 py-3 rounded-lg transition font-medium ${theme === 'dark' ? 'bg-green-700 hover:bg-green-800' : 'bg-green-600 hover:bg-green-700'} text-white`}
             >
               Start Quiz Now
             </button>
-            <p className="mt-3 text-sm text-gray-500">
+            <p className={`mt-3 text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
               The quiz will begin when you click the button above
             </p>
           </div>
@@ -384,72 +374,45 @@ export default function QuizPlayer() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" ref={quizContainerRef}>
-      <header className="bg-white shadow-sm">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
+      <header className={`shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold">{quiz?.title}</h1>
           <div className="flex items-center space-x-4">
-            {currentSectionData?.timeLimit && (
-              <QuestionTimer 
-                timeRemaining={sectionTimers[currentSection] || 0}
-                onTimeUp={handleSectionSubmit}
-              />
-            )}
-            <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-              {currentSectionData?.label}
-            </span>
-            <button
+            <button 
               onClick={() => setShowCalculator(!showCalculator)}
-              className="p-2 rounded-full hover:bg-gray-100"
+              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
               title="Calculator"
             >
               <Calculator size={20} />
             </button>
-            <button
+            <button 
               onClick={toggleFullScreen}
-              className="p-2 rounded-full hover:bg-gray-100"
-              title={isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              title={isFullScreen ? "Exit Fullscreen" : "Fullscreen"}
             >
               {isFullScreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
             </button>
+            <button
+              onClick={toggleTheme}
+              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+            >
+              {theme === 'dark' ? '☀️' : '🌙'}
+            </button>
+            {currentSectionData?.timeLimit && (
+              <QuestionTimer 
+                timeRemaining={sectionTimeRemaining} 
+                onTimeUp={handleSectionSubmit}
+                darkMode={theme === 'dark'}
+              />
+            )}
+            <span className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
+              {currentSectionData?.label}
+            </span>
           </div>
         </div>
       </header>
-
-      {/* Calculator Modal */}
-      {showCalculator && (
-        <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50 border">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-medium">Calculator</h3>
-            <button 
-              onClick={() => setShowCalculator(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </button>
-          </div>
-          <div className="bg-gray-100 p-2 mb-2 rounded text-right font-mono">
-            {calcInput || '0'}
-          </div>
-          <div className="grid grid-cols-4 gap-2">
-            {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', '.', '=', '+', 'C', '⌫'].map((btn) => (
-              <button
-                key={btn}
-                onClick={() => handleCalcButtonClick(btn)}
-                className={`p-2 rounded ${
-                  ['C', '⌫'].includes(btn)
-                    ? 'bg-red-100 hover:bg-red-200'
-                    : btn === '='
-                    ? 'bg-blue-100 hover:bg-blue-200'
-                    : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-              >
-                {btn}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Section Navigation */}
@@ -459,16 +422,17 @@ export default function QuizPlayer() {
             currentSection={currentSection}
             answers={sectionAnswers}
             onChangeSection={changeSection}
+            darkMode={theme === 'dark'}
           />
         </div>
 
         {/* Main Quiz Area */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+        <div className={`lg:col-span-2 p-6 rounded-lg shadow ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           {currentQuestion && (
             <>
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-500">
+                  <span className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                     Question {currentQuestionIndex + 1} of {currentQuestions.length}
                   </span>
                 </div>
@@ -480,17 +444,23 @@ export default function QuizPlayer() {
                   <div
                     key={index}
                     onClick={() => handleAnswerSelect(currentQuestion._id, index)}
-                    className={`p-4 border rounded-lg cursor-pointer transition ${
+                    className={`p-4 rounded-lg cursor-pointer transition ${
                       answers[currentQuestion._id] === index
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'hover:bg-gray-50'
+                        ? theme === 'dark' 
+                          ? 'border-blue-500 bg-blue-900 border' 
+                          : 'border-blue-500 bg-blue-50 border'
+                        : theme === 'dark'
+                          ? 'border-gray-700 hover:bg-gray-700 border'
+                          : 'border-gray-200 hover:bg-gray-50 border'
                     }`}
                   >
                     <div className="flex items-center">
                       <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${
                         answers[currentQuestion._id] === index
                           ? 'border-blue-500 bg-blue-500 text-white'
-                          : 'border-gray-300'
+                          : theme === 'dark'
+                            ? 'border-gray-500'
+                            : 'border-gray-300'
                       }`}>
                         {String.fromCharCode(65 + index)}
                       </div>
@@ -504,21 +474,25 @@ export default function QuizPlayer() {
                 <button
                   onClick={goToPrevQuestion}
                   disabled={currentQuestionIndex === 0}
-                  className="px-4 py-2 border rounded disabled:opacity-50"
+                  className={`px-4 py-2 rounded disabled:opacity-50 ${
+                    theme === 'dark' 
+                      ? 'border-gray-600 hover:bg-gray-700' 
+                      : 'border-gray-300 hover:bg-gray-50'
+                  } border`}
                 >
                   Previous
                 </button>
                 {currentQuestionIndex < currentQuestions.length - 1 ? (
                   <button
                     onClick={goToNextQuestion}
-                    className="px-4 py-2 bg-blue-500 text-white rounded"
+                    className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
                   >
                     Next
                   </button>
                 ) : (
                   <button
                     onClick={() => setShowSubmitModal(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded"
+                    className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-green-700 hover:bg-green-800' : 'bg-green-600 hover:bg-green-700'} text-white`}
                   >
                     {isLastSection ? 'Submit Quiz' : 'Submit Section'}
                   </button>
@@ -530,19 +504,25 @@ export default function QuizPlayer() {
 
         {/* Question Navigation */}
         <div className="lg:col-span-1">
-          <div className="bg-white p-4 rounded-lg shadow">
+          <div className={`p-4 rounded-lg shadow ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <h3 className="font-medium mb-3">Questions</h3>
             <div className="grid grid-cols-5 gap-2">
-              {currentQuestions.map((q, index) => (
+              {currentQuestions.map((_, index) => (
                 <button
-                  key={q._id}
+                  key={index}
                   onClick={() => goToQuestion(index)}
                   className={`w-10 h-10 rounded flex items-center justify-center ${
                     currentQuestionIndex === index
-                      ? 'bg-blue-500 text-white'
-                      : answers[q._id] !== undefined
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100'
+                      ? theme === 'dark'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-blue-500 text-white'
+                      : answers[currentQuestions[index]._id] !== undefined
+                      ? theme === 'dark'
+                        ? 'bg-green-900 text-green-200'
+                        : 'bg-green-100 text-green-800'
+                      : theme === 'dark'
+                        ? 'bg-gray-700 text-gray-300'
+                        : 'bg-gray-100 text-gray-600'
                   }`}
                 >
                   {index + 1}
@@ -550,6 +530,30 @@ export default function QuizPlayer() {
               ))}
             </div>
           </div>
+
+          {/* Calculator */}
+          {showCalculator && (
+            <div className={`mt-4 p-4 rounded-lg shadow ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className={`mb-2 p-2 rounded text-right font-mono text-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                {calcInput || '0'}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', '.', '=', '+', 'C', '⌫'].map((btn) => (
+                  <button
+                    key={btn}
+                    onClick={() => handleCalcButtonClick(btn)}
+                    className={`p-2 rounded ${
+                      theme === 'dark'
+                        ? 'bg-gray-700 hover:bg-gray-600'
+                        : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {btn}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -564,12 +568,14 @@ export default function QuizPlayer() {
             ? 'Are you sure you want to submit the entire quiz? You cannot change answers after submission.'
             : `Are you sure you want to submit the ${currentSectionData?.label} section? You cannot return to this section.`
         }
+        darkMode={theme === 'dark'}
       />
 
       <QuizResultModal
         isOpen={showResultModal}
         onClose={() => router.push('/')}
         quizId={quiz?._id}
+        darkMode={theme === 'dark'}
       />
     </div>
   );
