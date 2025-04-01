@@ -30,8 +30,8 @@ function ProfileLeftCard() {
 
   return (
     <div className="border-b-2 ml-2">
-      <div className="flex gap-2 justify-betweentext-center">
-            <h3 className="text-xs overflow-auto">{user?.name}</h3>
+      <div className="flex gap-2 justify-between text-center">
+            <h3 className="text-sm overflow-auto">Welcome {user?.name}</h3>
             <img
               className="w-5 h-5 rounded-full object-cover"
               src={user?.image ||"/trackode.png"}
