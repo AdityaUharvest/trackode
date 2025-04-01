@@ -404,7 +404,7 @@ export default function QuizPlayer() {
               <QuestionTimer 
                 timeRemaining={sectionTimeRemaining} 
                 onTimeUp={handleSectionSubmit}
-                darkMode={theme === 'dark'}
+               
               />
             )}
             <span className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
@@ -422,7 +422,7 @@ export default function QuizPlayer() {
             currentSection={currentSection}
             answers={sectionAnswers}
             onChangeSection={changeSection}
-            darkMode={theme === 'dark'}
+            
           />
         </div>
 
@@ -568,14 +568,14 @@ export default function QuizPlayer() {
             ? 'Are you sure you want to submit the entire quiz? You cannot change answers after submission.'
             : `Are you sure you want to submit the ${currentSectionData?.label} section? You cannot return to this section.`
         }
-        darkMode={theme === 'dark'}
+       
       />
 
       <QuizResultModal
         isOpen={showResultModal}
         onClose={() => router.push('/')}
         quizId={quiz?._id}
-        darkMode={theme === 'dark'}
+        
       />
     </div>
   );
