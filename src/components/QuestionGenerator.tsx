@@ -321,7 +321,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
       <div className="flex gap-2 items-center p-2">
       <img className="rounded-full w-9" src={session?.user?.image?session.user.image : `trackode.png`}>
        </img>
-        <h1 className="text-xl font-bold ">Welcome {session?.user?.name} to {mockTest} </h1>
+        <h1 className="text-lg font-bold ">Welcome {session?.user?.name} ! </h1>
       </div>
        
        <div className="p-2  items-center">

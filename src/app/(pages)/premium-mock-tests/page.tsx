@@ -219,24 +219,24 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className={`p-6 rounded-lg ${statCardBg}`}>
-          <h3 className={`text-lg font-medium ${statTextColor}`}>Mock Tests Created</h3>
-          <p className={`mt-2 text-3xl font-bold ${statTextColor}`}>{mocks.length}</p>
+          <h3 className={`text-sm font-medium ${statTextColor}`}>Mock Tests Created</h3>
+          <p className={`mt-2 text-lg font-bold ${statTextColor}`}>{mocks.length}</p>
         </div>
         <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-green-50'}`}>
-          <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-green-800'}`}>Tests Attempted</h3>
-          <p className={`mt-2 text-3xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-green-600'}`}>{attempts.length}</p>
+          <h3 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-green-800'}`}>Tests Attempted</h3>
+          <p className={`mt-2 text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-green-600'}`}>{attempts.length}</p>
         </div>
         <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'}`}>
-          <h3 className={`text-lg font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-purple-800'}`}>Average Score</h3>
-          <p className={`mt-2 text-3xl font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-purple-600'}`}>
-            {stats && stats.averageScore!==null? `${stats.averageScore}%` : 'N/A'}
+          <h3 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-purple-800'}`}>Average Score</h3>
+          <p className={`mt-2 text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-purple-600'}`}>
+            {stats && stats.averageScore!==null? `${stats.averageScore}%` : 'Being Prepared'}
           </p>
         </div>
       </div>
 
       {/* Recent Activity */}
       <div>
-        <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Recent Activity</h2>
+        <h2 className={`text-sm font-bold mb-4 ${textColor}`}>Recent Activity</h2>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -261,7 +261,7 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
 
       {/* Upcoming Events */}
       <div>
-        <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Upcoming Mock Tests</h2>
+        <h2 className={`text-sm font-bold mb-4 ${textColor}`}>Upcoming Mock Tests</h2>
         <div className="h-64">
           <Calendar
             localizer={localizer}
@@ -293,7 +293,7 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className={`text-lg font-bold ${textColor}`}>My Mock Tests</h2>
+        <h2 className={`text-sm font-bold ${textColor}`}>My Mock Tests</h2>
         <Link
           href="/mock-tests"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"

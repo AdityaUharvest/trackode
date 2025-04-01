@@ -89,16 +89,19 @@ const MockTestCreator: React.FC = () => {
   };
 
   // Theme-based classes
-  const containerClasses = `container mx-auto px-4 py-8 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`;
-  const formClasses = `max-w-2xl p-6 rounded-lg shadow-md ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`;
+  const containerClasses = `container p-3 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`;
+  const formClasses = `max-w-2xl p-3 rounded-lg shadow-md ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`;
   const inputClasses = `w-full px-3 py-2 border rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`;
   const errorClasses = `mb-4 p-3 rounded ${theme === 'dark' ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-700'}`;
-  const labelClasses = `block mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`;
+  const labelClasses = ` mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`;
 
   return (
-    <div className={containerClasses}>
-      <h1 className="text-2xl font-bold mb-6">New TCS NQT Mock Test</h1>
-
+    <div >
+      <h1 className="text-lg ml-3 mr-3 text-center mt-4  mb-2 text-gray-950">Tata Consultancy National Qualifier Mock Test</h1>
+    
+    <div className={`flex justify-center ${containerClasses}`}>
+      
+     
       <form onSubmit={handleSubmit} className={formClasses}>
         {error && <div className={errorClasses}>{error}</div>}
 
@@ -181,6 +184,7 @@ const MockTestCreator: React.FC = () => {
           {isLoading ? 'Creating...' : 'Create Mock Test'}
         </button>
       </form>
+    </div>
     </div>
   );
 };
