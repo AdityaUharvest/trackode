@@ -115,23 +115,6 @@ export default function DashBoard() {
             </li>
             <li>
               <button 
-                onClick={() => setActiveTab('quizzes')}
-                className={`w-full text-left p-2 rounded-md text-sm flex items-center ${activeTab === 'quizzes' 
-                  ? (theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800') 
-                  : (theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100')}`}
-              >
-                {sidebarCollapsed ? (
-                  <span>📝</span>
-                ) : (
-                  <>
-                    <span className="mr-2">📝</span>
-                    <span>Quizzes</span>
-                  </>
-                )}
-              </button>
-            </li>
-            <li>
-              <button 
                 onClick={() => setActiveTab('contests')}
                 className={`w-full text-left p-2 rounded-md text-sm flex items-center ${activeTab === 'contests' 
                   ? (theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800') 
@@ -147,6 +130,24 @@ export default function DashBoard() {
                 )}
               </button>
             </li>
+            <li>
+              <button 
+                onClick={() => setActiveTab('quizzes')}
+                className={`w-full text-left p-2 rounded-md text-sm flex items-center ${activeTab === 'quizzes' 
+                  ? (theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-blue-100 text-blue-800') 
+                  : (theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100')}`}
+              >
+                {sidebarCollapsed ? (
+                  <span>📝</span>
+                ) : (
+                  <>
+                    <span className="mr-2">📝</span>
+                    <span>Quizzes</span>
+                  </>
+                )}
+              </button>
+            </li>
+            
             <li>
               <button 
                 onClick={() => setActiveTab('analytics')}

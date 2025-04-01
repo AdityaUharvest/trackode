@@ -95,14 +95,7 @@ export default function Home() {
 
 
             <div className="px-8 sm:items-center sm:justify-center sm:px-0 sm:space-x-5 sm:flex mt-9 p-8">
-              <Link
-                href="/premium-mock-tests"
-                title=""
-                 className="inline-flex items-center justify-center w-full px-8 py-3 text-sm font-bold text-white transition-all bg-green-600 border-2 border-transparent sm:w-auto rounded-xl font-pj hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:text-white-400"
-                role="button"
-              >
-                Premium Mock Tests
-              </Link>
+              
               <Link
                 href="/admin-dashboard"
                 title=""
