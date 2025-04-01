@@ -131,7 +131,7 @@ export default function Dashboard() {
                   : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
               }`}
             >
-              My Mock Tests
+              Created Mock Tests
             </button>
             <button
               onClick={() => setActiveTab('results')}
