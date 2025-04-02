@@ -355,22 +355,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
           ) : 'Generate Questions'}
         </Button>
         </div>
-        {questions.length > 0 && (
-            <div className="flex mb-2 justify-end">
-              <Button
-                onClick={saveQuestions}
-                disabled={isSubmitting}
-                className="bg-green-600 mb-2 mr-2 text-white hover:bg-green-700"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2" />
-                    Saving...
-                  </>
-                ) : 'Save Questions'}
-              </Button>
-            </div>
-          )}
+       
       </div>
       
 
@@ -444,7 +429,22 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
               ))
             )}
           </div>
-
+ {questions.length > 0 && (
+            <div className="flex mb-2 justify-end">
+              <Button
+                onClick={saveQuestions}
+                disabled={isSubmitting}
+                className="bg-green-600 mb-2 mr-2 text-white hover:bg-green-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin mr-2" />
+                    Saving...
+                  </>
+                ) : 'Save Questions'}
+              </Button>
+            </div>
+          )}
           
         </>
       )}
