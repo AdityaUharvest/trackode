@@ -96,11 +96,11 @@ export default function Dashboard() {
   // Handle publish/unpublish action
   
   return (
-    <div className={`min-h-screen ${bgColor}`}>
+    <div className={` overflow-auto ${bgColor}`}>
       {/* Header */}
       <header className={`${headerBg}`}>
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className={`sm:text-sm lg:text-lg font-bold ${textColor}`}>TCS NQT Dashboard</h1>
+        <div className="max-w-7xl mx-auto px-2 py-2  lg:px-4 flex justify-between items-center">
+          <h1 className={`sm:text-sm lg:text-sm font-semibold ${textColor}`}>TCS NQT Dashboard</h1>
           <Link
             href="/mock-tests"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
@@ -111,7 +111,7 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className={`max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 ${bgColor}`}>
+      <main className={`max-w-7xl mx-auto px-2 py-4 sm:px-2 lg:px-2 ${bgColor}`}>
         {/* Tabs */}
         <div className={`border-b ${borderColor} mb-6`}>
           <nav className="-mb-px flex space-x-8">
@@ -432,10 +432,10 @@ function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, t
   
   return (
     <div>
-      <h2 className={`text-lg font-bold mb-6 ${textColor}`}>My Test Results</h2>
+      <h2 className={`text-sm font-bold mb-6 ${textColor}`}>My Test Results</h2>
 
       {attempts.length === 0 ? (
-        <div className={`text-center py-12 ${textColor}`}>
+        <div className={`text-center py-10 ${textColor}`}>
           <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
           {/* <Link
             href="/mock-tests"
