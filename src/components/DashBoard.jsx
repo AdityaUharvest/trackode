@@ -214,7 +214,7 @@ export default function DashBoard() {
       {/* Main Content */}
       <div className={`flex-1 p-3 ${sidebarCollapsed ? 'md:ml-2' : 'md:ml-2'} transition-all duration-200`}>
         {/* Profile Card at top for mobile */}
-        <div className="md:hidden mb-4">
+        <div className="md:hidden overflow-hidden mb-4">
           <ProfileLeftCard />
         </div>
 
@@ -290,11 +290,17 @@ export default function DashBoard() {
           </div>
         )}
 
-        {activeTab === 'contests' && (
-          <div>
-            <MockDashboard />
-          </div>
-        )}
+{activeTab === 'contests' && (
+  <div className="overflow-auto w-full">
+    {loading ? (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
+      </div>
+    ) : (
+      <MockDashboard />
+    )}
+  </div>
+)}
 
         {activeTab === 'analytics' && (
           <div>

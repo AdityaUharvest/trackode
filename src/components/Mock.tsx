@@ -7,9 +7,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { useTheme } from '@/components/ThemeContext'; // Import your theme context
+import { useTheme } from '@/components/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
+
 const localizer = momentLocalizer(moment);
 
 type MockTest = {
@@ -18,7 +19,6 @@ type MockTest = {
   createdAt: Date;
   isPublished: boolean;
   attempts: number;
-  
 };
 
 type Attempt = {
@@ -40,14 +40,25 @@ type UserStats = {
 };
 
 export default function Dashboard() {
-  const { theme } = useTheme(); // Get current theme
+  const { theme } = useTheme();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<'overview' | 'mocks' | 'results' | 'stats'>('overview');
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50';
   const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
@@ -62,20 +73,24 @@ export default function Dashboard() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const mocksRes = await fetch('/api/mock-tests/dashboard?creator=true');
-        const mocksData = await mocksRes.json();
+        const [mocksRes, attemptsRes, statsRes] = await Promise.all([
+          fetch('/api/mock-tests/dashboard?creator=true'),
+          fetch('/api/mock-tests/dashboard/attempts'),
+          fetch('/api/mock-tests/dashboard/stats')
+        ]);
+        
+        const [mocksData, attemptsData, statsData] = await Promise.all([
+          mocksRes.json(),
+          attemptsRes.json(),
+          statsRes.json()
+        ]);
+        
         setMockTests(mocksData);
-        
-        const attemptsRes = await fetch('/api/mock-tests/dashboard/attempts');
-        const attemptsData = await attemptsRes.json();
         setAttempts(attemptsData);
-        console.log('attemptsData', attemptsData);
-        
-        const statsRes = await fetch('/api/mock-tests/dashboard/stats');
-        const statsData = await statsRes.json();
         setStats(statsData);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
       } finally {
         setIsLoading(false);
       }
@@ -88,22 +103,21 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className={`flex items-center justify-center h-screen ${bgColor}`}>
+      <div className={`flex items-center justify-center min-h-screen ${bgColor}`}>
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
   }
-  // Handle publish/unpublish action
-  
+
   return (
-    <div className={` overflow-auto ${bgColor}`}>
+    <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
-      <header className={`${headerBg}`}>
-        <div className="max-w-7xl mx-auto px-2 py-2  lg:px-4 flex justify-between items-center">
-          <h1 className={`sm:text-sm lg:text-sm font-semibold ${textColor}`}>TCS NQT Dashboard</h1>
+      <header className={`${headerBg} shadow-sm`}>
+        <div className="max-w-7xl mx-auto p-3 sm:px-3 lg:px-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <h1 className={`text-lg font-semibold ${textColor}`}>TCS Dashboard</h1>
           <Link
             href="/mock-tests"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+            className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             New Mock Test
           </Link>
@@ -111,55 +125,30 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className={`max-w-7xl mx-auto px-2 py-4 sm:px-2 lg:px-2 ${bgColor}`}>
-        {/* Tabs */}
-        <div className={`border-b ${borderColor} mb-6`}>
-          <nav className="-mb-px flex space-x-8">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
-                  : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('mocks')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'mocks'
-                  ? 'border-blue-500 text-blue-600'
-                  : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
-              }`}
-            >
-              Created Mock Tests
-            </button>
-            <button
-              onClick={() => setActiveTab('results')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'results'
-                  ? 'border-blue-500 text-blue-600'
-                  : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
-              }`}
-            >
-              My Results
-            </button>
-            {/* <button
-              onClick={() => setActiveTab('stats')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'stats'
-                  ? 'border-blue-500 text-blue-600'
-                  : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
-              }`}
-            >
-              Statistics
-            </button> */}
+      <main className={`max-w-7xl mx-auto p-2 sm:px-2 lg:px-2  ${bgColor}`}>
+        {/* Tabs - Mobile friendly */}
+        <div className={`border-b ${borderColor} mb-6 overflow-x-auto`}>
+          <nav className="flex space-x-4 sm:space-x-8">
+            {(['overview', 'mocks', 'results'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab
+                    ? 'border-blue-500 text-blue-600'
+                    : `border-transparent ${secondaryText} hover:text-gray-700 hover:border-gray-300`
+                }`}
+              >
+                {tab === 'overview' && 'Overview'}
+                {tab === 'mocks' && 'Created Mocks'}
+                {tab === 'results' && 'My Results'}
+              </button>
+            ))}
           </nav>
         </div>
 
         {/* Tab Content */}
-        <div className={`shadow rounded-lg p-6 ${cardBg} ${borderColor}`}>
+        <div className={`rounded-lg shadow-sm p-4 sm:p-6 ${cardBg} ${borderColor}`}>
           {activeTab === 'overview' && (
             <OverviewTab 
               mocks={mockTests} 
@@ -168,6 +157,7 @@ export default function Dashboard() {
               theme={theme} 
               textColor={textColor}
               secondaryText={secondaryText}
+              isMobile={isMobile}
             />
           )}
           {activeTab === 'mocks' && (
@@ -179,6 +169,7 @@ export default function Dashboard() {
               secondaryText={secondaryText}
               tableHeaderBg={tableHeaderBg}
               tableRowHover={tableRowHover}
+              isMobile={isMobile}
             />
           )}
           {activeTab === 'results' && (
@@ -190,16 +181,7 @@ export default function Dashboard() {
               secondaryText={secondaryText}
               tableHeaderBg={tableHeaderBg}
               tableRowHover={tableRowHover}
-            />
-          )}
-          {activeTab === 'stats' && (
-            <StatsTab 
-              stats={stats} 
-              attempts={attempts} 
-              cardBg={cardBg}
-              borderColor={borderColor}
-              textColor={textColor}
-              secondaryText={secondaryText}
+              isMobile={isMobile}
             />
           )}
         </div>
@@ -208,62 +190,75 @@ export default function Dashboard() {
   );
 }
 
-// Tab Components with theme props
-function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }: 
+// Tab Components with responsive improvements
+function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText, isMobile }: 
   { mocks: MockTest[]; attempts: Attempt[]; stats: UserStats | null; 
-    theme: string; textColor: string; secondaryText: string }) {
+    theme: string; textColor: string; secondaryText: string; isMobile: boolean }) {
   
   const statCardBg = theme === 'dark' ? 'bg-gray-700' : 'bg-blue-50';
   const statTextColor = theme === 'dark' ? 'text-gray-100' : 'text-blue-800';
   
   return (
-    <div className="space-y-8">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className={`p-6 rounded-lg ${statCardBg}`}>
-          <h3 className={`text-sm font-medium ${statTextColor}`}>Mock Tests Created</h3>
-          <p className={`mt-2 text-lg font-bold ${statTextColor}`}>{mocks.length}</p>
+    <div className="space-y-6">
+      {/* Quick Stats - Stack on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className={`p-4 rounded-lg ${statCardBg}`}>
+          <h3 className={`text-xs sm:text-sm font-medium ${statTextColor}`}>Mock Tests Created</h3>
+          <p className={`mt-1 text-xl sm:text-2xl font-semibold ${statTextColor}`}>{mocks.length}</p>
         </div>
-        <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-green-50'}`}>
-          <h3 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-green-800'}`}>Tests Attempted</h3>
-          <p className={`mt-2 text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-green-600'}`}>{attempts.length}</p>
+        <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-green-50'}`}>
+          <h3 className={`text-xs sm:text-sm font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-green-800'}`}>Tests Attempted</h3>
+          <p className={`mt-1 text-xl sm:text-2xl font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-green-600'}`}>{attempts.length}</p>
         </div>
-        <div className={`p-6 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'}`}>
-          <h3 className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-purple-800'}`}>Average Score</h3>
-          <p className={`mt-2 text-lg font-bold ${theme === 'dark' ? 'text-gray-100' : 'text-purple-600'}`}>
-            {stats && stats.averageScore!==null? `${stats.averageScore}%` : 'Being Prepared'}
+        <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-purple-50'}`}>
+          <h3 className={`text-xs sm:text-sm font-medium ${theme === 'dark' ? 'text-gray-100' : 'text-purple-800'}`}>Average Score</h3>
+          <p className={`mt-1 text-xl sm:text-2xl font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-purple-600'}`}>
+            {stats?.averageScore !== null ? `${stats?.averageScore}%` : 'N/A'}
           </p>
         </div>
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity - Full width on mobile */}
       <div>
-        <h2 className={`text-sm font-bold mb-4 ${textColor}`}>Recent Activity</h2>
-        <div className="h-64">
+        <h2 className={`text-sm font-semibold mb-3 ${textColor}`}>Recent Activity</h2>
+        <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={stats?.recentActivity || []}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 20, right: 10, left: 0, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#4B5563' : '#E5E7EB'} />
-              <XAxis dataKey="date" stroke={secondaryText} />
-              <YAxis stroke={secondaryText} />
+              <XAxis 
+                dataKey="date" 
+                stroke={secondaryText} 
+                tick={{ fontSize: isMobile ? 10 : 12 }}
+              />
+              <YAxis 
+                stroke={secondaryText} 
+                tick={{ fontSize: isMobile ? 10 : 12 }}
+              />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: theme === 'dark' ? '#1F2937' : '#FFFFFF',
-                  borderColor: theme === 'dark' ? '#4B5563' : '#E5E7EB'
+                  borderColor: theme === 'dark' ? '#4B5563' : '#E5E7EB',
+                  fontSize: isMobile ? 12 : 14
                 }}
               />
-              <Legend />
-              <Bar dataKey="count" name="Tests Taken" fill="#8884d8" />
+              <Legend wrapperStyle={{ fontSize: isMobile ? 12 : 14 }} />
+              <Bar 
+                dataKey="count" 
+                name="Tests Taken" 
+                fill="#8884d8" 
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* Upcoming Events */}
+      {/* Upcoming Events - Simplified on mobile */}
       <div>
-        <h2 className={`text-sm font-bold mb-4 ${textColor}`}>Upcoming Mock Tests</h2>
+        <h2 className={`text-sm font-semibold mb-3 ${textColor}`}>Upcoming Mock Tests</h2>
         <div className="h-64">
           <Calendar
             localizer={localizer}
@@ -273,14 +268,15 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
               end: new Date(mock.createdAt),
               allDay: true
             }))}
-            defaultView="month"
-            views={['month', 'week', 'day']}
+            defaultView={isMobile ? 'agenda' : 'month'}
+            views={isMobile ? ['agenda'] : ['month', 'week', 'day']}
             style={{
-              color: 'gray',
-              backgroundColor: statCardBg,
-              borderColor: 'blue'
-              
+              height: '100%',
+              backgroundColor: theme === 'dark' ? '#1F2937' : '#F9FAFB',
+              color: textColor,
+              fontSize: isMobile ? 12 : 14
             }}
+            toolbar={!isMobile}
           />
         </div>
       </div>
@@ -288,49 +284,46 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
   );
 }
 
-function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover }: 
+function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover, isMobile }: 
   { mocks: MockTest[]; cardBg: string; borderColor: string; textColor: string; 
-    secondaryText: string; tableHeaderBg: string; tableRowHover: string }) {
+    secondaryText: string; tableHeaderBg: string; tableRowHover: string; isMobile: boolean }) {
+  
   const handlePublish = async (mockId: string, isPublished: boolean) => {
-        try {
-          const response = await fetch(`/api/mock-tests/${mockId}/publish`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ isPublished: !isPublished })
-          });
-          const data = await response.json();
-          console.log('Publish response:', data);
-          localStorage.setItem('shareLink', data.shareLink);
-          
-
-          // Optionally, you can update the state or refetch data here
-          // For example, if you want to update the mockTests state:
-          window.location.reload(); // Reload the page to reflect changes
-          // Update the mockTests state or refetch data if needed
-        } catch (error) {
-          console.error('Error publishing mock test:', error);
-        }
-      };
+    try {
+      const response = await fetch(`/api/mock-tests/${mockId}/publish`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublished: !isPublished })
+      });
+      const data = await response.json();
+      localStorage.setItem('shareLink', data.shareLink);
+      window.location.reload();
+    } catch (error) {
+      console.error('Error publishing mock test:', error);
+      toast.error('Failed to update publication status');
+    }
+  };
+   const { theme } = useTheme();
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className={`text-sm font-bold ${textColor}`}>My Mock Tests</h2>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-1">
+        <h2 className={`text-sm font-semibold ${textColor}`}>My Mock Tests</h2>
         <Link
           href="/mock-tests"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+          className="w-full sm:w-auto inline-flex justify-center items-center p-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
         >
           New Mock Test
         </Link>
       </div>
 
       {mocks.length === 0 ? (
-        <div className={`text-center py-12 ${textColor}`}>
+        <div className={`text-center py-8 ${textColor}`}>
           <p className={`mb-4 ${secondaryText}`}>You haven't created any mock tests yet</p>
           <Link
             href="/mock-tests"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
           >
-            First Mock Test +
+            Create First Mock Test
           </Link>
         </div>
       ) : (
@@ -338,83 +331,99 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
           <table className="min-w-full divide-y divide-gray-200">
             <thead className={tableHeaderBg}>
               <tr>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
                   Title
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                  Created On
+                {!isMobile && (
+                  <>
+                    <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                      Created On
+                    </th>
+                    <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                      Status
+                    </th>
+                    <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                      Participants
+                    </th>
+                  </>
+                )}
+                <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                  Actions
                 </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                  Status
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                  Participants
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                  Results
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                  Publish
-                </th>
-                <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                  Edit/Details
-                </th>
-
               </tr>
             </thead>
             <tbody className={`${cardBg} divide-y ${borderColor}`}>
               {mocks.map((mock) => (
                 <tr key={mock._id} className={tableRowHover}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm font-medium ${textColor}`}>{mock.title}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`text-sm ${secondaryText}`}>
-                      {new Date(mock.createdAt).toLocaleDateString()}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className={`text-sm font-medium ${textColor}`}>
+                      {isMobile ? mock.title.substring(0, 20) + (mock.title.length > 20 ? '...' : '') : mock.title}
                     </div>
+                    {isMobile && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        <span className={`text-xs px-1.5 py-0.5 rounded ${
+                          mock.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {mock.isPublished ? 'Published' : 'Draft'}
+                        </span>
+                        <span className={`text-xs ${secondaryText}`}>
+                          {new Date(mock.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        mock.isPublished
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {mock.isPublished ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className={`px-6 py-4 whitespace-nowrap text-sm ${secondaryText}`}>
-                    {mock.attempts || 0}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link
-                      href={`/mock-tests/${mock._id}/results`}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
-                      Results
-                    </Link>
-                    
-                    
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Button
-                      onClick={()=>handlePublish(mock._id, mock.isPublished)}
-                       
-                      
-                      className="text-indigo-600 bg-gray-50 hover:bg-gray-500 hover:text-indigo-900"
-                    >
-                      {mock.isPublished ? 'Unpublish' : 'Publish'}
-                      
-                    </Button>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Link
-                      href={`/mock-tests/${mock._id}/questions`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Questions
-                    </Link>
+                  
+                  {!isMobile && (
+                    <>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className={`text-sm ${secondaryText}`}>
+                          {new Date(mock.createdAt).toLocaleDateString()}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            mock.isPublished
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {mock.isPublished ? 'Published' : 'Draft'}
+                        </span>
+                      </td>
+                      <td className={`px-4 py-4 whitespace-nowrap text-sm ${secondaryText}`}>
+                        {mock.attempts || 0}
+                      </td>
+                    </>
+                  )}
+                  
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        href={`/mock-tests/${mock._id}/results`}
+                        className={`text-xs sm:text-sm px-2 py-1 rounded ${
+                          theme === 'dark' ? 'bg-green-600 text-white hover:bg-green-800' : 'bg-green-600 text-white hover:bg-green-800'
+                        }`}
+                      >
+                        Results
+                      </Link>
+                      <Button
+                        onClick={() => handlePublish(mock._id, mock.isPublished)}
+                        size="sm"
+                        variant={theme === 'dark' ? 'secondary' : 'outline'}
+                        className={`${mock.isPublished ? "bg-red-600 hover:bg-red-700 text-white":"bg-green-500 text-white hover:bg-green-700"} text-xs sm:text-sm px-2 py-1 h-auto`}
+                      >
+                        {mock.isPublished ? 'Unpublish' : 'Publish'}
+                      </Button>
+                      <Link
+                        href={`/mock-tests/${mock._id}/questions`}
+                        className={`text-xs sm:text-sm px-2 py-1 rounded ${
+                          theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+                        }`}
+                      >
+                        {isMobile ? 'Edit' : 'Questions'}
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -426,163 +435,77 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
   );
 }
 
-function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover }: 
+function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover, isMobile }: 
   { attempts: Attempt[]; cardBg: string; borderColor: string; textColor: string; 
-    secondaryText: string; tableHeaderBg: string; tableRowHover: string }) {
-  
+    secondaryText: string; tableHeaderBg: string; tableRowHover: string; isMobile: boolean }) {
+  const { theme } = useTheme();
   return (
     <div>
-      <h2 className={`text-sm font-bold mb-6 ${textColor}`}>My Test Results</h2>
+      <h2 className={`text-sm font-semibold mb-6 ${textColor}`}>My Test Results</h2>
 
       {attempts.length === 0 ? (
         <div className={`text-center py-10 ${textColor}`}>
           <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
-          {/* <Link
-            href="/mock-tests"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
-          >
-            Browse Mock Tests
-          </Link> */}
         </div>
       ) : (
-        <div className="space-y-8">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className={tableHeaderBg}>
-                <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Test
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className={tableHeaderBg}>
+              <tr>
+                <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                  Test
+                </th>
+                {!isMobile && (
+                  <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
                     Date
                   </th>
-                  
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Details
-                  </th>
-                </tr>
-              </thead>
-              <tbody className={`${cardBg} divide-y ${borderColor}`}>
-                {attempts.map((attempt) => (
-                  <tr key={attempt._id} className={tableRowHover}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm font-medium ${textColor}`}>{attempt.quizTitle}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                )}
+                
+                <th className={`px-4 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                  Details
+                </th>
+              </tr>
+            </thead>
+            <tbody className={`${cardBg} divide-y ${borderColor}`}>
+              {attempts.map((attempt) => (
+                <tr key={attempt._id} className={tableRowHover}>
+                  <td className="px-4 py-4">
+                    <div className={`text-sm font-medium ${textColor}`}>
+                      {isMobile ? 
+                        attempt.quizTitle.substring(0, 20) + (attempt.quizTitle.length > 20 ? '...' : '') : 
+                        attempt.quizTitle
+                      }
+                    </div>
+                    {isMobile && (
+                      <div className={`text-xs ${secondaryText} mt-1`}>
+                        {new Date(attempt.completedAt).toLocaleDateString()}
+                      </div>
+                    )}
+                  </td>
+                  {!isMobile && (
+                    <td className="px-4 py-4 whitespace-nowrap">
                       <div className={`text-sm ${secondaryText}`}>
                         {new Date(attempt.completedAt).toLocaleDateString()}
                       </div>
                     </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link
-                        href={`mock-tests/${attempt._id}/user-results`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View Detailed Result
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                  
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <Link
+                      href={`mock-tests/${attempt._id}/user-results`}
+                      className={`text-xs sm:text-sm px-2 py-1 rounded ${
+                        theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+                      }`}
+                    >
+                      {isMobile ? 'View' : 'View Details'}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
-    </div>
-  );
-}
-
-function StatsTab({ stats, attempts, cardBg, borderColor, textColor, secondaryText }: 
-  { stats: UserStats | null; attempts: Attempt[]; cardBg: string; borderColor: string; 
-    textColor: string; secondaryText: string }) {
-  
-  if (!stats) return <div>Loading statistics...</div>;
-
-  return (
-    <div className="space-y-8">
-      {/* Section Performance */}
-      <div>
-        <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Section Performance (Your Stats section will be started working soon)</h2>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={stats.sectionPerformance}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3"  />
-              <XAxis dataKey="section" stroke={secondaryText} />
-              <YAxis domain={[0, 100]} stroke={secondaryText} />
-              <Tooltip 
-                formatter={(value) => [`${value}%`, 'Accuracy']}
-                contentStyle={{
-                 
-                }}
-              />
-              <Legend />
-              <Bar dataKey="accuracy" name="Accuracy" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Progress Over Time */}
-      <div>
-        <h2 className={`text-xl font-bold mb-4 ${textColor}`}>Progress Over Time</h2>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={attempts.map(attempt => ({
-                date: new Date(attempt.completedAt).toLocaleDateString(),
-                score: (attempt.score / attempt.totalQuestions) * 100
-              }))}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3"  />
-              <XAxis dataKey="date" stroke={secondaryText} />
-              <YAxis domain={[0, 100]} stroke={secondaryText} />
-              <Tooltip 
-                formatter={(value) => [`${value}%`, 'Score']}
-                contentStyle={{
-                 
-                }}
-              />
-              <Legend />
-              <Bar dataKey="score" name="Score" fill="#8884d8" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Additional Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className={`p-6 rounded-lg shadow ${cardBg} ${borderColor}`}>
-          <h3 className={`text-lg font-medium mb-4 ${textColor}`}>Performance Highlights</h3>
-          <ul className="space-y-3">
-            <li className="flex justify-between">
-              <span className={secondaryText}>Highest Score:</span>
-              <span className={`font-medium ${textColor}`}>{stats.bestScore}%</span>
-            </li>
-            <li className="flex justify-between">
-              <span className={secondaryText}>Average Score:</span>
-              <span className={`font-medium ${textColor}`}>{stats.averageScore}%</span>
-            </li>
-            <li className="flex justify-between">
-              <span className={secondaryText}>Tests Completed:</span>
-              <span className={`font-medium ${textColor}`}>{stats.totalAttempts}</span>
-            </li>
-          </ul>
-        </div>
-        <div className={`p-6 rounded-lg shadow ${cardBg} ${borderColor}`}>
-          <h3 className={`text-lg font-medium mb-4 ${textColor}`}>Strongest Section</h3>
-          {/* <p className={`text-2xl font-bold text-green-600 mb-2 ${textColor}`}>
-            {stats.sectionPerformance.reduce((prev, current) => 
-              (prev.accuracy > current.accuracy) ? prev : current
-            ).section}
-          </p> */}
-          <p className={secondaryText}>Keep up the good work in this section!</p>
-        </div>
-      </div>
     </div>
   );
 }
