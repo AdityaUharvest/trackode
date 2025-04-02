@@ -355,7 +355,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
           ) : 'Generate Questions'}
         </Button>
         </div>
-        {questions.length < 0 && (
+        {questions.length > 0 && (
             <div className="flex mb-2 justify-end">
               <Button
                 onClick={saveQuestions}
