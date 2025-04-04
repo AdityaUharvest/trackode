@@ -12,8 +12,7 @@ export default function ProfileComponent() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    bio: "",
-    isPrivate: false,
+    
   });
   const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,9 +22,7 @@ export default function ProfileComponent() {
     if (session?.user) {
       setFormData({
         name: session.user.name || "",
-        email: session.user.email || "",
-        bio: session.user.bio || "",
-        isPrivate: session.user.isPrivate || false,
+        email: session.user.email || ""
       });
     }
   }, [session]);
@@ -35,9 +32,9 @@ export default function ProfileComponent() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleTogglePrivacy = () => {
-    setFormData(prev => ({ ...prev, isPrivate: !prev.isPrivate }));
-  };
+  // const handleTogglePrivacy = () => {
+  //   setFormData(prev => ({ ...prev, isPrivate: !prev.isPrivate }));
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,7 +145,7 @@ export default function ProfileComponent() {
             <label className={`block text-xs ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
               Bio
             </label>
-            <textarea
+            {/* <textarea
               name="bio"
               value={formData.bio}
               onChange={handleInputChange}
@@ -158,11 +155,11 @@ export default function ProfileComponent() {
             />
             <p className={`text-xs mt-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
               {formData.bio.length}/150 characters
-            </p>
+            </p> */}
           </div>
 
           <div className="flex items-center">
-            <button
+            {/* <button
               type="button"
               onClick={handleTogglePrivacy}
               className={`flex items-center text-sm mr-4 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}
@@ -173,7 +170,7 @@ export default function ProfileComponent() {
                 <FiUnlock className="mr-1 text-green-500" />
               )}
               {formData.isPrivate ? "Private Account" : "Public Account"}
-            </button>
+            </button> */}
 
             <button
               type="submit"
@@ -202,14 +199,14 @@ export default function ProfileComponent() {
             <p className={`text-sm ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{formData.email}</p>
           </div>
 
-          {formData.bio && (
+          {/* {formData.bio && (
             <div>
               <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>Bio</p>
               <p className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{formData.bio}</p>
             </div>
-          )}
+          )} */}
 
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             {formData.isPrivate ? (
               <span className="flex items-center text-sm text-red-500">
                 <FiLock className="mr-1" /> Private Account
@@ -219,7 +216,7 @@ export default function ProfileComponent() {
                 <FiUnlock className="mr-1" /> Public Account
               </span>
             )}
-          </div>
+          </div> */}
         </div>
       )}
 

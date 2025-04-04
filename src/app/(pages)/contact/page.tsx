@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTheme } from '../../../components/ThemeContext';
 import { toast } from "react-toastify";
 import { useSession } from 'next-auth/react';
+import Head from 'next/head';
 export default function ContactForm() {
   const {data:session}= useSession();
   const userName = session?.user?.name?session.user.name:'';
@@ -47,6 +48,16 @@ export default function ContactForm() {
   };
 
   return (
+    <>
+      <Head>
+        <title>Contact Us</title>
+        <meta name="description" content="Contact us for any inquiries or support." />
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow" />
+      </Head>
+      <main>
+
     <div className=" dark:bg-gray-900 justify-center flex ">
          <div className="max-w-3xl  h-screen   mx-auto p-6">
       
@@ -142,6 +153,7 @@ export default function ContactForm() {
       </form>
     </div>
     </div>
-   
+    </main>
+    </>
   );
 }

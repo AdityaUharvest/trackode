@@ -191,10 +191,7 @@ export default function UserQuizResult() {
           <Progress 
             value={overallPercentage} 
             className="h-3"
-            indicatorColor={
-              overallPercentage >= 70 ? 'bg-green-500' : 
-              overallPercentage >= 40 ? 'bg-yellow-500' : 'bg-red-500'
-            }
+            
           />
           <div className="flex justify-between mt-1">
             <span className="text-xs text-gray-500 dark:text-gray-400">0%</span>
@@ -226,8 +223,8 @@ export default function UserQuizResult() {
                     </h2>
                     <Badge 
                       variant={
-                        sectionPercentage >= 70 ? 'success' : 
-                        sectionPercentage >= 40 ? 'warning' : 'destructive'
+                        sectionPercentage >= 70 ? 'secondary' : 
+                        sectionPercentage >= 40 ? 'destructive':'default'
                       }
                     >
                       {section.correct}/{section.total} ({sectionPercentage}%)
@@ -261,7 +258,7 @@ export default function UserQuizResult() {
                             <h3 className="font-medium text-base">{question.text}</h3>
                             <div className="flex-shrink-0">
                               {question.userAnswer === question.correctAnswer ? (
-                                <Badge variant="success" className="gap-1">
+                                <Badge variant="default" className="gap-1">
                                   <CheckCircle2 className="h-4 w-4" />
                                   Correct
                                 </Badge>

@@ -1,11 +1,20 @@
 "use client";
 import { useTheme } from "@/components/ThemeContext";
-
+import Head from "next/head";
 
 export default function PrivacyPolicy() {
   const { theme } = useTheme();
 
   return (
+    <>
+      <Head>
+        <title>Trackode - Privacy Policy</title>
+        <meta name="description" content="Privacy Policy for Trackode" />
+        <meta name="robots" content="index, follow" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <main>
     <div className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className={`max-w-4xl mx-auto p-8 rounded-xl shadow-lg ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
         <div className="text-center mb-10">
@@ -126,6 +135,7 @@ export default function PrivacyPolicy() {
           </section>
         </div>
       </div>
-    </div>
+    </div></main>
+    </>
   );
 }

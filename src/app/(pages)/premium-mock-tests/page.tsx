@@ -10,6 +10,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useTheme } from '@/components/ThemeContext'; // Import your theme context
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-toastify';
+import Head from 'next/head';
 const localizer = momentLocalizer(moment);
 
 type MockTest = {
@@ -96,6 +97,15 @@ export default function Dashboard() {
   // Handle publish/unpublish action
   
   return (
+    <>
+      <Head>
+        <title>TCS NQT Dashboard</title>
+        <meta name="description" content="TCS NQT Dashboard" />
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow" />
+      </Head>
+      <main>
     <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
       <header className={`shadow ${headerBg}`}>
@@ -205,6 +215,8 @@ export default function Dashboard() {
         </div>
       </main>
     </div>
+    </main>
+    </>
   );
 }
 

@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTheme } from "../../../components/ThemeContext";
 import { FiUser, FiMail, FiLock, FiPhone } from "react-icons/fi";
-
+import Head from "next/head";
 export default function SignUp() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -57,6 +57,15 @@ export default function SignUp() {
   };
 
   return (
+    <>
+      <Head>
+        <title>Sign Up</title>
+        <meta name="description" content="Sign up for Trackode" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+    <main>
     <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className={`w-full max-w-md  mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-lg`}>
         <div className="text-center">
@@ -219,6 +228,7 @@ export default function SignUp() {
           </div>
         </div>
       </div>
-    </div>
+    </div></main>
+    </>
   );
 }

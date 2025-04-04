@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTheme } from "../../../components/ThemeContext";
-
+import Head from "next/head";
 export default function Signin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -50,6 +50,15 @@ export default function Signin() {
   };
 
   return (
+    <>
+      <Head>
+        <title>Sign In</title>
+        <meta name="description" content="Sign in to your account" />
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow" />
+      </Head>
+    <main>
     <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className={`w-full max-w-md mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-lg`}>
         <div className="text-center">
@@ -174,6 +183,6 @@ export default function Signin() {
           </div>
         </div>
       </div>
-    </div>
+    </div></main></>
   );
 }

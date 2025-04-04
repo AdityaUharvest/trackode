@@ -1,6 +1,6 @@
-/** @type {import('next-sitemap').IConfig} */
 module.exports = {
-    siteUrl: 'https://trackode.vercel.app',
+    siteUrl: 'https://trackode.in',
     generateRobotsTxt: true,
-    sitemapSize: 5000, 
-};
+    // Add other options if needed
+  }
+  
