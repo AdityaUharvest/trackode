@@ -203,7 +203,7 @@ export default function Home() {
 
 
 
-        <div className="lg:max-w-4xl  mb-14 ml-6 mr-6 justify-center flex lg:mx-auto">
+        {/* <div className="lg:max-w-4xl  mb-14 ml-6 mr-6 justify-center flex lg:mx-auto">
           <img
             className="transform rounded-lg  shadow-lg  shadow-blue-800 scale-120"
             src={`${theme === "dark" ? "homepage2.png" : "homepage2dark.png"}`}
@@ -211,7 +211,7 @@ export default function Home() {
             loading="lazy"
           />
 
-        </div>
+        </div> */}
       </section>
       <Faq />
     </div>

@@ -30,10 +30,10 @@ const Navbar: React.FC = () => {
   return (
     <div>
       <Link  href="/premium-mock-tests">
-      <div className={`flex p-2  animate-pulse justify-center  border-b-2 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
+      <div className={`flex p-1  animate-pulse justify-center  border-b-2 ${theme === "light" ? "bg-gray-50 border-gray-200" : "bg-gray-900 border-gray-800"}`}>
       <GradientText
                         colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
-                        animationSpeed={10}
+                        animationSpeed={50}
                         showBorder={false}
                         className="text-sm font-semibold"
                       >
@@ -94,7 +94,7 @@ const Navbar: React.FC = () => {
           ) : (
             <Link
               href="/signin"
-              className={`block p-1 rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white md:p-2 ${theme === "light" ? "bg-blue-900 text-white" : "bg-blue-900 text-white"}`}
+              className={`block p-1 text-sm rounded-lg hover:bg-blue-400 md:hover:bg-blue-400 md:hover:text-white px-3 py-2 ${theme === "light" ? "bg-blue-900 text-white" : "bg-blue-900 text-white"}`}
             >
               Sign in
             </Link>
@@ -127,7 +127,7 @@ const Navbar: React.FC = () => {
                     href="#"
                     className={`block px-4 py-2  font-medium  text-sm hover:bg-blue-400 ${theme === "light" ? "text-black hover:bg-blue-700" : "text-white hover:bg-blue-700"}`}
                   >
-                    Settings
+                    Profile Settings
                   </Link>
                 </li>
                 <li>
@@ -170,13 +170,13 @@ const Navbar: React.FC = () => {
         <div
           className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${theme === "light" ? "bg-gray-50" : "bg-gray-900"} ${isNavOpen ? "block" : "hidden"}`}
         >
-          <ul className={`flex  flex-col font-medium p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white"}`}>
+          <ul className={`flex flex-col text-sm font-serif p-4 md:p-0 mt-4 border rounded-lg md:space-x-8 md:flex-row md:mt-0 md:border-0 ${theme === "light" ? "bg-gray-50 text-black" : "bg-gray-900 text-white"}`}>
             <li>
               <Link
                 href="/premium-mock-tests"
                 className={`block  py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
-                TCS NQT Mock Test
+               Mock Test
               </Link>
             </li>
             <li>
@@ -185,6 +185,14 @@ const Navbar: React.FC = () => {
                 className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
               >
                 Student Section
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin-dashboard"
+                className={`block py-2 px-3 rounded-sm font-sans font-semibold hover:bg-blue-400 md:hover:bg-transparent md:hover:text-blue-700 md:p-0 ${theme === "light" ? "text-black hover:bg-gray-200" : "text-white hover:bg-gray-700"}`}
+              >
+                Dashboard
               </Link>
             </li>
             <li>

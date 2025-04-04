@@ -5,14 +5,14 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { useTheme } from "../../../components/ThemeContext"; // Adjust the import path as necessary
-
+import { useTheme } from "../../../components/ThemeContext";
 
 export default function Signin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { theme } = useTheme(); // Get the current theme
+  const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   const submitHandler = async (e: any) => {
     e.preventDefault();
@@ -23,6 +23,8 @@ export default function Signin() {
       });
       return;
     }
+
+    setIsLoading(true);
     toast.info("Signing you in");
 
     try {
@@ -31,159 +33,145 @@ export default function Signin() {
         password,
         redirect: false,
       });
-      if (response?.ok && response?.error) {
+      
+      if (response?.error) {
         toast.error("Password or email is incorrect");
       }
-      if (response?.ok && response?.url) {
+      if (response?.ok && !response?.error) {
         setTimeout(() => {
-          router.push("/");
-        }, 2000);
+          router.push(response.url || "/");
+        }, 1500);
       }
     } catch (error) {
       toast.error("Sign in failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div
-      className={`min-h-screen ${
-        theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-      } flex justify-center`}
-    >
-      <div
-        className={`max-w-screen-xl sm:m-5 ${
-          theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-        } sm:rounded-lg flex justify-center flex-1`}
-      >
-        <div
-          className={`lg:w-1/2 xl:w-5/12 mt-2 mb-4 shadow-blue-900 shadow-inner ${
-            theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-          } rounded-lg p-6 sm:p-6`}
-        >
-          <div className="flex flex-col items-center">
-            <h1
-              className={`text-2xl xl:text-3xl font-extrabold ${
-                theme === "dark" ? "text-white" : "text-gray-800"
-              }`}
-            >
-              Get Started
-            </h1>
-            <div className="w-full flex-1 mt-8">
-              <div className="flex flex-col mb-8 items-center">
-                <SignInButton />
-                {/* <a
-                  href="#"
-                  className={`shadow-blue-900 w-full max-w-xs font-bold shadow-sm rounded-lg py-3 hover:bg-blue-700 ${
-                    theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-                  } ${
-                    theme === "dark" ? "text-white" : "text-gray-800"
-                  } flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline mt-5`}
-                >
-                  <div className="p-1 rounded-full">
-                    <svg className="w-6" viewBox="0 0 32 32">
-                      <path
-                        fillRule="evenodd"
-                        d="M16 4C9.371 4 4 9.371 4 16c0 5.3 3.438 9.8 8.207 11.387.602.11.82-.258.82-.578 0-.286-.011-1.04-.015-2.04-3.34.723-4.043-1.609-4.043-1.609-.547-1.387-1.332-1.758-1.332-1.758-1.09-.742.082-.726.082-.726 1.203.086 1.836 1.234 1.836 1.234 1.07 1.836 2.808 1.305 3.492 1 .11-.777.422-1.305.762-1.605-2.664-.301-5.465-1.332-5.465-5.93 0-1.313.469-2.383 1.234-3.223-.121-.3-.535-1.523.117-3.175 0 0 1.008-.32 3.301 1.23A11.487 11.487 0 0116 9.805c1.02.004 2.047.136 3.004.402 2.293-1.55 3.297-1.23 3.297-1.23.656 1.652.246 2.875.12 3.175.77.84 1.231 1.91 1.231 3.223 0 4.61-2.804 5.621-5.476 5.922.43.367.812 1.101.812 2.219 0 1.605-.011 2.898-.011 3.293 0 .32.214.695.824.578C24.566 25.797 28 21.3 28 16c0-6.629-5.371-12-12-12z"
-                      />
-                    </svg>
-                  </div>
-                  <span className="ml-4">Sign In with GitHub</span>
-                </a> */}
-              </div>
+    <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+      <div className={`w-full max-w-md mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-lg`}>
+        <div className="text-center">
+          <h1 className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+            Welcome back
+          </h1>
+          <p className={`mt-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+            Sign in to your account to continue
+          </p>
+        </div>
 
-              <div className="mx-auto max-w-xs">
-                <form method="post" onSubmit={submitHandler}>
-                  <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium ${
-                      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-                    } border ${
-                      theme === "dark" ? "border-gray-600" : "border-gray-400"
-                    } ${
-                      theme === "dark" ? "text-white" : "text-gray-800"
-                    } placeholder-${
-                      theme === "dark" ? "gray-400" : "gray-600"
-                    } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-gray-900" : "focus:bg-amber-100"
-                    }`}
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                    }}
-                  />
-                  <input
-                    className={`w-full px-8 py-4 rounded-lg font-medium ${
-                      theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-                    } border ${
-                      theme === "dark" ? "border-gray-600" : "border-gray-400"
-                    } ${
-                      theme === "dark" ? "text-white" : "text-gray-800"
-                    } placeholder-${
-                      theme === "dark" ? "gray-400" : "gray-600"
-                    } text-sm focus:outline-none focus:border-gray-400 ${
-                      theme === "dark" ? "focus:bg-gray-900" : "focus:bg-amber-100"
-                    } mt-5`}
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                    }}
-                  />
-                  <button
-                    type="submit"
-                    className="mt-5 tracking-wide font-semibold bg-blue-500 text-gray-100 w-full py-4 rounded-lg hover:bg-blue-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none"
-                  >
-                    <svg
-                      className="w-6 h-6 -ml-2"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
-                      <circle cx="8.5" cy="7" r="4" />
-                      <path d="M20 8v6M23 11h-6" />
-                    </svg>
-                    <span className="ml-3">Let me in!</span>
-                  </button>
-                </form>
-                <Link
-                  href="/signup"
-                  className={`ml-16 mt-5 text-xs ${
-                    theme === "dark" ?  "text-gray-400" : "text-gray-600"
-                  } text-center`}
-                >
-                  Don't have an account?  <span className=" text-blue-700"> Register</span> 
-                </Link>
-                <p
-                  className={`mt-6 text-xs ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-600"
-                  } text-center`}
-                >
-                  I agree to abide by trackode's
-                  <a href="#" className="border-b border-gray-500 border-dotted">
-                    Terms of Service
-                  </a>
-                  and its
-                  <a href="#" className="border-b border-gray-500 border-dotted">
-                    Privacy Policy
-                  </a>
-                </p>
-              </div>
+        <div className="mt-8 space-y-6">
+        <div className="flex flex-col items-center">
+            <SignInButton />
+          </div>
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className={`w-full border-t ${theme === "dark" ? "border-gray-700" : "border-gray-300"}`} />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className={`px-2 ${theme === "dark" ? "bg-gray-800 text-gray-400" : "bg-white text-gray-500"}`}>
+                Or continue with
+              </span>
             </div>
           </div>
-        </div>
-        <div
-          className={`flex-1 ${
-            theme === "dark" ? "bg-gray-900" : "bg-gray-50"
-          } text-center hidden lg:flex`}
-        >
-          <div className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat bg-designer-life"></div>
+
+          <form className="mt-8 space-y-6" onSubmit={submitHandler}>
+            <div className="rounded-md shadow-sm space-y-4">
+              <div>
+                <label htmlFor="email" className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                  Email address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  className={`mt-1 block w-full px-3 py-2 rounded-md border ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"} placeholder-${theme === "dark" ? "gray-400" : "gray-500"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="password" className={`block text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  className={`mt-1 block w-full px-3 py-2 rounded-md border ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"} placeholder-${theme === "dark" ? "gray-400" : "gray-500"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className={`h-4 w-4 rounded ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"} focus:ring-blue-500`}
+                />
+                <label htmlFor="remember-me" className={`ml-2 block text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <Link href="/forgot-password" className={`font-medium ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}>
+                  Forgot your password?
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isLoading ? "opacity-75 cursor-not-allowed" : ""}`}
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign in"
+                )}
+              </button>
+            </div>
+          </form>
+
+          <div className={`text-sm text-center ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+            Don't have an account?{" "}
+            <Link href="/signup" className={`font-medium ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}>
+              Sign up
+            </Link>
+          </div>
+
+          <div className={`text-xs text-center ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+            By continuing, you agree to our{" "}
+            <Link href="/terms" className={`hover:underline ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className={`hover:underline ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+              Privacy Policy
+            </Link>.
+          </div>
         </div>
       </div>
     </div>

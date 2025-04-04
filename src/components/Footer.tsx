@@ -19,11 +19,11 @@ export default function Footer() {
               
               <img
                 key={theme}
-                className="w-44 bg-gray-800"
+                className="w-36 bg-gray-800"
                 src={theme === "dark" ? "https://i.ibb.co/WppJvVPk/image-2025-02-12-122350771.png" : "https://i.ibb.co/twvK9Wdm/image-2025-02-12-131158350.png"}
                 alt="Footer Logo"
               />
-              <Link className="mb-3 text-lg font-sans font-cur text-yellow-400" href="https://buymeacoffee.com/iamadityaupadhyay"><span className="text-green-300">Buy me</span> a coffee ☕</Link>
+              <Link className="mb-3 text-xs font-sans font-cur text-yellow-400" href="https://buymeacoffee.com/iamadityaupadhyay"><span className="text-green-300">Buy me</span> a coffee ☕</Link>
               
 
 
@@ -31,7 +31,7 @@ export default function Footer() {
               
               <Link
                 href="/dashboard"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="Home"
@@ -40,7 +40,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="/admin-dashboard"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="Home"
@@ -50,7 +50,7 @@ export default function Footer() {
 
               <Link
                 href="/premium-mock-tests"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="About"
@@ -59,7 +59,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="/contact"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="About"
@@ -68,7 +68,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="/signup"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="About"
@@ -77,7 +77,7 @@ export default function Footer() {
               </Link>
               <Link
                 href="/signin"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="About"
@@ -88,7 +88,7 @@ export default function Footer() {
 
               <a
                 href="https://www.linkedin.com/in/iamadityaupadhyay/"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="Teams"
@@ -100,7 +100,7 @@ export default function Footer() {
 
               <a
                 href="#"
-                className={`mx-4 text-sm transition-colors duration-300 hover:text-blue-500 ${
+                className={`mx-4 text-xs transition-colors duration-300 hover:text-blue-500 ${
                   theme === "dark" ? "text-gray-300" : "text-gray-600"
                 }`}
                 aria-label="Privacy"
@@ -120,7 +120,7 @@ export default function Footer() {
 
           <div className="flex flex-col mb-3 items-center sm:flex-row sm:justify-between">
             <p
-              className={`text-sm mb-5 ${
+              className={`text-xs mb-5 ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
