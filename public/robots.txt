@@ -2,7 +2,8 @@
 User-agent: *
 Allow: /
 
-
+# Host
+Host: https://trackode.in
 
 # Sitemaps
 Sitemap: https://trackode.in/sitemap.xml
