@@ -12,9 +12,50 @@ import { toast } from "react-toastify";
 import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from '../components/ThemeContext';
 import { SpeedInsights } from "@vercel/speed-insights/next"
-import { metadata } from "./metadata";
 
-
+import StructuredData from "@/components/StructuredData"
+export const metadata = {
+  title: 'Trackode - Master Coding Skills with Interactive Quizzes & Contests',
+  description: 'Trackode helps developers track their coding journey through interactive quizzes, AI-generated challenges, and coding contests. Improve your programming skills effectively.',
+  metadataBase: new URL('https://trackode.in'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Trackode - Master Coding Skills with Interactive Quizzes & Contests',
+    description: 'Track your coding journey with interactive quizzes, AI challenges, and contests. The most effective way to improve programming skills.',
+    url: 'https://trackode.in/',
+    siteName: 'Trackode',
+    images: [
+      {
+        url: 'https://trackode.in/trackode.png',
+        width: 1200,
+        height: 630,
+        alt: 'Trackode Coding Platform',
+      }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Trackode - Master Coding Skills with Interactive Quizzes & Contests',
+    description: 'Track your coding journey with interactive quizzes, AI challenges, and contests.',
+    images: ['https://trackode.in/trackode-og-image.png'],
+  },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: '#1f2937' },
+  ],
+};
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
 
@@ -56,7 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Navbar />
         <ToastContainer position="top-right" autoClose={3000}/>
           <div className="min-h-screen">{children}</div>
-        
+          <StructuredData />
         
         
         <Footer />
