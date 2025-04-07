@@ -714,7 +714,7 @@ export default function Home() {
         </div>
         
         {/* Stats */}
-        <div className="grid grid-cols-1 gap-6 mx-auto mt-12 lg:grid-cols-5 grid-cols-2 max-w-3xl">
+        <div className="grid grid-cols-2 gap-6 mx-auto mt-12 lg:grid-cols-5  max-w-3xl">
         <div className="text-center">
             <div className="text-2xl font-bold text-white">4+</div>
             <div className="mt-1 text-blue-200">Active Mocks</div>
