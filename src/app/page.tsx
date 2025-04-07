@@ -66,12 +66,7 @@ export default function Home() {
         <meta property="og:locale" content="en_US" />
 
         {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://trackode.in/" />
-        <meta property="twitter:title" content="Trackode - Master Coding Skills with Interactive Quizzes & Contests" />
-        <meta property="twitter:description" content="Track your coding journey with interactive quizzes, AI challenges, and contests. The most effective way to improve programming skills." />
-        <meta property="twitter:image" content="https://trackode.in/trackode-twitter-image.png" />
-        <meta property="twitter:image:alt" content="Trackode Coding Platform" />
+        
 
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" />
@@ -106,10 +101,7 @@ export default function Home() {
             "name": "Trackode",
             "url": "https://trackode.in",
             "logo": "https://trackode.in/logo.png",
-            "sameAs": [
-              "https://twitter.com/trackode",
-              "https://github.com/trackode"
-            ]
+            
           })}
         </script>
       </Head>

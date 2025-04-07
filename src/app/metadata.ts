@@ -5,5 +5,5 @@ export const metadata: Metadata = {
     default: 'Trackode',
   },
   description: 'Trackode is a one-stop platform for coding, quizzes, and contest preparation.',
-  metadataBase: new URL('https://trackode.in'),
+  metadataBase: new URL('https://www.trackode.in'),
 };
