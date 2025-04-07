@@ -249,6 +249,7 @@ export default function HomePage() {
                   alt="User"
                   
                 src={`${[_]}`}
+loading='lazy'
                   className={`w-full h-full ${['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500'][i]}`}
                 ></img>
               </div>
@@ -347,7 +348,7 @@ export default function HomePage() {
   
 </section>
         {/* image section */}
-       {/* Screenshot Section with Floating Animation */}
+       {/* Screenshot Section with Floating Animation 
 <section className={`py-20 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
   <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     {/* Decorative elements */}
@@ -415,6 +416,7 @@ export default function HomePage() {
     }
   `}</style>
 </section>
+*/}
 <section className={`py-10 feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div className="text-center mb-16">
