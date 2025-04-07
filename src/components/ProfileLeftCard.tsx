@@ -2,12 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTheme } from './ThemeContext'; // Import ThemeContext
-import Quizes from './Quizes';
-import RunningQuizes from './RunningQuizes';
-import { Button } from './ui/button';
-import { Plus } from 'lucide-react';
-import { Card } from './ui/card';
-import Link from 'next/link';
 
 function ProfileLeftCard() {
   const { data: session } = useSession();

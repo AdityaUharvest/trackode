@@ -114,7 +114,7 @@ export default function Home() {
         </script>
       </Head>
 
-      <div className={`overflow-x-hidden ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
+      <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/* Hero Section */}
         <section
   className={`py-16 sm:py-24 ${theme === "dark" ? "bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" : "bg-gradient-to-br from-blue-50 via-white to-blue-50"}`}
@@ -158,7 +158,7 @@ export default function Home() {
             <span className="text-blue-600 mr-2">
               <SplitText
                 text="Track"
-                className="font-semibold"
+                className="font-bold"
                 delay={150}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -172,7 +172,7 @@ export default function Home() {
               <SplitText
               onLetterAnimationComplete={handleAnimationComplete}
                 text="Code"
-                className="font-semibold relative z-10"
+                className="font-bold relative z-10"
                 delay={250}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -184,7 +184,7 @@ export default function Home() {
               <SplitText
               onLetterAnimationComplete={handleAnimationComplete}
                 text="Quiz"
-                className="font-semibold"
+                className="font-bold"
                 delay={350}
                 animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
                 animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
@@ -193,24 +193,24 @@ export default function Home() {
               />
             </span>
           </div>
-          <div className="mt-4 sm:mr-0 mr-5">
+          <div className="mt-4">
             <GradientText
               colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
               animationSpeed={15}
               showBorder={false}
-              className="text-2xl sm:text-2xl font-semibold"
+              className="text-2xl sm:text-2xl font-bold leading-tight lg:text-3xl"
             >
               Navigate Your Coding Journey
             </GradientText>
           </div>
         </h1>
 
-        <p className="text-lg p-3 leading-relaxed text-gray-600 dark:text-gray-300 max-w-lg backdrop-blur-sm bg-white/10 dark:bg-gray-900/10 rounded-lg">
+        <p className="text-sm p-2 leading-relaxed text-gray-600 dark:text-gray-300 max-w-lg backdrop-blur-sm bg-white/10 dark:bg-gray-900/10 rounded-lg">
           Join over 494 developers improving their skills with our interactive
-          coding challenges, quizzes, and contests designed to accelerate your growth.
+          coding challenges, quizzes designed to accelerate your growth.
         </p>
 
-        <div className="flex ml-7 lg:ml-0 flex-wrap gap-4 pt-4">
+        <div className="flex  lg:mr-44 justify-evenly pt-4">
           <Link
             href="/admin-dashboard"
             className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 border-2 border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:scale-105"
@@ -246,7 +246,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="flex items-center pt-6 space-x-2">
+        <div className="flex items-center ml-5 pt-2 space-x-2">
           <div className="flex -space-x-2">
             {['aditya.png','rohit.png', 'rohitk.png','kaju.png'].map((_, i) => (
               <div
@@ -263,7 +263,7 @@ export default function Home() {
             ))}
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-medium">494</span> developers already joined
+            <span className="font-medium">+ 494</span> developers already joined
           </p>
         </div>
       </div>
@@ -291,7 +291,7 @@ export default function Home() {
             Join as a participant
           </h2>
 
-          <div className="space-y-4">
+          <div className="mb-5 space-y-4">
             <div className="relative">
               <input
                 placeholder="Enter quiz code"
@@ -336,7 +336,7 @@ export default function Home() {
               <span aria-hidden="true" className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
             </button>
 
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-2">
+            <div className="text-center text-sm  text-gray-500 dark:text-gray-400 mt-2">
               No account? <a href="/signup" className="text-blue-600 hover:underline">Sign up for free</a>
             </div>
           </div>
@@ -500,7 +500,7 @@ export default function Home() {
       </p>
     </div>
 
-    <div className="grid max-w-6xl gap-8 mx-auto sm:grid-cols-3">
+    <div className="grid pb-9 max-w-6xl gap-8 mx-auto sm:grid-cols-3">
       {/* Card 1 - with enhanced hover effects */}
       <div 
         className={`relative overflow-hidden rounded-xl transition-all duration-500 group ${
@@ -541,7 +541,7 @@ export default function Home() {
             Easily prepare your quiz in Trackode with our intuitive interface. Add questions, set timers, and customize settings.
           </p>
           
-          <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
+          {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
             <span className={`inline-flex items-center text-sm font-medium transition-all duration-300 group-hover:translate-x-1 ${
               theme === "dark" ? "text-blue-400" : "text-blue-600"
             }`}>
@@ -550,7 +550,7 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -592,7 +592,7 @@ export default function Home() {
             Host up to 15 quizzes for free directly on Trackode. Participants join instantly via link or QR code - no downloads needed.
           </p>
           
-          <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
+          {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
             <span className={`inline-flex items-center text-sm font-medium transition-all duration-300 group-hover:translate-x-1 ${
               theme === "dark" ? "text-purple-400" : "text-purple-600"
             }`}>
@@ -601,7 +601,7 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -643,7 +643,7 @@ export default function Home() {
             Watch the excitement as participants compete in real-time. Detailed analytics help you track performance and engagement.
           </p>
           
-          <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
+          {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
             <span className={`inline-flex items-center text-sm font-medium transition-all duration-300 group-hover:translate-x-1 ${
               theme === "dark" ? "text-green-400" : "text-green-600"
             }`}>
@@ -652,7 +652,7 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
               </svg>
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
@@ -660,8 +660,8 @@ export default function Home() {
 </section>
 
 {/* Improved CTA Section with Animation */}
-<section className={`py-20 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`} aria-labelledby="cta-heading">
-  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+<section className={`py-10 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`} aria-labelledby="cta-heading">
+  <div className="px-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div 
       className="relative overflow-hidden rounded-3xl"
       style={{
