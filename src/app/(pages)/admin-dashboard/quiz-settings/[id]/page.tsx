@@ -85,7 +85,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       console.log(response);
       if (response.data.success) {
         setQuiz(updatedQuiz);
-        toast.success("Quiz updated successfully!");
+        toast.success("Quiz updated successfully!",{
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        });
         setIsEditingQuiz(false);
       } else {
         toast.error(response.data.message);
@@ -106,7 +114,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         setIsPublished(true);
         setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
         
-        toast.success("Quiz published successfully!");
+        toast.success("Quiz published successfully!",{
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        });
       } else {
         toast.error(response.data.message);
       }
@@ -144,7 +160,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       const response = await axios.delete(`${API_BASE_URL}/quiz-update/${quizId}`);
       if (response.data.success) {
         
-        toast.success("Quiz Deleted successfully!");
+        toast.success("Quiz Deleted successfully!",{
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        });
         window.location.href = "/admin-dashboard"
       } else {
         toast.error(response.data.message);
@@ -159,7 +183,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const response = await axios.put(`${API_BASE_URL}/questions`, {questionId,newQuestion:updatedQuestion})
     
     if(response.data.success){
-      toast.success("Question Updated Successfully");
+      toast.success("Question Updated Successfully",{
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+      });
       console.log("Question Updated Successfully");
     }
     // const updatedQuestions = quiz?.questions?.map((q) => (q._id === questionId ? updatedQuestion : q));
@@ -268,7 +300,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                     const link = `${window.location.origin}/quiz-play/${quizId}`;
                     navigator.clipboard.writeText(link)
                       .then(() => {
-                        toast.success("Link copied to clipboard!");
+                        toast.success("Link copied to clipboard!",{
+                          position: "top-right",
+                          autoClose: 2000,
+                          hideProgressBar: true,
+                          closeOnClick: true,
+                          pauseOnHover: false,
+                          draggable: false,
+                          progress: undefined,
+                        });
                       })
                       .catch((error) => {
                         console.error("Failed to copy:", error);

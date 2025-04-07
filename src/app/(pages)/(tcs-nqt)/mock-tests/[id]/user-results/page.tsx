@@ -91,6 +91,7 @@ export default function UserQuizResult() {
   };
 
   const toggleQuestionExplanation = (questionId: string) => {
+    
     setExpandedQuestions(prev => ({
       ...prev,
       [questionId]: !prev[questionId]
@@ -152,53 +153,30 @@ export default function UserQuizResult() {
               </span>
             </div>
           </div>
-          
-          <div className="flex flex-col items-end gap-3">
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <div className={`text-3xl font-semibold ${performanceColor}`}>
-                  {overallPercentage}%
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">Overall Score</div>
-              </div>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center border-4 border-blue-500">
-                <span className="text-sm font-semibold">{result.totalScore}/{result.totalQuestions}</span>
-              </div>
+          </div>
+        </div>
+        <div className={`mt-8 p-2 mb-5 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-blue-50'} border ${borderColor}`}>
+          <h3 className="font-semibold mb-3 flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-yellow-500" />
+            Quiz Summary
+          </h3>
+          <div className="grid mb-5 grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total Questions</p>
+              <p className="text-sm font-semibold">{result.totalQuestions}</p>
             </div>
-            
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => window.print()}
-                className="gap-2"
-              >
-                <Printer className="h-4 w-4" />
-                Print Results
-              </Button>
-              <Button asChild>
-                <a href={`/mock-tests/${quizId}`}>Retake Quiz</a>
-              </Button>
+            <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Correct Answers</p>
+              <p className="text-sm font-semibold text-green-500">{result.totalScore}</p>
+            </div>
+            <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+              <p className="text-sm text-gray-500 dark:text-gray-400">Overall Score</p>
+              <p className="text-sm font-semibold">{overallPercentage}%</p>
             </div>
           </div>
         </div>
-
         {/* Overall performance */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium">Your Performance</span>
-            <span className="text-sm font-medium">{overallPercentage}%</span>
-          </div>
-          <Progress 
-            value={overallPercentage} 
-            className="h-3"
-            
-          />
-          <div className="flex justify-between mt-1">
-            <span className="text-xs text-gray-500 dark:text-gray-400">0%</span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">100%</span>
-          </div>
-        </div>
-
+        
         {/* Sections */}
         <div className="space-y-6">
           {result.sections.map((section) => {
@@ -309,7 +287,10 @@ export default function UserQuizResult() {
                           {/* Explanation */}
                           <div>
                             <button
-                              onClick={() => toggleQuestionExplanation(question._id)}
+                              onClick={() => toggleQuestionExplanation(question._id)
+                                
+
+                              }
                               className={`flex items-center text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} transition-colors`}
                             >
                               {expandedQuestions[question._id] ? 'Hide Explanation' : 'Show Explanation'}
@@ -341,27 +322,8 @@ export default function UserQuizResult() {
         </div>
 
         {/* Summary at bottom */}
-        <div className={`mt-8 p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-blue-50'} border ${borderColor}`}>
-          <h3 className="font-semibold mb-3 flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-500" />
-            Quiz Summary
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Total Questions</p>
-              <p className="text-sm font-semibold">{result.totalQuestions}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Correct Answers</p>
-              <p className="text-sm font-semibold text-green-500">{result.totalScore}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Overall Score</p>
-              <p className="text-sm font-semibold">{overallPercentage}%</p>
-            </div>
-          </div>
-        </div>
+        
       </div>
-    </div>
+    
   );
 }

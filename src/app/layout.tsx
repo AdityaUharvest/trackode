@@ -22,7 +22,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     const hasVisited = localStorage.getItem("hasVisited");
 
     if (!hasVisited) {
-      toast.success("🎉 Welcome to Trackode!", { autoClose: 3000 });
+      toast.success("🎉 Welcome to Trackode!",{
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+      });
       localStorage.setItem("hasVisited", "true");
       setIsFirstVisit(true);
     }

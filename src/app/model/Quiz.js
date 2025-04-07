@@ -70,6 +70,10 @@ const quizSchema = new mongoose.Schema(
             type: Boolean,
             default: false
         },
+        shareCode: {
+            type: String,
+            default: null
+        },
     },
     { timestamps: true }
 );

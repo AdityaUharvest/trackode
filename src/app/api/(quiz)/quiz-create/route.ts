@@ -2,11 +2,11 @@ import connectDB from "@/lib/util";
 import { NextRequest, NextResponse } from "next/server";
 import Quiz from "@/app/model/Quiz";
 import User from "@/app/model/User";
-
+import { generateShareCode } from "@/app/api/generateShareCode";
 
 export async function POST(request: NextRequest) {
     await connectDB();
-
+    const shareCode = generateShareCode();
     const {
         name,
         instructions,
@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
         shuffleOptions,
         email,
         publicc,
-        duration
+        duration,
+        
     } = await request.json();
     
     console.log(duration)
@@ -50,8 +51,8 @@ export async function POST(request: NextRequest) {
             active: false,
             instructions,
             public: publicc || false,
-            duration: duration || 0
-           
+            duration: duration || 0,
+            shareCode
         });
 
         await quiz.save();

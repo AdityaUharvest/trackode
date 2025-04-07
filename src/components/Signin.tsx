@@ -14,7 +14,7 @@ const SignInButton = () => {
     const loadingToast = toast.loading("Signing you in!");
 
     try {
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google", { callbackUrl: new URLSearchParams(window.location.search).get('callbackUrl') || '/' });
     } catch (error) {
       toast.error("Sign in failed. Please try again.");
     } finally {

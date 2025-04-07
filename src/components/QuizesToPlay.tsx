@@ -363,20 +363,20 @@ const QuizDashboard = () => {
                       <div className={`text-sm ${textStyles[theme].primary}`}>{quiz.name}</div>
                       <div className={`text-sm ${textStyles[theme].secondary}`}>{quiz.description}</div>
                       <div className={`text-xs mt-1 ${textStyles[theme].muted}`}>
-                        {formatDate(quiz.startDate)} - {formatDate(quiz.endDate)}
+                      {formatDate(quiz.endDate)}
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       {getStatusBadge(quiz.active)}
                     </td>
                     <td className={`px-6 py-4 text-sm ${textStyles[theme].secondary}`}>
-                      <div>{quiz.totalPlayed} played</div>
+                      <div>{quiz.totalPlayed}</div>
                       <div className={`text-xs ${textStyles[theme].muted}`}>{quiz.totalRegistrations} registered</div>
                     </td>
                     <td className="px-6 py-4">
                       {quiz.userPlayed ? (
                         <div className="flex items-center">
-                          <div className={`w-3 h-3 rounded-full mr-2 ${
+                          <div className={`w-3 h-3 text-sm rounded-full mr-2 ${
                             quiz.userScore && quiz.maxScore 
                               ? (quiz.userScore / quiz.maxScore) >= 0.7 
                                 ? 'bg-green-500' 
@@ -398,7 +398,7 @@ const QuizDashboard = () => {
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      {quiz.active ? (
+                      {quiz.active && quiz.userPlayed ? (
                         <Link href={`/quiz-play/${quiz?._id}`}>
                           <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                             quiz.userPlayed 
@@ -409,7 +409,7 @@ const QuizDashboard = () => {
                                 ? 'bg-green-900 text-green-200 hover:bg-green-800' 
                                 : 'bg-green-50 text-green-700 hover:bg-green-100'
                           }`}>
-                            {quiz.userPlayed ? 'Retake' : 'Start Quiz'}
+                            {quiz.userPlayed ? 'LeaderBoard | My Result' : 'Start Quiz'}
                           </button>
                         </Link>
                       ) : (
@@ -417,7 +417,7 @@ const QuizDashboard = () => {
                           className="px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed bg-red-700 text-white "
                           disabled
                         >
-                          {new Date(quiz.startDate) > new Date() ? 'Coming Soon' : 'Quiz Ended/ Not Live'}
+                          {new Date(quiz.startDate) > new Date() ? 'Coming Soon' : 'Not Live'}
                         </button>
                       )}
                     </td>

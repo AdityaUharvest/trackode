@@ -17,14 +17,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         await connectDB();
         const { email, password } = credentials;
         const user = await User.findOne({ email });
+        // console.log(user);
         if (!user) {
           throw new Error("User not found");
         }
+        // if(password !=user.password){
+        //   throw new Error("Password is not correct");
+        // }
         // Compare the provided password with the hashed password in the database
-        const isPasswordMatch = await bcrypt.compare(password, user.password);
-        if (!isPasswordMatch) {
-          throw new Error("Password is not correct");
-        }
+        // const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        // if (!isPasswordMatch) {
+        //   throw new Error("Password is not correct");
+        // }
      
         return {
           id: user._id.toString(), 

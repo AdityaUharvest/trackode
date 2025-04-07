@@ -37,7 +37,15 @@ export default function ContactForm() {
 
       if (response.ok) {
         setStatus('Message sent successfully!');
-        toast.success('Message sent successfully!');
+        toast.success('Message sent successfully!',{
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        });
         setFormData({ name: '', email: '', message: '' });
       } else {
         setStatus('Failed to send message.');
