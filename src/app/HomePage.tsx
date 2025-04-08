@@ -42,69 +42,7 @@ export default function HomePage() {
   const [quizCode, setQuizCode] = useState("");
   return (
     <>
-      <Head>
-        <title>Trackode - Master Coding Skills with Interactive Quizzes & Contests</title>
-        <meta name="description" content="Trackode helps developers track their coding journey through interactive quizzes, AI-generated challenges, and coding contests. Improve your programming skills effectively." />
-        <link rel="canonical" href="https://trackode.in" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        {/* Primary Meta Tags */}
-        <meta name="title" content="Trackode - Master Coding Skills with Interactive Quizzes & Contests" />
-        <meta name="description" content="Track your coding journey with interactive quizzes, AI challenges, and contests. The most effective way to improve programming skills." />
-        <meta name="keywords" content="coding quiz, programming challenges, coding contests, developer skills, coding practice, technical assessments, JavaScript quiz, Python challenges" />
-        <meta name="author" content="Trackode Team" />
-        <meta name="robots" content="index, follow" />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://trackode.in/" />
-        <meta property="og:title" content="Trackode - Master Coding Skills with Interactive Quizzes & Contests" />
-        <meta property="og:description" content="Track your coding journey with interactive quizzes, AI challenges, and contests. The most effective way to improve programming skills." />
-        <meta property="og:image" content="https://trackode.in/trackode-og-image.png" />
-        <meta property="og:image:alt" content="Trackode Coding Platform" />
-        <meta property="og:site_name" content="Trackode" />
-        <meta property="og:locale" content="en_US" />
-
-        {/* Twitter */}
-        
-
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-
-        {/* Theme Color */}
-        <meta name="theme-color" content={theme === "dark" ? "#1f2937" : "#ffffff"} />
-        <meta name="msapplication-TileColor" content="#2b5797" />
-
-        {/* Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebSite",
-            "name": "Trackode",
-            "url": "https://trackode.in",
-            "potentialAction": {
-              "@type": "SearchAction",
-              "target": "https://trackode.in/search?q={search_term_string}",
-              "query-input": "required name=search_term_string"
-            }
-          })}
-        </script>
-
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Trackode",
-            "url": "https://trackode.in",
-            "logo": "https://trackode.in/logo.png",
-            
-          })}
-        </script>
-      </Head>
+     
 
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/* Hero Section */}

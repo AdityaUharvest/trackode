@@ -11,7 +11,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: {
     template: '%s | Trackode',
-    default: 'Trackode',
+    default: 'Trackode - Master Coding Skills with Interactive Quizzes & Contests',
   },
   description: 'Trackode helps developers track their coding journey through interactive quizzes, AI-generated challenges, and coding contests. Improve your programming skills effectively.',
   metadataBase: new URL('https://trackode.in'),
@@ -42,13 +42,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <title>Trackode - Enhance Your Coding Skills</title>
-        <meta name="description" content="Trackode is a one-stop platform for coding, quizzes, and contest preparation." />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon.ico" />
-      </head>
+      <head></head>
       <body>
         <SessionProvider>
           <ClientLayout>
