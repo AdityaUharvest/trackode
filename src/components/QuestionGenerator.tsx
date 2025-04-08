@@ -151,7 +151,7 @@ export default function QuestionGenerator({ isPublished, mockTest }: QuestionGen
       
       // Generate all 25 questions in a single API call
       const res = await axios.post('/api/chat-gpt', { 
-        prompt: `You are an expert in creating high-quality TCS NQT exam questions. Generate exactly 25 challenging ${selectedSection} questions. 
+        prompt: `You are an expert in creating high-quality TCS NQT exam questions. Generate exactly 25 easy and medium level ${selectedSection} questions. 
 
 Each question must:
 - Be conceptually challenging with clear, unambiguous wording
