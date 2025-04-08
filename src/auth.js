@@ -21,15 +21,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user) {
           throw new Error("User not found");
         }
-        // if(password !=user.password){
-        //   throw new Error("Password is not correct");
-        // }
+       
         // Compare the provided password with the hashed password in the database
-        // const isPasswordMatch = await bcrypt.compare(password, user.password);
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
 
-        // if (!isPasswordMatch) {
-        //   throw new Error("Password is not correct");
-        // }
+        if (!isPasswordMatch) {
+          throw new Error("Password is not correct");
+        }
      
         return {
           id: user._id.toString(), 
