@@ -67,13 +67,13 @@ const Navbar: React.FC = () => {
       
       <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
-          <Link href="/" className="flex items-center space-x-3 rtl:space-x-reverse">
+          <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
               src="https://i.ibb.co/jvr3wb6b/trackode.png" 
               className="h-8 rounded-lg"
               alt="Trackode Logo"
             />
-            <span className={`self-center text-xl font-extrabold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
+            <span className={`self-center text-lg font-extrabold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
               Trackode
             </span>
           </Link>
@@ -138,7 +138,7 @@ const Navbar: React.FC = () => {
                       </li>
                       <li>
                         <Link
-                          href="#"
+                          href="/profile"
                           className={`flex items-center px-4 py-2 text-sm font-medium hover:bg-blue-500 hover:text-white transition-colors ${theme === "light" ? "text-gray-700" : "text-gray-200"}`}
                         >
                           <User size={16} className="mr-2" />
@@ -164,7 +164,7 @@ const Navbar: React.FC = () => {
                 href="/signin"
                 className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:translate-y-[-2px] ${theme === "light" ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-blue-600 hover:bg-blue-500 text-white"}`}
               >
-                <User size={16} className="mr-2" />
+                <User size={16} className="mr-1" />
                 Sign in
               </Link>
             )}

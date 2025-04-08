@@ -348,14 +348,14 @@ loading='lazy'
   
 </section>
         {/* image section */}
-       {/* Screenshot Section with Floating Animation 
+       {/* Screenshot Section with Floating Animation  */}
 <section className={`py-20 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
   <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    {/* Decorative elements */}
+
     <div className="absolute top-1/3 left-0 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
     <div className="absolute top-1/3 right-0 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-2000"></div>
     
-    {/* Main content */}
+   
     <div className="relative">
       {/* Image container with advanced animation */}
       <div className="lg:max-w-3xl mx-auto mb-16 relative">
@@ -416,7 +416,7 @@ loading='lazy'
     }
   `}</style>
 </section>
-*/}
+
 <section className={`py-10 feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div className="text-center mb-16">
@@ -424,11 +424,24 @@ loading='lazy'
         Why Choose <span className="text-blue-600">Trackode Quizzes</span>
       </h2>
       <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">
-        Everything you need to host, create and participate in coding challenges
+        Everything you need to host, create and participate in coding quizzes and mock test
       </p>
     </div>
 
-    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="relative p-6 bg-white dark:bg-gray-700 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
+        <div className="absolute -top-5 left-6">
+          <div className="rounded-full p-3 bg-purple-100 dark:bg-purple-900">
+          <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+          </div>
+        </div>
+        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">AI Powered Quiz Generation</h3>
+        <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
+          Generate quizzes tailored to your learning needs using our AI-driven platform.
+        </p>
+      </div>
       {/* Feature 1 */}
       <div className="relative p-6 bg-white dark:bg-gray-700 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
         <div className="absolute -top-5 left-6">
@@ -463,14 +476,14 @@ loading='lazy'
       <div className="relative p-6 bg-white dark:bg-gray-700 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
         <div className="absolute -top-5 left-6">
           <div className="rounded-full p-3 bg-purple-100 dark:bg-purple-900">
-            <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
             </svg>
           </div>
         </div>
-        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Community Challenges</h3>
+        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h3>
         <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
-          Compete with peers in live contests and collaborative problem-solving events.
+        Detailed dashboard for student with leaderboard and result analysis, AI based personlaized feedback.
         </p>
       </div>
     </div>
@@ -532,7 +545,7 @@ loading='lazy'
           <p className={`transition-all duration-300 ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}>
-            Easily prepare your quiz in Trackode with our intuitive interface. Add questions, set timers, and customize settings.
+            Easily prepare your quiz in Trackode with our intuitive interface. Add auto generated questions and answers, and customize settings.
           </p>
           
           {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
@@ -583,7 +596,7 @@ loading='lazy'
           <p className={`transition-all duration-300 ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
           }`}>
-            Host up to 15 quizzes for free directly on Trackode. Participants join instantly via link or QR code - no downloads needed.
+            Directly publish the quiz and share the link to play , you can Host up to 15 quizzes for free directly on Trackode. Participants join instantly via link or QR code - no downloads needed.
           </p>
           
           {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
