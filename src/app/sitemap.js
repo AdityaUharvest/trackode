@@ -14,7 +14,7 @@ export default function sitemap() {
         priority: 0.8,
       },
       {
-        url: 'https://trackode.in/dashboard/quiz-list',
+        url: 'https://trackode.in/quiz-list',
         lastModified: new Date(),
         changeFrequency: 'daily',
         priority: 0.8,

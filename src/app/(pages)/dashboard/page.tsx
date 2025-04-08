@@ -1,18 +1,15 @@
-import Signin from '@/components/SigninPage'
+import StudentDashboard from '@/components/StudentDashboard'
 import React from 'react'
 import { Metadata } from 'next'
 export const metadata: Metadata = {
-  title: 'Sign In',
+  title: 'Student Dashboard',
   keywords: ['Trackode', 'Mock Tests', 'Mock Tests in nextjs', 'Mock Tests','TCS Mocks', 'Free TCS Mock Tests'],
-  description: 'Sign In | Trackode',
+  description: 'Student Dashboard | Trackode',
 };
-
-function page() {
+export default function page() {
   return (
     <div>
-      <Signin/>
+      <StudentDashboard/>
     </div>
   )
 }
-
-export default page

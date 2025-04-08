@@ -274,7 +274,7 @@ loading='lazy'
 
           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
             <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 text-xs font-medium shadow-sm">
-              Quick join • No sign up required
+              Quick join • No Registration required
             </div>
           </div>
         </div>
@@ -638,7 +638,7 @@ loading='lazy'
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
           <Link
-            href="/dashboard/quiz-list"
+            href="/quiz-list"
             className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-blue-700 transition-all duration-300 bg-white border border-transparent rounded-xl hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white hover:shadow-lg transform hover:scale-105"
             role="button"
             aria-label="Sign up for Trackode"
@@ -742,38 +742,9 @@ loading='lazy'
         </div>
       ))}
     </div>
-  </div>
-</section>
-
-{/* Final CTA Section */}
-<section className={`py-16 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
-<div className="text-center max-w-2xl mx-auto">
-<div className="flex justify-center mb-12">
-        <div className="h-px w-16 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
-      </div>
-      <div>
-        
-      </div>
-        <h2 className={`text-2xl font-bold mb-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
-          Your Favorite Coding Platform
-          <span className="inline-block ml-2 relative">
-            <span className="absolute inset-0 bg-blue-200 dark:bg-blue-900 opacity-30 rounded transform -rotate-2"></span>
-            <span className="relative">⭐</span>
-          </span>
-        </h2>
-
-        <p className={`mt-4 text-xl font-medium ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
-          Effortless coding practice & contests with Trackode
-        </p>
-      </div>
-  <div className="px-4 mx-auto mt-4 max-w-7xl sm:px-6 lg:px-8">
-    <div className="max-w-3xl mx-auto">
-      {/* Before and After Decorative Elements */}
-     
-      
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+    <div className="flex mt-10 flex-col sm:flex-row items-center justify-center gap-4">
         <Link
-          href="/dashboard/quiz-list"
+          href="/quiz-list"
           className={`group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base font-bold transition-all duration-300 rounded-xl shadow-md ${
             theme === "dark" 
               ? "bg-blue-600 hover:bg-blue-700 text-white" 
@@ -824,6 +795,37 @@ loading='lazy'
           </span>
         </Link>
       </div>
+  </div>
+  
+</section>
+
+{/* Final CTA Section */}
+<section className={`py-16 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+<div className="text-center max-w-2xl mx-auto">
+<div className="flex justify-center mb-12">
+        <div className="h-px w-16 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
+      </div>
+      <div>
+        
+      </div>
+        <h2 className={`text-2xl font-bold mb-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
+          Your Favorite Coding Platform
+          <span className="inline-block ml-2 relative">
+            <span className="absolute inset-0 bg-blue-200 dark:bg-blue-900 opacity-30 rounded transform -rotate-2"></span>
+            <span className="relative">⭐</span>
+          </span>
+        </h2>
+
+        <p className={`mt-4 text-xl font-medium ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
+          Effortless coding practice & contests with Trackode
+        </p>
+      </div>
+  <div className="px-4 mx-auto mt-4 max-w-7xl sm:px-6 lg:px-8">
+    <div className="max-w-3xl mx-auto">
+      {/* Before and After Decorative Elements */}
+     
+      
+      
       
       {/* After Decorative Elements */}
       <div className="flex justify-center mt-12">

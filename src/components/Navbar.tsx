@@ -201,7 +201,7 @@ const Navbar: React.FC = () => {
                 Dashboard
               </NavItem>
               <NavItem 
-                href={status === "authenticated" ? "/dashboard/quiz-list" : "/signin"} 
+                href={status === "authenticated" ? "/quiz-list" : "/signin"} 
                 theme={theme} 
                 icon={<Home size={18} />}
               >

@@ -1,4 +1,4 @@
-import Question from "@/app/model/questions"
+import Question from "@/app/model/MockQuestions"
 import connectDB from "@/lib/util";
 export async function getQuestionsBySection(mockTestId: string, section: string) {
   await connectDB();

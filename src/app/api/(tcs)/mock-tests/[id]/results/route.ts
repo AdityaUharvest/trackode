@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import User from '@/app/model/User';
-import Question from '@/app/model/questions';
+import Question from '@/app/model/MockQuestions';
 
 // Define TypeScript interfaces for your models
 interface IQuestion {

@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import PerformanceChart from "@/components/PerformanceChart";
 import QuizHistory from "@/components/QuizHistory";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,7 @@ import FormattedDateTime from '@/components/FormattedDateTime';
 import { useSession } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
 import axios from 'axios';
+import Link from 'next/link';
 import { useTheme } from '@/components/ThemeContext';
 import SkeletonLoader from '@/components/skeleton/student';
 export default function StudentDashboard() {
@@ -15,6 +16,37 @@ export default function StudentDashboard() {
   const { data: session, status } = useSession();
   const [quizResults, setQuizResults] = React.useState([]);
   const [loading, setLoading]= React.useState(true);
+    
+  const [attempts, setAttempts] = useState([]);
+    
+    // Theme-based styles
+    const bgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50';
+    const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
+    const cardBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white';
+    const borderColor = theme === 'dark' ? 'border-gray-700' : 'border-gray-200';
+    const headerBg = theme === 'dark' ? 'bg-gray-800' : 'bg-white';
+    const secondaryText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
+    const tableHeaderBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50';
+    const tableRowHover = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const attemptsRes = await axios.get('/api/mock-tests/dashboard/attempts');
+         
+          setAttempts(attemptsRes.data);
+          console.log(attemptsRes.data)
+          
+        } catch (error) {
+          console.error('Error fetching dashboard data:', error);
+        } 
+      };
+  
+      if (session) {
+        fetchData();
+      }
+    }, [session]);
+  console.log(attempts)
   useEffect(() => {
     const fetchQuizResults = async () => {
       const response = await axios.get("/api/attempted");
@@ -85,6 +117,9 @@ export default function StudentDashboard() {
             </TabsTrigger>
             <TabsTrigger value="quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
               Quizzes
+            </TabsTrigger>
+            <TabsTrigger value="mocks" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+              Mocks
             </TabsTrigger>
           </TabsList>
 
@@ -192,25 +227,93 @@ export default function StudentDashboard() {
             <PerformanceChart chartData={chartData} theme={theme} />
             <QuizHistory results={quizResults} theme={theme} />
           </TabsContent>
-          <TabsContent value="attendance" className="space-y-6">
-            <Card className="bg-gray-800 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Monthly Attendance Overview</h3>
-              <div className="grid grid-cols-7 gap-2">
-                {Array(31).fill(0).map((_, index) => (
-                  <div
-                    key={index}
-                    className={`aspect-square rounded-lg flex items-center justify-center text-sm ${
-                      Math.random() > 0.1 ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400'
-                    }`}
-                  >
-                    {index + 1}
-                  </div>
-                ))}
-              </div>
-            </Card>
+          
+
+          <TabsContent value="mocks" className="space-y-6">
+
+           <ResultsTab 
+              attempts={attempts} 
+              cardBg={cardBg}
+              borderColor={borderColor}
+              textColor={textColor}
+              secondaryText={secondaryText}
+              tableHeaderBg={tableHeaderBg}
+              tableRowHover={tableRowHover}
+            />
           </TabsContent>
+          
         </Tabs>
       </div>
+    </div>
+  );
+}
+function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover }) {
+  
+  return (
+    <div>
+      
+
+      {attempts.length === 0 ? (
+        <div className={`text-center py-12 ${textColor}`}>
+          <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
+          {/* <Link
+            href="/mock-tests"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+          >
+            Browse Mock Tests
+          </Link> */}
+        </div>
+      ) : (
+        <div className="space-y-8">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className={tableHeaderBg}>
+                <tr>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                    Test
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                    Date
+                  </th>
+                  
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                    Details
+                  </th>
+                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
+                    LeaderBoard
+                  </th>
+                </tr>
+              </thead>
+              <tbody className={`${cardBg} divide-y ${borderColor}`}>
+                {attempts.map((attempt) => (
+                  <tr key={attempt._id} className={tableRowHover}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className={`text-sm font-medium ${textColor}`}>{attempt.quizTitle}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className={`text-sm ${secondaryText}`}>
+                        {new Date(attempt.completedAt).toLocaleDateString()}
+                      </div>
+                    </td>
+                    
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <Link
+                        href={`mock-tests/${attempt._id}/user-results`}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        View Detailed Result
+                      </Link>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      Not Released Yet
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -51,8 +51,9 @@ export default function QuizPlayer() {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [calcInput, setCalcInput] = useState('');
   const [hasAttemptedQuestions, setHasAttemptedQuestions] = useState(false);
+  const [hasAttempted, setHasAttempted] = useState<boolean>(false);
   //checking if the quiz is published or not
-  const [isPublished, setIsPublished] = useState(false);
+  const [isPublished, setIsPublished] = useState<boolean>(false);
   
   // Initialize sections and load saved answers
   useEffect(() => {
@@ -62,7 +63,14 @@ export default function QuizPlayer() {
         const response = await axios.get(`/api/quiz/${shareCode}`);
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
+        setIsPublished(response.data.quiz.isPublished);
+        // check user attempted or not  
+        const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
         
+        if (attempted.data) {
+          setHasAttempted(attempted.data);
+        }
+        console.log(hasAttempted)
         // Create sections with question counts
         const sectionData = [
           { name: 'verbal-ability', label: 'Verbal Ability', timeLimit: 25 * 60, questionCount: 0 },
@@ -100,34 +108,9 @@ export default function QuizPlayer() {
 
     fetchQuizData();
   }, [shareCode]);
-  useEffect(
-    ()=>{
-      if(quiz?.isPublished===false){
-        setIsPublished(false);}
-    }
-  )
-  if (!isPublished) {
-    return (
-      <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-xl font-bold mb-4">The Quiz is ended</h2>
-          <p className="mb-6">This quiz is not yet published. Please check back later.</p>
-          <button 
-            onClick={() => router.push('/dashboard')}
-            className={`px-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-          >
-            Student Home
-          </button>
-          <button 
-            onClick={() => router.push('/dashboard/quiz-list')}
-            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-          >
-            Live Quiz
-          </button>
-        </div>
-      </div>
-    );
-  }
+
+  
+  
   // Save answers to localStorage
   useEffect(() => {
     if (quizStarted && (Object.keys(answers).length > 0 || Object.keys(sectionAnswers).length > 0)) {
@@ -257,7 +240,28 @@ export default function QuizPlayer() {
       </div>
     );
   }
-
+  if (!isPublished) {
+    return (
+      <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+          <h2 className="text-xl font-bold mb-4">The Quiz is ended</h2>
+          <p className="mb-6">This quiz is not yet published. Please check back later.</p>
+          <button 
+            onClick={() => router.push('/dashboard')}
+            className={`px-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+          >
+            Student Home
+          </button>
+          <button 
+            onClick={() => router.push('/quiz-list')}
+            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+          >
+            Live Quiz
+          </button>
+        </div>
+      </div>
+    );
+  }
   if (error) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -269,6 +273,29 @@ export default function QuizPlayer() {
             className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
             Go Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+  if(hasAttempted){
+    console.log("You have already attempted this quiz.");
+    return (
+      <div className={`flex p-4   items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+          <h2 className="text-sm text-red-400 font-semibold mb-4"><span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>  You have already attempted this mock test <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span></h2>
+         
+          <button 
+            onClick={() => router.push('/dashboard')}
+            className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+          >
+            Go to your Dashboard
+          </button>
+          <button 
+            onClick={() => router.push('/quiz-list')}
+            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+          >
+            Explore Free Live Quizes
           </button>
         </div>
       </div>

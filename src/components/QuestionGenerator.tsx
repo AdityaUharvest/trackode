@@ -9,6 +9,7 @@ import { useTheme } from './ThemeContext';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useSession } from 'next-auth/react';
+
 interface Question {
   text: string;
   options: string[];
@@ -25,7 +26,7 @@ interface Section {
 
 interface QuestionGeneratorProps {
   isPublished: boolean;
-  mockTest:string
+  mockTest: string;
 }
 
 interface EditingQuestion extends Question {
@@ -41,12 +42,9 @@ const sections: Section[] = [
   { value: 'advanced-coding', label: 'Advanced Coding' }
 ];
 
-const CHUNK_SIZE = 10; // Process questions in chunks of 10
-const API_TIMEOUT = 30000; // 30 seconds timeout
+const API_TIMEOUT = 60000; // 60 seconds timeout
 
-export default function QuestionGenerator({ isPublished,mockTest }: QuestionGeneratorProps,
-  
-) {
+export default function QuestionGenerator({ isPublished, mockTest }: QuestionGeneratorProps) {
   const { theme } = useTheme();
   const params = useParams();
   const { data: session } = useSession();
@@ -109,7 +107,6 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
           text, 
           options, 
           correctAnswer,
-          
         };
       }).filter(q => q !== null) as Question[];
     }
@@ -119,7 +116,6 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         text: q.text || q.question || '',
         options: Array.isArray(q.options) ? q.options : [],
         correctAnswer: typeof q.correctAnswer === 'number' ? q.correctAnswer : 0,
-        
       })).filter(q => q.text && q.options.length >= 2);
     }
 
@@ -153,34 +149,40 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
       setIsGenerating(true);
       setErrorMessage('');
       
-      // Generate in smaller batches
-      const batchSize = 5;
-      let allQuestions: Question[] = [];
+      // Generate all 25 questions in a single API call
+      const res = await axios.post('/api/chat-gpt', { 
+        prompt: `You are an expert in creating high-quality TCS NQT exam questions. Generate exactly 25 challenging ${selectedSection} questions. 
+
+Each question must:
+- Be conceptually challenging with clear, unambiguous wording
+- Have exactly 4 options (labeled options 0-3)
+- Have a single correct answer
+- Be appropriate for tech/IT assessment
+- Be original and not reuse question patterns
+- Have realistic distractors that seem plausible
+
+Return a valid JSON array with 25 objects following this exact format:
+[
+  {
+    "text": "Question text here",
+    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+    "correctAnswer": 0
+  },
+  ...
+]
+
+The "correctAnswer" field must be the index (0-3) of the correct option. 
+
+DO NOT include any explanations, markdown formatting, or additional text outside the JSON array. Ensure the JSON is properly formatted and parseable.`
+      }, {
+        timeout: API_TIMEOUT
+      });
       
-      for (let i = 0; i < 5; i++) { // Generate up to 25 questions (5 batches of 5)
-        try {
-          const res = await axios.post('/api/chat-gpt', { 
-            prompt: `Generate ${batchSize} ${selectedSection} questions for TCS NQT exam. Format as JSON array with each question having:
-            - "text": "question text"
-            - "options": ["option1", "option2", "option3", "option4"]
-            - "correctAnswer": index (0-3)`
-          }, {
-            timeout: API_TIMEOUT
-          });
-          
-          const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
-          allQuestions = [...allQuestions, ...parsedQuestions];
-          
-          // Stop if we've got enough questions
-          if (allQuestions.length >= 25) break;
-        } catch (batchError) {
-          console.error(`Batch ${i+1} failed`, batchError);
-        }
-      }
+      const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
       
-      if (allQuestions.length > 0) {
-        setQuestions(allQuestions.slice(0, 25)); // Limit to 25 questions max
-        setSuccessMessage(`Successfully generated ${allQuestions.length} questions!`);
+      if (parsedQuestions.length > 0) {
+        setQuestions(parsedQuestions.slice(0, 25)); // Limit to 25 questions max
+        setSuccessMessage(`Successfully generated ${parsedQuestions.length} questions!`);
       } else {
         setErrorMessage('No valid questions could be generated. Please try again.');
       }
@@ -192,37 +194,6 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
     }
   };
 
-  // const saveQuestions = async () => {
-  //   try {
-  //     setIsSubmitting(true);
-  //     setErrorMessage('');
-      
-  //     // First, delete existing questions for this section
-  //     await axios.delete(`/api/mock-tests/${mockTestId}/questions`, {
-  //       params: { section: selectedSection },
-  //       timeout: API_TIMEOUT
-  //     });
-  
-  //     // Then save all new questions in chunks
-  //     for (let i = 0; i < questions.length; i += CHUNK_SIZE) {
-  //       const chunk = questions.slice(i, i + CHUNK_SIZE);
-  //       await axios.post(`/api/mock-tests/${mockTestId}/questions`, {
-  //         section: selectedSection,
-  //         questions: chunk
-  //       }, {
-  //         timeout: API_TIMEOUT
-  //       });
-  //     }
-      
-  //     setSuccessMessage(`Successfully saved ${questions.length} questions!`);
-  //     setTimeout(() => setSuccessMessage(''), 3000);
-  //   } catch (error) {
-  //     console.error('Failed to save questions', error);
-  //     setErrorMessage('Failed to save questions. Please try again.');
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
   const saveQuestions = async () => {
     try {
       setIsSubmitting(true);
@@ -258,6 +229,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
       setIsSubmitting(false);
     }
   };
+
   const handleEdit = (index: number) => {
     setEditingQuestion({ ...questions[index], index });
   };
@@ -279,85 +251,74 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
     setSuccessMessage('Question updated successfully!');
     setTimeout(() => setSuccessMessage(''), 3000);
   };
-  const [copied , setCopied] = useState(false);
+
+  const [copied, setCopied] = useState(false);
   const handleShareLink = async () => {
-    const shareLink =localStorage.getItem('shareLink')
+    const shareLink = localStorage.getItem('shareLink');
     navigator.clipboard.writeText(`${window.location.origin}${shareLink}`).then(
-      ()=>{
+      () => {
         setSuccessMessage('Share link copied to clipboard!');
         setCopied(true);
         setTimeout(() => setSuccessMessage(''), 3000);
       }
     );
-
-    
   };
-
-  
 
   return (
     <div className={containerClasses}>
-      
-      <div className="p-4 flex  justify-between  items-center">
-      
-       {isPublished && (
+      <div className="p-4 flex justify-between items-center">
+        {isPublished && (
           <Button 
-            className=" dark:bg-green-600 bg-white text-blue hover:bg-blue-700 hover:text-white"
+            className="dark:bg-green-600 bg-white text-blue hover:bg-blue-700 hover:text-white"
             onClick={handleShareLink}
             disabled={isGenerating || isSubmitting || copied}
           >
             <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
-<path fill="#1976D2" d="M38.1,31.2L19.4,24l18.7-7.2c1.5-0.6,2.3-2.3,1.7-3.9c-0.6-1.5-2.3-2.3-3.9-1.7l-26,10C8.8,21.6,8,22.8,8,24s0.8,2.4,1.9,2.8l26,10c0.4,0.1,0.7,0.2,1.1,0.2c1.2,0,2.3-0.7,2.8-1.9C40.4,33.5,39.6,31.8,38.1,31.2z"></path><path fill="#1E88E5" d="M11 17A7 7 0 1 0 11 31 7 7 0 1 0 11 17zM37 7A7 7 0 1 0 37 21 7 7 0 1 0 37 7zM37 27A7 7 0 1 0 37 41 7 7 0 1 0 37 27z"></path>
-</svg>      {copied ? 'Copied' : 'Share'}
-            
+              <path fill="#1976D2" d="M38.1,31.2L19.4,24l18.7-7.2c1.5-0.6,2.3-2.3,1.7-3.9c-0.6-1.5-2.3-2.3-3.9-1.7l-26,10C8.8,21.6,8,22.8,8,24s0.8,2.4,1.9,2.8l26,10c0.4,0.1,0.7,0.2,1.1,0.2c1.2,0,2.3-0.7,2.8-1.9C40.4,33.5,39.6,31.8,38.1,31.2z"></path><path fill="#1E88E5" d="M11 17A7 7 0 1 0 11 31 7 7 0 1 0 11 17zM37 7A7 7 0 1 0 37 21 7 7 0 1 0 37 7zM37 27A7 7 0 1 0 37 41 7 7 0 1 0 37 27z"></path>
+            </svg>
+            {copied ? 'Copied' : 'Share'}
           </Button>
-      )}
+        )}
 
-        {isPublished ?(
+        {isPublished ? (
           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
             Published
           </span>
-        ):(
+        ) : (
           <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
             Unpublished
           </span>
-        )
-        }
-        
-       
+        )}
       </div>
-      
       
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-2">
-        <select
-          value={selectedSection}
-          onChange={(e) => setSelectedSection(e.target.value)}
-          className={` ml-2 text-sm ${selectClasses}`}
-          disabled={isGenerating || isSubmitting}
-        >
-          {sections.map(section => (
-            <option className='text-sm' key={section.value} value={section.value}>
-              {section.label}
-            </option>
-          ))}
-        </select>
-        <Button
-          onClick={generateQuestions}
-          disabled={isGenerating || isSubmitting}
-          className="bg-blue-600 text-white hover:bg-blue-700"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="animate-spin mr-2" />
-              Generating...
-            </>
-          ) : 'Generate Questions'}
-        </Button>
+          <select
+            value={selectedSection}
+            onChange={(e) => setSelectedSection(e.target.value)}
+            className={`ml-2 text-sm ${selectClasses}`}
+            disabled={isGenerating || isSubmitting}
+          >
+            {sections.map(section => (
+              <option className='text-sm' key={section.value} value={section.value}>
+                {section.label}
+              </option>
+            ))}
+          </select>
+          <Button
+            onClick={generateQuestions}
+            disabled={isGenerating || isSubmitting}
+            className="bg-blue-600 text-white hover:bg-blue-700"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="animate-spin mr-2" />
+                Generating...
+              </>
+            ) : 'Generate Questions'}
+          </Button>
         </div>
-       
       </div>
-      
 
       {errorMessage && (
         toast.error(errorMessage),
@@ -386,7 +347,7 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
         />
       ) : (
         <>
-          <div className=" grid sm:grid-cols-2 p-3 gap-4">
+          <div className="grid sm:grid-cols-2 p-3 gap-4">
             {questions.length === 0 ? (
               <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                 No questions yet. Click "Generate Questions" to get started.
@@ -423,13 +384,11 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
                       </div>
                     ))}
                   </div>
-                  
-                  
                 </div>
               ))
             )}
           </div>
- {questions.length > 0 && (
+          {questions.length > 0 && (
             <div className="flex mb-2 justify-end">
               <Button
                 onClick={saveQuestions}
@@ -445,7 +404,6 @@ export default function QuestionGenerator({ isPublished,mockTest }: QuestionGene
               </Button>
             </div>
           )}
-          
         </>
       )}
     </div>

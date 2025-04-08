@@ -25,4 +25,5 @@ const MockTestSchema: Schema = new Schema({
 
 });
 
-export default mongoose.models?.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);
+const MockTest= mongoose.models.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);
+export default MockTest;

@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
-import Question from '@/app/model/questions';
+import Question from '@/app/model/MockQuestions';
 import { auth } from '@/auth';
 
 // Define TypeScript interfaces for your models

@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: any) {
 
     const { quizId, questions, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await req.json();
     console.log(quizId)
-    console.log(questions)
+    // console.log(questions)
     if (!quizId) {
       return NextResponse.json({
         message: "Please provide quiz id",
@@ -70,6 +70,7 @@ export async function POST(req: NextRequest, { params }: any) {
         await newQuestion.save();
         savedQuestions.push(newQuestion._id);
       } catch (error) {
+        console.error("Error saving question:", error);
         errors.push({
           message: "Failed to save a question",
           question: questionData,
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest, { params }: any) {
         { new: true }
       );
     }
+    console.log("Questions added successfully");
 
     return NextResponse.json({
       message: `Successfully added ${savedQuestions.length} questions. ${errors.length} questions failed.`,
@@ -175,7 +177,7 @@ export async function PUT(request: NextRequest) {
   await connectDB();
   const {  questionId,newQuestion, category, difficulty, questionType, image, explanation, shuffleOptions, order, timeLimit } = await request.json();
   const id= questionId;
-  console.log(newQuestion)
+  // console.log(newQuestion)
   if (!id) {
     return NextResponse.json({
       message: "Please provide question id",
