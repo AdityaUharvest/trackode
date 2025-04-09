@@ -105,19 +105,19 @@ export default function StudentDashboard() {
           </h1>
         </div>
 
-        <Tabs defaultValue="quizzes" className="space-y-6">
-          <TabsList className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} p-1 overflow-hidden rounded-lg`}>
+        <Tabs defaultValue="quizzes" className="space-y-6 overflow-hidden">
+          <TabsList className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} p-1  rounded-lg`}>
            <TabsTrigger value="quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
               Quiz Histories
             </TabsTrigger>
             
-            
-            <TabsTrigger value="mocks" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-              Mocks
-            </TabsTrigger>
             <TabsTrigger value="available-quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
             Free Available quizzes
             </TabsTrigger>
+            <TabsTrigger value="mocks" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+              Mocks
+            </TabsTrigger>
+            
             <TabsTrigger value="overview" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
               Overview
             </TabsTrigger>
@@ -197,7 +197,7 @@ export default function StudentDashboard() {
                   <div key={index} className="flex items-start gap-4">
                     <div className="w-2 h-2 mt-2 rounded-full bg-blue-600"></div>
                     <div>
-                      <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Completed Quiz: {quiz.quiz?.name}</p>
+                      <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>{quiz.quiz?.name}</p>
                       <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                         <FormattedDateTime date={quiz.attemptedAt} />
                       </p>
@@ -209,7 +209,66 @@ export default function StudentDashboard() {
           </TabsContent>
 
           <TabsContent value="quizzes" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
+                <div className="flex items-center gap-4">
+                  <div className="bg-blue-100 p-3 rounded-full">
+                    <span className="text-blue-600 text-xl">📚</span>
+                  </div>
+                  <div>
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Overall Progress</h3>
+                    <p className="text-sm font-bold">
+                      {totalQuizzes > 0 ? `${averagePercentage}%` : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
+                <div className="flex items-center gap-4">
+                  <div className="bg-green-100 p-3 rounded-full">
+                    <span className="text-green-600 text-xl">🏆</span>
+                  </div>
+                  <div>
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Highest Score</h3>
+                    <p className="text-sm font-bold">
+                      {totalQuizzes > 0 ? `${highestPercentage}%` : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
+                <div className="flex items-center gap-4">
+                  <div className="bg-orange-100 p-3 rounded-full">
+                    <span className="text-orange-600 text-xl">⏱</span>
+                  </div>
+                  <div>
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Recent Performance</h3>
+                    <p className="text-sm font-bold">
+                      {totalQuizzes > 0 ? `${recentPercentage}%` : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+              <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
+                <div className="flex items-center gap-4">
+                  <div className="bg-purple-100 p-3 rounded-full">
+                    <span className="text-purple-600 text-xl">📈</span>
+                  </div>
+                  <div>
+                    <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Average Performance</h3>
+                    <p className="text-sm font-bold">
+                      {totalQuizzes > 0 ? `${averagePercentage}%` : 'N/A'}
+                      {accuracyTrend !== 'stable' && (
+                        <span className={`text-sm ml-2 ${
+                          accuracyTrend === 'improving' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          ({accuracyTrend} ↗)
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </Card>
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 p-3 rounded-full">
@@ -221,9 +280,27 @@ export default function StudentDashboard() {
                   </div>
                 </div>
               </Card>
-
               {/* Repeat for other cards */}
             </div>
+
+            {/* Recent Activity Timeline */}
+            <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg`}>
+              <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Recent Activity</h3>
+              <div className="space-y-4">
+                {quizResults.map((quiz, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="w-2 h-2 mt-2 rounded-full bg-blue-600"></div>
+                    <div>
+                      <p className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Completed Quiz: {quiz.quiz?.name}</p>
+                      <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                        <FormattedDateTime date={quiz.attemptedAt} />
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+            
 
             <PerformanceChart chartData={chartData} theme={theme} />
             <QuizHistory results={quizResults} theme={theme} />
