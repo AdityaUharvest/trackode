@@ -358,7 +358,7 @@ loading='lazy'
       
       
       <h2 id="features-heading" className={`text-2xl font-bold tracking-tight sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-        How Trackode It Works
+        How Trackode Works
       </h2>
       <span className={`inline-block mt-1 px-4 py-1 rounded-full text-sm font-semibold mb-2 ${theme === "dark" ? "bg-gray-700 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
         Simple Process
