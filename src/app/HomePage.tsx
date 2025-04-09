@@ -47,12 +47,12 @@ export default function HomePage() {
      
 
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
-        {/* Hero Section */}
+        {/*Trackode Hero Section */}
         <section
   className={`py-16 sm:py-24 ${theme === "dark" ? "bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" : "bg-gradient-to-br from-blue-50 via-white to-blue-50"}`}
   aria-labelledby="hero-heading"
 >
-  {/* Animated background elements */}
+  {/* Trackode Animated background elements */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
     <div className="absolute top-0 left-0 w-full h-full">
       {theme === "dark" ? (
@@ -71,7 +71,7 @@ export default function HomePage() {
 
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative z-10">
     <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-      {/* Left side - Content */}
+      {/* Trackode now live you can create quizzes- Content */}
       <div className="w-full lg:w-1/2 space-y-6">
         <div className="flex items-center justify-end lg:mr-20 space-x-2">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
@@ -137,10 +137,10 @@ export default function HomePage() {
           </div>
         </h1>
 
-        <p className="text-sm p-2 leading-relaxed text-gray-600 dark:text-gray-300 max-w-lg backdrop-blur-sm bg-white/10 dark:bg-gray-900/10 rounded-lg">
-          Join over 494 developers improving their skills with our interactive
+        <h1 className="text-sm p-2 leading-relaxed text-gray-600 dark:text-gray-300 max-w-lg backdrop-blur-sm bg-white/10 dark:bg-gray-900/10 rounded-lg">
+          Join Trackode, over 494 developers improving their skills with our interactive
           coding challenges, quizzes designed to accelerate your growth.
-        </p>
+        </h1>
 
         <div className="flex  lg:mr-44 justify-evenly pt-4">
           <Link
@@ -201,16 +201,17 @@ loading='lazy'
         </div>
       </div>
 
-      {/* Right side - Join form with floating animation */}
+      
       <QuizJoinComponent/>
     </div>
   </div>
 
-  {/* Add this style tag for the floating and blob animations */}
+ 
   
 </section>
-        {/* image section */}
-       {/* Screenshot Section with Floating Animation  */}
+        {/* here the hero section of the trackode ends */}
+          
+          {/* Trackode Image Section */}
 <section className={`py-20 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
   <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -237,24 +238,23 @@ loading='lazy'
             height="450"
           />
           
-          {/* Interactive overlay elements */}
+          
           <div className="absolute -top-4 -right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
             Admin Dashboard
           </div>
           
-          {/* Code snippet aesthetic overlay */}
+          
           <div className="absolute -bottom-3 -left-3 bg-gray-900 text-green-400 px-4 py-2 rounded-lg text-xs font-mono opacity-90 shadow-lg">
             &gt; trackode --start-quiz
           </div>
         </div>
       </div>
       
-      {/* Text content below image */}
+      
      
     </div>
   </div>
   
-  {/* Animation styles */}
   <style jsx>{`
     @keyframes float {
       0% { transform: translateY(0px) rotate(0deg); }
@@ -282,9 +282,9 @@ loading='lazy'
 <section className={`py-10 feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div className="text-center mb-16">
-      <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+      <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
         Why Choose <span className="text-blue-600">Trackode Quizzes</span>
-      </h2>
+      </h1>
       <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">
         Everything you need to host, create and participate in coding quizzes and mock test
       </p>
@@ -299,7 +299,7 @@ loading='lazy'
             </svg>
           </div>
         </div>
-        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">AI Powered Quiz Generation</h3>
+        <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">AI Powered Quiz Generation</h1>
         <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
           Generate quizzes tailored to your learning needs using our AI-driven platform.
         </p>
@@ -313,7 +313,7 @@ loading='lazy'
             </svg>
           </div>
         </div>
-        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Interactive Challenges</h3>
+        <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Interactive Challenges</h1>
         <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
           Hands-on coding exercises with real-time feedback to improve your skills efficiently.
         </p>
@@ -328,7 +328,7 @@ loading='lazy'
             </svg>
           </div>
         </div>
-        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Progress Tracking</h3>
+        <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Progress Tracking</h1>
         <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
           Monitor your growth with detailed analytics and personalized skill assessments.
         </p>
@@ -343,7 +343,7 @@ loading='lazy'
             </svg>
           </div>
         </div>
-        <h3 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h3>
+        <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h1>
         <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
         Detailed dashboard for student with leaderboard and result analysis, AI based personlaized feedback.
         </p>
@@ -358,7 +358,7 @@ loading='lazy'
       
       
       <h2 id="features-heading" className={`text-2xl font-bold tracking-tight sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-        How It Works
+        How Trackode It Works
       </h2>
       <span className={`inline-block mt-1 px-4 py-1 rounded-full text-sm font-semibold mb-2 ${theme === "dark" ? "bg-gray-700 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
         Simple Process
@@ -410,16 +410,7 @@ loading='lazy'
             Easily prepare your quiz in Trackode with our intuitive interface. Add auto generated questions and answers, and customize settings.
           </p>
           
-          {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
-            <span className={`inline-flex items-center text-sm font-medium transition-all duration-300 group-hover:translate-x-1 ${
-              theme === "dark" ? "text-blue-400" : "text-blue-600"
-            }`}>
-              Learn more
-              <svg className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </span>
-          </div> */}
+          
         </div>
       </div>
 
@@ -461,16 +452,7 @@ loading='lazy'
             Directly publish the quiz and share the link to play , you can Host up to 15 quizzes for free directly on Trackode. Participants join instantly via link or QR code - no downloads needed.
           </p>
           
-          {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
-            <span className={`inline-flex items-center text-sm font-medium transition-all duration-300 group-hover:translate-x-1 ${
-              theme === "dark" ? "text-purple-400" : "text-purple-600"
-            }`}>
-              Learn more
-              <svg className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </span>
-          </div> */}
+          
         </div>
       </div>
 
@@ -512,23 +494,13 @@ loading='lazy'
             Watch the excitement as participants compete in real-time. Detailed analytics help you track performance and engagement.
           </p>
           
-          {/* <div className={`mt-6 pt-4 border-t ${theme === "dark" ? "border-gray-600" : "border-gray-100"}`}>
-            <span className={`inline-flex items-center text-sm font-medium transition-all duration-300 group-hover:translate-x-1 ${
-              theme === "dark" ? "text-green-400" : "text-green-600"
-            }`}>
-              Learn more
-              <svg className="w-4 h-4 ml-1 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </span>
-          </div> */}
+          
         </div>
       </div>
     </div>
   </div>
 </section>
 
-{/* Improved CTA Section with Animation */}
 <section className={`py-10 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`} aria-labelledby="cta-heading">
   <div className="px-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div 
@@ -538,7 +510,7 @@ loading='lazy'
         boxShadow: theme === "dark" ? "0 20px 40px -20px rgba(0, 0, 100, 0.6)" : "0 20px 40px -20px rgba(37, 99, 235, 0.5)"
       }}
     >
-      {/* Background animation elements */}
+    
       <div className="absolute top-0 left-0 w-full h-full opacity-10">
         <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white opacity-20 animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-white opacity-10 animate-pulse" style={{ animationDelay: "1s" }}></div>
