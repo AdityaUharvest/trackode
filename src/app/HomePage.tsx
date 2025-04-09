@@ -13,6 +13,7 @@ import SplitText from "../components/SplitText";
 import GradientText from "@/components/GradientText";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
+import QuizJoinComponent from '@/components/JoinQuiz';
 const handleAnimationComplete = () => {
     console.log('All letters have animated!');
   };
@@ -200,85 +201,7 @@ loading='lazy'
       </div>
 
       {/* Right side - Join form with floating animation */}
-      <div className="w-full lg:w-2/5">
-        <div
-          className="relative p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl transform transition-all duration-700 hover:shadow-2xl"
-          style={{
-            animation: "float 6s ease-in-out infinite"
-          }}
-        >
-          <div className="absolute -top-3 -right-3">
-            <span className="flex h-6 w-6">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-6 w-6 bg-blue-500 items-center justify-center">
-                <svg className="h-3 w-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
-                </svg>
-              </span>
-            </span>
-          </div>
-
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-            Join as a participant
-          </h2>
-
-          <div className="mb-5 space-y-4">
-            <div className="relative">
-              <input
-                placeholder="Enter quiz code"
-                className="w-full px-4 py-3 rounded-lg border border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-400 focus:border-transparent focus:outline-none text-gray-800 dark:text-white dark:bg-gray-700 placeholder-gray-500"
-                type="text"
-                onChange={(e) => setQuizCode(e.target.value)}
-                value={quizCode}
-
-                aria-label="Enter quiz code to join"
-              />
-            </div>
-
-            <button
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-6 py-3 rounded-lg transition-colors duration-200 shadow-sm transform hover:translate-y-px"
-              aria-label="Join the quiz now"
-              onClick={() => {
-                if (session) {
-                  toast.success("Joining the quiz...", {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                  });
-                  router.push("/playy/" + quizCode); // Replace with actual quiz code
-                } else {
-                  toast.error("Please log in to join the quiz.", {
-                    position: "top-right",
-                    autoClose: 2000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                  });
-                }
-              }}
-            >
-              Join Now
-              <span aria-hidden="true" className="ml-1 group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-
-            <div className="text-center text-sm  text-gray-500 dark:text-gray-400 mt-2">
-              No account? <a href="/signup" className="text-blue-600 hover:underline">Sign up for free</a>
-            </div>
-          </div>
-
-          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-            <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 text-xs font-medium shadow-sm">
-              Quick join • No Registration required
-            </div>
-          </div>
-        </div>
-      </div>
+      <QuizJoinComponent/>
     </div>
   </div>
 
