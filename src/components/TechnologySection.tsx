@@ -1,9 +1,11 @@
 "use client"
-import React,  { useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from './ThemeContext'; // Adjust the import path as needed
+
 interface Quiz {
   _id: string;
   name: string;
@@ -31,7 +33,7 @@ interface SectionLevels {
 
 export default function TechStackQuizSystem() {
   const router = useRouter();
-  const [theme, setTheme] = useState("light");
+  const { theme, toggleTheme } = useTheme(); // Get theme from context
   const [selectedTech, setSelectedTech] = useState<string | null>(null);
   const { data: session, status } = useSession();
   const [quizResults, setQuizResults] = React.useState<any[]>([]);
@@ -57,95 +59,7 @@ export default function TechStackQuizSystem() {
     { name: 'Docker', color: 'blue' },
     { name: 'AWS', color: 'yellow' }
   ];
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get("/api/total-quizes");
-      const quizData = response.data.quizes;
-      setQuizzes(quizData);
-      setFilteredQuizzes(quizData);
-      
-      const organized = organizeQuizzesBySectionAndLevel(quizData);
-      setOrganizedQuizzes(organized);
-      
-      // Initialize expanded sections
-      
-      
-      // Calculate stats
-      const totalQuizzes = quizData.length;
-      const percentages = quizResults.map(
-        (result: any) => Number(((result?.score / result?.totalQuestions) * 100).toFixed(1)))
-      
-      
-      
-      
-    };
 
-    fetchData();
-  }, [quizResults]);
-  console.log(organizedQuizzes)
-  
-  
-  
-  
-  
-  const handleBackToTechs = () => {
-    setSelectedTech(null);
-    
-  };
-  const organizeQuizzesBySectionAndLevel = (quizList: Quiz[]) => {
-    const organized: SectionLevels = {};
-    
-    quizList.forEach(quiz => {
-      const match = quiz.name.match(/\(([^)]+)\)\s*-\s*(\w+)/);
-      
-      if (match) {
-        const section = match[1].trim();
-
-        const level = match[2].trim();
-        
-        if (!organized[section]) {
-          organized[section] = {
-            Easy: [],
-            Medium: [],
-            Hard: [],
-            Other: []
-          };
-        }
-        
-        if (['Easy', 'Medium', 'Hard'].includes(level)) {
-          organized[section][level as 'Easy' | 'Medium' | 'Hard'].push({
-            
-            ...quiz,
-            section,
-            level
-          });
-        } else {
-          organized[section].Other.push({
-            ...quiz,
-            section,
-            level: 'Other'
-          });
-        }
-      } else {
-        const section = "Uncategorized";
-        if (!organized[section]) {
-          organized[section] = {
-            Easy: [],
-            Medium: [],
-            Hard: [],
-            Other: []
-          };
-        }
-        organized[section].Other.push({
-          ...quiz,
-          section,
-          level: 'Other'
-        });
-      }
-    });
-    
-    return organized;
-  };
   useEffect(() => {
     const fetchData = async () => {
       const response = await axios.get("/api/total-quizes");
@@ -180,18 +94,77 @@ export default function TechStackQuizSystem() {
 
     fetchData();
   }, [quizResults]);
+
+  const handleBackToTechs = () => {
+    setSelectedTech(null);
+  };
+
+  const organizeQuizzesBySectionAndLevel = (quizList: Quiz[]) => {
+    const organized: SectionLevels = {};
+    
+    quizList.forEach(quiz => {
+      const match = quiz.name.match(/\(([^)]+)\)\s*-\s*(\w+)/);
+      
+      if (match) {
+        const section = match[1].trim();
+        const level = match[2].trim();
+        
+        if (!organized[section]) {
+          organized[section] = {
+            Easy: [],
+            Medium: [],
+            Hard: [],
+            Other: []
+          };
+        }
+        
+        if (['Easy', 'Medium', 'Hard'].includes(level)) {
+          organized[section][level as 'Easy' | 'Medium' | 'Hard'].push({
+            ...quiz,
+            section,
+            level
+          });
+        } else {
+          organized[section].Other.push({
+            ...quiz,
+            section,
+            level: 'Other'
+          });
+        }
+      } else {
+        const section = "Uncategorized";
+        if (!organized[section]) {
+          organized[section] = {
+            Easy: [],
+            Medium: [],
+            Hard: [],
+            Other: []
+          };
+        }
+        organized[section].Other.push({
+          ...quiz,
+          section,
+          level: 'Other'
+        });
+      }
+    });
+    
+    return organized;
+  };
+
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
       ...prev,
       [section]: !prev[section]
     }));
   };
+
   const handleTechClick = (tech: string) => {
     router.push(`/tech/${encodeURIComponent(tech)}`);
   };
 
   return (
-    <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div className={`min-h-screen rounded-3xl ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 py-12">
         {!selectedTech ? (
           <>
@@ -211,14 +184,12 @@ export default function TechStackQuizSystem() {
 
             <div className="grid grid-cols-2 gap-4 sm:gap-6 mt-12 sm:grid-cols-3 lg:grid-cols-6">
               {Object.keys(organizedQuizzes).filter(section => section !== "Uncategorized").map((tech) => {
-                // Count total quizzes for this technology
                 const totalQuizzes = 
                   (organizedQuizzes[tech].Easy?.length || 0) +
                   (organizedQuizzes[tech].Medium?.length || 0) +
                   (organizedQuizzes[tech].Hard?.length || 0) +
                   (organizedQuizzes[tech].Other?.length || 0);
                 
-                // Assign colors based on technology
                 const colorMap: Record<string, string> = {
                   'JavaScript': 'yellow',
                   'Python': 'blue',
@@ -279,9 +250,7 @@ export default function TechStackQuizSystem() {
           </>
         ) : (
           <div className="max-w-6xl mx-auto">
-            
-
-            
+            {/* Your selected tech view */}
           </div>
         )}
       </div>

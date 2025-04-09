@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import { Loader2 } from 'lucide-react';
 import axios from 'axios';
 import Link from 'next/link';
+import QuizDashboard from './QuizesToPlay';
 import { useTheme } from '@/components/ThemeContext';
 import SkeletonLoader from '@/components/skeleton/student';
 export default function StudentDashboard() {
@@ -93,34 +94,34 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} p-8`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} p-4`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} flex items-center gap-3`}>
-            <span className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'} p-3 rounded-lg`}>
+        <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} flex items-center gap-3`}>
+            <span className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'} p-1 rounded-lg`}>
               📊
             </span>
             Student Dashboard
           </h1>
-          <button
-            onClick={toggleTheme}
-            className={`p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} hover:bg-gray-600 transition-colors`}
-          >
-            {theme === 'dark' ? '🌙' : '☀️'}
-          </button>
         </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
+        <Tabs defaultValue="quizzes" className="space-y-6">
           <TabsList className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} p-1 rounded-lg`}>
-            <TabsTrigger value="overview" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-              Overview
+           <TabsTrigger value="quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+              Quiz Histories
             </TabsTrigger>
-            <TabsTrigger value="quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-              Quizzes
-            </TabsTrigger>
+            
+            
             <TabsTrigger value="mocks" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
               Mocks
             </TabsTrigger>
+            <TabsTrigger value="available-quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+            Free Available quizzes
+            </TabsTrigger>
+            <TabsTrigger value="overview" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
+              Overview
+            </TabsTrigger>
+            
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -240,6 +241,10 @@ export default function StudentDashboard() {
               tableHeaderBg={tableHeaderBg}
               tableRowHover={tableRowHover}
             />
+          </TabsContent>
+          <TabsContent value="available-quizzes" className="space-y-2">
+
+           <QuizDashboard/>
           </TabsContent>
           
         </Tabs>

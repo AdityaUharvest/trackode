@@ -5,7 +5,7 @@ export default function QuizHistory({ results }: any) {
   const { theme } = useTheme(); // Access the current theme
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} p-6 rounded-lg shadow-sm`}>
+    <div className={`${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} p-1 rounded-lg shadow-sm`}>
       <div className="flex justify-between items-center mb-4">
         <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
           Recent Attempts

@@ -32,9 +32,9 @@ export default function QuizResultClient({ result }: { result: any }) {
   return (
     <div className={`min-h-screen sm:text-sm lg:p-8 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="max-w-4xl mx-auto">
-        <div className={`p-8 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-          <h1 className="text-2xl font-bold mb-4">
-            {result.title} Result
+        <div className={`p-4 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+          <h1 className="text-xl font-bold mb-4">
+            {result.title} 
           </h1>
 
           {/* Score Section */}
@@ -56,7 +56,7 @@ export default function QuizResultClient({ result }: { result: any }) {
             {result.answers.map((answer: any, index: number) => (
               <div
                 key={index}
-                className={`p-6 rounded-lg border-l-4 border-r-4 ${
+                className={`p-3 rounded-lg border-l-4 border-r-4 ${
                   answer.isCorrect
                     ? theme === 'dark' ? 'border-green-400 bg-gray-900' : 'border-green-600 bg-green-100'
                     : theme === 'dark' ? 'border-red-400 bg-gray-900 ' : 'border-red-600 bg-red-100'

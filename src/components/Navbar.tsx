@@ -46,7 +46,8 @@ const Navbar: React.FC = () => {
   }, [isDropdownOpen]);
 
   return (
-    <div className={`${scrolled ? 'shadow-md' : ''} transition-all duration-300`}>
+    <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
+    <div className={`${scrolled ? 'shadow-md' : ''}   `}>
       <Link href="/premium-mock-tests">
         <div className={`flex py-2 justify-center ${theme === "light" ? "bg-blue-50" : "bg-blue-900 bg-opacity-30"}`}>
           <div className="flex items-center gap-2">
@@ -65,7 +66,7 @@ const Navbar: React.FC = () => {
         </div>
       </Link>
       
-      <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
+
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
@@ -213,8 +214,9 @@ const Navbar: React.FC = () => {
             </ul>
           </div>
         </div>
+        </div>
       </nav>
-    </div>
+    
   );
 };
 
