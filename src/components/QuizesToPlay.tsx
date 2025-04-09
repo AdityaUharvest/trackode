@@ -67,6 +67,8 @@ const QuizDashboard = () => {
   });
   const [activeFilter, setActiveFilter] = useState<QuizFilter>('all');
   const [expandedSections, setExpandedSections] = useState<{[key: string]: boolean}>({});
+  const [showStats, setShowStats] = useState(false);
+  const [showPerformanceChart, setShowPerformanceChart] = useState(false);
 
   // Theme-based styles
   const containerStyles = {
@@ -172,7 +174,6 @@ const QuizDashboard = () => {
       const totalQuizzes = quizData.length;
       const percentages = quizResults.map(
         (result: any) => Number(((result?.score / result?.totalQuestions) * 100).toFixed(1))
-      );
       
       let accuracyTrend = 'stable';
       if (totalQuizzes >= 3) {
@@ -337,459 +338,494 @@ const QuizDashboard = () => {
   return (
     <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Section */}
-        
-
-        {/* Performance Chart Section */}
-        
-
-        {/* Quizzes Section */}
-        <div className="mb-8">
-  {/* Header Section */}
-  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-    <div className='flex gap-2'>
-  <span>
-          <svg className={`w-7 h-7 ${
-              theme === "dark" ? "text-white" : "text-blue-600"
-            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            </span>
-    <h2 className={`text-xl font-bold  text-blue-500`}>Available Quizzes</h2>
-    </div>
-    <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
-      <input
-        type="text"
-        placeholder="Search quizzes..."
-        className={`p-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-          theme === 'dark' 
-            ? 'bg-gray-700 border-gray-600 focus:ring-blue-500 text-white' 
-            : 'bg-white border-gray-300 focus:ring-blue-400 text-gray-800'
-        }`}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => setActiveFilter('all')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-            activeFilter === 'all' 
-              ? theme === 'dark' 
-                ? 'bg-blue-600 text-white shadow-lg' 
-                : 'bg-blue-100 text-blue-800 shadow-md'
-              : theme === 'dark' 
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setActiveFilter('active')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-            activeFilter === 'active' 
-              ? theme === 'dark' 
-                ? 'bg-green-600 text-white shadow-lg' 
-                : 'bg-green-100 text-green-800 shadow-md'
-              : theme === 'dark' 
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }`}
-        >
-          Active
-        </button>
-        <button
-          onClick={() => setActiveFilter('completed')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-            activeFilter === 'completed' 
-              ? theme === 'dark' 
-                ? 'bg-purple-600 text-white shadow-lg' 
-                : 'bg-purple-100 text-purple-800 shadow-md'
-              : theme === 'dark' 
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }`}
-        >
-          Completed
-        </button>
-        <button
-          onClick={() => setActiveFilter('ended')}
-          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-            activeFilter === 'ended' 
-              ? theme === 'dark' 
-                ? 'bg-gray-600 text-white shadow-lg' 
-                : 'bg-gray-200 text-gray-800 shadow-md'
-              : theme === 'dark' 
-                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-          }`}
-        >
-          Ended
-        </button>
-      </div>
-    </div>
-  </div>
-
-  {/* Difficulty Filter */}
-  <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-    {['All', 'Easy', 'Medium', 'Hard', 'Other'].map((level) => (
-      <button
-        key={level}
-        onClick={() => setDifficultyFilter(level.toLowerCase())}
-        className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-          difficultyFilter === level.toLowerCase()
-            ? theme === 'dark'
-              ? `${
-                  level === 'Easy' ? 'bg-green-700 text-white' :
-                  level === 'Medium' ? 'bg-yellow-600 text-white' :
-                  level === 'Hard' ? 'bg-red-600 text-white' :
-                  level === 'Other' ? 'bg-purple-600 text-white' :
-                  'bg-blue-600 text-white'
-                } shadow-md`
-              : `${
-                  level === 'Easy' ? 'bg-green-100 text-green-800' :
-                  level === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
-                  level === 'Hard' ? 'bg-red-100 text-red-800' :
-                  level === 'Other' ? 'bg-purple-100 text-purple-800' :
-                  'bg-blue-100 text-blue-800'
-                } shadow-sm`
-            : theme === 'dark'
-              ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-        }`}
-      >
-        {level}
-      </button>
-    ))}
-  </div>
-
-  {/* Organized Quizzes */}
-  <div className="space-y-4">
-    {Object.keys(organizedQuizzes).map((section) => (
-      <div
-        key={section}
-        className={`rounded-xl shadow-sm border overflow-hidden transition-all duration-200 ${
-          theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-        }`}
-      >
-        {/* Section Header */}
-        <div
-          className={`p-4 flex justify-between items-center cursor-pointer transition-all duration-200 ${
-            theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
-          }`}
-          onClick={() => toggleSection(section)}
-        >
-          <div className="flex items-center">
-            <h3 className={`text-base text-green-600 font-semibold `}>
-              {section}
-            </h3>
-            <span
-              className={`ml-2 text-xs px-2 py-1 rounded-full transition-all ${
-                theme === 'dark' ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-700'
-              }`}
+        {/* Stats Section - Only show if completed quizzes > 0 */}
+        {userStats.completedQuizzes > 0 && (
+          <div className="mb-8">
+            <button
+              onClick={() => setShowStats(!showStats)}
+              className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
+                theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+              } transition-colors`}
             >
-              {Object.values(organizedQuizzes[section]).reduce(
-                (acc, levelQuizzes) => acc + levelQuizzes.length,
-                0
-              )}{' '}
-              quizzes
-            </span>
-          </div>
-          <div className="flex items-center">
-            <svg
-              className={`w-5 h-5 transition-transform duration-200 ${
-                expandedSections[section] ? 'rotate-180' : ''
-              } ${textStyles[theme].secondary}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </div>
-        </div>
+              <span className="font-medium">{showStats ? 'Hide Stats' : 'Show Stats'}</span>
+              <svg
+                className={`w-4 h-4 transition-transform ${showStats ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
 
-        {/* Section Content - Initially Collapsed */}
-        {expandedSections[section] && (
-          <div className="divide-y divide-gray-200 animate-fadeIn">
-            {(['Easy', 'Medium', 'Hard', 'Other'] as const).map((level) => {
-              if (
-                organizedQuizzes[section][level].length === 0 ||
-                (difficultyFilter !== 'all' && difficultyFilter !== level.toLowerCase())
-              )
-                return null;
-
-              return (
-                <div key={`${section}-${level}`} className="p-4">
-                  <div className="flex items-center mb-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium mr-2 ${getLevelColor(
-                        level
-                      )}`}
-                    >
-                      {level}
-                    </span>
-                    <span className={`text-sm ${textStyles[theme].muted}`}>
-                      {organizedQuizzes[section][level].length} quizzes
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {organizedQuizzes[section][level].map((quiz) => (
-                      <div
-                        key={quiz._id}
-                        className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] ${
-                          theme === 'dark'
-                            ? 'border-gray-700 hover:bg-gray-700 hover:shadow-lg'
-                            : 'border-gray-200 hover:bg-gray-50 hover:shadow-md'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className={`font-medium ${textStyles[theme].primary}`}>
-                            {quiz.name}
-                          </h4>
-                          {getStatusBadge(quiz.active, quiz.endDate)}
-                        </div>
-                        <p className={`text-sm mb-3 ${textStyles[theme].secondary}`}>
-                          {quiz.description}
-                        </p>
-
-                        <div className="flex justify-between items-center mb-3">
-                          <div>
-                            <span className={`text-xs ${textStyles[theme].muted}`}>
-                              Participants:{' '}
-                            </span>
-                            
-                            <span className={`text-xs ${textStyles[theme].muted}`}>
-                              {quiz.totalRegistrations}
-                            </span>
-                          </div>
-                          {quiz.userPlayed && (
-                            <div className="flex items-center">
-                              <div
-                                className={`w-2 h-2 rounded-full mr-1 ${
-                                  quiz.userScore && quiz.maxScore
-                                    ? quiz.userScore / quiz.maxScore >= 0.7
-                                      ? 'bg-green-500'
-                                      : quiz.userScore / quiz.maxScore >= 0.4
-                                      ? 'bg-yellow-500'
-                                      : 'bg-red-500'
-                                    : 'bg-gray-500'
-                                }`}
-                              ></div>
-                              <span className={`text-xs ${textStyles[theme].secondary}`}>
-                                {quiz.userScore !== undefined && quiz.maxScore !== undefined
-                                  ? `${Math.round((quiz.userScore / quiz.maxScore) * 100)}%`
-                                  : 'Played'}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex justify-end">
-                          {quiz.active  ? (
-                            <Link href={`/quiz-play/${quiz._id}`}>
-                              <button
-                                className={`px-3 py-1 rounded-lg text-sm font-medium transition-all hover:shadow-md ${
-                                  quiz.userPlayed
-                                    ? theme === 'dark'
-                                      ? 'bg-blue-800 text-blue-200 hover:bg-blue-700'
-                                      : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                                    : theme === 'dark'
-                                    ? 'bg-green-800 text-green-200 hover:bg-green-700'
-                                    : 'bg-green-100 text-green-800 hover:bg-green-200'
-                                }`}
-                              >
-                                {quiz.userPlayed ? 'View Results' : 'Start Quiz'}
-                              </button>
-                            </Link>
-                          ) : (
-                            <button
-                              className="px-3 py-1 rounded-lg text-sm font-medium cursor-not-allowed bg-gray-200 text-gray-500"
-                              disabled
-                            >
-                              {new Date(quiz.startDate) > new Date()
-                                ? 'Coming Soon'
-                                : 'Quiz Ended'}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+            {showStats && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                {/* Completion Rate */}
+                <div
+                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
+                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
+                    Completion
+                  </h3>
+                  <div className="relative h-40">
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      <circle
+                        className={theme === 'dark' ? 'text-gray-700' : 'text-gray-200'}
+                        strokeWidth="8"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="40"
+                        cx="50"
+                        cy="50"
+                      />
+                      <circle
+                        className="text-blue-500"
+                        strokeWidth="8"
+                        strokeDasharray={`${
+                          (userStats.completedQuizzes / userStats.totalQuizzes) * 251
+                        } 251`}
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="transparent"
+                        r="40"
+                        cx="50"
+                        cy="50"
+                        transform="rotate(-90 50 50)"
+                      />
+                    </svg>
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                      <span className={`text-2xl font-bold block ${textStyles[theme].primary}`}>
+                        {userStats.totalQuizzes > 0
+                          ? Math.round((userStats.completedQuizzes / userStats.totalQuizzes) * 100)
+                          : 0}
+                        %
+                      </span>
+                      <span className={`text-xs block ${textStyles[theme].muted}`}>
+                        {userStats.completedQuizzes > 0 ? userStats.completedQuizzes : 0} /{' '}
+                        {userStats.totalQuizzes}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+
+                {/* Average Score */}
+                <div
+                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
+                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                    Average Score
+                  </h3>
+                  <div className="flex items-end mb-2">
+                    <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                      {userStats.averageScore}
+                    </p>
+                    <span className={textStyles[theme].muted}>%</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className={`text-sm mr-2 ${textStyles[theme].muted}`}>Trend:</span>
+                    {getTrendIcon(userStats.accuracyTrend)}
+                    <span
+                      className={`text-sm ml-1 capitalize ${
+                        userStats.accuracyTrend === 'up'
+                          ? 'text-green-500'
+                          : userStats.accuracyTrend === 'down'
+                          ? 'text-red-500'
+                          : textStyles[theme].secondary
+                      }`}
+                    >
+                      {userStats.accuracyTrend}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Achievement */}
+                <div
+                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
+                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                    Achievement
+                  </h3>
+                  <div className="flex items-center">
+                    <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                      {getAchievementLevel()}
+                    </p>
+                    <span className="text-xl">✨</span>
+                  </div>
+                </div>
+
+                {/* Highest Score */}
+                <div
+                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
+                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                    Highest Score
+                  </h3>
+                  <div className="flex items-end mb-2">
+                    <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                      {userStats.highestScore}
+                    </p>
+                    <span className={textStyles[theme].muted}>%</span>
+                  </div>
+                  <div>
+                    <span className={`text-sm ${textStyles[theme].muted}`}>Your personal best</span>
+                  </div>
+                </div>
+
+                {/* Recent Performance */}
+                <div
+                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
+                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                    Recent Score
+                  </h3>
+                  <div className="flex items-end mb-2">
+                    <p
+                      className={`text-3xl font-bold mr-2 ${
+                        userStats.recentScore >= 80
+                          ? 'text-green-500'
+                          : userStats.recentScore >= 50
+                          ? 'text-yellow-500'
+                          : 'text-red-500'
+                      }`}
+                    >
+                      {userStats.recentScore}
+                    </p>
+                    <span className={textStyles[theme].muted}>%</span>
+                  </div>
+                  <div>
+                    <span className={`text-sm ${textStyles[theme].muted}`}>Latest attempt</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Performance Chart Section */}
+            <div className="mb-8">
+              <button
+                onClick={() => setShowPerformanceChart(!showPerformanceChart)}
+                className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
+                  theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+                } transition-colors`}
+              >
+                <span className="font-medium">
+                  {showPerformanceChart ? 'Hide Performance Chart' : 'Show Performance Chart'}
+                </span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${showPerformanceChart ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showPerformanceChart && (
+                <div className={`p-6 rounded-xl shadow-sm border ${
+                  theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'
+                }`}>
+                  <h2 className={`text-xl font-semibold mb-4 ${textStyles[theme].primary}`}>Performance Trend</h2>
+                  <div className="h-80">
+                    <PerformanceChart chartData={chartData} theme={theme} />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
-      </div>
-    ))}
-  </div>
 
-  {/* Stats Cards - Improved Layout */}
-{userStats.completedQuizzes > 0 ? (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
-    {/* Completion Rate */}
-    <div
-      className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-        theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-      }`}
-    >
-      <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
-        Completion
-      </h3>
-      <div className="relative h-40">
-        <svg className="w-full h-full" viewBox="0 0 100 100">
-          <circle
-            className={theme === 'dark' ? 'text-gray-700' : 'text-gray-200'}
-            strokeWidth="8"
-            stroke="currentColor"
-            fill="transparent"
-            r="40"
-            cx="50"
-            cy="50"
-          />
-          <circle
-            className="text-blue-500"
-            strokeWidth="8"
-            strokeDasharray={`${
-              (userStats.completedQuizzes / userStats.totalQuizzes) * 251
-            } 251`}
-            strokeLinecap="round"
-            stroke="currentColor"
-            fill="transparent"
-            r="40"
-            cx="50"
-            cy="50"
-            transform="rotate(-90 50 50)"
-          />
-        </svg>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <span className={`text-2xl font-bold block ${textStyles[theme].primary}`}>
-            {userStats.totalQuizzes > 0
-              ? Math.round((userStats.completedQuizzes / userStats.totalQuizzes) * 100)
-              : 0}
-            %
-          </span>
-          <span className={`text-xs block ${textStyles[theme].muted}`}>
-            {userStats.completedQuizzes > 0 ? userStats.completedQuizzes : 0} /{' '}
-            {userStats.totalQuizzes}
-          </span>
-        </div>
-      </div>
-    </div>
+        {/* Quizzes Section */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Filters Sidebar - Visible on large screens */}
+          <div className="lg:w-64 flex-shrink-0">
+            <div className={`sticky top-4 p-4 rounded-xl border ${
+              theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+            }`}>
+              <h3 className={`font-semibold mb-4 ${textStyles[theme].primary}`}>Filters</h3>
+              
+              {/* Search Input */}
+              <div className="mb-4">
+                <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
+                  Search
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search quizzes..."
+                  className={`w-full p-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-700 border-gray-600 focus:ring-blue-500 text-white' 
+                      : 'bg-white border-gray-300 focus:ring-blue-400 text-gray-800'
+                  }`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
 
-    {/* Average Score */}
-    <div
-      className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-        theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-      }`}
-    >
-      <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-        Average Score
-      </h3>
-      <div className="flex items-end mb-2">
-        <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-          {userStats.averageScore}
-        </p>
-        <span className={textStyles[theme].muted}>%</span>
-      </div>
-      <div className="flex items-center">
-        <span className={`text-sm mr-2 ${textStyles[theme].muted}`}>Trend:</span>
-        {getTrendIcon(userStats.accuracyTrend)}
-        <span
-          className={`text-sm ml-1 capitalize ${
-            userStats.accuracyTrend === 'up'
-              ? 'text-green-500'
-              : userStats.accuracyTrend === 'down'
-              ? 'text-red-500'
-              : textStyles[theme].secondary
-          }`}
-        >
-          {userStats.accuracyTrend}
-        </span>
-      </div>
-    </div>
+              {/* Status Filter */}
+              <div className="mb-4">
+                <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
+                  Status
+                </label>
+                <div className="space-y-2">
+                  {[
+                    { value: 'all', label: 'All Quizzes' },
+                    { value: 'active', label: 'Active' },
+                    { value: 'completed', label: 'Completed' },
+                    { value: 'ended', label: 'Ended' }
+                  ].map((filter) => (
+                    <button
+                      key={filter.value}
+                      onClick={() => setActiveFilter(filter.value as QuizFilter)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        activeFilter === filter.value
+                          ? theme === 'dark'
+                            ? 'bg-blue-600 text-white shadow-lg'
+                            : 'bg-blue-100 text-blue-800 shadow-md'
+                          : theme === 'dark'
+                          ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-    {/* Achievement */}
-    <div
-      className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-        theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-      }`}
-    >
-      <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-        Achievement
-      </h3>
-      <div className="flex items-center">
-        <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
-          {getAchievementLevel()}
-        </p>
-        <span className="text-xl">✨</span>
-      </div>
-      
-    </div>
+              {/* Difficulty Filter */}
+              <div>
+                <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
+                  Difficulty
+                </label>
+                <div className="space-y-2">
+                  {['All', 'Easy', 'Medium', 'Hard', 'Other'].map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => setDifficultyFilter(level.toLowerCase())}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                        difficultyFilter === level.toLowerCase()
+                          ? theme === 'dark'
+                            ? `${
+                                level === 'Easy' ? 'bg-green-700 text-white' :
+                                level === 'Medium' ? 'bg-yellow-600 text-white' :
+                                level === 'Hard' ? 'bg-red-600 text-white' :
+                                level === 'Other' ? 'bg-purple-600 text-white' :
+                                'bg-blue-600 text-white'
+                              } shadow-md`
+                            : `${
+                                level === 'Easy' ? 'bg-green-100 text-green-800' :
+                                level === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                                level === 'Hard' ? 'bg-red-100 text-red-800' :
+                                level === 'Other' ? 'bg-purple-100 text-purple-800' :
+                                'bg-blue-100 text-blue-800'
+                              } shadow-sm`
+                          : theme === 'dark'
+                          ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
 
-    {/* Highest Score */}
-    <div
-      className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-        theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-      }`}
-    >
-      <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-        Highest Score
-      </h3>
-      <div className="flex items-end mb-2">
-        <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-          {userStats.highestScore}
-        </p>
-        <span className={textStyles[theme].muted}>%</span>
-      </div>
-      <div>
-        <span className={`text-sm ${textStyles[theme].muted}`}>Your personal best</span>
-      </div>
-    </div>
+          {/* Quizzes Content */}
+          <div className="flex-1">
+            <div className="mb-6">
+              <div className='flex gap-2 items-center'>
+                <span>
+                  <svg className={`w-7 h-7 ${
+                      theme === "dark" ? "text-white" : "text-blue-600"
+                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </span>
+                <h2 className={`text-xl font-bold text-blue-500`}>Available Quizzes</h2>
+              </div>
+            </div>
 
-    {/* Recent Performance */}
-    <div
-      className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-        theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-      }`}
-    >
-      <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-        Recent Score
-      </h3>
-      <div className="flex items-end mb-2">
-        <p
-          className={`text-3xl font-bold mr-2 ${
-            userStats.recentScore >= 80
-              ? 'text-green-500'
-              : userStats.recentScore >= 50
-              ? 'text-yellow-500'
-              : 'text-red-500'
-          }`}
-        >
-          {userStats.recentScore}
-        </p>
-        <span className={textStyles[theme].muted}>%</span>
-      </div>
-      <div>
-        <span className={`text-sm ${textStyles[theme].muted}`}>Latest attempt</span>
-      </div>
-    </div>
-  </div>
-</div>
-<div className={`p-6 rounded-xl shadow-sm border mb-10 ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
-          <h2 className={`text-xl font-semibold mb-4 ${textStyles[theme].primary}`}>Performance Trend</h2>
-          <div className="h-80">
-            <PerformanceChart chartData={chartData} theme={theme} />
+            {/* Organized Quizzes */}
+            <div className="space-y-4">
+              {Object.keys(organizedQuizzes).map((section) => (
+                <div
+                  key={section}
+                  className={`rounded-xl shadow-sm border overflow-hidden transition-all duration-200 ${
+                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  {/* Section Header */}
+                  <div
+                    className={`p-4 flex justify-between items-center cursor-pointer transition-all duration-200 ${
+                      theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                    }`}
+                    onClick={() => toggleSection(section)}
+                  >
+                    <div className="flex items-center">
+                      <h3 className={`text-base text-green-600 font-semibold `}>
+                        {section}
+                      </h3>
+                      <span
+                        className={`ml-2 text-xs px-2 py-1 rounded-full transition-all ${
+                          theme === 'dark' ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-700'
+                        }`}
+                      >
+                        {Object.values(organizedQuizzes[section]).reduce(
+                          (acc, levelQuizzes) => acc + levelQuizzes.length,
+                          0
+                        )}{' '}
+                        quizzes
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        className={`w-5 h-5 transition-transform duration-200 ${
+                          expandedSections[section] ? 'rotate-180' : ''
+                        } ${textStyles[theme].secondary}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Section Content - Initially Collapsed */}
+                  {expandedSections[section] && (
+                    <div className="divide-y divide-gray-200 animate-fadeIn">
+                      {(['Easy', 'Medium', 'Hard', 'Other'] as const).map((level) => {
+                        if (
+                          organizedQuizzes[section][level].length === 0 ||
+                          (difficultyFilter !== 'all' && difficultyFilter !== level.toLowerCase())
+                        )
+                          return null;
+
+                        return (
+                          <div key={`${section}-${level}`} className="p-4">
+                            <div className="flex items-center mb-3">
+                              <span
+                                className={`px-3 py-1 rounded-full text-sm font-medium mr-2 ${getLevelColor(
+                                  level
+                                )}`}
+                              >
+                                {level}
+                              </span>
+                              <span className={`text-sm ${textStyles[theme].muted}`}>
+                                {organizedQuizzes[section][level].length} quizzes
+                              </span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {organizedQuizzes[section][level].map((quiz) => (
+                                <div
+                                  key={quiz._id}
+                                  className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] ${
+                                    theme === 'dark'
+                                      ? 'border-gray-700 hover:bg-gray-700 hover:shadow-lg'
+                                      : 'border-gray-200 hover:bg-gray-50 hover:shadow-md'
+                                  }`}
+                                >
+                                  <div className="flex justify-between items-start mb-2">
+                                    <h4 className={`font-medium ${textStyles[theme].primary}`}>
+                                      {quiz.name}
+                                    </h4>
+                                    {getStatusBadge(quiz.active, quiz.endDate)}
+                                  </div>
+                                  <p className={`text-sm mb-3 ${textStyles[theme].secondary}`}>
+                                    {quiz.description}
+                                  </p>
+
+                                  <div className="flex justify-between items-center mb-3">
+                                    <div>
+                                      <span className={`text-xs ${textStyles[theme].muted}`}>
+                                        Participants:{' '}
+                                      </span>
+                                      
+                                      <span className={`text-xs ${textStyles[theme].muted}`}>
+                                        {quiz.totalRegistrations}
+                                      </span>
+                                    </div>
+                                    {quiz.userPlayed && (
+                                      <div className="flex items-center">
+                                        <div
+                                          className={`w-2 h-2 rounded-full mr-1 ${
+                                            quiz.userScore && quiz.maxScore
+                                              ? quiz.userScore / quiz.maxScore >= 0.7
+                                                ? 'bg-green-500'
+                                                : quiz.userScore / quiz.maxScore >= 0.4
+                                                ? 'bg-yellow-500'
+                                                : 'bg-red-500'
+                                              : 'bg-gray-500'
+                                          }`}
+                                        ></div>
+                                        <span className={`text-xs ${textStyles[theme].secondary}`}>
+                                          {quiz.userScore !== undefined && quiz.maxScore !== undefined
+                                            ? `${Math.round((quiz.userScore / quiz.maxScore) * 100)}%`
+                                            : 'Played'}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div className="flex justify-end">
+                                    {quiz.active ? (
+                                      <Link href={`/quiz-play/${quiz._id}`}>
+                                        <button
+                                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all hover:shadow-md ${
+                                            quiz.userPlayed
+                                              ? theme === 'dark'
+                                                ? 'bg-blue-800 text-blue-200 hover:bg-blue-700'
+                                                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                              : theme === 'dark'
+                                              ? 'bg-green-800 text-green-200 hover:bg-green-700'
+                                              : 'bg-green-100 text-green-800 hover:bg-green-200'
+                                          }`}
+                                        >
+                                          {quiz.userPlayed ? 'View Results' : 'Start Quiz'}
+                                        </button>
+                                      </Link>
+                                    ) : (
+                                      <button
+                                        className="px-3 py-1 rounded-lg text-sm font-medium cursor-not-allowed bg-gray-200 text-gray-500"
+                                        disabled
+                                      >
+                                        {new Date(quiz.startDate) > new Date()
+                                          ? 'Coming Soon'
+                                          : 'Quiz Ended'}
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-)
       </div>
     </div>
   );
