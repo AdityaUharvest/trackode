@@ -339,211 +339,7 @@ const QuizDashboard = () => {
     <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
       <div className="container mx-auto px-4 py-8">
         {/* Stats Section - Only show if completed quizzes > 0 */}
-        {userStats.completedQuizzes > 0 && (
-          <div className="mb-8">
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className={`flex w-full justify-between items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
-                theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
-              } transition-colors`}
-            >
-              <span className="font-medium">{showStats ? 'Hide Stats' : 'Show Stats'}</span>
-              <svg
-                className={`w-4 flex h-4 transition-transform ${showStats ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            {showStats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                {/* Completion Rate */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
-                    Completion
-                  </h3>
-                  <div className="relative h-40">
-                    <svg className="w-full h-full" viewBox="0 0 100 100">
-                      <circle
-                        className={theme === 'dark' ? 'text-gray-700' : 'text-gray-200'}
-                        strokeWidth="8"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="40"
-                        cx="50"
-                        cy="50"
-                      />
-                      <circle
-                        className="text-blue-500"
-                        strokeWidth="8"
-                        strokeDasharray={`${
-                          (userStats.completedQuizzes / userStats.totalQuizzes) * 251
-                        } 251`}
-                        strokeLinecap="round"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="40"
-                        cx="50"
-                        cy="50"
-                        transform="rotate(-90 50 50)"
-                      />
-                    </svg>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <span className={`text-2xl font-bold block ${textStyles[theme].primary}`}>
-                        {userStats.totalQuizzes > 0
-                          ? Math.round((userStats.completedQuizzes / userStats.totalQuizzes) * 100)
-                          : 0}
-                        %
-                      </span>
-                      <span className={`text-xs block ${textStyles[theme].muted}`}>
-                        {userStats.completedQuizzes > 0 ? userStats.completedQuizzes : 0} /{' '}
-                        {userStats.totalQuizzes}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Average Score */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Average Score
-                  </h3>
-                  <div className="flex items-end mb-2">
-                    <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                      {userStats.averageScore}
-                    </p>
-                    <span className={textStyles[theme].muted}>%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className={`text-sm mr-2 ${textStyles[theme].muted}`}>Trend:</span>
-                    {getTrendIcon(userStats.accuracyTrend)}
-                    <span
-                      className={`text-sm ml-1 capitalize ${
-                        userStats.accuracyTrend === 'up'
-                          ? 'text-green-500'
-                          : userStats.accuracyTrend === 'down'
-                          ? 'text-red-500'
-                          : textStyles[theme].secondary
-                      }`}
-                    >
-                      {userStats.accuracyTrend}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Achievement */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Achievement
-                  </h3>
-                  <div className="flex items-center">
-                    <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                      {getAchievementLevel()}
-                    </p>
-                    <span className="text-xl">✨</span>
-                  </div>
-                </div>
-
-                {/* Highest Score */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Highest Score
-                  </h3>
-                  <div className="flex items-end mb-2">
-                    <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                      {userStats.highestScore}
-                    </p>
-                    <span className={textStyles[theme].muted}>%</span>
-                  </div>
-                  <div>
-                    <span className={`text-sm ${textStyles[theme].muted}`}>Your personal best</span>
-                  </div>
-                </div>
-
-                {/* Recent Performance */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${
-                    theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Recent Score
-                  </h3>
-                  <div className="flex items-end mb-2">
-                    <p
-                      className={`text-3xl font-bold mr-2 ${
-                        userStats.recentScore >= 80
-                          ? 'text-green-500'
-                          : userStats.recentScore >= 50
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
-                      }`}
-                    >
-                      {userStats.recentScore}
-                    </p>
-                    <span className={textStyles[theme].muted}>%</span>
-                  </div>
-                  <div>
-                    <span className={`text-sm ${textStyles[theme].muted}`}>Latest attempt</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Performance Chart Section */}
-            <div className="mb-8">
-              <button
-                onClick={() => setShowPerformanceChart(!showPerformanceChart)}
-                className={`flex w-full justify-between  items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
-                  theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
-                } transition-colors`}
-              >{showPerformanceChart ? 'Hide Performance Chart' : 'Show Performance Chart'}
-                
-               
-                <svg
-                  className={`w-4 h-4 transition-transform ${showPerformanceChart ? 'rotate-180' : ''}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-                 
-                
-              </button>
-
-              {showPerformanceChart && (
-                <div className={`p-6 rounded-xl shadow-sm border ${
-                  theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'
-                }`}>
-                  <h2 className={`text-xl font-semibold mb-4 ${textStyles[theme].primary}`}>Performance Trend</h2>
-                  <div className="h-80">
-                    <PerformanceChart chartData={chartData} theme={theme} />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        
 
         {/* Quizzes Section */}
         <div className="flex flex-col lg:flex-row gap-6">
@@ -721,7 +517,7 @@ const QuizDashboard = () => {
 
                         return (
                           <div key={`${section}-${level}`} className="p-4">
-                            <div className="flex items-center mb-3">
+                            {/* <div className="flex items-center mb-3">
                               <span
                                 className={`px-3 py-1 rounded-full text-sm font-medium mr-2 ${getLevelColor(
                                   level
@@ -732,89 +528,97 @@ const QuizDashboard = () => {
                               <span className={`text-sm ${textStyles[theme].muted}`}>
                                 {organizedQuizzes[section][level].length} quizzes
                               </span>
-                            </div>
+                            </div> */}
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
                               {organizedQuizzes[section][level].map((quiz) => (
                                 <div
-                                  key={quiz._id}
-                                  className={`p-4 rounded-lg border transition-all duration-200 hover:scale-[1.02] ${
-                                    theme === 'dark'
-                                      ? 'border-gray-700 hover:bg-gray-700 hover:shadow-lg'
-                                      : 'border-gray-200 hover:bg-gray-50 hover:shadow-md'
-                                  }`}
-                                >
-                                  <div className="flex justify-between items-start mb-2">
-                                    <h4 className={`font-medium ${textStyles[theme].primary}`}>
-                                      {quiz.name}
-                                    </h4>
-                                    {getStatusBadge(quiz.active, quiz.endDate)}
-                                  </div>
-                                  <p className={`text-sm mb-3 ${textStyles[theme].secondary}`}>
-                                    {quiz.description}
-                                  </p>
-
-                                  <div className="flex justify-between items-center mb-3">
-                                    <div>
-                                      <span className={`text-xs ${textStyles[theme].muted}`}>
-                                        Participants:{' '}
+                                key={quiz._id}
+                                className={`p-5 border-s-4 border-green-500 rounded-lg shadow-md ${
+                                  theme === "dark" ? "bg-gray-700 hover:bg-gray-650" : "bg-gray-50 hover:bg-white"
+                                } transition-all duration-200 hover:shadow-lg`}
+                              >
+                                <h4 className={`font-semibold text-sm ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                                  {quiz.name}
+                                </h4>
+                                <p className='text-sm mt-2 font-sans font-medium text-green-600 dark:text-green-400'>
+                                  {quiz.userPlayed ? `Your Score: ${quiz.userScore}/${quiz.maxScore}` : ""}
+                                </p>
+                                <p className={`text-sm mt-2 leading-relaxed ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                                  {quiz.description}
+                                </p>
+                                  
+                                <div className="mt-4 flex justify-between items-center">
+                                  <span className={`text-xs flex items-center ${
+                                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                                  }`}>
+                                    <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                    </svg>
+                                    {quiz.totalRegistrations} players
+                                  </span>
+                                  
+                                  {quiz.userPlayed && (
+                                    <>
+                                      <span className={`text-xs font-semibold flex items-center ${
+                                        theme === "dark" ? "text-green-400" : "text-green-600"
+                                      }`}>
+                                        <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Completed
                                       </span>
                                       
-                                      <span className={`text-xs ${textStyles[theme].muted}`}>
-                                        {quiz.totalRegistrations}
-                                      </span>
-                                    </div>
-                                    {quiz.userPlayed && (
-                                      <div className="flex items-center">
-                                        <div
-                                          className={`w-2 h-2 rounded-full mr-1 ${
-                                            quiz.userScore && quiz.maxScore
-                                              ? quiz.userScore / quiz.maxScore >= 0.7
-                                                ? 'bg-green-500'
-                                                : quiz.userScore / quiz.maxScore >= 0.4
-                                                ? 'bg-yellow-500'
-                                                : 'bg-red-500'
-                                              : 'bg-gray-500'
-                                          }`}
-                                        ></div>
-                                        <span className={`text-xs ${textStyles[theme].secondary}`}>
-                                          {quiz.userScore !== undefined && quiz.maxScore !== undefined
-                                            ? `${Math.round((quiz.userScore / quiz.maxScore) * 100)}%`
-                                            : 'Played'}
-                                        </span>
+                                      <div className="flex gap-2">
+                                        <Link href={`/quiz-result/${quiz._id}`} className={`text-xs ${
+                                          theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"
+                                        }`}>
+                                          View Leaderboard
+                                        </Link>
                                       </div>
-                                    )}
-                                  </div>
-
-                                  <div className="flex justify-end">
-                                    {quiz.active ? (
-                                      <Link href={`/quiz-play/${quiz._id}`}>
-                                        <button
-                                          className={`px-3 py-1 rounded-lg text-sm font-medium transition-all hover:shadow-md ${
-                                            quiz.userPlayed
-                                              ? theme === 'dark'
-                                                ? 'bg-blue-800 text-blue-200 hover:bg-blue-700'
-                                                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                                              : theme === 'dark'
-                                              ? 'bg-green-800 text-green-200 hover:bg-green-700'
-                                              : 'bg-green-100 text-green-800 hover:bg-green-200'
-                                          }`}
-                                        >
-                                          {quiz.userPlayed ? 'View Results' : 'Start Quiz'}
-                                        </button>
-                                      </Link>
-                                    ) : (
-                                      <button
-                                        className="px-3 py-1 rounded-lg text-sm font-medium cursor-not-allowed bg-gray-200 text-gray-500"
-                                        disabled
-                                      >
-                                        {new Date(quiz.startDate) > new Date()
-                                          ? 'Coming Soon'
-                                          : 'Quiz Ended'}
-                                      </button>
-                                    )}
-                                  </div>
+                                      
+                                      
+                                    </>
+                                  )}
+                                  {quiz.userPlayed ? (
+                                    <Link
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-full ${
+                                      theme === "dark"
+                                        ? "bg-purple-600 hover:bg-purple-500 text-white"
+                                        : "bg-purple-600 hover:bg-purple-700 text-white"
+                                    } transition-colors shadow-sm hover:shadow flex items-center`}
+                                    href={`/dashboard/result/${quiz._id}`}
+                                  >
+                                    <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Result
+                                  </Link>
+                                  ):
+                                  (
+                                    <Link
+                                    href={`/quiz-play/${quiz._id}`}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-full ${
+                                      theme === "dark"
+                                        ? "bg-purple-600 hover:bg-purple-500 text-white"
+                                        : "bg-purple-600 hover:bg-purple-700 text-white"
+                                    } transition-colors shadow-sm hover:shadow flex items-center`}
+                                    onClick={() => {
+                                      
+                                    }}
+                                  >
+                                    <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    Start
+                                  </Link>
+                                  )}
+                                  
+                                  
                                 </div>
+                              </div>
                               ))}
                             </div>
                           </div>

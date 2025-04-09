@@ -14,6 +14,7 @@ import GradientText from "@/components/GradientText";
 import Head from "next/head";
 import { useRouter } from "next/navigation";
 import QuizJoinComponent from '@/components/JoinQuiz';
+import TechStackQuizSystem from '@/components/TechnologySection';
 const handleAnimationComplete = () => {
     console.log('All letters have animated!');
   };
@@ -616,55 +617,9 @@ loading='lazy'
 {/* Technologies Section with Animation */}
 <section className={`py-20 ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <div className="max-w-3xl mx-auto text-center mb-16">
-      <span className={`inline-block px-4 py-1 rounded-full text-sm font-semibold mb-4 ${theme === "dark" ? "bg-gray-700 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
-        Multiple Technologies
-      </span>
-      
-      <h2 id="tech-stack-heading" className={`text-2xl font-bold sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-        Technologies We Cover
-      </h2>
-      
-      <p className={`mt-4 text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-        Practice with quizzes and challenges in all major programming languages and frameworks
-      </p>
-    </div>
+   <TechStackQuizSystem/>
 
-    <div className="grid grid-cols-2 gap-4 sm:gap-6 mt-12 sm:grid-cols-3 lg:grid-cols-6">
-      {[
-        { name: 'JavaScript', color: 'yellow' },
-        { name: 'Python', color: 'blue' },
-        { name: 'Java', color: 'orange' },
-        { name: 'C++', color: 'indigo' },
-        { name: 'React', color: 'cyan' },
-        { name: 'Node.js', color: 'green' },
-        { name: 'TypeScript', color: 'blue' },
-        { name: 'SQL', color: 'orange' },
-        { name: 'HTML/CSS', color: 'red' },
-        { name: 'Git', color: 'orange' },
-        { name: 'Docker', color: 'blue' },
-        { name: 'AWS', color: 'yellow' }
-      ].map((tech) => (
-        <div 
-          key={tech.name}
-          className={`flex items-center justify-center p-5 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${
-            theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-white hover:bg-gray-50"
-          }`}
-          style={{
-            boxShadow: theme === "dark" ? "0 4px 20px -5px rgba(0, 0, 0, 0.3)" : "0 4px 20px -5px rgba(0, 0, 0, 0.1)"
-          }}
-        >
-          <div className="flex items-center space-x-2">
-            <span 
-              className={`inline-block w-3 h-3 rounded-full bg-${tech.color}-${theme === "dark" ? "500" : "400"}`}
-            ></span>
-            <span className={`font-medium ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-              {tech.name}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
+    
     <div className="flex mt-10 flex-col sm:flex-row items-center justify-center gap-4">
         <Link
           href="/quiz-list"

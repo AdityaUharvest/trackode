@@ -7,8 +7,13 @@ import QuizResultClient from './QuizResultClient'; // Client component
 export default async function QuizResultPage({ params }: any) {
   await connectDB();
   const { id } = params;
- 
-  const result = await Attempted.findById(id)
+  
+  const result = await Attempted.findOne(
+    {$or:[
+      { _id: id },
+      { quiz: id } // Assuming you want to find by quiz ID as well
+    ]}
+  )
     .populate('quiz', 'title')
     .populate('student', 'name');
    
