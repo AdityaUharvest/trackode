@@ -22,13 +22,7 @@ const quizSchema = new mongoose.Schema(
             type: Date,
             // required: true
         },
-        startTime:{
-            type: String,
-            
-        },
-        endTime:{
-            type:String,
-        },
+        
         totalMarks: {
             type: Number,
             required: true,

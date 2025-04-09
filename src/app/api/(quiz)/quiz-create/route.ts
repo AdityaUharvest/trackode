@@ -12,8 +12,7 @@ export async function POST(request: NextRequest) {
         instructions,
         startDate,
         endDate,
-        startTime,
-        endTime,
+        
         totalMarks,
         totalQuestions,
         shuffleOptions,
@@ -24,8 +23,7 @@ export async function POST(request: NextRequest) {
     } = await request.json();
     
     console.log(duration)
-    const start= `${startTime.hours}:${startTime.minutes}`
-    const end= `${endTime.hours}:${endTime.minutes}`
+    
     
     try {
         const foundUser = await User.findOne({email});
@@ -37,13 +35,11 @@ export async function POST(request: NextRequest) {
             }, { status: 404 });
         }
 
-
+        const shareCode= Math.random().toString(36).substring(2, 9).toUpperCase();
         const quiz = new Quiz({
             name,
             startDate,
             endDate,
-            startTime:start,
-            endTime:end,
             totalMarks,
             totalQuestions,
             shuffleOptions: shuffleOptions || false,
@@ -51,7 +47,7 @@ export async function POST(request: NextRequest) {
             active: false,
             instructions,
             public: publicc || false,
-            duration: duration || 0,
+            duration: duration/60 || 0,
             shareCode
         });
 

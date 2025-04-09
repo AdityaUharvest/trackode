@@ -12,47 +12,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { duration } from 'moment';
 
-const TimePicker = ({ value, onChange, label }: any) => {
-  const hours = [...Array(24).keys()];
-  const minutes = [...Array(60).keys()];
-  const { theme } = useTheme();
-  
-  return (
-    <div className="flex flex-col">
-      <label className={`text-sm font-medium mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-        {label}
-      </label>
-      <div className="flex gap-2">
-        <select
-          title="Hours"
-          className="w-full mt-1 py-2 rounded-lg bg-gray-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
-          value={value.hours}
-          onChange={(e) => onChange({ ...value, hours: e.target.value })}
-        >
-          {hours.map((hour) => (
-            <option key={hour} value={hour}>
-              {hour < 10 ? `0${hour}` : hour}
-            </option>
-          ))}
-        </select>
-        <span className="self-center">:</span>
-        <select
-          title="Minutes"
-          className="w-full mt-1 py-2 rounded-lg bg-gray-50 text-gray-900 focus:ring-2 focus:ring-blue-500"
-          value={value.minutes}
-          onChange={(e) => onChange({ ...value, minutes: e.target.value })}
-        >
-          {minutes.map((minute) => (
-            <option key={minute} value={minute}>
-              {minute < 10 ? `0${minute}` : minute}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
-};
+
 
 const QuizSetup = () => {
   const router = useRouter();
@@ -65,8 +27,7 @@ const QuizSetup = () => {
     name: '',
     startDate: '',
     endDate: '',
-    startTime: { hours: 10, minutes: 0 },
-    endTime: { hours: 12, minutes: 0 },
+    duration:25,
     totalMarks: '',
     totalQuestions: '',
     instructions: '',
@@ -83,7 +44,7 @@ const QuizSetup = () => {
         body: JSON.stringify({
           prompt: `Generate clear, concise instructions for a quiz with the following details:
             Quiz Name: ${formData.name}
-            Duration: ${formData.endTime.hours - formData.startTime.hours} hours
+            Duration: ${formData.duration} minutes
             Total Marks: ${formData.totalMarks}
             Total Questions: ${formData.totalQuestions}
             Format the instructions as a numbered list and include important points about timing, marking scheme, and submission requirements.`
@@ -119,7 +80,7 @@ const QuizSetup = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          duration: formData.endTime.hours - formData.startTime.hours,
+          duration: formData.duration,
           email: session?.user?.email
         })
       });
@@ -228,7 +189,7 @@ const QuizSetup = () => {
               <label className="block text-sm font-medium mb-1">Start Date *</label>
               <input
                 className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
-                type="date"
+                type="datetime-local"
                 value={formData.startDate}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                 required
@@ -238,25 +199,25 @@ const QuizSetup = () => {
               <label className="block text-sm font-medium mb-1">End Date *</label>
               <input
                 className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
-                type="date"
+                type="datetime-local"
                 value={formData.endDate}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                 required
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Duration *</label>
+              <input
+                className="w-full px-4 py-2 rounded-lg bg-gray-50 text-gray-900"
+                type="number"
+                placeholder='Enter in minutes'
+                value={formData.duration}
+                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                required
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <TimePicker
-              label="Start Time"
-              value={formData.startTime}
-              onChange={(newTime: any) => setFormData({ ...formData, startTime: newTime })}
-            />
-            <TimePicker
-              label="End Time"
-              value={formData.endTime}
-              onChange={(newTime: any) => setFormData({ ...formData, endTime: newTime })}
-            />
-          </div>
+          
         </div>
       )
     },
@@ -279,7 +240,7 @@ const QuizSetup = () => {
             <Card className={`p-4 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
               <h4 className="text-sm font-medium mb-2">Sample Format</h4>
               <div className="text-sm space-y-2">
-                <p>1. Time limit: {formData.endTime.hours - formData.startTime.hours} Hours</p>
+                <p>1. Time limit: {formData.duration} Hours</p>
                 <p>2. Total marks: {formData.totalMarks}</p>
                 <p>3. All questions are mandatory</p>
                 <p>4. No negative marking</p>

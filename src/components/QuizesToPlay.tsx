@@ -343,13 +343,13 @@ const QuizDashboard = () => {
           <div className="mb-8">
             <button
               onClick={() => setShowStats(!showStats)}
-              className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
+              className={`flex w-full justify-between items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
                 theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
               } transition-colors`}
             >
               <span className="font-medium">{showStats ? 'Hide Stats' : 'Show Stats'}</span>
               <svg
-                className={`w-4 h-4 transition-transform ${showStats ? 'rotate-180' : ''}`}
+                className={`w-4 flex h-4 transition-transform ${showStats ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -513,13 +513,12 @@ const QuizDashboard = () => {
             <div className="mb-8">
               <button
                 onClick={() => setShowPerformanceChart(!showPerformanceChart)}
-                className={`flex items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
+                className={`flex w-full justify-between  items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
                   theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
                 } transition-colors`}
-              >
-                <span className="font-medium">
-                  {showPerformanceChart ? 'Hide Performance Chart' : 'Show Performance Chart'}
-                </span>
+              >{showPerformanceChart ? 'Hide Performance Chart' : 'Show Performance Chart'}
+                
+               
                 <svg
                   className={`w-4 h-4 transition-transform ${showPerformanceChart ? 'rotate-180' : ''}`}
                   fill="none"
@@ -528,6 +527,8 @@ const QuizDashboard = () => {
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
+                 
+                
               </button>
 
               {showPerformanceChart && (
@@ -674,7 +675,7 @@ const QuizDashboard = () => {
                     onClick={() => toggleSection(section)}
                   >
                     <div className="flex items-center">
-                      <h3 className={`text-base text-green-600 font-semibold `}>
+                      <h3 className={`text-base text-blue-600 font-semibold `}>
                         {section}
                       </h3>
                       <span
