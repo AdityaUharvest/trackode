@@ -39,11 +39,17 @@ type UserStats = {
   sectionPerformance: { section: string; accuracy: number }[];
   recentActivity: { date: Date; count: number }[];
 };
-
+const DASHBOARD_TAB_KEY = 'overview-active-tab';
 export default function MockTestDashboard() {
   const { theme } = useTheme(); // Get current theme
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<'overview' | 'mocks' | 'results' | 'stats'>('overview');
+  const [activeTab, setActiveTab] = useState(() => {
+      // Initialize from localStorage if available
+      if (typeof window !== 'undefined') {
+        return localStorage.getItem(DASHBOARD_TAB_KEY) || 'overview';
+      }
+      return 'overview';
+    });
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -58,7 +64,11 @@ export default function MockTestDashboard() {
   const secondaryText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
   const tableHeaderBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50';
   const tableRowHover = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
-
+  useEffect(() => {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(DASHBOARD_TAB_KEY, activeTab);
+      }
+    }, [activeTab]);
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -98,13 +108,7 @@ export default function MockTestDashboard() {
   
   return (
     <>
-      <Head>
-        <title>TCS NQT Dashboard</title>
-        <meta name="description" content="TCS NQT Dashboard" />
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="robots" content="index, follow" />
-      </Head>
+      
       <main>
     <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
@@ -184,6 +188,7 @@ export default function MockTestDashboard() {
             <MockTestsTab 
               mocks={mockTests} 
               cardBg={cardBg}
+              setMocks={setMockTests}
               borderColor={borderColor}
               textColor={textColor}
               secondaryText={secondaryText}
@@ -300,10 +305,11 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
   );
 }
 
-function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover }: 
-  { mocks: MockTest[]; cardBg: string; borderColor: string; textColor: string; 
+function MockTestsTab({ mocks, setMocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover }: 
+  { mocks: MockTest[]; setMocks: React.Dispatch<React.SetStateAction<MockTest[]>>; cardBg: string; borderColor: string; textColor: string; 
     secondaryText: string; tableHeaderBg: string; tableRowHover: string }) {
-  const handlePublish = async (mockId: string, isPublished: boolean) => {
+    
+      const handlePublish = async (mockId: string, isPublished: boolean) => {
         try {
           const response = await fetch(`/api/mock-tests/${mockId}/publish`, {
             method: 'POST',
@@ -311,16 +317,25 @@ function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, ta
             body: JSON.stringify({ isPublished: !isPublished })
           });
           const data = await response.json();
-          console.log('Publish response:', data);
-          localStorage.setItem('shareLink', data.shareLink);
           
-
-          // Optionally, you can update the state or refetch data here
-          // For example, if you want to update the mockTests state:
-          window.location.reload(); // Reload the page to reflect changes
-          // Update the mockTests state or refetch data if needed
+          if (response.ok) {
+            // Update the local state to reflect the change
+            setMocks(prevMocks => 
+              prevMocks.map(mock => 
+                mock._id === mockId 
+                  ? { ...mock, isPublished: !isPublished } // Toggle the isPublished status
+                  : mock
+              )
+            );
+            
+            localStorage.setItem('shareLink', data.shareLink);
+            toast.success(`Mock test ${!isPublished ? 'published' : 'unpublished'} successfully!`);
+          } else {
+            throw new Error(data.message || 'Failed to update publish status');
+          }
         } catch (error) {
           console.error('Error publishing mock test:', error);
+          toast.error('Failed to update publish status');
         }
       };
   return (

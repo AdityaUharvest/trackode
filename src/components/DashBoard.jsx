@@ -1,23 +1,29 @@
 'use client';
 import { useTheme } from '@/components/ThemeContext';
 import Quizes from './Quizes';
-import Contests from './Contests';
 import ProfileLeftCard from './ProfileLeftCard';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import SkeletonLoader from "@/components/skeleton/Skeleton";
 import MockDashboard from './Mock';
 import { Loader2 } from 'lucide-react';
+
+// Key for localStorage
+const DASHBOARD_TAB_KEY = 'dashboard-active-tab';
 
 export default function DashBoard() {
   const [quizes, setQuizes] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(DASHBOARD_TAB_KEY) || 'dashboard';
+    }
+    return 'dashboard';
+  });
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-
   const { theme, toggleTheme } = useTheme();
 
   // Calculate stats
@@ -47,20 +53,29 @@ export default function DashBoard() {
 
   const fetchQuiz = async () => {
     try {
+      setLoading(true);
       const response = await axios.get('/api/quiz-get');
       setQuizes(response.data.quizzes);
       setParticipants(response.data.participants);
       setRecent(response.data.recentParticipants);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
       setLoading(false);
     }
   }
 
+  // Memoize the fetchQuiz function to prevent unnecessary recreations
   useEffect(() => {
     fetchQuiz();
-  }, []);
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  // Save active tab to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(DASHBOARD_TAB_KEY, activeTab);
+    }
+  }, [activeTab]);
 
   const StatCard = ({ title, value, trend, theme }) => (
     <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow`}>
@@ -90,12 +105,11 @@ export default function DashBoard() {
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className={`p-2 text-xm mb-2 rounded-md ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} w-full text-left`}
         >
-          {sidebarCollapsed ? '☰' : '◄ Collapse'}
+          {sidebarCollapsed ? '☰' : '◄ Minimize'}
         </button>
         
         <nav>
           <ul className="space-y-1">
-          
             <li>
               <button 
                 onClick={() => setActiveTab('dashboard')}
@@ -147,7 +161,6 @@ export default function DashBoard() {
                 )}
               </button>
             </li>
-            
             <li>
               <button 
                 onClick={() => setActiveTab('analytics')}
@@ -290,17 +303,17 @@ export default function DashBoard() {
           </div>
         )}
 
-{activeTab === 'contests' && (
-  <div className="overflow-auto w-full">
-    {loading ? (
-      <div className="flex justify-center items-center h-64">
-        <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
-      </div>
-    ) : (
-      <MockDashboard />
-    )}
-  </div>
-)}
+        {activeTab === 'contests' && (
+          <div className="overflow-auto w-full">
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
+              </div>
+            ) : (
+              <MockDashboard />
+            )}
+          </div>
+        )}
 
         {activeTab === 'analytics' && (
           <div>
@@ -367,11 +380,6 @@ export default function DashBoard() {
           </div>
         )}
       </div>
-
-      {/* Profile Card on side for desktop */}
-      {/* <div className={`hidden md:block ${sidebarCollapsed ? 'w-16' : 'w-56'} p-2 transition-all duration-200`}>
-        <ProfileLeftCard compact={sidebarCollapsed} />
-      </div> */}
     </div>
   );
 }

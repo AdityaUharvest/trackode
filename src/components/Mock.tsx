@@ -38,11 +38,17 @@ type UserStats = {
   sectionPerformance: { section: string; accuracy: number }[];
   recentActivity: { date: Date; count: number }[];
 };
-
+const DASHBOARD_TAB_KEY = 'overview-active-tab';
 export default function Dashboard() {
   const { theme } = useTheme();
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState<'overview' | 'mocks' | 'results' | 'stats'>('overview');
+  const [activeTab, setActiveTab] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(DASHBOARD_TAB_KEY) || 'overview';
+    }
+    return 'overview';
+  });
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
@@ -68,7 +74,11 @@ export default function Dashboard() {
   const secondaryText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
   const tableHeaderBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50';
   const tableRowHover = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
-
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(DASHBOARD_TAB_KEY, activeTab);
+    }
+  }, [activeTab]);
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -99,7 +109,7 @@ export default function Dashboard() {
     if (session) {
       fetchData();
     }
-  }, [session]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -108,7 +118,7 @@ export default function Dashboard() {
       </div>
     );
   }
-
+  
   return (
     <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
@@ -162,7 +172,8 @@ export default function Dashboard() {
           )}
           {activeTab === 'mocks' && (
             <MockTestsTab 
-              mocks={mockTests} 
+              mocks={mockTests}
+              setMocks={setMockTests} 
               cardBg={cardBg}
               borderColor={borderColor}
               textColor={textColor}
@@ -284,25 +295,39 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText, 
   );
 }
 
-function MockTestsTab({ mocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover, isMobile }: 
-  { mocks: MockTest[]; cardBg: string; borderColor: string; textColor: string; 
+function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover, isMobile }: 
+  { mocks: MockTest[];setMocks: React.Dispatch<React.SetStateAction<MockTest[]>>; cardBg: string; borderColor: string; textColor: string; 
     secondaryText: string; tableHeaderBg: string; tableRowHover: string; isMobile: boolean }) {
   
-  const handlePublish = async (mockId: string, isPublished: boolean) => {
-    try {
-      const response = await fetch(`/api/mock-tests/${mockId}/publish`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isPublished: !isPublished })
-      });
-      const data = await response.json();
-      localStorage.setItem('shareLink', data.shareLink);
-      window.location.reload();
-    } catch (error) {
-      console.error('Error publishing mock test:', error);
-      toast.error('Failed to update publication status');
-    }
-  };
+      const handlePublish = async (mockId: string, isPublished: boolean) => {
+        try {
+          const response = await fetch(`/api/mock-tests/${mockId}/publish`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ isPublished: !isPublished })
+          });
+          const data = await response.json();
+          
+          if (response.ok) {
+            // Update the local state to reflect the change
+            setMocks(prevMocks => 
+              prevMocks.map(mock => 
+                mock._id === mockId 
+                  ? { ...mock, isPublished: !isPublished } // Toggle the isPublished status
+                  : mock
+              )
+            );
+            
+            localStorage.setItem('shareLink', data.shareLink);
+            toast.success(`Mock test ${!isPublished ? 'published' : 'unpublished'} successfully!`);
+          } else {
+            throw new Error(data.message || 'Failed to update publish status');
+          }
+        } catch (error) {
+          console.error('Error publishing mock test:', error);
+          toast.error( 'Failed to update publish status');
+        }
+      };
    const { theme } = useTheme();
   return (
     <div>

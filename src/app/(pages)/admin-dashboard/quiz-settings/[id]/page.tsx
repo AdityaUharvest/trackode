@@ -105,54 +105,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   };
   
   // Publish quiz
-  const handlePublishQuiz = async () => {
-    
-    try {
-      setIsPublishing(true);
-      const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`,{updatedQuiz: { ...updatedQuiz, active:true}});
-      if (response.data.success) {
-        setIsPublished(true);
-        setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
-        
-        toast.success("Quiz published successfully!",{
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-        });
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to publish quiz");
-    } finally {
-      setIsPublishing(false);
-    }
-  };
-  const handleUnPublishQuiz = async () => {
-    
-    try {
-      setIsPublishing(true);
-      const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`,{updatedQuiz: { ...updatedQuiz, active:false}});
-      if (response.data.success) {
-        setIsPublished(false);
-        setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
-        
-        toast.info("Quiz Unpublished successfully!");
-      } else {
-        toast.error(response.data.message);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to publish quiz");
-    } finally {
-      setIsPublishing(false);
-    }
-  };
+  
   const handleDeleteQuiz = async () => {
    
     try {
@@ -257,34 +210,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {/* Quiz Status */}
-              <div className="flex items-center gap-4">
-                {isPublished && (
-                  <Button onClick={handleUnPublishQuiz} disabled={isPublishing} className="bg-red-600 text-white hover:bg-red-700">
-                    {isPublishing ? (
-                      <>
-                        <Loader2 className="animate-spin mr-2" />
-                        Unpublishing...
-                      </>
-                    ) : (
-                      "Unpublish Quiz"
-                    )}
-                  </Button>
-                )}
+              <div className="flex justify-between items-center mb-4">
                 
-                {!isPublished && (
-                  <Button onClick={handlePublishQuiz} disabled={isPublishing} className="bg-blue-600 text-white hover:bg-blue-700">
-                  
-                    {isPublishing ? (
-                      <>
-                        <Loader2 className="animate-spin mr-2" />
-                        Publishing...
-                      </>
-                    ) : (
-                      "Publish Quiz"
-                    )}
-                  </Button>
-                )}
+                
                 {!isPublished && (
                   <Button onClick={
                     ()=>{

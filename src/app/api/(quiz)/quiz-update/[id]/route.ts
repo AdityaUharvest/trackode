@@ -18,7 +18,7 @@ export async function PUT(req: NextRequest, { params }: any) {
                 startDate: updatedQuiz.startDate,
                 endDate: updatedQuiz.endDate,
                 suffleOptions: updatedQuiz.suffleOptions,
-                active: updatedQuiz.active,
+                active: !updatedQuiz.active,
 
 
             }

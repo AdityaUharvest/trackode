@@ -21,7 +21,15 @@ import {
   BarChart2,
   Send,
   FileQuestion,
-  ChevronDown
+  ChevronDown,
+   
+ 
+  Share2, 
+   
+  Globe,
+  Pencil,
+  Download,
+  Copy
 } from "lucide-react";
 
 // UI Components
@@ -60,6 +68,7 @@ interface Quiz {
   createdAt: string;
   public?: boolean;
   randomize?: boolean;
+  isPublished?: boolean;
 }
 
 interface Question {
@@ -564,20 +573,83 @@ const RunningQuizes: React.FC = () => {
       toast.error("Failed to delete question");
     }
   };
-
+  // adding publish and delete and share quiz functionality
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
+  const [shareLink, setShareLink] = useState("");
+  const handlePublishQuiz = async (quizId:any, active:any) => {
+    
+    try {
+      setIsPublishing(true);
+      const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`,{updatedQuiz:{active, quizId}});
+      if (response.data.success) {
+        setQuizes(prevQuizes => 
+          prevQuizes.map(quiz => 
+            quiz._id === quizId 
+              ? { ...quiz, active: !quiz.active } // Toggle the active status
+              : quiz
+          )
+        );
+        setIsPublished(true);
+        setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
+        
+        toast.success("Quiz published successfully!",{
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        });
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to publish quiz");
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+  
+  const handleDeleteQuiz = async (quizId:any) => {
+   
+    try {
+      const response = await axios.delete(`${API_BASE_URL}/quiz-update/${quizId}`);
+      if (response.data.success) {
+        
+        toast.success("Quiz Deleted successfully!",{
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: false,
+          progress: undefined,
+        });
+        setQuizes((prevQuizes) => prevQuizes.filter((quiz) => quiz._id !== quizId));
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to Delete quiz");
+    } 
+  };
+  const handleShareQuiz = async (quizId:any) => {
+    
+        // Copy the share link to clipboard
+        const shareLink = `${window.location.origin}/quiz-play/${quizId}`;
+        await navigator.clipboard.writeText(shareLink);
+        setShareLink(shareLink);
+        toast.success("Quiz link copied to clipboard!");
+     
+  };
   return (
     <Card className={`w-full mx-auto ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-black"}`}>
       <TooltipProvider> 
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-sm">Running Quizzes</CardTitle>
-              <CardDescription className={theme === "dark" ? "text-gray-300" : "text-gray-600"}>
-                Manage your active quizzes
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
+        
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8">
@@ -588,29 +660,125 @@ const RunningQuizes: React.FC = () => {
               No quizzes available. Create one to get started!
             </div>
           ) : (
-            <Accordion type="single" collapsible className="w-full">
+            <Accordion type="single" className="p-1  overflow-auto w-full rounded-lg" collapsible >
               {quizes.map((quiz, index) => (
-                <AccordionItem key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="hover:no-underline">
-                    <div className="flex items-center justify-between w-full pr-4">
-                      <div className="flex items-center gap-4">
-                        <span className="text-sm font-medium">{quiz.name}</span>
+                
+                  <AccordionItem className="border-2  border-blue-400 mb-4 mt-2 p-1 rounded-lg "
+                  key={index} value={`item-${index}`}>
+                  <AccordionTrigger className="  hover:no-underline">
+                    <div className=" p-2  w-full pr-4">
+                      <div className="flex mb-3 items-center justify-between gap-4">
+                        <span className="text-sm font-semibold">{quiz.name}</span>
                         <Badge
                           variant={quiz.active ? "outline" : "destructive"}
                           className={quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700 text-white" : "bg-green-600 text-white hover:bg-green-700") : ""}
                         >
                           {quiz.active ? "Active" : "Inactive"}
                         </Badge>
-                        <span className="text-xs text-gray-500">
+                        
+                      </div>
+
+                      {/* quiz action button starts here */}
+                      <div className="flex mb-2 items-center justify-between">
+                      <span className="text-xs text-gray-500">
                           {quiz.questions?.length || 0} questions
                         </span>
+                        <span className="text-xs text-gray-500">Created on {new Date(quiz.createdAt).toLocaleDateString()}</span>
+                      
                       </div>
+                      
+                    {/* quiz action button ends here */}
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
                     
-                    {/* Bulk Question Generation */}
-                    <div className="mb-6 p-4 rounded-lg bg-opacity-50" style={{ backgroundColor: theme === "dark" ? "rgba(59, 130, 246, 0.1)" : "rgba(59, 130, 246, 0.05)" }}>
+                    <Tabs defaultValue="info" className="w-full">
+                      <TabsList className={`grid w-full grid-cols-2 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+                        <TabsTrigger value="info">Quiz Settings</TabsTrigger>
+                        <TabsTrigger value="questions">Questions ({quiz.questions?.length || 0})</TabsTrigger>
+                        
+                      </TabsList>
+                      <TabsContent value="info">
+    <div className="p-4 space-y-6">
+      {/* Quiz action buttons in a grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        <Button 
+          onClick={() => handleAddQuestion(index, quiz._id)}
+          className={`${theme === "dark" ? "bg-blue-700 hover:bg-blue-800" : "bg-blue-600 hover:bg-blue-700"} text-white`}
+        >
+          <Plus size={16} className="mr-2" />
+          Add Question
+        </Button>
+        
+        <Button 
+          asChild
+          variant="outline"
+          className={`${theme === "dark" ? "border-blue-700 text-blue-400" : "border-blue-600 text-blue-700"}`}
+        >
+          <Link href={`quiz-result/${quiz._id}`}>
+            <BarChart2 size={16} className="mr-2" />
+            View Results
+          </Link>
+        </Button>
+        
+        <Button 
+          onClick={() => handlePublishQuiz(quiz._id, quiz.active)}
+          className={`${theme === "dark" ? "bg-green-700 hover:bg-green-800" : "bg-green-600 hover:bg-green-700"} text-white`}
+        >
+          <Globe size={16} className="mr-2" />
+         {!quiz.active? 'Publish Quiz' : 'Unpublish Quiz'} 
+        </Button>
+        
+        <Button 
+          asChild
+          variant="outline"
+          className={`${theme === "dark" ? "border-gray-700 text-gray-400" : "border-gray-300 text-gray-700"}`}
+        >
+          <Link href={`admin-dashboard/quiz-settings/${quiz._id}`}>
+            <Pencil size={16} className="mr-2" />
+            Edit Settings
+          </Link>
+        </Button>
+        
+        <Button 
+          onClick={() => handleShareQuiz(quiz._id)}
+          variant="outline"
+          className={`${theme === "dark" ? "border-purple-700 text-purple-400" : "border-purple-600 text-purple-700"}`}
+        >
+          <Share2 size={16} className="mr-2" />
+          Share Quiz
+        </Button>
+        
+        <Button 
+          onClick={() => handleDeleteQuiz(quiz._id)}
+          variant="outline"
+          className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+        >
+          <Trash2 size={16} className="mr-2" />
+          Delete Quiz
+        </Button>
+      </div>
+      
+      
+      {/* Copy link section */}
+      <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
+        <h3 className="font-medium mb-3">Share Quiz</h3>
+        <div className="flex gap-2">
+          <Input 
+            value={`https://trackode.in/quiz-play/${quiz._id}`} 
+            readOnly 
+            className="flex-1 bg-opacity-50"
+          />
+          <Button variant="outline" onClick={() => handleShareQuiz(quiz._id)} >
+            <Copy size={16} className="mr-2" /> Copy
+          </Button>
+        </div>
+      </div>
+    </div>
+  </TabsContent>
+                      
+                      <TabsContent value="questions">
+                      <div className="mb-6 p-4 rounded-lg bg-opacity-50" style={{ backgroundColor: theme === "dark" ? "rgba(59, 130, 246, 0.1)" : "rgba(59, 130, 246, 0.05)" }}>
                       <h4 className="font-medium mb-3">Bulk Generate Questions</h4>
                       <div className="flex items-center gap-4">
                         <Input
@@ -638,38 +806,6 @@ const RunningQuizes: React.FC = () => {
                         </Button>
                       </div>
                     </div>
-                    
-
-
-
-                    {/* Questions Tab View */}
-                    <Tabs defaultValue="questions" className="w-full">
-                      <TabsList className={`grid w-full grid-cols-3 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
-                        <TabsTrigger value="info">Quiz Info</TabsTrigger>
-                        <TabsTrigger value="questions">Questions ({quiz.questions?.length || 0})</TabsTrigger>
-                        <TabsTrigger value="settings">Advanced</TabsTrigger>
-                      </TabsList>
-                      
-                      <TabsContent value="info">
-                        <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: theme === "dark" ? "rgba(17, 24, 39, 0.5)" : "rgba(243, 244, 246, 0.5)" }}>
-                          <h4 className="font-medium mb-2">Quiz Information</h4>
-                          <p className="text-sm text-gray-500 mb-3">Manage your quiz details</p>
-                          <div className="space-y-2">
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">Status:</span>
-                              <Badge variant={quiz.active ? "default" : "destructive"}>
-                                {quiz.active ? "Active" : "Inactive"}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium">Created:</span>
-                              <span>{new Date(quiz.createdAt).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </TabsContent>
-                      
-                      <TabsContent value="questions">
                         {quiz.questions && quiz.questions.length > 0 ? (
                           <div className="mt-4 space-y-4">
                             {quiz.questions.map((q, qIndex) => (
@@ -765,66 +901,10 @@ const RunningQuizes: React.FC = () => {
                         )}
                       </TabsContent>
                       
-                      <TabsContent value="settings">
-                        <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: theme === "dark" ? "rgba(17, 24, 39, 0.5)" : "rgba(243, 244, 246, 0.5)" }}>
-                          <h4 className="font-medium mb-2">Advanced Settings</h4>
-                          <p className="text-sm text-gray-500 mb-3">Configure additional quiz options</p>
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <Label htmlFor="quiz-visibility">Quiz Visibility</Label>
-                              <Switch id="quiz-visibility" checked={quiz.public} />
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <Label htmlFor="randomize-questions">Randomize Questions</Label>
-                              <Switch id="randomize-questions" checked={quiz.randomize} />
-                              <p><Link href="/contact">Contact admin</Link></p>
-                            </div>
-                          </div>
-                        </div>
-                      </TabsContent>
+                      
                     </Tabs>
                     {/* Action Dropdown */}
-                    <div className="mb-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={`${theme === "dark" ? "bg-gray-800 hover:bg-gray-700" : "bg-white hover:bg-gray-50"} flex items-center gap-2`}
-                          >
-                            <Settings size={16} />
-                            <span>Quiz Actions</span>
-                            <ChevronDown size={16} />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className={`${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white"}`}>
-                          <DropdownMenuItem 
-                            onClick={() => handleAddQuestion(index, quiz._id)}
-                            className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} cursor-pointer`}
-                          >
-                            <Plus size={16} className="mr-2" />
-                            Add Question
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} cursor-pointer`}
-                            asChild
-                          >
-                            <Link href={`quiz-result/${quiz._id}`}>
-                              <BarChart2 size={16} className="mr-2" />
-                              View Results
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className={`${theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-100"} cursor-pointer`}
-                            asChild
-                          >
-                            <Link href={`admin-dashboard/quiz-settings/${quiz._id}`}>
-                              <Send size={16} className="mr-2" />
-                              Publish Settings
-                            </Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
+                    
                     {/* Question Form - Rendered outside Tabs */}
                     {activeQuizIndex === index && !editingQuestionId && (
                       <QuestionForm
@@ -837,6 +917,8 @@ const RunningQuizes: React.FC = () => {
                     )}
                   </AccordionContent>
                 </AccordionItem>
+               
+                
               ))}
             </Accordion>
           )}
