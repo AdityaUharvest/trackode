@@ -7,9 +7,10 @@ import { SubmitConfirmationModal } from '@/components/(tcs)/SubmitConfirmationMo
 import { QuizResultModal } from '@/components/(tcs)/QuizResultModal';
 import { SectionProgress } from '@/components/(tcs)/SectionProgress';
 import { QuestionTimer } from '@/components/(tcs)/QuestionTimer';
-import { Loader2, Calculator, Minimize2, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, Calculator, Minimize2, Maximize2, ChevronLeft, ChevronRight, Lock, AlertTriangle } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { FeedbackForm } from '@/components/(tcs)/FeedbackForm';
+import {toast} from 'react-toastify'
 
 interface Question {
   _id: string;
@@ -25,6 +26,8 @@ interface Section {
   label: string;
   timeLimit?: number;
   questionCount: number;
+  submitted: boolean;
+  unlocked: boolean;
 }
 
 export default function QuizPlayer() {
@@ -52,9 +55,9 @@ export default function QuizPlayer() {
   const [calcInput, setCalcInput] = useState('');
   const [hasAttemptedQuestions, setHasAttemptedQuestions] = useState(false);
   const [hasAttempted, setHasAttempted] = useState<boolean>(false);
-  //checking if the quiz is published or not
   const [isPublished, setIsPublished] = useState<boolean>(false);
-  
+  const [showSectionWarning, setShowSectionWarning] = useState(false);
+
   // Initialize sections and load saved answers
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -64,21 +67,62 @@ export default function QuizPlayer() {
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         setIsPublished(response.data.quiz.isPublished);
-        // check user attempted or not  
-        const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
         
+        const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
         if (attempted.data) {
           setHasAttempted(attempted.data);
         }
-        console.log(hasAttempted)
+
         // Create sections with question counts
         const sectionData = [
-          { name: 'verbal-ability', label: 'Verbal Ability', timeLimit: 25 * 60, questionCount: 0 },
-          { name: 'reasoning-ability', label: 'Reasoning Ability', timeLimit: 35 * 60, questionCount: 0 },
-          { name: 'numerical-ability', label: 'Numerical Ability', timeLimit: 40 * 60, questionCount: 0 },
-          { name: 'advanced-quantitative', label: 'Advanced Quantitative', questionCount: 0 },
-          { name: 'advanced-reasoning', label: 'Advanced Reasoning', questionCount: 0 },
-          { name: 'advanced-coding', label: 'Advanced Coding', questionCount: 0 }
+          { 
+            name: 'verbal-ability', 
+            label: 'Verbal Ability', 
+            timeLimit: 20 * 60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'reasoning-ability', 
+            label: 'Reasoning Ability', 
+            timeLimit: 20 * 60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'numerical-ability', 
+            label: 'Numerical Ability', 
+            timeLimit: 30 * 60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'advanced-quantitative', 
+            label: 'Advanced Quantitative', 
+            timeLimit: 30*60,  
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'advanced-reasoning', 
+            label: 'Advanced Reasoning', 
+            timeLimit: 30*60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'advanced-coding', 
+            label: 'Advanced Coding', 
+            timeLimit: 30*60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          }
         ];
 
         // Calculate question counts per section
@@ -87,18 +131,42 @@ export default function QuizPlayer() {
           if (section) section.questionCount++;
         });
 
-        setSections(sectionData.filter(s => s.questionCount > 0));
-        setCurrentSection(sectionData[0].name);
+        const filteredSections = sectionData.filter(s => s.questionCount > 0);
+        
+        // Unlock first section
+        if (filteredSections.length > 0) {
+          filteredSections[0].unlocked = true;
+        }
 
-        // Load saved answers
+        // Load saved state
         const savedAnswers = localStorage.getItem(`quiz_${shareCode}_answers`);
         if (savedAnswers) {
           const parsed = JSON.parse(savedAnswers);
           setAnswers(parsed.answers || {});
           setSectionAnswers(parsed.sectionAnswers || {});
           setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
+
+          // Update sections with saved state
+          if (parsed.sectionsState) {
+            filteredSections.forEach(section => {
+              const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
+              if (savedSection) {
+                section.submitted = savedSection.submitted;
+                section.unlocked = savedSection.unlocked;
+              }
+            });
+          }
+
+          // Find first unsubmitted section
+          const firstUnsubmitted = filteredSections.find(s => !s.submitted);
+          if (firstUnsubmitted) {
+            setCurrentSection(firstUnsubmitted.name);
+          }
+        } else {
+          setCurrentSection(filteredSections[0]?.name || '');
         }
 
+        setSections(filteredSections);
         setIsLoading(false);
       } catch (err) {
         setError('Failed to load quiz. Please check the link and try again.');
@@ -109,25 +177,28 @@ export default function QuizPlayer() {
     fetchQuizData();
   }, [shareCode]);
 
-  
-  
-  // Save answers to localStorage
+  // Save answers and section state to localStorage
   useEffect(() => {
-    if (quizStarted && (Object.keys(answers).length > 0 || Object.keys(sectionAnswers).length > 0)) {
+    if (quizStarted && sections.length > 0) {
       localStorage.setItem(`quiz_${shareCode}_answers`, JSON.stringify({
         answers,
-        sectionAnswers
+        sectionAnswers,
+        sectionsState: sections.map(s => ({
+          name: s.name,
+          submitted: s.submitted,
+          unlocked: s.unlocked
+        }))
       }));
-      setHasAttemptedQuestions(true);
+      setHasAttemptedQuestions(Object.keys(answers).length > 0);
     }
-  }, [answers, sectionAnswers, shareCode, quizStarted]);
+  }, [answers, sectionAnswers, sections, shareCode, quizStarted]);
 
   // Section timer logic
   useEffect(() => {
     if (!quizStarted || !currentSection) return;
     
     const section = sections.find(s => s.name === currentSection);
-    if (!section?.timeLimit) return;
+    if (!section?.timeLimit || section.submitted) return;
     
     setSectionTimeRemaining(section.timeLimit);
     
@@ -145,11 +216,24 @@ export default function QuizPlayer() {
     return () => clearInterval(timer);
   }, [currentSection, quizStarted, sections]);
 
+  // Fullscreen change handler
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   const startQuiz = () => {
     setQuizStarted(true);
   };
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
+    const currentSectionObj = sections.find(s => s.name === currentSection);
+    if (currentSectionObj?.submitted) return;
+
     setAnswers(prev => ({
       ...prev,
       [questionId]: optionIndex
@@ -165,14 +249,23 @@ export default function QuizPlayer() {
   };
 
   const changeSection = (sectionName: string) => {
-    if (sections.findIndex(s => s.name === sectionName) < sections.findIndex(s => s.name === currentSection)) {
-      return; // Prevent going back to previous sections
+    const targetSection = sections.find(s => s.name === sectionName);
+    if (!targetSection?.unlocked || targetSection.submitted) {
+      toast.warning('You cannot access this section yet', {
+        description: 'Complete the current section first to unlock the next one',
+        icon: <Lock size={16} />
+      });
+      return;
     }
+
     setCurrentSection(sectionName);
     setCurrentQuestionIndex(0);
   };
 
   const goToQuestion = (index: number) => {
+    const currentSectionObj = sections.find(s => s.name === currentSection);
+    if (currentSectionObj?.submitted) return;
+
     setCurrentQuestionIndex(index);
   };
 
@@ -190,16 +283,44 @@ export default function QuizPlayer() {
 
   const handleSectionSubmit = async () => {
     try {
+      const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
+      
+      // Check if at least one question is answered
+      const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
+      if (answeredQuestions === 0) {
+        setShowSectionWarning(true);
+        return;
+      }
+
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
         answers: sectionAnswers[currentSection] || {}
       });
       
-      const currentIdx = sections.findIndex(s => s.name === currentSection);
-      if (currentIdx < sections.length - 1) {
-        changeSection(sections[currentIdx + 1].name);
+      // Mark section as submitted
+      setSections(prev => prev.map(s => 
+        s.name === currentSection 
+          ? { ...s, submitted: true } 
+          : s
+      ));
+
+      // Unlock next section if available
+      if (currentSectionIndex < sections.length - 1) {
+        setSections(prev => prev.map((s, idx) => 
+          idx === currentSectionIndex + 1 
+            ? { ...s, unlocked: true } 
+            : s
+        ));
+      }
+
+      // Move to next section if available
+      if (currentSectionIndex < sections.length - 1) {
+        const nextSection = sections[currentSectionIndex + 1].name;
+        setCurrentSection(nextSection);
+        setCurrentQuestionIndex(0);
       } else {
-        setShowFeedbackModal(true);
+        // If last section, submit the quiz
+        handleQuizSubmit();
       }
     } catch (err) {
       setError('Failed to save answers. Please try again.');
@@ -230,8 +351,9 @@ export default function QuizPlayer() {
   const currentQuestions = questions.filter(q => q.section === currentSection);
   const currentQuestion = currentQuestions[currentQuestionIndex];
   const currentSectionData = sections.find(s => s.name === currentSection);
-  const isLastSection = currentSection === sections[sections.length - 1]?.name;
+  const isLastSection = sections.findIndex(s => s.name === currentSection) === sections.length - 1;
   const hasQuestions = currentQuestions.length > 0;
+  const isSectionSubmitted = currentSectionData?.submitted || false;
 
   if (isLoading) {
     return (
@@ -240,6 +362,7 @@ export default function QuizPlayer() {
       </div>
     );
   }
+  
   if (!isPublished) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -262,6 +385,7 @@ export default function QuizPlayer() {
       </div>
     );
   }
+  
   if (error) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -278,12 +402,16 @@ export default function QuizPlayer() {
       </div>
     );
   }
-  if(hasAttempted){
-    console.log("You have already attempted this quiz.");
+  
+  if(hasAttempted) {
     return (
-      <div className={`flex p-4   items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-sm text-red-400 font-semibold mb-4"><span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>  You have already attempted this mock test <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span></h2>
+          <h2 className="text-sm text-red-400 font-semibold mb-4">
+            <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>  
+            You have already attempted this mock test 
+            <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
+          </h2>
          
           <button 
             onClick={() => router.push('/dashboard')}
@@ -320,19 +448,24 @@ export default function QuizPlayer() {
               <h2 className="text-xl font-semibold mb-4">Sections</h2>
               <div className="space-y-3">
                 {sections.map(section => (
-                  <div key={section.name} className={`p-4 rounded-lg border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <div className="flex justify-between items-center">
+                  <div key={section.name} className={`p-4 rounded-lg border flex items-center justify-between ${
+                    theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                  } ${
+                    !section.unlocked ? 'opacity-70' : ''
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      {!section.unlocked && <Lock size={16} className="flex-shrink-0" />}
                       <span className="font-medium">{section.label}</span>
-                      <div className="flex items-center gap-2">
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 text-xs rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                        {section.questionCount} Qs
+                      </span>
+                      {section.timeLimit && (
                         <span className={`px-2 py-1 text-xs rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                          {section.questionCount} Qs
+                          {Math.floor(section.timeLimit / 60)} mins
                         </span>
-                        {section.timeLimit && (
-                          <span className={`px-2 py-1 text-xs rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                            {Math.floor(section.timeLimit / 60)} mins
-                          </span>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -343,11 +476,12 @@ export default function QuizPlayer() {
               <h2 className="text-xl font-semibold mb-4">Instructions</h2>
               <ul className="space-y-3">
                 {[
-                  "Each section must be completed in sequence",
-                  "You cannot go back to previous sections",
-                  "Time limits are enforced per section",
-                  "Answers are auto-saved as you progress",
-                  "Use the calculator tool for numerical questions"
+                  "Sections must be completed in sequence",
+                  "First section is unlocked automatically",
+                  "Next section unlocks only after submitting current section",
+                  "Submitted sections are locked permanently",
+                  "You cannot return to submitted sections",
+                  "Complete all questions before time runs out"
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
@@ -383,17 +517,17 @@ export default function QuizPlayer() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-lg font-bold truncate max-w-xs">{quiz?.title}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
+            <span className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${theme === 'dark' ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
               {currentSectionData?.label}
+              {isSectionSubmitted && <Lock size={14} />}
             </span>
           </div>
           
           <div className="flex items-center gap-3">
-            {currentSectionData?.timeLimit && (
+            {currentSectionData?.timeLimit && !isSectionSubmitted && (
               <QuestionTimer 
                 timeRemaining={sectionTimeRemaining} 
                 onTimeUp={handleSectionSubmit}
-                
               />
             )}
             
@@ -443,7 +577,7 @@ export default function QuizPlayer() {
               <div className="flex justify-between items-center mb-6">
                 <button
                   onClick={goToPrevQuestion}
-                  disabled={currentQuestionIndex === 0}
+                  disabled={currentQuestionIndex === 0 || isSectionSubmitted}
                   className={`flex items-center gap-1 px-3 py-1 rounded ${theme === 'dark' ? 'hover:bg-gray-700 disabled:opacity-40' : 'hover:bg-gray-100 disabled:opacity-40'}`}
                 >
                   <ChevronLeft size={18} />
@@ -456,7 +590,7 @@ export default function QuizPlayer() {
                 
                 <button
                   onClick={goToNextQuestion}
-                  disabled={currentQuestionIndex === currentQuestions.length - 1}
+                  disabled={currentQuestionIndex === currentQuestions.length - 1 || isSectionSubmitted}
                   className={`flex items-center gap-1 px-3 py-1 rounded ${theme === 'dark' ? 'hover:bg-gray-700 disabled:opacity-40' : 'hover:bg-gray-100 disabled:opacity-40'}`}
                 >
                   <span>Next</span>
@@ -474,8 +608,8 @@ export default function QuizPlayer() {
                 {currentQuestion.options.map((option, index) => (
                   <div
                     key={index}
-                    onClick={() => handleAnswerSelect(currentQuestion._id, index)}
-                    className={`p-4 rounded-lg cursor-pointer transition-all border ${
+                    onClick={() => !isSectionSubmitted && handleAnswerSelect(currentQuestion._id, index)}
+                    className={`p-4 rounded-lg transition-all border ${
                       answers[currentQuestion._id] === index
                         ? theme === 'dark' 
                           ? 'border-blue-500 bg-blue-900/30' 
@@ -483,6 +617,10 @@ export default function QuizPlayer() {
                         : theme === 'dark'
                           ? 'border-gray-700 hover:bg-gray-700'
                           : 'border-gray-200 hover:bg-gray-50'
+                    } ${
+                      isSectionSubmitted 
+                        ? 'cursor-not-allowed opacity-80' 
+                        : 'cursor-pointer'
                     }`}
                   >
                     <div className="flex items-center">
@@ -503,27 +641,50 @@ export default function QuizPlayer() {
 
               {/* Navigation Buttons */}
               <div className="flex justify-between gap-4">
-                <button
-                  onClick={() => setShowSubmitModal(true)}
-                  className={`flex-1 py-2.5 rounded-lg font-medium ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-                >
-                  {isLastSection ? 'Submit Quiz' : 'Submit Section'}
-                </button>
-                
-                <button
-                  onClick={goToNextQuestion}
-                  disabled={currentQuestionIndex === currentQuestions.length - 1}
-                  className={`flex-1 py-2.5 rounded-lg font-medium ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50' : 'bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50'} text-white`}
-                >
-                  {currentQuestionIndex === currentQuestions.length - 1 ? 'Review' : 'Next Question'}
-                </button>
+                {!isSectionSubmitted ? (
+                  <>
+                    <button
+                      onClick={() => setShowSubmitModal(true)}
+                      className={`flex-1 py-2.5 rounded-lg font-medium ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                    >
+                      {isLastSection ? 'Submit Quiz' : 'Submit Section'}
+                    </button>
+                    
+                    <button
+                      onClick={goToNextQuestion}
+                      disabled={currentQuestionIndex === currentQuestions.length - 1}
+                      className={`flex-1 py-2.5 rounded-lg font-medium ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50' : 'bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50'} text-white`}
+                    >
+                      {currentQuestionIndex === currentQuestions.length - 1 ? 'Review' : 'Next Question'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      const nextSection = sections.find(s => s.unlocked && !s.submitted);
+                      if (nextSection) {
+                        changeSection(nextSection.name);
+                      } else {
+                        handleQuizSubmit();
+                      }
+                    }}
+                    className={`flex-1 py-2.5 rounded-lg font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-600'} text-white`}
+                  >
+                    {isLastSection ? 'View Results' : 'Continue to Next Section'}
+                  </button>
+                )}
               </div>
             </div>
           ) : (
             <div className={`p-6 rounded-xl shadow text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
               <h3 className="text-lg font-medium mb-4">No questions available in this section</h3>
               <button
-                onClick={() => changeSection(sections[sections.findIndex(s => s.name === currentSection) + 1].name)}
+                onClick={() => {
+                  const nextSection = sections.find(s => s.unlocked && !s.submitted);
+                  if (nextSection) {
+                    changeSection(nextSection.name);
+                  }
+                }}
                 className={`px-4 py-2 rounded-lg ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
               >
                 Continue to Next Section
@@ -541,7 +702,7 @@ export default function QuizPlayer() {
               {currentQuestions.map((q, index) => (
                 <button
                   key={q._id}
-                  onClick={() => goToQuestion(index)}
+                  onClick={() => !isSectionSubmitted && goToQuestion(index)}
                   className={`aspect-square rounded flex items-center justify-center transition-all ${
                     currentQuestionIndex === index
                       ? theme === 'dark'
@@ -554,7 +715,10 @@ export default function QuizPlayer() {
                       : theme === 'dark'
                         ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  } ${
+                    isSectionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'
                   }`}
+                  disabled={isSectionSubmitted}
                 >
                   {index + 1}
                 </button>
@@ -562,8 +726,7 @@ export default function QuizPlayer() {
             </div>
           </div>
 
-          {/* Calculator */}
-          {/* {showCalculator && (
+          {showCalculator && (
             <div className={`p-4 rounded-xl shadow ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
               <div className={`mb-3 p-3 rounded text-right font-mono text-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
                 {calcInput || '0'}
@@ -572,7 +735,20 @@ export default function QuizPlayer() {
                 {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', '.', '=', '+', 'C', '⌫'].map((btn) => (
                   <button
                     key={btn}
-                    onClick={() => handleCalcButtonClick(btn)}
+                    onClick={() => {
+                      if (btn === 'C') setCalcInput('');
+                      else if (btn === '⌫') setCalcInput(prev => prev.slice(0, -1));
+                      else if (btn === '=') {
+                        try {
+                          // eslint-disable-next-line no-eval
+                          setCalcInput(eval(calcInput).toString());
+                        } catch {
+                          setCalcInput('Error');
+                        }
+                      } else {
+                        setCalcInput(prev => prev + btn);
+                      }
+                    }}
                     className={`p-3 rounded text-sm font-medium ${
                       theme === 'dark'
                         ? 'bg-gray-700 hover:bg-gray-600'
@@ -596,7 +772,7 @@ export default function QuizPlayer() {
                 ))}
               </div>
             </div>
-          )} */}
+          )}
         </div>
       </div>
 
@@ -614,6 +790,38 @@ export default function QuizPlayer() {
         
       />
 
+      {/* No Answers Warning Modal */}
+      {showSectionWarning && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`p-6 rounded-lg max-w-md w-full mx-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className="flex items-start gap-3 mb-4">
+              <AlertTriangle className="text-yellow-500 mt-1 flex-shrink-0" />
+              <div>
+                <h3 className="font-bold text-lg">No Answers Submitted</h3>
+                <p className="mt-1">You haven't answered any questions in this section. Are you sure you want to submit?</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setShowSectionWarning(false)}
+                className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowSectionWarning(false);
+                  handleSectionSubmit();
+                }}
+                className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-600'} text-white`}
+              >
+                Submit Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Feedback Modal */}
       <FeedbackForm
         isOpen={showFeedbackModal}
@@ -626,9 +834,9 @@ export default function QuizPlayer() {
       {/* Results Modal */}
       <QuizResultModal
         isOpen={showResultModal}
-        onClose={() => router.push('/')}
+        onClose={() => router.push('/dashboard')}
         quizId={quiz?._id}
-       
+        
       />
     </div>
   );
