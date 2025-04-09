@@ -632,6 +632,7 @@ const QuizDashboard = () => {
   </div>
 
   {/* Stats Cards - Improved Layout */}
+{userStats.completedQuizzes > 0 ? (
   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mt-8">
     {/* Completion Rate */}
     <div
@@ -788,6 +789,7 @@ const QuizDashboard = () => {
             <PerformanceChart chartData={chartData} theme={theme} />
           </div>
         </div>
+)
       </div>
     </div>
   );
