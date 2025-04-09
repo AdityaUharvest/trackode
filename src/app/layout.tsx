@@ -11,15 +11,17 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: {
     template: '%s | Trackode',
-    default: 'Trackode - Master Coding Skills with Interactive Quizzes & Contests',
+    default: 'Trackode - Free Mock Tests & AI-powered Quizzes',
   },
-  description: 'Trackode helps developers track their coding journey through interactive quizzes, AI-generated challenges, and coding contests. Improve your programming skills effectively.',
+  
+  keywords: ['Trackode', 'Coding', 'Quizzes', 'Mock Tests', 'AI Challenges', 'Programming', 'Contests', 'Knowledge Tracking', 'Skill Improvement', 'Interactive Learning', 'Coding Skills', 'Developer Tools', 'Tech Challenges', 'Online Learning', 'Coding Platform', 'Software Development', 'Programming Contests', 'AI-Generated Challenges'],
+  description: 'Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively.',
   metadataBase: new URL('https://trackode.in'),
   alternates: {
     canonical: 'https://trackode.in',
   },
   openGraph: {
-    title: 'Trackode - Master Coding Skills with Interactive Quizzes & Contests',
+    title: 'Trackode - Free Mock Tests & AI-powered Quizzes',
     description: 'Track your coding journey with interactive quizzes, AI challenges, and contests.',
     url: 'https://trackode.in/',
     siteName: 'Trackode',
