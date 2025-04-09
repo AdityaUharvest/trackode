@@ -182,6 +182,7 @@ DO NOT include any explanations, markdown formatting, or additional text outside
       if (parsedQuestions.length > 0) {
         setQuestions(parsedQuestions.slice(0, 25)); // Limit to 25 questions max
         setSuccessMessage(`Successfully generated ${parsedQuestions.length} questions!`);
+        setTimeout(() => setSuccessMessage(''), 2000);
       } else {
         setErrorMessage('No valid questions could be generated. Please try again.');
       }
