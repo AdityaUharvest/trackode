@@ -157,9 +157,8 @@ Each question must:
 - Be conceptually challenging with clear, unambiguous wording
 - Have exactly 4 options (labeled options 0-3)
 - Have a single correct answer
-- Be appropriate for tech/IT assessment
-- Be original and not reuse question patterns
-- Have realistic distractors that seem plausible
+
+
 
 Return a valid JSON array with 25 objects following this exact format:
 [
