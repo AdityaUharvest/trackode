@@ -13,6 +13,12 @@ export const metadata: Metadata = {
     template: '%s | Trackode',
     default: 'Trackode - Free Mock Tests & AI-powered Quizzes',
   },
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/apple-icon.png',
+    
+  },
   
   keywords: ['Trackode', 'Coding', 'Quizzes', 'Mock Tests', 'AI Challenges', 'Programming', 'Contests', 'Knowledge Tracking', 'Skill Improvement', 'Interactive Learning', 'Coding Skills', 'Developer Tools', 'Tech Challenges', 'Online Learning', 'Coding Platform', 'Software Development', 'Programming Contests', 'AI-Generated Challenges'],
   description: 'Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively.',
