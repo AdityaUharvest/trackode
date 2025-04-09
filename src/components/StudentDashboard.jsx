@@ -106,7 +106,7 @@ export default function StudentDashboard() {
         </div>
 
         <Tabs defaultValue="quizzes" className="space-y-6">
-          <TabsList className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} p-1 rounded-lg`}>
+          <TabsList className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} p-1 overflow-hidden rounded-lg`}>
            <TabsTrigger value="quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
               Quiz Histories
             </TabsTrigger>

@@ -13,12 +13,7 @@ export const metadata: Metadata = {
     template: '%s | Trackode',
     default: 'Trackode - Free Mock Tests & AI-powered Quizzes',
   },
-  authors: [
-    {
-      name: 'Trackode',
-      url: 'https://trackode.in',
-    },
-  ],
+  
 // Remove the template if it's causing inconsistency
   icons: {
     icon: '/favicon.ico',
