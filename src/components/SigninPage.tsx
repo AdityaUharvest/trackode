@@ -1,7 +1,7 @@
 "use client";
 import SignInButton from "./Signin";
 import Link from "next/link";
-import { useState } from "react";
+import { use, useState,useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -14,9 +14,14 @@ export default function Signin() {
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
   const {status} = useSession()
-  if (status === "authenticated") {
-    router.push("/");
-  }
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/");
+    }
+  })
+
+
+  
   const submitHandler = async (e: any) => {
     e.preventDefault();
     if (!email || !password) {

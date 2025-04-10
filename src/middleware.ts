@@ -26,8 +26,7 @@ export async function middleware(req: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
       secureCookie: 
         process.env.NODE_ENV === 'production' ||
-        process.env.VERCEL_ENV === 'production' ||
-        process.env.HOSTNAME?.includes('vercel.app')
+        process.env.VERCEL_ENV === 'production' 
     })
 
     console.log('Token exists:', !!token) // Debug log

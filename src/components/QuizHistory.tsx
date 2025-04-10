@@ -25,10 +25,10 @@ export default function QuizHistory({ results }: any) {
             No quiz attempts recorded yet
           </p>
           <a
-            href="/quizzes"
+            href="/quiz-list"
             className={`inline-block ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'} text-white px-6 py-2 rounded-lg transition-colors`}
           >
-            Don't Take Your First Quiz (this feature is coming soon)
+            Check Avialable Quizzes
           </a>
         </div>
       ) : (
