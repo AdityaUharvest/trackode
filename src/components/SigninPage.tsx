@@ -6,14 +6,17 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTheme } from "./ThemeContext";
-
+import { useSession } from "next-auth/react";
 export default function Signin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
-
+  const {status} = useSession()
+  if (status === "authenticated") {
+    router.push("/");
+  }
   const submitHandler = async (e: any) => {
     e.preventDefault();
     if (!email || !password) {

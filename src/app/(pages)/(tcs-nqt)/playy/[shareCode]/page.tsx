@@ -11,6 +11,7 @@ import { Loader2, Calculator, Minimize2, Maximize2, ChevronLeft, ChevronRight, L
 import { useTheme } from '@/components/ThemeContext';
 import { FeedbackForm } from '@/components/(tcs)/FeedbackForm';
 import {toast} from 'react-toastify'
+import { createAccordionScope } from '@radix-ui/react-accordion';
 
 interface Question {
   _id: string;
@@ -67,8 +68,9 @@ export default function QuizPlayer() {
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         setIsPublished(response.data.quiz.isPublished);
-        
+        console.log(isPublished)
         const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
+        console.log(attempted.data);
         if (attempted.data) {
           setHasAttempted(attempted.data);
         }
@@ -225,7 +227,12 @@ export default function QuizPlayer() {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
-
+  //when clicking on start quiz button, quiz will be in fullscreen mode
+  useEffect(
+  ()=>{
+    quizContainerRef.current?.requestFullscreen();
+  }
+  )
   const startQuiz = () => {
     setQuizStarted(true);
   };
@@ -370,13 +377,13 @@ export default function QuizPlayer() {
             onClick={() => router.push('/dashboard')}
             className={`px-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
-            Student Home
+            Student Dashboard
           </button>
           <button 
             onClick={() => router.push('/quiz-list')}
             className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
-            Live Quiz
+            Explore Free Live Quizes
           </button>
         </div>
       </div>
@@ -831,7 +838,7 @@ export default function QuizPlayer() {
       {/* Results Modal */}
       <QuizResultModal
         isOpen={showResultModal}
-        onClose={() => router.push('/dashboard')}
+        onClose={() => router.push('/quiz-list')}
         quizId={quiz?._id}
         
       />

@@ -160,7 +160,7 @@ export default function TechStackQuizSystem() {
   };
 
   const handleTechClick = (tech: string) => {
-    router.push(`/tech/${encodeURIComponent(tech)}`);
+    router.push(`/free-tech-quiz/${encodeURIComponent(tech)}`);
   };
 
   return (

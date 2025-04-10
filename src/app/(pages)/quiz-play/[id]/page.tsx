@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import React from "react";
 import axios from "axios";
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useSession } from "next-auth/react";
@@ -9,16 +10,17 @@ import { useTheme } from "@/components/ThemeContext";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 
-const requestFullscreen = (elem: HTMLElement) => {
+const requestFullscreen = (elem: any) => {
   if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if ((elem as any).mozRequestFullScreen) {
-    (elem as any).mozRequestFullScreen();
-  } else if ((elem as any).webkitRequestFullscreen) {
-    (elem as any).webkitRequestFullscreen();
-  } else if ((elem as any).msRequestFullscreen) {
-    (elem as any).msRequestFullscreen();
+    return elem.requestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    return elem.mozRequestFullScreen();
+  } else if (elem.webkitRequestFullscreen) {
+    return elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    return elem.msRequestFullscreen();
   }
+  return Promise.reject(new Error('Fullscreen API not supported'));
 };
 
 export default function QuizPage({ params }: any) {
@@ -43,6 +45,8 @@ export default function QuizPage({ params }: any) {
   const [visibilityChanged, setVisibilityChanged] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const id = params.id;
+
+  const fullscreenContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -88,31 +92,21 @@ export default function QuizPage({ params }: any) {
   useEffect(() => {
     const handleFullScreenChange = () => {
       if (!document.fullscreenElement && hasStarted && !submitted) {
-        // Immediately attempt to re-enter fullscreen
-        try {
-          requestFullscreen(document.documentElement)
-        } catch (error) {
-          setFullScreenViolations(prev => {
-            const newCount = prev + 1;
-            if (newCount >= 3) {
-              handleSubmitQuiz();
-              
-              return 3;
-            }
-            toast.error(`Fullscreen required (${newCount}/3 violations)`);
-            return newCount;
-          });
-       
-        }
-        
-          
-          
+        setFullScreenViolations(prev => {
+          const newCount = prev + 1;
+          if (newCount >= 3) {
+            handleSubmitQuiz();
+            toast.error("Quiz submitted due to exiting fullscreen");
+            return 3;
+          }
+          toast.error(`Please return to fullscreen (${newCount}/3 violations)`);
+          return newCount;
+        });
       }
     };
-  
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (hasStarted && !submitted) {
-        // Block more comprehensive set of keys
         const blockedKeys = [
           'Escape', 'F11', 'F4', 
           'Alt', 'Meta', 'Control',
@@ -128,61 +122,14 @@ export default function QuizPage({ params }: any) {
         }
       }
     };
-  
-    // Add mouseleave detection
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (hasStarted && !submitted && e.clientY < 0) {
-        e.preventDefault();
-        requestFullscreen(document.documentElement);
-      }
-    };
-  
-    // Add orientation change detection
-    const handleOrientationChange = () => {
-      if (hasStarted && !submitted) {
-        setFullScreenViolations(prev => {
-          const newCount = prev + 1;
-          if (newCount >= 3) {
-            handleSubmitQuiz();
-            return 3;
-          }
-          toast.error(`Orientation change detected (${newCount}/3)`);
-          return newCount;
-        });
-      }
-    };
-  
-    // Add all event listeners
+
     document.addEventListener('fullscreenchange', handleFullScreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullScreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullScreenChange);
     document.addEventListener('keydown', handleKeyDown, true);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    window.addEventListener('orientationchange', handleOrientationChange);
-  
+
     return () => {
-      // Cleanup all listeners
       document.removeEventListener('fullscreenchange', handleFullScreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullScreenChange);
-      document.removeEventListener('MSFullscreenChange', handleFullScreenChange);
       document.removeEventListener('keydown', handleKeyDown, true);
-      document.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('orientationchange', handleOrientationChange);
     };
-  }, [hasStarted, submitted]);
-
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasStarted && !submitted) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasStarted, submitted]);
 
   useEffect(() => {
@@ -208,14 +155,12 @@ export default function QuizPage({ params }: any) {
 
   const handleStartQuiz = async () => {
     try {
-      
-      await requestFullscreen(document.documentElement);
-
-      
-
-      setHasStarted(true);
+      if (fullscreenContentRef.current) {
+        await requestFullscreen(fullscreenContentRef.current);
+        setHasStarted(true);
+      }
     } catch (error) {
-      toast.error("Failed to enter secure mode. Please try again.");
+      toast.error("Failed to enter fullscreen mode. Please allow fullscreen and try again.");
     }
   };
 
@@ -310,24 +255,6 @@ export default function QuizPage({ params }: any) {
     setCurrentQuestion(index);
   };
 
-  const ReturnToFullscreenButton = () => {
-    if (!document.fullscreenElement && hasStarted && !submitted) {
-      return (
-        <div className="fixed top-4 right-4 z-50">
-          <button
-            onClick={() => requestFullscreen(document.documentElement)}
-            className={`px-4 py-2 rounded-lg ${
-              theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-600 hover:bg-red-700"
-            } text-white`}
-          >
-            Return to Fullscreen
-          </button>
-        </div>
-      );
-    }
-    return null;
-  };
-
   const handleSubmitQuiz = async () => {
     if (submitted || isSubmitting) return;
     setIsSubmitting(true);
@@ -342,8 +269,8 @@ export default function QuizPage({ params }: any) {
         setSubmitted(true);
         toast.success(response.data.message);
         setTimeout(() => {
-          screen.orientation.unlock();
-          router.push(`/dashboard`);
+          document.exitFullscreen();
+          router.push(`/quiz-list`);
         }, 1500);
       }
     } catch (error) {
@@ -373,337 +300,295 @@ export default function QuizPage({ params }: any) {
     );
   }
 
-  if (!hasStarted) {
-    return (
-      <div className={`min-h-screen flex items-center justify-center p-4 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
-        <div className={`rounded-xl shadow-2xl p-8 max-w-4xl w-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h1 className="text-2xl font-bold">{quizData.name}</h1>
-              <p className="text-sm opacity-80">Please read the instructions carefully before starting</p>
+  return (
+    <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+      {/* Fullscreen quiz content */}
+      <div
+        ref={fullscreenContentRef}
+        className={`${hasStarted ? 'fixed inset-0 z-50 overflow-auto' : 'hidden'} ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}
+        style={{
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          MozUserSelect: 'none',
+          msUserSelect: 'none',
+          WebkitTouchCallout: 'none'
+        }}
+        onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onPaste={(e) => e.preventDefault()}
+      >
+        {hasStarted && (
+          <div className={`p-6 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+            <div className="flex justify-between items-center mb-8">
+              <div className="text-xl font-semibold">
+                Time Remaining: {Math.floor(timeLeft / 60).toString().padStart(2, "0")}:
+                {Math.round((timeLeft % 60)).toString().padStart(2, "0")}
+              </div>
+              <button
+                onClick={() => setShowCalculator(!showCalculator)}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-700 hover:bg-gray-800"
+                } text-white`}
+              >
+                {showCalculator ? "Close" : "Calculator"}
+              </button>
             </div>
-            <button
-              onClick={handleStartQuiz}
-              disabled={!declarationsAgreed || !termsAgreed}
-              className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
-              } text-white ${(!declarationsAgreed || !termsAgreed) ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
-            >
-              Start Quiz in Fullscreen
-            </button>
-          </div>
-  
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - General Instructions */}
-            <div className="lg:col-span-2 space-y-6">
-              {isMobile && (
-                <div className={`p-4 rounded-lg border-l-4 ${theme === "dark" ? "border-red-500 bg-gray-700" : "border-red-500 bg-red-50"}`}>
-                  <div className="font-bold flex items-center gap-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                    Mobile Restrictions
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+              <div className={`lg:col-span-3 rounded-lg shadow-lg p-8 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                <h3 className="text-xl font-semibold mb-6">Question {currentQuestion + 1}</h3>
+                <p className="mb-8">{quizData.questions[currentQuestion].question}</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {quizData.questions[currentQuestion].options.map((option: string, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleAnswer(quizData.questions[currentQuestion]._id, option)}
+                      className={`p-4 rounded-lg border-2 transition-all select-none ${
+                        answers[quizData.questions[currentQuestion]._id] === option
+                          ? theme === "dark"
+                            ? "border-blue-600 bg-blue-900"
+                            : "border-blue-600 bg-blue-50"
+                          : theme === "dark"
+                          ? "border-gray-700 hover:border-blue-400"
+                          : "border-gray-200 hover:border-blue-400"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="lg:flex lg:justify-between gap-2 p-2 mt-8">
+                  <button
+                    onClick={() => handleQuestionChange(currentQuestion - 1)}
+                    disabled={currentQuestion === 0}
+                    className={`px-6 py-2 mb-2 rounded-lg transition-colors ${
+                      theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
+                    } disabled:opacity-50`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={handleMarkReview}
+                    className={`p-2 mb-2 ml-2 rounded-lg transition-colors ${
+                      theme === "dark" ? "bg-orange-600 hover:bg-orange-700" : "bg-orange-500 hover:bg-orange-600"
+                    } text-white`}
+                  >
+                    Mark for Review
+                  </button>
+                  {currentQuestion === quizData.questions.length - 1 ? (
+                    <button
+                      onClick={handleSubmitQuiz}
+                      disabled={submitted || isSubmitting}
+                      className={`p-2 mb-2 ml-2 rounded-lg transition-colors ${
+                        theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"
+                      } text-white`}
+                    >
+                      {submitted ? "Quiz Submitted" : isSubmitting ? "Submitting..." : "Submit Quiz"}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleQuestionChange(currentQuestion + 1)}
+                      disabled={currentQuestion === quizData.questions.length - 1}
+                      className={`px-6 bg-green-700 text-white py-2 rounded-lg transition-colors ${
+                        theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
+                      } disabled:opacity-50`}
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className={`rounded-lg shadow-lg p-2 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                <h4 className="text-lg font-semibold mb-4">Questions</h4>
+                <div className="grid grid-cols-5 gap-2 mb-6">
+                  {quizData.questions.map((_: any, index: number) => (
+                    <button
+                      key={index}
+                      onClick={() => handleQuestionChange(index)}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all ${
+                        currentQuestion === index
+                          ? theme === "dark"
+                            ? "border-blue-600 bg-blue-900"
+                            : "border-blue-600 bg-blue-50"
+                          : questionStatus[index].answered
+                          ? theme === "dark"
+                            ? "border-green-600 bg-green-900"
+                            : "border-green-500 bg-green-50"
+                          : questionStatus[index].marked
+                          ? theme === "dark"
+                            ? "border-orange-600 bg-orange-900"
+                            : "border-orange-400 bg-orange-50"
+                          : theme === "dark"
+                          ? "border-gray-700 bg-gray-700"
+                          : "border-gray-200 bg-gray-50"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+
+                {showCalculator && (
+                  <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
+                    <ScientificCalculator theme={theme} />
                   </div>
-                  <ul className="list-disc pl-5 space-y-1 text-sm">
-                    <li>Screen recording/printscreen disabled</li>
-                    <li>Install as PWA required</li>
-                    <li>Landscape mode locked</li>
-                    <li>App switching limited to 3 times</li>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {!hasStarted && (
+        <div className={`min-h-screen flex items-center justify-center p-4 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+          <div className={`rounded-xl shadow-2xl p-8 max-w-4xl w-full ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+            <div className="flex justify-between items-start mb-6">
+              <div>
+                <h1 className="text-xl font-semibold">{quizData.name}</h1>
+                <p className="text-sm opacity-80">Please read the instructions carefully before starting</p>
+              </div>
+              <button
+                onClick={handleStartQuiz}
+                disabled={!declarationsAgreed || !termsAgreed}
+                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                  theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
+                } text-white ${(!declarationsAgreed || !termsAgreed) ? "opacity-50 cursor-not-allowed" : "hover:scale-105"}`}
+              >
+                Start Quiz 
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                {isMobile && (
+                  <div className={`p-4 rounded-lg border-l-4 ${theme === "dark" ? "border-red-500 bg-gray-700" : "border-red-500 bg-red-50"}`}>
+                    <div className="font-semibold flex items-center gap-2 mb-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      Mobile Restrictions
+                    </div>
+                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                      <li>Screen recording/printscreen disabled</li>
+                      <li>Landscape mode locked</li>
+                      <li>App switching limited to 3 times</li>
+                    </ul>
+                  </div>
+                )}
+
+                <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
+                  <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
+                    </svg>
+                    Quiz Instructions
+                  </h2>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Navigate between questions using the question panel</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Mark questions for review to come back later</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span>Calculator available in the tools menu</span>
+                    </li>
                   </ul>
                 </div>
-              )}
-  
-              <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clipRule="evenodd" />
-                  </svg>
-                  Quiz Instructions
-                </h2>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Navigate between questions using the question panel</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Mark questions for review to come back later</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Calculator available in the tools menu</span>
-                  </li>
-                </ul>
+
+                {quizData.instructions && (
+                  <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
+                    <h2 className="text-lg font-semibold mb-3">Additional Instructions</h2>
+                    <div className="prose prose-sm max-w-none" style={{ whiteSpace: "pre-line" }}>
+                      {quizData.instructions}
+                    </div>
+                  </div>
+                )}
               </div>
-  
-              {quizData.instructions && (
+
+              <div className="space-y-6">
                 <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
-                  <h2 className="text-lg font-semibold mb-3">Additional Instructions</h2>
-                  <div className="prose prose-sm max-w-none" style={{ whiteSpace: "pre-line" }}>
-                    {quizData.instructions}
+                  <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Declaration & Terms
+                  </h2>
+                  
+                  <div className="space-y-4">
+                    <label className="block">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={declarationsAgreed}
+                          onChange={(e) => setDeclarationsAgreed(e.target.checked)}
+                          className={`mt-1 form-checkbox h-5 w-5 rounded ${theme === "dark" ? "text-blue-500 bg-gray-600 border-gray-500" : "text-blue-600 border-gray-300"}`}
+                        />
+                        <div>
+                          <span className="font-medium">Anti-Cheating Declaration</span>
+                          <p className="text-sm opacity-80 mt-1">I hereby declare that I am not cheating. If found cheating, I understand I will be debarred.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label className="block">
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={termsAgreed}
+                          onChange={(e) => setTermsAgreed(e.target.checked)}
+                          className={`mt-1 form-checkbox h-5 w-5 rounded ${theme === "dark" ? "text-blue-500 bg-gray-600 border-gray-500" : "text-blue-600 border-gray-300"}`}
+                        />
+                        <div>
+                          <span className="font-medium">Terms Acceptance</span>
+                          <p className="text-sm opacity-80 mt-1">I agree to the terms and conditions of the quiz.</p>
+                        </div>
+                      </div>
+                    </label>
                   </div>
                 </div>
-              )}
-            </div>
-  
-            {/* Right Column - Terms and Agreements */}
-            <div className="space-y-6">
-              <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                  </svg>
-                  Declaration & Terms
-                </h2>
-                
-                <div className="space-y-4">
-                  <label className="block">
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={declarationsAgreed}
-                        onChange={(e) => setDeclarationsAgreed(e.target.checked)}
-                        className={`mt-1 form-checkbox h-5 w-5 rounded ${theme === "dark" ? "text-blue-500 bg-gray-600 border-gray-500" : "text-blue-600 border-gray-300"}`}
-                      />
-                      <div>
-                        <span className="font-medium">Anti-Cheating Declaration</span>
-                        <p className="text-sm opacity-80 mt-1">I hereby declare that I am not cheating. If found cheating, I understand I will be debarred.</p>
-                      </div>
-                    </div>
-                  </label>
-  
-                  <label className="block">
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        checked={termsAgreed}
-                        onChange={(e) => setTermsAgreed(e.target.checked)}
-                        className={`mt-1 form-checkbox h-5 w-5 rounded ${theme === "dark" ? "text-blue-500 bg-gray-600 border-gray-500" : "text-blue-600 border-gray-300"}`}
-                      />
-                      <div>
-                        <span className="font-medium">Terms Acceptance</span>
-                        <p className="text-sm opacity-80 mt-1">I agree to the terms and conditions of the quiz.</p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </div>
-  
-              <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
-                <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clipRule="evenodd" />
-                  </svg>
-                  Quiz Summary
-                </h2>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>Total Questions:</div>
-                  <div className="font-medium">{quizData.totalQuestions}</div>
-                  <div>Duration:</div>
-                  <div className="font-medium">{quizData.duration * 60 } mins </div>
-                  <div>Max Attempts:</div>
-                  <div className="font-medium">{quizData.totalQuestions}</div>
-                  <div>Passing Score:</div>
-                  <div className="font-medium">75%</div>
+
+                <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
+                  <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z" clipRule="evenodd" />
+                    </svg>
+                    Quiz Summary
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>Total Questions:</div>
+                    <div className="font-medium">{quizData.totalQuestions}</div>
+                    <div>Duration:</div>
+                    <div className="font-medium">{quizData.duration * 60 } mins </div>
+                    <div>Max Attempts:</div>
+                    <div className="font-medium">{quizData.totalQuestions}</div>
+                    <div>Passing Score:</div>
+                    <div className="font-medium">75%</div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className={`min-h-screen p-6 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}
-      style={{
-        userSelect: "none",
-        WebkitUserSelect: "none",
-        MozUserSelect: "none",
-        msUserSelect: "none",
-        WebkitTouchCallout: "none",
-        
-      }}
-      onContextMenu={(e) => e.preventDefault()}
-      onCopy={(e) => {
-        e.preventDefault();
-        toast.error("Copying disabled during quiz");
-      }}
-      onCut={(e) => {
-        e.preventDefault();
-        toast.error("Cutting disabled during quiz");
-      }}
-      onPaste={(e) => {
-        e.preventDefault();
-        toast.error("Pasting disabled during quiz");
-      }}
-    >
-      <ReturnToFullscreenButton/>
-      <div className="flex justify-between items-center mb-8">
-        <div className="text-xl font-bold">
-          Time Remaining: {Math.floor(timeLeft / 60).toString().padStart(2, "0")}:
-          {Math.round((timeLeft % 60)).toString().padStart(2, "0")}
-        </div>
-        <button
-          onClick={() => setShowCalculator(!showCalculator)}
-          className={`px-4 py-2 rounded-lg transition-colors ${
-            theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-700 hover:bg-gray-800"
-          } text-white`}
-        >
-          {showCalculator ? "Close" : "Calculator"}
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className={`lg:col-span-3 rounded-lg shadow-lg p-8 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
-          <h3 className="text-xl font-bold mb-6">Question {currentQuestion + 1}</h3>
-          <p className="mb-8">{quizData.questions[currentQuestion].question}</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {quizData.questions[currentQuestion].options.map((option: string, index: number) => (
-              <button
-                key={index}
-                onClick={() => handleAnswer(quizData.questions[currentQuestion]._id, option)}
-                className={`p-4 rounded-lg border-2 transition-all select-none ${
-                  answers[quizData.questions[currentQuestion]._id] === option
-                    ? theme === "dark"
-                      ? "border-blue-600 bg-blue-900"
-                      : "border-blue-600 bg-blue-50"
-                    : theme === "dark"
-                    ? "border-gray-700 hover:border-blue-400"
-                    : "border-gray-200 hover:border-blue-400"
-                }`}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
-
-          <div className="lg:flex lg:justify-between gap-2 p-2  mt-8">
-            <button
-              onClick={() => handleQuestionChange(currentQuestion - 1)}
-              disabled={currentQuestion === 0}
-              className={`px-6 py-2 mb-2 rounded-lg transition-colors ${
-                theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
-              } disabled:opacity-50`}
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleMarkReview}
-              className={`p-2 mb-2 ml-2 rounded-lg transition-colors ${
-                theme === "dark" ? "bg-orange-600 hover:bg-orange-700" : "bg-orange-500 hover:bg-orange-600"
-              } text-white`}
-            >
-              Mark for Review
-            </button>
-            {currentQuestion === quizData.questions.length - 1 ? (
-              <button
-              onClick={handleSubmitQuiz}
-              disabled={submitted || isSubmitting}
-              className={`p-2 mb-2 ml-2 rounded-lg transition-colors ${
-                theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"
-              } text-white`}
-            >
-              {submitted ? (
-                "Quiz Submitted"
-              ) : isSubmitting ? (
-                <div className="flex items-center justify-center gap-2 select-none">
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Submitting...
-                </div>
-              ) : (
-                "Submit Quiz"
-              )}
-            </button>
-              )
-              :
-              (
-                <button
-              onClick={() => handleQuestionChange(currentQuestion + 1)}
-              disabled={currentQuestion === quizData.questions.length - 1}
-              className={`px-6 bg-green-700 text-white py-2 rounded-lg transition-colors ${
-                theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
-              } disabled:opacity-50`}
-            >
-              Next
-            </button>
-              )}
-            
-          </div>
-        </div>
-
-        {/* Side Panel */}
-        <div className={`rounded-lg shadow-lg p-2 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
-          <h4 className="text-lg font-bold mb-4">Questions</h4>
-          <div className="grid grid-cols-5 gap-2 mb-6">
-            {quizData.questions.map((_: any, index: number) => (
-              <button
-                key={index}
-                onClick={() => handleQuestionChange(index)}
-                className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all ${
-                  currentQuestion === index
-                    ? theme === "dark"
-                      ? "border-blue-600 bg-blue-900"
-                      : "border-blue-600 bg-blue-50"
-                    : questionStatus[index].answered
-                    ? theme === "dark"
-                      ? "border-green-600 bg-green-900"
-                      : "border-green-500 bg-green-50"
-                    : questionStatus[index].marked
-                    ? theme === "dark"
-                      ? "border-orange-600 bg-orange-900"
-                      : "border-orange-400 bg-orange-50"
-                    : theme === "dark"
-                    ? "border-gray-700 bg-gray-700"
-                    : "border-gray-200 bg-gray-50"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-
-          {showCalculator && (
-            <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-50"}`}>
-              <ScientificCalculator theme={theme} />
-            </div>
-          )}
-
-
-      
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
-// Scientific Calculator Component
+
+// Keep your ScientificCalculator component the same
 const ScientificCalculator = ({ theme }: any) => {
   const [input, setInput] = useState("");
   const [result, setResult] = useState("");
@@ -772,7 +657,7 @@ const ScientificCalculator = ({ theme }: any) => {
         <div className={`text-right ${theme === "dark" ? "text-gray-300" : "text-gray-700"} min-h-[20px]`}>
           {input || "0"}
         </div>
-        <div className={`text-right font-bold text-xl ${theme === "dark" ? "text-white" : "text-black"} min-h-[28px]`}>
+        <div className={`text-right font-semibold text-xl ${theme === "dark" ? "text-white" : "text-black"} min-h-[28px]`}>
           {result || "0"}
         </div>
       </div>
