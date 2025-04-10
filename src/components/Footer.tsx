@@ -15,22 +15,22 @@ export default function Footer() {
     }`}>
       {/* Main Footer Content */}
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Company Info Column */}
           <div className="flex flex-col">
             <div className="mb-6 flex flex-col items-center md:items-start">
-              <div className={`p-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+              <div className={` rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
                 <img
-                  className="h-12 bg-none w-auto"
+                  className="h-12 bg-transparent  w-auto"
                   src={theme === "dark" 
                     ? "https://i.ibb.co/WppJvVPk/image-2025-02-12-122350771.png" 
                     : "https://i.ibb.co/twvK9Wdm/image-2025-02-12-131158350.png"}
                   alt="Trackode Logo"
                 />
               </div>
-              <h3 className={`mt-4 text-lg font-bold ${
+              <h1 className={`mt-4 text-lg font-bold ${
                 theme === "dark" ? "text-white" : "text-gray-800"
-              }`}>Trackode</h3>
+              }`}>Trackode</h1>
               <p className="mt-2 text-sm opacity-75 max-w-xs text-center md:text-left">
                 Enhancing coding skills through interactive challenges, competitions, and personalized learning paths.
               </p>
@@ -78,7 +78,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a 
-                href="https://www.instagram.com/iamadityaupadhyay"
+                href="https://www.instagram.com/iam_adityaupadhyay"
                 target="_blank" 
                 className={`p-2 rounded-full transition-colors duration-300 ${
                   theme === "dark" 
@@ -204,7 +204,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="https://www.youtube.com/iamadityaupadhyay" 
+                  href="https://www.youtube.com/@iamadityaupadhyay" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -226,7 +226,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="/" 
+                  href="/#faq" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -272,7 +272,7 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className={`mt-2 overflow-auto sm:mt-0 py-2 px-4 rounded-md text-sm font-medium ${
+                  className={`mt-2 sm:mt-0 py-2 px-4 rounded-md text-sm font-medium ${
                     theme === "dark" 
                       ? "bg-blue-600 hover:bg-blue-700 text-white" 
                       : "bg-blue-600 hover:bg-blue-700 text-white"
@@ -285,7 +285,7 @@ export default function Footer() {
             </form>
             
             {/* Account Links */}
-            <div className="mt-8">
+            <div className="mt-4">
               <h4 className={`text-base font-semibold mb-4 ${
                 theme === "dark" ? "text-white" : "text-gray-800"
               }`}>Account</h4>
@@ -312,7 +312,7 @@ export default function Footer() {
         </div>
         
         {/* Secondary Footer */}
-        <div className={`mt-16 pt-8 border-t ${
+        <div className={`mt-5 pt-2 border-t ${
           theme === "dark" ? "border-gray-800" : "border-gray-200"
         }`}>
           <div className="flex flex-col md:flex-row justify-between items-center">
@@ -368,7 +368,7 @@ export default function Footer() {
       </div>
       
       {/* Bottom Bar */}
-      <div className={`mt-8 py-4 ${
+      <div className={`mt-4 py-4 ${
         theme === "dark" ? "bg-black" : "bg-gray-100"
       }`}>
         <div className="container mx-auto px-6">
@@ -376,24 +376,7 @@ export default function Footer() {
             <p className="text-xs opacity-75 mb-2 md:mb-0">
               Using this site means you consent to our use of cookies.
             </p>
-            <div className="flex items-center space-x-2">
-              <select 
-                className={`text-xs py-1 px-2 rounded ${
-                  theme === "dark" 
-                    ? "bg-gray-800 border-gray-700" 
-                    : "bg-white border-gray-300"
-                } border`}
-              >
-                <option>English</option>
-                <option>Español</option>
-                <option>Français</option>
-                <option>Deutsch</option>
-                <option>日本語</option>
-              </select>
-              <a href="#" className="text-xs hover:underline">
-                Accessibility
-              </a>
-            </div>
+            
           </div>
         </div>
       </div>

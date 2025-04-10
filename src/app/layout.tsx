@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   
 // Remove the template if it's causing inconsistency
   icons: {
-    icon: '/favicon.ico',
+    icon: '/trackode.png',
     shortcut: '/favicon.ico',
-    apple: '/apple-icon.png',
+    
     
   },
   
@@ -52,7 +52,28 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head></head>
+      <head>
+      
+<title>Trackode - Free Mock Tests & AI-powered Quizzes</title>
+<meta name="title" content="Trackode - Free Mock Tests & AI-powered Quizzes" />
+<meta name="description" content="Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively." />
+
+
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://trackode.in/" />
+<meta property="og:title" content="Trackode - Free Mock Tests & AI-powered Quizzes" />
+<meta property="og:description" content="Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively." />
+<meta property="og:image" content="https://metatags.io/images/meta-tags.png" />
+
+
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content="https://trackode.in/" />
+<meta property="twitter:title" content="Trackode - Free Mock Tests & AI-powered Quizzes" />
+<meta property="twitter:description" content="Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively." />
+<meta property="twitter:image" content="https://metatags.io/images/meta-tags.png" />
+
+      </head>
+
       <body>
         <SessionProvider>
           <ClientLayout>
