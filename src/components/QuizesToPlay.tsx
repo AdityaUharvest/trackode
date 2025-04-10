@@ -533,7 +533,7 @@ const QuizDashboard = () => {
                 >
                   {/* Section Header */}
                   <div
-                    className={`p-4 flex justify-between items-center cursor-pointer transition-all duration-200 ${
+                    className={`p-2 flex justify-between items-center cursor-pointer transition-all duration-200 ${
                       theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => toggleSection(section)}
@@ -584,7 +584,7 @@ const QuizDashboard = () => {
                           return null;
 
                         return (
-                          <div key={`${section}-${level}`} className="p-4">
+                          <div key={`${section}-${level}`} className="p-2">
                             {/* <div className="flex items-center mb-3">
                               <span
                                 className={`px-3 py-1 rounded-full text-sm font-medium mr-2 ${getLevelColor(
