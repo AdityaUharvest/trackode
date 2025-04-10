@@ -9,6 +9,10 @@ import { useSession } from "next-auth/react";
 import { useTheme } from "@/components/ThemeContext";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+
+
+
 
 const requestFullscreen = (elem: any) => {
   if (elem.requestFullscreen) {
@@ -338,7 +342,11 @@ export default function QuizPage({ params }: any) {
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               <div className={`lg:col-span-3 rounded-lg shadow-lg p-8 ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
                 <h3 className="text-xl font-semibold mb-6">Question {currentQuestion + 1}</h3>
-                <p className="mb-8">{quizData.questions[currentQuestion].question}</p>
+                    <p className="mb-8">
+                      <ReactMarkdown>
+                        {quizData.questions[currentQuestion].question}
+                      </ReactMarkdown>
+                    </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {quizData.questions[currentQuestion].options.map((option: string, index: number) => (
                     <button

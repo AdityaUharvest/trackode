@@ -115,7 +115,7 @@ export default function HomePage() {
                     <span className="ml-2">
                       <SplitText
                         onLetterAnimationComplete={handleAnimationComplete}
-                        text="& Quiz"
+                        text="Quiz"
                         className="font-bold"
                         delay={350}
                         animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
