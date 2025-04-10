@@ -68,6 +68,7 @@ interface Quiz {
   createdAt: string;
   public?: boolean;
   randomize?: boolean;
+  shareCode:String;
   isPublished?: boolean;
 }
 
@@ -765,11 +766,11 @@ const RunningQuizes: React.FC = () => {
         <h3 className="font-medium mb-3">Share Quiz</h3>
         <div className="flex gap-2">
           <Input 
-            value={`https://trackode.in/quiz-play/${quiz._id}`} 
+            value={`${quiz.shareCode}`} 
             readOnly 
             className="flex-1 bg-opacity-50"
           />
-          <Button variant="outline" onClick={() => handleShareQuiz(quiz._id)} >
+          <Button variant="outline" onClick={() => handleShareQuiz(quiz.shareCode)} >
             <Copy size={16} className="mr-2" /> Copy
           </Button>
         </div>
