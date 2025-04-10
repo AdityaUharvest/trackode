@@ -27,7 +27,7 @@ const QuizSetup = () => {
     name: '',
     startDate: '',
     endDate: '',
-    duration:25,
+    duration:'',
     totalMarks: '',
     totalQuestions: '',
     instructions: '',
@@ -212,7 +212,7 @@ const QuizSetup = () => {
                 type="number"
                 placeholder='Enter in minutes'
                 value={formData.duration}
-                onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                 required
               />
             </div>
