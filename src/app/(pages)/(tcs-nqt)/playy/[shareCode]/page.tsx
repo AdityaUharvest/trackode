@@ -251,10 +251,7 @@ export default function QuizPlayer() {
   const changeSection = (sectionName: string) => {
     const targetSection = sections.find(s => s.name === sectionName);
     if (!targetSection?.unlocked || targetSection.submitted) {
-      toast.warning('You cannot access this section yet', {
-        description: 'Complete the current section first to unlock the next one',
-        icon: <Lock size={16} />
-      });
+      toast.warning('You cannot access this section yet');
       return;
     }
 
