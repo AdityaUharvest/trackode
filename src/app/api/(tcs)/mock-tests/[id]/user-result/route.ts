@@ -90,12 +90,15 @@ export async function GET(request: NextRequest, { params }: any) {
 
     // Process section-wise results with question details
     const sections = [
-      'verbal-ability',
-      'reasoning-ability',
-      'numerical-ability',
-      'advanced-quantitative',
-      'advanced-reasoning',
-      'advanced-coding'
+      'c-arrays',
+      'ratio-proportion',
+      // 'verbal-ability',
+      // 'reasoning-ability',
+      // 'numerical-ability',
+      // 'advanced-quantitative',
+      // 'advanced-reasoning',
+      // 'advanced-coding',
+      
     ];
 
     const sectionResults: ISectionResult[] = sections.map(sectionName => {

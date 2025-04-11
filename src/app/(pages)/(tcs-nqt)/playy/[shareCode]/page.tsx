@@ -77,54 +77,54 @@ export default function QuizPlayer() {
 
         // Create sections with question counts
         const sectionData = [
-          { 
-            name: 'verbal-ability', 
-            label: 'Verbal Ability', 
-            timeLimit: 20 * 60, 
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
-          },
-          { 
-            name: 'reasoning-ability', 
-            label: 'Reasoning Ability', 
-            timeLimit: 20 * 60, 
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
-          },
-          { 
-            name: 'numerical-ability', 
-            label: 'Numerical Ability', 
-            timeLimit: 30 * 60, 
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
-          },
-          { 
-            name: 'advanced-quantitative', 
-            label: 'Advanced Quantitative', 
-            timeLimit: 30*60,  
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
-          },
-          { 
-            name: 'advanced-reasoning', 
-            label: 'Advanced Reasoning', 
-            timeLimit: 30*60, 
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
-          },
-          { 
-            name: 'advanced-coding', 
-            label: 'Advanced Coding', 
-            timeLimit: 30*60, 
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
-          },
+          // { 
+          //   name: 'verbal-ability', 
+          //   label: 'Verbal Ability', 
+          //   timeLimit: 20 * 60, 
+          //   questionCount: 0, 
+          //   submitted: false,
+          //   unlocked: false 
+          // },
+          // { 
+          //   name: 'reasoning-ability', 
+          //   label: 'Reasoning Ability', 
+          //   timeLimit: 20 * 60, 
+          //   questionCount: 0, 
+          //   submitted: false,
+          //   unlocked: false 
+          // },
+          // { 
+          //   name: 'numerical-ability', 
+          //   label: 'Numerical Ability', 
+          //   timeLimit: 30 * 60, 
+          //   questionCount: 0, 
+          //   submitted: false,
+          //   unlocked: false 
+          // },
+          // { 
+          //   name: 'advanced-quantitative', 
+          //   label: 'Advanced Quantitative', 
+          //   timeLimit: 30*60,  
+          //   questionCount: 0, 
+          //   submitted: false,
+          //   unlocked: false 
+          // },
+          // { 
+          //   name: 'advanced-reasoning', 
+          //   label: 'Advanced Reasoning', 
+          //   timeLimit: 30*60, 
+          //   questionCount: 0, 
+          //   submitted: false,
+          //   unlocked: false 
+          // },
+          // { 
+          //   name: 'advanced-coding', 
+          //   label: 'Advanced Coding', 
+          //   timeLimit: 30*60, 
+          //   questionCount: 0, 
+          //   submitted: false,
+          //   unlocked: false 
+          // },
           { 
             name: 'c-arrays', 
             label: 'C Arrays', 

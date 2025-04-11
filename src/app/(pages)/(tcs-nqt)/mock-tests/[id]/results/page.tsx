@@ -61,7 +61,9 @@ export default function QuizResultsDashboard({ params }: any) {
     'numerical-ability',
     'advanced-quantitative',
     'advanced-reasoning',
-    'advanced-coding'
+    'advanced-coding',
+    'c-arrays',
+    'ratio-proportion',
   ];
 
   // Theme-based styles

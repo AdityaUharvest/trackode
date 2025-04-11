@@ -65,7 +65,9 @@ export async function GET(request: NextRequest, { params }: any) {
       'numerical-ability',
       'advanced-quantitative',
       'advanced-reasoning',
-      'advanced-coding'
+      'advanced-coding',
+      'c-arrays',
+      'ratio-proportion'
     ];
 
     // Fetch all questions with proper typing
