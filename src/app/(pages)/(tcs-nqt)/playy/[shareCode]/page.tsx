@@ -240,13 +240,15 @@ export default function QuizPlayer() {
 
   //adding this date 07:36 11 april
   const handleAutoSubmit = async () => {
+    if (isSubmittingQuiz) return;
     
     try {
+      setIsSubmittingQuiz(true);
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
       
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
-        answers: sectionAnswers[currentSection] || {} // Submit whatever exists
+        answers: sectionAnswers[currentSection] || {}
       });
   
       // Mark as submitted
@@ -265,7 +267,9 @@ export default function QuizPlayer() {
           idx === currentSectionIndex + 1 ? {...s, unlocked: true} : s
         ));
       } else {
-        handleQuizSubmit();
+        // If this is the last section, submit the quiz
+        await handleQuizSubmit();
+        return; // Early return to prevent duplicate submission
       }
   
       // Show time up notification
@@ -273,8 +277,12 @@ export default function QuizPlayer() {
       
     } catch (err) {
       toast.error('Failed to auto-submit section');
+    } finally {
+      setIsSubmittingQuiz(false);
     }
   };
+  
+  
   
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
     const currentSectionObj = sections.find(s => s.name === currentSection);
@@ -372,20 +380,19 @@ export default function QuizPlayer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleQuizSubmit = async () => {
     if (isSubmittingQuiz) return;
-    setIsSubmitting(true);
-    setIsSubmittingQuiz(true);
+    
     try {
+      setIsSubmittingQuiz(true);
       await axios.post(`/api/quiz/${shareCode}/complete`, {
         answers: sectionAnswers
       });
+      
       localStorage.removeItem(`quiz_${shareCode}_answers`);
       setShowFeedbackModal(true);
     } catch (err) {
       setError('Failed to submit quiz. Please try again.');
     } finally {
       setIsSubmittingQuiz(false);
-      setIsSubmitting(false);
-      setShowSubmitModal(false);
     }
   };
 
