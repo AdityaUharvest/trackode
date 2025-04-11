@@ -93,12 +93,12 @@ export default function QuizPlayer() {
   
         // Count questions in each section
         response.data.questions.forEach((q: Question) => {
-          const section = normalizedSections.find(s => s.name === q.section);
+          const section = normalizedSections.find((s:any) => s.name === q.section);
           if (section) section.questionCount++;
         });
   
         // Filter out sections with 0 questions
-        const filteredSections = normalizedSections.filter(s => s.questionCount > 0);
+        const filteredSections = normalizedSections.filter((s:any) => s.questionCount > 0);
   
         // Unlock the first section
         if (filteredSections.length > 0) {
@@ -115,7 +115,7 @@ export default function QuizPlayer() {
   
           // Restore section states
           if (parsed.sectionsState) {
-            filteredSections.forEach(section => {
+            filteredSections.forEach((section:any) => {
               const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
               if (savedSection) {
                 section.submitted = savedSection.submitted;
@@ -124,7 +124,7 @@ export default function QuizPlayer() {
             });
           }
   
-          const firstUnsubmitted = filteredSections.find(s => !s.submitted);
+          const firstUnsubmitted = filteredSections.find((s:any) => !s.submitted);
           if (firstUnsubmitted) {
             setCurrentSection(firstUnsubmitted.name);
           }
