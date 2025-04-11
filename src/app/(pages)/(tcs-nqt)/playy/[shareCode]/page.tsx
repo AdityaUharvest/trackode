@@ -240,7 +240,7 @@ export default function QuizPlayer() {
 
   //adding this date 07:36 11 april
   const handleAutoSubmit = async () => {
-    if (isSubmittingQuiz || isSubmitting) return;
+    
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
       
