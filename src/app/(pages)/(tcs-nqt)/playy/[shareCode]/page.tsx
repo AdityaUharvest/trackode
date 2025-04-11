@@ -85,7 +85,7 @@ export default function QuizPlayer() {
         const normalizedSections = res.data.sections.map((s: any) => ({
           name: s.value,
           label: s.label,
-          timeLimit: 0.1 * 60,
+          timeLimit: 25 * 60,
           questionCount: 0,
           submitted: false,
           unlocked: false,
@@ -421,32 +421,32 @@ export default function QuizPlayer() {
     );
   }
 
-  // if (hasAttempted) {
-  //   return (
-  //     <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-  //       <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-  //         <h2 className="text-sm text-red-400 font-semibold mb-4">
-  //           <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
-  //           You have already attempted this mock test
-  //           <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
-  //         </h2>
+  if (hasAttempted) {
+    return (
+      <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+          <h2 className="text-sm text-red-400 font-semibold mb-4">
+            <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
+            You have already attempted this mock test
+            <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
+          </h2>
 
-  //         <button
-  //           onClick={() => router.push('/dashboard')}
-  //           className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-  //         >
-  //           Go to your Dashboard
-  //         </button>
-  //         <button
-  //           onClick={() => router.push('/quiz-list')}
-  //           className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-  //         >
-  //           Explore Free Live Quizes
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+          <button
+            onClick={() => router.push('/dashboard')}
+            className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+          >
+            Go to your Dashboard
+          </button>
+          <button
+            onClick={() => router.push('/quiz-list')}
+            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+          >
+            Explore Free Live Quizes
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!quizStarted) {
     return (
