@@ -10,6 +10,7 @@ import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer } from 'lucide-react
 import { useTheme } from '@/components/ThemeContext';
 import { useSession } from 'next-auth/react';
 import React from 'react';
+import axios from 'axios';
 interface SectionStats {
   answered: number;
   correct: number;
@@ -55,16 +56,7 @@ export default function QuizResultsDashboard({ params }: any) {
     totalParticipants: 0
   });
 
-  const sections = [
-    'verbal-ability',
-    'reasoning-ability',
-    'numerical-ability',
-    'advanced-quantitative',
-    'advanced-reasoning',
-    'advanced-coding',
-    'c-arrays',
-    'ratio-proportion',
-  ];
+  
 
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
@@ -74,7 +66,27 @@ export default function QuizResultsDashboard({ params }: any) {
   const hoverBg = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
   const headerBg = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50';
   const secondaryText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
-
+  const [sections, setSections] = useState<any[]>([]);
+  const printingRef = React.useRef<HTMLDivElement>(null);
+  let sectionss=[];
+  useEffect(
+    ()=>{
+      const fetchSection = async () => {
+        try {
+          const res = await axios.get('/api/fetchSection');
+          console.log(res.data.sections);
+          setSections(res.data.sections);
+        } catch (error) {
+          console.error('Failed to fetch sections', error);
+        }
+      };
+      fetchSection();
+    },[]
+  )
+  for(let i =0;i<sections.length;i++){
+    sectionss.push(sections[i].value);
+  }
+  console.log(sections);
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
@@ -166,10 +178,23 @@ export default function QuizResultsDashboard({ params }: any) {
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-lg font-bold"> Welcome {session?.user?.name}</h1>
         <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={() => window.print()} className={`gap-2 ${borderColor}`}>
+            <Button
+            variant="outline"
+            onClick={() => {
+              if (printingRef.current) {
+              const printContents = printingRef.current.innerHTML;
+              const originalContents = document.body.innerHTML;
+              document.body.innerHTML = printContents;
+              window.print();
+              document.body.innerHTML = originalContents;
+              window.location.reload();
+              }
+            }}
+            className={`gap-2 ${borderColor}`}
+            >
             <Printer className="h-4 w-4" />
             Export Results
-          </Button>
+            </Button>
         </div>
       </div>
 
@@ -190,9 +215,9 @@ export default function QuizResultsDashboard({ params }: any) {
           </SelectTrigger>
           <SelectContent className={`${cardBg} ${borderColor}`}>
             <SelectItem value="all">All Sections</SelectItem>
-            {sections.map(section => (
+            {sectionss.map(section => (
               <SelectItem key={section} value={section}>
-                {section.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                {section.split('-').map((word:any) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
               </SelectItem>
             ))}
           </SelectContent>
@@ -241,9 +266,26 @@ export default function QuizResultsDashboard({ params }: any) {
         </div>
       </div>
 
-      <div className={`rounded-lg shadow overflow-hidden border ${cardBg} ${borderColor}`}>
+      <div 
+      ref={printingRef}
+      className={`rounded-lg shadow overflow-hidden border ${cardBg} ${borderColor}`}>
+        <div className="flex justify-evenly border-b-blue-200 border-b-2">
+        <p className='text-center p-2 '>
+          <span className=' text-blue-600'>Total Participants:</span> {quizStats.totalParticipants} 
+        </p>
+        <p className='text-center p-2 '>
+          <span className=' text-blue-600'>Quiz Title:</span> {quizStats.quizTitle}
+        </p>
+        <p className='text-center p-2 '>
+          <span className=' text-blue-600'>Visit:</span> www.trackode.in/
+        </p>
+       
+        </div>
+        
         <Table>
+          
           <TableHeader className={headerBg}>
+          
             <TableRow className={borderColor}>
               <TableHead className={textColor}>
                 <Button 
@@ -251,7 +293,7 @@ export default function QuizResultsDashboard({ params }: any) {
                   onClick={() => handleSort('userName')}
                   className={`px-0 hover:bg-transparent font-medium ${textColor}`}
                 >
-                  User {sortConfig.key === 'userName' && (
+                  Player {sortConfig.key === 'userName' && (
                     sortConfig.direction === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
                   )}
                 </Button>
@@ -273,7 +315,18 @@ export default function QuizResultsDashboard({ params }: any) {
                   onClick={() => handleSort('totalCorrect')}
                   className={`px-0 hover:bg-transparent font-medium ${textColor}`}
                 >
-                  Correct {sortConfig.key === 'totalCorrect' && (
+                  Overall Correct {sortConfig.key === 'totalCorrect' && (
+                    sortConfig.direction === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
+                  )}
+                </Button>
+              </TableHead>
+              <TableHead className={`text-right ${textColor}`}>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('totalCorrect')}
+                  className={`px-0 hover:bg-transparent font-medium ${textColor}`}
+                >
+                  Score Ratio {sortConfig.key === 'totalCorrect' && (
                     sortConfig.direction === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
                   )}
                 </Button>
@@ -296,6 +349,17 @@ export default function QuizResultsDashboard({ params }: any) {
                   className={`px-0 hover:bg-transparent font-medium ${textColor}`}
                 >
                   Completed {sortConfig.key === 'completedAt' && (
+                    sortConfig.direction === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
+                  )}
+                </Button>
+              </TableHead>
+              <TableHead className={`text-right ${textColor}`}>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSort('timeTaken')}
+                  className={`px-0 hover:bg-transparent font-medium ${textColor}`}
+                >
+                  Time taken {sortConfig.key === 'timeTaken' && (
                     sortConfig.direction === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
                   )}
                 </Button>
@@ -325,15 +389,30 @@ export default function QuizResultsDashboard({ params }: any) {
                     <TableCell className="text-right">
                       <span className={`font-medium ${textColor}`}>{attempt.totalCorrect}</span>
                       <span className={`text-sm ${secondaryText}`}>/{attempt.totalQuestions}</span>
+                     
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <span className={`font-medium ${textColor}`}>{attempt.totalCorrect}</span>/
+                      <span className={`text-sm ${secondaryText}`}>{attempt.totalAnswered}</span>
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={`font-medium ${textColor}`}>{attempt.accuracy}%</span>
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={textColor}>{new Date(attempt.completedAt).toLocaleDateString()}</span>
-                      <div className={`text-sm ${secondaryText}`}>
+                      <div className={`text-xs ${secondaryText}`}>
+                        {new Date(attempt.startedAt).toLocaleTimeString()}
+                      </div>
+                      
+                    </TableCell>
+                    <TableCell className="text-right">
+                    <div className={`text-sm ${secondaryText}`}>
+                        {((new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000).toFixed(2)} min
+                    </div>
+                    <div className={`text-xs ${secondaryText}`}>
                         {new Date(attempt.completedAt).toLocaleTimeString()}
                       </div>
+                      
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
