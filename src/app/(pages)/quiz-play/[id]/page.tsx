@@ -182,7 +182,7 @@ export default function QuizPage({ params }: any) {
           toast.error("You have already attempted this quiz.");
         }
       } catch (error) {
-        console.error("Error checking quiz attempt:", error);
+       
         toast.error("Failed to check quiz attempt.");
       }
     };
@@ -198,7 +198,7 @@ export default function QuizPage({ params }: any) {
         const response = await axios.get(`/api/quiz-get/${id}`);
         
         if(response.data.active === false){
-          console.log(response.data.active);
+         
           toast.error("Quiz is not active");
           router.push("/dashboard");
         }
@@ -211,7 +211,7 @@ export default function QuizPage({ params }: any) {
         );
         setTimeLeft(response.data.quiz.duration * 60 * 60);
       } catch (error) {
-        console.error("Error fetching quiz data:", error);
+        
         toast.error("Failed to load quiz.");
       }
     };
@@ -278,7 +278,7 @@ export default function QuizPage({ params }: any) {
         }, 1500);
       }
     } catch (error) {
-      console.error("Error submitting quiz:", error);
+      
       toast.error("Failed to submit quiz.");
     } finally {
       setIsSubmitting(false);

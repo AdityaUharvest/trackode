@@ -22,7 +22,7 @@ export default function QuizResultClient({ result }: { result: any }) {
       });
 
       const data = await response.json();
-      console.log(data.instructions);
+      
       setExplanation((prev) => ({ ...prev, [index]: data.instructions }));
     } finally {
       setGeneratingId(null);

@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         
     } = await request.json();
     
-    console.log(duration)
+    
     
     
     try {
@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
         }, { status: 201 });
 
     } catch (error) {
-        console.error(error);
         return NextResponse.json({
             message: "Error Occurred",
             success: false,

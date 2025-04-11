@@ -93,22 +93,7 @@ export default function QuizPlayer() {
             submitted: false,
             unlocked: false
           },
-          {
-            name: 'c-structures',
-            label: 'C Structures',
-            timeLimit: 30 * 60,
-            questionCount: 0,
-            submitted: false,
-            unlocked: false
-          },
-          {
-            name: 'c-pointers',
-            label: 'C Pointers',
-            timeLimit: 30 * 60,
-            questionCount: 0,
-            submitted: false,
-            unlocked: false
-          },
+          
           
           {
             name: 'verbal-ability',
@@ -209,10 +194,6 @@ export default function QuizPlayer() {
     fetchQuizData();
   }, [shareCode]);
 
-  // Security measures
-
-
-  // Save answers and section state to localStorage
   useEffect(() => {
     if (quizStarted && sections.length > 0) {
       localStorage.setItem(`quiz_${shareCode}_answers`, JSON.stringify({
@@ -393,7 +374,7 @@ export default function QuizPlayer() {
 
   const handleFeedbackComplete = () => {
     setShowFeedbackModal(false);
-    setShowResultModal(true);
+    router.push('/dashboard');
   };
   useEffect(() => {
     if (!quizStarted) return;
@@ -559,13 +540,12 @@ export default function QuizPlayer() {
               <h2 className="text-xl font-semibold mb-4">Instructions</h2>
               <ul className="space-y-3">
                 {[
-                  "Sections must be completed in sequence",
-                  "First section is unlocked automatically",
-                  "Next section unlocks only after submitting current section",
-                  "Submitted sections are locked permanently",
-                  "You cannot return to submitted sections",
-                  "Complete all questions before time runs out",
-                  "Belt treatment in case of cheating by Mr. Bhibhuti",
+                  "✅ Sections must be completed in sequence",
+                  "✅ First section is unlocked automatically",
+                  "✅ Next section unlocks only after submitting current section",
+                  "✅ Submitted sections are locked permanently",
+                  "✅ You cannot return to submitted sections",
+                  "✅ Complete all questions before time runs out",
                  
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
@@ -597,7 +577,6 @@ export default function QuizPlayer() {
       ref={quizContainerRef}
       className={`${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'} overflow-y-auto`}
     >
-      {/* Quiz Header */}
       <header className={`sticky top-0 z-10 mt-5 shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -921,6 +900,7 @@ export default function QuizPlayer() {
         quizId={quiz?._id}
         quizTitle={quiz?.title}
         theme={theme}
+        
       />
 
       {/* Results Modal */}

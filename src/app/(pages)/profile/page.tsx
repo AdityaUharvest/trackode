@@ -17,7 +17,7 @@ type User = {
 export default function Page() {
   const [user, setUser] = useState<User | null>(null)
   const { data: session, status } = useSession()
-  console.log('Session:', session)
+  
   useEffect(() => {
     if (session?.user) {
       setUser({

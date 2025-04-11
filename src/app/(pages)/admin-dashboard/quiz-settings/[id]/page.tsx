@@ -82,7 +82,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const handleUpdateQuiz = async () => {
     try {
       const response = await axios.put(`${API_BASE_URL}/quiz-update/${quizId}`, {updatedQuiz});
-      console.log(response);
+      
       if (response.data.success) {
         setQuiz(updatedQuiz);
         toast.success("Quiz updated successfully!",{
@@ -145,7 +145,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         draggable: false,
         progress: undefined,
       });
-      console.log("Question Updated Successfully");
+      
     }
     // const updatedQuestions = quiz?.questions?.map((q) => (q._id === questionId ? updatedQuestion : q));
     setQuiz((prev) => ({
@@ -239,7 +239,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                         });
                       })
                       .catch((error) => {
-                        console.error("Failed to copy:", error);
+                       
                         toast.error("Failed to copy link");
                       });
                   }}

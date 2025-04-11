@@ -13,7 +13,7 @@ export async function GET(req:NextRequest,{params}:any){
     await connectDB();
     try {
         const attempted=await Attempted.find({quiz:quizId}).populate("student")
-        console.log(attempted.length)
+      
         if(attempted){
             return NextResponse.json(
                 {

@@ -6,7 +6,7 @@ export async function PUT(req: NextRequest, { params }: any) {
     await connectDB();
     try {
         const { updatedQuiz } = await req.json();
-        console.log(updatedQuiz.name);
+       
         const quiz = await Quiz.findByIdAndUpdate(id,
             { 
                 name: updatedQuiz.name,

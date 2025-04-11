@@ -6,13 +6,13 @@ export async function GET(req:NextRequest){
     await connectDB();
     try {
         const {searchParams }= new URL(req.url);
-        console.log(searchParams);
+        
         const id = searchParams.get('id');
         const userId= searchParams.get('userId');
         
         
         const attempted = await Attempted.findOne({student:userId,quiz:id});
-        console.log("attempted",attempted)
+        
         if (attempted){
             return NextResponse.json(
                 {

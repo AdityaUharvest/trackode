@@ -27,6 +27,7 @@ interface Section {
 interface QuestionGeneratorProps {
   isPublished: boolean;
   mockTest: string;
+  shareCode: string;
 }
 
 interface EditingQuestion extends Question {
@@ -58,7 +59,7 @@ const sections: Section[] = [
 
 const API_TIMEOUT = 60000; // 60 seconds timeout
 
-export default function QuestionGenerator({ isPublished, mockTest }: QuestionGeneratorProps) {
+export default function QuestionGenerator({ isPublished, mockTest, shareCode }: QuestionGeneratorProps) {
   const { theme } = useTheme();
   const params = useParams();
   const { data: session } = useSession();
@@ -268,8 +269,9 @@ DO NOT include any explanations, markdown formatting, or additional text outside
 
   const [copied, setCopied] = useState(false);
   const handleShareLink = async () => {
-    const shareLink = localStorage.getItem('shareLink');
-    navigator.clipboard.writeText(`${window.location.origin}${shareLink}`).then(
+    
+    
+    navigator.clipboard.writeText(`${window.location.origin}/playy/${shareCode}`).then(
       () => {
         setSuccessMessage('Share link copied to clipboard!');
         setCopied(true);

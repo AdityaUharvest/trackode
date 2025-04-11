@@ -8,7 +8,7 @@ export default async function MockTestQuestionsPage(
   params,
 }: any
 ) {
-  console.log("params", params);
+  
   const mockTest = await getMockTest(params.id);
   
   return (
@@ -18,6 +18,7 @@ export default async function MockTestQuestionsPage(
       <QuestionGenerator
      isPublished={mockTest.isPublished}
      mockTest={mockTest.title}
+    shareCode={mockTest.shareCode}
      />
 
       

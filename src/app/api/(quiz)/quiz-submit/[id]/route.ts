@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, { params }: any) {
       isCorrect
     });
   }
-  console.log(quiz.name)
+  
   // answer me question ki id aa rhi hai aur uss question ka user ka answer aa rha hai
   // Store result in database
   const result = await Attempted.create({

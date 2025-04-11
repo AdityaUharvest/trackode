@@ -58,9 +58,7 @@ export async function GET(req: NextRequest, { params }: any) {
         };
       });
     }
-    console.log(quizResponse);
-    console.log(quiz.shuffleQuestions);
-    console.log(quiz.shuffleOptions);
+    
     return NextResponse.json({
       message: "Quiz found",
       success: true,

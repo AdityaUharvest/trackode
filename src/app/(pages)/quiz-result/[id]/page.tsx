@@ -46,7 +46,7 @@ export default function QuizResults({ params }: any) {
         });
         setResults(response.data.attempted);
       } catch (error) {
-        console.error("Failed to fetch results:", error);
+       
         setError("Failed to fetch results");
       } finally {
         setLoading(false);
