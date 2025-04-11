@@ -10,8 +10,8 @@ import { QuestionTimer } from '@/components/(tcs)/QuestionTimer';
 import { Loader2, Calculator, Minimize2, Maximize2, ChevronLeft, ChevronRight, Lock, AlertTriangle } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { FeedbackForm } from '@/components/(tcs)/FeedbackForm';
-import {toast} from 'react-toastify'
-import { createAccordionScope } from '@radix-ui/react-accordion';
+import { toast } from 'react-toastify'
+import ReactMarkdown from 'react-markdown';
 
 interface Question {
   _id: string;
@@ -36,7 +36,7 @@ export default function QuizPlayer() {
   const { shareCode } = useParams();
   const router = useRouter();
   const quizContainerRef = useRef<HTMLDivElement>(null);
-  
+
   const [quiz, setQuiz] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
@@ -58,6 +58,8 @@ export default function QuizPlayer() {
   const [hasAttempted, setHasAttempted] = useState<boolean>(false);
   const [isPublished, setIsPublished] = useState<boolean>(false);
   const [showSectionWarning, setShowSectionWarning] = useState(false);
+  const [fullscreenExits, setFullscreenExits] = useState(0);
+  const [isTabActive, setIsTabActive] = useState(true);
 
   // Initialize sections and load saved answers
   useEffect(() => {
@@ -68,112 +70,58 @@ export default function QuizPlayer() {
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         setIsPublished(response.data.quiz.isPublished);
-        console.log(isPublished)
+
         const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
-        console.log(attempted.data);
         if (attempted.data) {
           setHasAttempted(attempted.data);
         }
 
-        // Create sections with question counts
         const sectionData = [
-          // { 
-          //   name: 'verbal-ability', 
-          //   label: 'Verbal Ability', 
-          //   timeLimit: 20 * 60, 
-          //   questionCount: 0, 
-          //   submitted: false,
-          //   unlocked: false 
-          // },
-          // { 
-          //   name: 'reasoning-ability', 
-          //   label: 'Reasoning Ability', 
-          //   timeLimit: 20 * 60, 
-          //   questionCount: 0, 
-          //   submitted: false,
-          //   unlocked: false 
-          // },
-          // { 
-          //   name: 'numerical-ability', 
-          //   label: 'Numerical Ability', 
-          //   timeLimit: 30 * 60, 
-          //   questionCount: 0, 
-          //   submitted: false,
-          //   unlocked: false 
-          // },
-          // { 
-          //   name: 'advanced-quantitative', 
-          //   label: 'Advanced Quantitative', 
-          //   timeLimit: 30*60,  
-          //   questionCount: 0, 
-          //   submitted: false,
-          //   unlocked: false 
-          // },
-          // { 
-          //   name: 'advanced-reasoning', 
-          //   label: 'Advanced Reasoning', 
-          //   timeLimit: 30*60, 
-          //   questionCount: 0, 
-          //   submitted: false,
-          //   unlocked: false 
-          // },
-          // { 
-          //   name: 'advanced-coding', 
-          //   label: 'Advanced Coding', 
-          //   timeLimit: 30*60, 
-          //   questionCount: 0, 
-          //   submitted: false,
-          //   unlocked: false 
-          // },
-          { 
-            name: 'c-arrays', 
-            label: 'C Arrays', 
-            timeLimit: 30*60, 
-            questionCount: 0, 
+          {
+            name: 'c-arrays',
+            label: 'C Arrays',
+            timeLimit: 30 * 60,
+            questionCount: 0,
             submitted: false,
-            unlocked: false 
-          }
-          ,
-          { 
-            name: 'ratio-proportion', 
-            label: 'Ratio Proportion', 
-            timeLimit: 30*60, 
-            questionCount: 0, 
-            submitted: false,
-            unlocked: false 
+            unlocked: false
           },
-          { 
-            name: 'c-structures', 
-            label: 'C Structures', 
-            timeLimit: 30*60, 
-            questionCount: 0, 
+          {
+            name: 'ratio-proportion',
+            label: 'Ratio Proportion',
+            timeLimit: 30 * 60,
+            questionCount: 0,
             submitted: false,
-            unlocked: false 
+            unlocked: false
           },
-          { 
-            name: 'c-pointers', 
-            label: 'C Pointers', 
-            timeLimit: 30*60, 
-            questionCount: 0, 
+          {
+            name: 'c-structures',
+            label: 'C Structures',
+            timeLimit: 30 * 60,
+            questionCount: 0,
             submitted: false,
-            unlocked: false 
+            unlocked: false
+          },
+          {
+            name: 'c-pointers',
+            label: 'C Pointers',
+            timeLimit: 30 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
           }
         ];
 
-        // Calculate question counts per section
         response.data.questions.forEach((q: Question) => {
           const section = sectionData.find(s => s.name === q.section);
           if (section) section.questionCount++;
         });
 
         const filteredSections = sectionData.filter(s => s.questionCount > 0);
-        
-        // Unlock first section
+
         if (filteredSections.length > 0) {
           filteredSections[0].unlocked = true;
         }
 
-        // Load saved state
         const savedAnswers = localStorage.getItem(`quiz_${shareCode}_answers`);
         if (savedAnswers) {
           const parsed = JSON.parse(savedAnswers);
@@ -181,7 +129,6 @@ export default function QuizPlayer() {
           setSectionAnswers(parsed.sectionAnswers || {});
           setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
 
-          // Update sections with saved state
           if (parsed.sectionsState) {
             filteredSections.forEach(section => {
               const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
@@ -192,7 +139,6 @@ export default function QuizPlayer() {
             });
           }
 
-          // Find first unsubmitted section
           const firstUnsubmitted = filteredSections.find(s => !s.submitted);
           if (firstUnsubmitted) {
             setCurrentSection(firstUnsubmitted.name);
@@ -211,6 +157,9 @@ export default function QuizPlayer() {
 
     fetchQuizData();
   }, [shareCode]);
+
+  // Security measures
+
 
   // Save answers and section state to localStorage
   useEffect(() => {
@@ -231,12 +180,12 @@ export default function QuizPlayer() {
   // Section timer logic
   useEffect(() => {
     if (!quizStarted || !currentSection) return;
-    
+
     const section = sections.find(s => s.name === currentSection);
     if (!section?.timeLimit || section.submitted) return;
-    
+
     setSectionTimeRemaining(section.timeLimit);
-    
+
     const timer = setInterval(() => {
       setSectionTimeRemaining(prev => {
         if (prev <= 1) {
@@ -247,28 +196,40 @@ export default function QuizPlayer() {
         return prev - 1;
       });
     }, 1000);
-    
+
     return () => clearInterval(timer);
   }, [currentSection, quizStarted, sections]);
 
-  // Fullscreen change handler
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-  //when clicking on start quiz button, quiz will be in fullscreen mode
-  useEffect(
-  ()=>{
-    quizContainerRef.current?.requestFullscreen();
-  }
-  )
   const startQuiz = () => {
-    setQuizStarted(true);
+
+
+    try {
+      // First set the state, then request fullscreen after a short delay
+      setQuizStarted(true);
+
+      // Small delay to ensure state update has completed
+      setTimeout(() => {
+        quizContainerRef.current?.requestFullscreen()
+          .catch(e => {
+            console.error('Fullscreen error:', e);
+            // More descriptive error message based on the error
+            if (e.name === 'NotAllowedError') {
+              toast.error('Fullscreen was denied. This quiz requires fullscreen mode.');
+            } else if (e.name === 'NotSupportedError') {
+              toast.error('Your browser does not support fullscreen mode.');
+            } else {
+              toast.error('Failed to enter fullscreen mode. This quiz requires fullscreen.');
+            }
+            setQuizStarted(false);
+          });
+      }, 100);
+    } catch (error) {
+      console.error('Fullscreen setup error:', error);
+      toast.error('Failed to start quiz in fullscreen mode.');
+      setQuizStarted(false);
+    }
   };
+
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
     const currentSectionObj = sections.find(s => s.name === currentSection);
@@ -278,7 +239,7 @@ export default function QuizPlayer() {
       ...prev,
       [questionId]: optionIndex
     }));
-    
+
     setSectionAnswers(prev => ({
       ...prev,
       [currentSection]: {
@@ -319,10 +280,10 @@ export default function QuizPlayer() {
   };
 
   const handleSectionSubmit = async () => {
+    setIsSubmitting(true)
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-      
-      // Check if at least one question is answered
+
       const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
       if (answeredQuestions === 0) {
         setShowSectionWarning(true);
@@ -333,40 +294,38 @@ export default function QuizPlayer() {
         section: currentSection,
         answers: sectionAnswers[currentSection] || {}
       });
-      
-      // Mark section as submitted
-      setSections(prev => prev.map(s => 
-        s.name === currentSection 
-          ? { ...s, submitted: true } 
+
+      setSections(prev => prev.map(s =>
+        s.name === currentSection
+          ? { ...s, submitted: true }
           : s
       ));
 
-      // Unlock next section if available
       if (currentSectionIndex < sections.length - 1) {
-        setSections(prev => prev.map((s, idx) => 
-          idx === currentSectionIndex + 1 
-            ? { ...s, unlocked: true } 
+        setSections(prev => prev.map((s, idx) =>
+          idx === currentSectionIndex + 1
+            ? { ...s, unlocked: true }
             : s
         ));
       }
 
-      // Move to next section if available
       if (currentSectionIndex < sections.length - 1) {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
       } else {
-        // If last section, submit the quiz
         handleQuizSubmit();
       }
     } catch (err) {
       setError('Failed to save answers. Please try again.');
     } finally {
+      setIsSubmitting(false);
       setShowSubmitModal(false);
     }
   };
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleQuizSubmit = async () => {
+    setIsSubmitting(true);
     try {
       await axios.post(`/api/quiz/${shareCode}/complete`, {
         answers: sectionAnswers
@@ -376,6 +335,7 @@ export default function QuizPlayer() {
     } catch (err) {
       setError('Failed to submit quiz. Please try again.');
     } finally {
+      setIsSubmitting(false);
       setShowSubmitModal(false);
     }
   };
@@ -384,7 +344,44 @@ export default function QuizPlayer() {
     setShowFeedbackModal(false);
     setShowResultModal(true);
   };
+  useEffect(() => {
+    if (!quizStarted) return;
 
+    // Function to handle fullscreen changes
+    const handleFullscreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+
+      if (document.fullscreenElement === null && quizStarted) {
+        setFullscreenExits(prev => prev + 1);
+        if (fullscreenExits >= 3) {
+          toast.error('Maximum fullscreen exits reached. Submitting your progress...');
+          handleQuizSubmit();
+        } else {
+          toast.warning(`Warning ${fullscreenExits + 1}/4: Please stay in fullscreen mode`);
+
+          // Try to re-enter fullscreen after a short delay
+          setTimeout(() => {
+            quizContainerRef.current?.requestFullscreen().catch(e => {
+              console.error('Fullscreen re-entry error:', e);
+            });
+          }, 500);
+        }
+      }
+    }
+
+    // Use the correct event name for fullscreen changes
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // For Safari
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange); // For Firefox
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange); // For IE/Edge
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [quizStarted, fullscreenExits, handleQuizSubmit]);
   const currentQuestions = questions.filter(q => q.section === currentSection);
   const currentQuestion = currentQuestions[currentQuestionIndex];
   const currentSectionData = sections.find(s => s.name === currentSection);
@@ -399,20 +396,20 @@ export default function QuizPlayer() {
       </div>
     );
   }
-  
+
   if (!isPublished) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
           <h2 className="text-xl font-bold mb-4">The Quiz is ended</h2>
           <p className="mb-6">This quiz is not yet published. Please check back later.</p>
-          <button 
+          <button
             onClick={() => router.push('/dashboard')}
             className={`px-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
             Student Dashboard
           </button>
-          <button 
+          <button
             onClick={() => router.push('/quiz-list')}
             className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
@@ -422,14 +419,14 @@ export default function QuizPlayer() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
           <h2 className="text-xl font-bold mb-4">Error</h2>
           <p className="mb-6">{error}</p>
-          <button 
+          <button
             onClick={() => router.push('/')}
             className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
@@ -439,24 +436,24 @@ export default function QuizPlayer() {
       </div>
     );
   }
-  
-  if(hasAttempted) {
+
+  if (hasAttempted) {
     return (
       <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
           <h2 className="text-sm text-red-400 font-semibold mb-4">
-            <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>  
-            You have already attempted this mock test 
+            <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
+            You have already attempted this mock test
             <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
           </h2>
-         
-          <button 
+
+          <button
             onClick={() => router.push('/dashboard')}
             className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
             Go to your Dashboard
           </button>
-          <button 
+          <button
             onClick={() => router.push('/quiz-list')}
             className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
@@ -479,17 +476,15 @@ export default function QuizPlayer() {
               </div>
             )}
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div>
               <h2 className="text-xl font-semibold mb-4">Sections</h2>
               <div className="space-y-3">
                 {sections.map(section => (
-                  <div key={section.name} className={`p-4 rounded-lg border flex items-center justify-between ${
-                    theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-                  } ${
-                    !section.unlocked ? 'opacity-70' : ''
-                  }`}>
+                  <div key={section.name} className={`p-4 rounded-lg border flex items-center justify-between ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                    } ${!section.unlocked ? 'opacity-70' : ''
+                    }`}>
                     <div className="flex items-center gap-3">
                       {!section.unlocked && <Lock size={16} className="flex-shrink-0" />}
                       <span className="font-medium">{section.label}</span>
@@ -518,7 +513,10 @@ export default function QuizPlayer() {
                   "Next section unlocks only after submitting current section",
                   "Submitted sections are locked permanently",
                   "You cannot return to submitted sections",
-                  "Complete all questions before time runs out"
+                  "Complete all questions before time runs out",
+                  "Fullscreen mode is required",
+                  "Switching tabs will be detected",
+                  "Copying text is disabled"
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
@@ -545,38 +543,35 @@ export default function QuizPlayer() {
   }
 
   return (
-    <div 
+    <div
       ref={quizContainerRef}
-      className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}
+      className={`${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'} overflow-y-auto`}
     >
       {/* Quiz Header */}
-      <header className={`sticky top-0 z-10 shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+      <header className={`sticky top-0 z-10 mt-5 shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <h1 className="text-lg font-bold truncate max-w-xs">{quiz?.title}</h1>
-            <span className={`px-3 py-1 rounded-full text-sm flex items-center gap-2 ${theme === 'dark' ? 'bg-blue-900 text-blue-100' : 'bg-blue-100 text-blue-800'}`}>
-              {currentSectionData?.label}
-              {isSectionSubmitted && <Lock size={14} />}
-            </span>
+            <h1 className="text-sm ml-2 font-bold truncate max-w-xs">{quiz?.title}</h1>
+
           </div>
-          
+
           <div className="flex items-center gap-3">
             {currentSectionData?.timeLimit && !isSectionSubmitted && (
-              <QuestionTimer 
-                timeRemaining={sectionTimeRemaining} 
+              <QuestionTimer
+                timeRemaining={sectionTimeRemaining}
                 onTimeUp={handleSectionSubmit}
               />
             )}
-            
-            <button 
+
+            <button
               onClick={() => setShowCalculator(!showCalculator)}
               className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} ${showCalculator ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
               title="Calculator"
             >
               <Calculator size={20} />
             </button>
-            
-            <button 
+
+            <button
               onClick={() => {
                 if (!document.fullscreenElement) {
                   quizContainerRef.current?.requestFullscreen();
@@ -597,12 +592,11 @@ export default function QuizPlayer() {
       <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Section Navigation - Left Sidebar */}
         <div className="lg:col-span-3">
-          <SectionProgress 
+          <SectionProgress
             sections={sections}
             currentSection={currentSection}
             answers={sectionAnswers}
             onChangeSection={changeSection}
-            
           />
         </div>
 
@@ -620,11 +614,11 @@ export default function QuizPlayer() {
                   <ChevronLeft size={18} />
                   <span>Previous</span>
                 </button>
-                
+
                 <span className={`px-3 py-1 rounded-full text-sm ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                  Question {currentQuestionIndex + 1} of {currentQuestions.length}
+                  {currentQuestionIndex + 1}/{currentQuestions.length}
                 </span>
-                
+
                 <button
                   onClick={goToNextQuestion}
                   disabled={currentQuestionIndex === currentQuestions.length - 1 || isSectionSubmitted}
@@ -637,7 +631,9 @@ export default function QuizPlayer() {
 
               {/* Question Text */}
               <div className="mb-8">
-                <h2 className="text-lg font-medium leading-relaxed">{currentQuestion.text}</h2>
+                <ReactMarkdown>
+                  {currentQuestion.text}
+                </ReactMarkdown>
               </div>
 
               {/* Options */}
@@ -646,28 +642,25 @@ export default function QuizPlayer() {
                   <div
                     key={index}
                     onClick={() => !isSectionSubmitted && handleAnswerSelect(currentQuestion._id, index)}
-                    className={`p-4 rounded-lg transition-all border ${
-                      answers[currentQuestion._id] === index
-                        ? theme === 'dark' 
-                          ? 'border-blue-500 bg-blue-900/30' 
+                    className={`p-4 rounded-lg transition-all border ${answers[currentQuestion._id] === index
+                        ? theme === 'dark'
+                          ? 'border-blue-500 bg-blue-900/30'
                           : 'border-blue-500 bg-blue-50'
                         : theme === 'dark'
                           ? 'border-gray-700 hover:bg-gray-700'
                           : 'border-gray-200 hover:bg-gray-50'
-                    } ${
-                      isSectionSubmitted 
-                        ? 'cursor-not-allowed opacity-80' 
+                      } ${isSectionSubmitted
+                        ? 'cursor-not-allowed opacity-80'
                         : 'cursor-pointer'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center">
-                      <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
-                        answers[currentQuestion._id] === index
+                      <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${answers[currentQuestion._id] === index
                           ? 'border-blue-500 bg-blue-500 text-white'
                           : theme === 'dark'
                             ? 'border-gray-500'
                             : 'border-gray-300'
-                      }`}>
+                        }`}>
                         {String.fromCharCode(65 + index)}
                       </div>
                       <span className="break-words">{option}</span>
@@ -686,7 +679,7 @@ export default function QuizPlayer() {
                     >
                       {isLastSection ? 'Submit Quiz' : 'Submit Section'}
                     </button>
-                    
+
                     <button
                       onClick={goToNextQuestion}
                       disabled={currentQuestionIndex === currentQuestions.length - 1}
@@ -740,21 +733,19 @@ export default function QuizPlayer() {
                 <button
                   key={q._id}
                   onClick={() => !isSectionSubmitted && goToQuestion(index)}
-                  className={`aspect-square rounded flex items-center justify-center transition-all ${
-                    currentQuestionIndex === index
+                  className={`aspect-square rounded flex items-center justify-center transition-all ${currentQuestionIndex === index
                       ? theme === 'dark'
                         ? 'bg-blue-600 text-white'
                         : 'bg-blue-500 text-white'
                       : answers[q._id] !== undefined
-                      ? theme === 'dark'
-                        ? 'bg-green-900/50 text-green-200'
-                        : 'bg-green-100 text-green-800'
-                      : theme === 'dark'
-                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  } ${
-                    isSectionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'
-                  }`}
+                        ? theme === 'dark'
+                          ? 'bg-green-900/50 text-green-200'
+                          : 'bg-green-100 text-green-800'
+                        : theme === 'dark'
+                          ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    } ${isSectionSubmitted ? 'cursor-not-allowed' : 'cursor-pointer'
+                    }`}
                   disabled={isSectionSubmitted}
                 >
                   {index + 1}
@@ -786,23 +777,20 @@ export default function QuizPlayer() {
                         setCalcInput(prev => prev + btn);
                       }
                     }}
-                    className={`p-3 rounded text-sm font-medium ${
-                      theme === 'dark'
+                    className={`p-3 rounded text-sm font-medium ${theme === 'dark'
                         ? 'bg-gray-700 hover:bg-gray-600'
                         : 'bg-gray-200 hover:bg-gray-300'
-                    } ${
-                      ['/', '*', '-', '+', '='].includes(btn) 
-                        ? theme === 'dark' 
-                          ? 'bg-blue-900 hover:bg-blue-800' 
+                      } ${['/', '*', '-', '+', '='].includes(btn)
+                        ? theme === 'dark'
+                          ? 'bg-blue-900 hover:bg-blue-800'
                           : 'bg-blue-500 hover:bg-blue-600 text-white'
                         : ''
-                    } ${
-                      btn === 'C' 
-                        ? theme === 'dark' 
-                          ? 'bg-red-900 hover:bg-red-800' 
+                      } ${btn === 'C'
+                        ? theme === 'dark'
+                          ? 'bg-red-900 hover:bg-red-800'
                           : 'bg-red-500 hover:bg-red-600 text-white'
                         : ''
-                    }`}
+                      }`}
                   >
                     {btn}
                   </button>
@@ -824,7 +812,7 @@ export default function QuizPlayer() {
             ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
             : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
         }
-        
+        isSubmitting={isSubmitting}
       />
 
       {/* No Answers Warning Modal */}
@@ -859,6 +847,23 @@ export default function QuizPlayer() {
         </div>
       )}
 
+      {/* Tab Switch Warning */}
+      {!isTabActive && (
+        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
+          <div className="bg-red-600 text-white p-8 rounded-lg max-w-md text-center">
+            <AlertTriangle className="h-12 w-12 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-4">Warning!</h2>
+            <p className="mb-6">You have switched away from the quiz. Please return immediately or your progress may be submitted.</p>
+            <button
+              onClick={() => setIsTabActive(true)}
+              className="px-6 py-2 bg-white text-red-600 font-bold rounded hover:bg-gray-100"
+            >
+              I'm Back
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Feedback Modal */}
       <FeedbackForm
         isOpen={showFeedbackModal}
@@ -872,8 +877,9 @@ export default function QuizPlayer() {
       <QuizResultModal
         isOpen={showResultModal}
         onClose={() => router.push('/quiz-list')}
+
         quizId={quiz?._id}
-        
+
       />
     </div>
   );
