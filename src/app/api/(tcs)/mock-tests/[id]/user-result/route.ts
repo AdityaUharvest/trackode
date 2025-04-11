@@ -4,7 +4,7 @@ import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import Question from '@/app/model/MockQuestions';
 import { auth } from '@/auth';
-
+import Section from '@/app/model/Section';
 // Define TypeScript interfaces for your models
 interface IQuestion {
   _id: mongoose.Types.ObjectId;
@@ -49,7 +49,7 @@ interface ISectionResult {
 
 export async function GET(request: NextRequest, { params }: any) {
   try {
-    const { id } = params;  // Removed await since params is synchronous
+    const { id } = await params;  // Removed await since params is synchronous
     const attemptId = id;
     
     // Get current session user
@@ -89,19 +89,16 @@ export async function GET(request: NextRequest, { params }: any) {
     });
 
     // Process section-wise results with question details
-    const sections = [
-      'c-arrays',
-      'ratio-proportion',
-      'verbal-ability',
-      'reasoning-ability',
-      'numerical-ability',
-      'advanced-quantitative',
-      'advanced-reasoning',
-      'advanced-coding',
-      
-    ];
+    const section = await Section.find();
+    
+    let sections=<any>[]
+    for(let i =0;i<section.length;i++){
+      sections.push(section[i].value);
+    }
+    console.log(sections);
 
-    const sectionResults: ISectionResult[] = sections.map(sectionName => {
+
+    const sectionResults: ISectionResult[] = sections.map((sectionName:any) => {
       const sectionAnswers = attempt.answers[sectionName] || {};
       const sectionQuestions = allQuestions.filter(q => q.section === sectionName);
       

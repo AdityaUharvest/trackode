@@ -4,6 +4,7 @@ import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import User from '@/app/model/User';
 import Question from '@/app/model/MockQuestions';
+import Section from '@/app/model/Section';
 
 // Define TypeScript interfaces for your models
 interface IQuestion {
@@ -58,17 +59,13 @@ export async function GET(request: NextRequest, { params }: any) {
     if (!quiz) {
       return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
     }
-
-    const sections = [
-      'verbal-ability',
-      'reasoning-ability',
-      'numerical-ability',
-      'advanced-quantitative',
-      'advanced-reasoning',
-      'advanced-coding',
-      'c-arrays',
-      'ratio-proportion'
-    ];
+    const section = await Section.find();
+    console.log(section)
+    let sections=<any>[]
+    for(let i =0;i<section.length;i++){
+      sections.push(section[i].value);
+    }
+    console.log(sections);
 
     // Fetch all questions with proper typing
     const allQuestions = await Question.find({ mockTestId: quizId }).lean<IQuestion[]>();
@@ -108,7 +105,7 @@ export async function GET(request: NextRequest, { params }: any) {
       }> = {};
 
       // Initialize section stats
-      sections.forEach(section => {
+      sections.forEach((section:any) => {
         sectionStats[section] = {
           answered: 0,
           correct: 0,
@@ -121,7 +118,7 @@ export async function GET(request: NextRequest, { params }: any) {
       const totalQuestions = allQuestions.length;
 
       // Process each section's answers
-      sections.forEach(section => {
+      sections.forEach((section:any) => {
         const sectionAnswers = attempt.answers[section] || {};
         const answered = Object.keys(sectionAnswers).length;
         let correct = 0;

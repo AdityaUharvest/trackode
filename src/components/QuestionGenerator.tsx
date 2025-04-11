@@ -9,7 +9,7 @@ import { useTheme } from './ThemeContext';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useSession } from 'next-auth/react';
-
+import Section from "@/app/model/Section"
 interface Question {
   text: string;
   options: string[];
@@ -20,6 +20,7 @@ interface Question {
 }
 
 interface Section {
+  _id:string;
   value: string;
   label: string;
 }
@@ -34,38 +35,33 @@ interface EditingQuestion extends Question {
   index: number;
 }
 
-const sections: Section[] = [
-  { value: 'verbal-ability', label: 'Verbal Ability (English)' },
-  { value: 'reasoning-ability', label: 'Reasoning Ability' },
-  { value: 'numerical-ability', label: 'Numerical Ability' },
-  { value: 'advanced-quantitative', label: 'Advanced Quantitative' },
-  { value: 'advanced-reasoning', label: 'Advanced Reasoning' },
-  { value: 'advanced-coding', label: 'Advanced Coding' },
-  { value: 'c-arrays', label: 'C Arrays' },
-  { value: 'ratio-proportion', label: 'Ratio Proportion' },
-  { value: 'percentage', label: 'Percentage' },
-  { value: 'profit-loss', label: 'Profit & Loss' },
-  { value: 'time-speed-distance', label: 'Time, Speed & Distance' },
-  { value: 'time-work', label: 'Time & Work' },
-  { value: 'algebra', label: 'Algebra' },
-  { value: 'geometry', label: 'Geometry' },
-  { value: 'trigonometry', label: 'Trigonometry' },
-  { value: 'statistics', label: 'Statistics' },
-  { value: 'data-interpretation', label: 'Data Interpretation' },
-
-
-
-];
-
 const API_TIMEOUT = 60000; // 60 seconds timeout
 
 export default function QuestionGenerator({ isPublished, mockTest, shareCode }: QuestionGeneratorProps) {
+  //fetching sections from the server
+  const [sections, setSections] = useState<Section[]>([]);
+  useEffect(
+    ()=>{
+      const fetchSection = async () => {
+        try {
+          const res = await axios.get('/api/fetchSection');
+          console.log(res.data.sections);
+          setSections(res.data.sections);
+        } catch (error) {
+          console.error('Failed to fetch sections', error);
+        }
+      };
+      fetchSection();
+    },[]
+  )
+  console.log(sections)
   const { theme } = useTheme();
   const params = useParams();
   const { data: session } = useSession();
 
   const mockTestId = params.id as string;
-  const [selectedSection, setSelectedSection] = useState(sections[0].value);
+  
+  const [selectedSection, setSelectedSection] = useState('verbal-ability');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [editingQuestion, setEditingQuestion] = useState<EditingQuestion | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,7 +70,8 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [shareLink, setShareLink] = useState('');
-
+  // for sections
+  
   // Theme-based classes
   const containerClasses = `space-y-6 ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`;
   const selectClasses = `p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`;
@@ -154,11 +151,12 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       setIsLoading(false);
     }
   };
-
+  
   useEffect(() => {
     fetchQuestions();
   }, [mockTestId, selectedSection]);
-
+  
+  
   const generateQuestions = async () => {
     try {
       setIsGenerating(true);
