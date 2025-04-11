@@ -39,7 +39,21 @@ const sections: Section[] = [
   { value: 'numerical-ability', label: 'Numerical Ability' },
   { value: 'advanced-quantitative', label: 'Advanced Quantitative' },
   { value: 'advanced-reasoning', label: 'Advanced Reasoning' },
-  { value: 'advanced-coding', label: 'Advanced Coding' }
+  { value: 'advanced-coding', label: 'Advanced Coding' },
+  { value: 'c-arrays', label: 'C Arrays' },
+  { value: 'ratio-proportion', label: 'Ratio Proportion' },
+  { value: 'percentage', label: 'Percentage' },
+  { value: 'profit-loss', label: 'Profit & Loss' },
+  { value: 'time-speed-distance', label: 'Time, Speed & Distance' },
+  { value: 'time-work', label: 'Time & Work' },
+  { value: 'algebra', label: 'Algebra' },
+  { value: 'geometry', label: 'Geometry' },
+  { value: 'trigonometry', label: 'Trigonometry' },
+  { value: 'statistics', label: 'Statistics' },
+  { value: 'data-interpretation', label: 'Data Interpretation' },
+
+
+
 ];
 
 const API_TIMEOUT = 60000; // 60 seconds timeout

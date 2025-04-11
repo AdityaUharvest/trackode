@@ -124,6 +124,39 @@ export default function QuizPlayer() {
             questionCount: 0, 
             submitted: false,
             unlocked: false 
+          },
+          { 
+            name: 'c-arrays', 
+            label: 'C Arrays', 
+            timeLimit: 30*60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          }
+          ,
+          { 
+            name: 'ratio-proportion', 
+            label: 'Ratio Proportion', 
+            timeLimit: 30*60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'c-structures', 
+            label: 'C Structures', 
+            timeLimit: 30*60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
+          },
+          { 
+            name: 'c-pointers', 
+            label: 'C Pointers', 
+            timeLimit: 30*60, 
+            questionCount: 0, 
+            submitted: false,
+            unlocked: false 
           }
         ];
 
