@@ -184,6 +184,8 @@ export default function QuizPlayer() {
 
   //   return () => clearInterval(timer);
   // }, [currentSection, quizStarted, sections]);
+  
+  
   useEffect(() => {
     if (!quizStarted || !currentSection) return;
   
@@ -196,12 +198,7 @@ export default function QuizPlayer() {
       setSectionTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          
-          // Lock this section
-          setLockedSections(prev => ({...prev, [currentSection]: true}));
-          
-          // Auto-submit and move to next section
-          handleAutoSubmit();
+          handleAutoSubmit().catch(console.error);
           return 0;
         }
         return prev - 1;
@@ -210,6 +207,9 @@ export default function QuizPlayer() {
   
     return () => clearInterval(timer);
   }, [currentSection, quizStarted, sections]);
+
+
+
   const startQuiz = () => {
     try {
       // First set the state, then request fullscreen after a short delay
@@ -240,15 +240,18 @@ export default function QuizPlayer() {
 
   //adding this date 07:36 11 april
   const handleAutoSubmit = async () => {
-    if (isSubmittingQuiz) return;
+    if (isSubmittingQuiz || !currentSection) return;
     
     try {
       setIsSubmittingQuiz(true);
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
       
+      // Ensure we have answers to submit
+      const answersToSubmit = sectionAnswers[currentSection] || {};
+      
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
-        answers: sectionAnswers[currentSection] || {}
+        answers: answersToSubmit
       });
   
       // Mark as submitted
@@ -267,15 +270,14 @@ export default function QuizPlayer() {
           idx === currentSectionIndex + 1 ? {...s, unlocked: true} : s
         ));
       } else {
-        // If this is the last section, submit the quiz
+        // Submit the entire quiz
         await handleQuizSubmit();
-        return; // Early return to prevent duplicate submission
       }
-  
-      // Show time up notification
+      
       toast.warning(`Time's up! Section ${currentSection} auto-submitted`);
       
     } catch (err) {
+      console.error('Auto-submit error:', err);
       toast.error('Failed to auto-submit section');
     } finally {
       setIsSubmittingQuiz(false);
@@ -383,17 +385,37 @@ export default function QuizPlayer() {
     
     try {
       setIsSubmittingQuiz(true);
+      
+      // Ensure all sections are submitted
+      const updatedSections = sections.map(s => 
+        s.submitted ? s : {...s, submitted: true}
+      );
+      setSections(updatedSections);
+      
+      // Submit all answers
       await axios.post(`/api/quiz/${shareCode}/complete`, {
         answers: sectionAnswers
       });
       
+      // Clear local storage
       localStorage.removeItem(`quiz_${shareCode}_answers`);
+      
+      // Show feedback modal
       setShowFeedbackModal(true);
     } catch (err) {
+      console.error('Quiz submission error:', err);
       setError('Failed to submit quiz. Please try again.');
+      toast.error('Failed to submit quiz. Please try again.');
     } finally {
       setIsSubmittingQuiz(false);
     }
+  };
+  const validateSectionAnswers = (sectionName: string) => {
+    const section = sections.find(s => s.name === sectionName);
+    if (!section) return false;
+    
+    const answersExist = sectionAnswers[sectionName] && Object.keys(sectionAnswers[sectionName]).length > 0;
+    return answersExist || section.submitted;
   };
 
   const handleFeedbackComplete = () => {
