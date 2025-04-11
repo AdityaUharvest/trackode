@@ -241,41 +241,45 @@ export default function QuizPlayer() {
   //adding this date 07:36 11 april
   const handleAutoSubmit = async () => {
     if (isSubmittingQuiz || !currentSection) return;
-    
+  
     try {
       setIsSubmittingQuiz(true);
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-      
-      // Ensure we have answers to submit
+  
+      // Submit current section answers
       const answersToSubmit = sectionAnswers[currentSection] || {};
-      
-      await axios.post(`/api/quiz/${shareCode}/answers`, {
-        section: currentSection,
-        answers: answersToSubmit
-      });
+      if (Object.keys(answersToSubmit).length > 0) {
+        await axios.post(`/api/quiz/${shareCode}/answers`, {
+          section: currentSection,
+          answers: answersToSubmit,
+        });
+      }
   
       // Mark as submitted
-      setSections(prev => prev.map(s => 
-        s.name === currentSection ? {...s, submitted: true} : s
-      ));
+      setSections(prev =>
+        prev.map(s =>
+          s.name === currentSection ? { ...s, submitted: true } : s
+        )
+      );
   
       // Move to next section or finish quiz
       if (currentSectionIndex < sections.length - 1) {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
-        
+  
         // Unlock next section
-        setSections(prev => prev.map((s, idx) => 
-          idx === currentSectionIndex + 1 ? {...s, unlocked: true} : s
-        ));
+        setSections(prev =>
+          prev.map((s, idx) =>
+            idx === currentSectionIndex + 1 ? { ...s, unlocked: true } : s
+          )
+        );
       } else {
         // Submit the entire quiz
         await handleQuizSubmit();
       }
-      
+  
       toast.warning(`Time's up! Section ${currentSection} auto-submitted`);
-      
     } catch (err) {
       console.error('Auto-submit error:', err);
       toast.error('Failed to auto-submit section');
@@ -290,19 +294,37 @@ export default function QuizPlayer() {
     const currentSectionObj = sections.find(s => s.name === currentSection);
     if (currentSectionObj?.submitted) return;
     if (lockedSections[currentSection]) return;
-
+  
     setAnswers(prev => ({
       ...prev,
-      [questionId]: optionIndex
+      [questionId]: optionIndex,
     }));
-
-    setSectionAnswers(prev => ({
-      ...prev,
-      [currentSection]: {
-        ...prev[currentSection],
-        [questionId]: optionIndex
-      }
-    }));
+  
+    setSectionAnswers(prev => {
+      const updatedSectionAnswers = {
+        ...prev,
+        [currentSection]: {
+          ...prev[currentSection],
+          [questionId]: optionIndex,
+        },
+      };
+  
+      // Save to localStorage immediately
+      localStorage.setItem(
+        `quiz_${shareCode}_answers`,
+        JSON.stringify({
+          answers: { ...answers, [questionId]: optionIndex },
+          sectionAnswers: updatedSectionAnswers,
+          sectionsState: sections.map(s => ({
+            name: s.name,
+            submitted: s.submitted,
+            unlocked: s.unlocked,
+          })),
+        })
+      );
+  
+      return updatedSectionAnswers;
+    });
   };
 
   const changeSection = (sectionName: string) => {
@@ -336,44 +358,46 @@ export default function QuizPlayer() {
   };
 
   const handleSectionSubmit = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-
+  
       const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
       if (answeredQuestions === 0) {
         setShowSectionWarning(true);
         return;
       }
-
+  
+      // Submit the current section’s answers
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
-        answers: sectionAnswers[currentSection] || {}
+        answers: sectionAnswers[currentSection] || {},
       });
-
-      setSections(prev => prev.map(s =>
-        s.name === currentSection
-          ? { ...s, submitted: true }
-          : s
-      ));
-
+  
+      // Mark the section as submitted
+      setSections(prev =>
+        prev.map(s =>
+          s.name === currentSection ? { ...s, submitted: true } : s
+        )
+      );
+  
+      // Unlock the next section if not the last
       if (currentSectionIndex < sections.length - 1) {
-        setSections(prev => prev.map((s, idx) =>
-          idx === currentSectionIndex + 1
-            ? { ...s, unlocked: true }
-            : s
-        ));
-      }
-
-      if (currentSectionIndex < sections.length - 1) {
+        setSections(prev =>
+          prev.map((s, idx) =>
+            idx === currentSectionIndex + 1 ? { ...s, unlocked: true } : s
+          )
+        );
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
       } else {
-        handleQuizSubmit();
+        // For the last section, explicitly call handleQuizSubmit
+        await handleQuizSubmit();
       }
     } catch (err) {
       setError('Failed to save answers. Please try again.');
+      toast.error('Failed to save answers. Please try again.');
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
@@ -382,25 +406,39 @@ export default function QuizPlayer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleQuizSubmit = async () => {
     if (isSubmittingQuiz) return;
-    
+  
     try {
       setIsSubmittingQuiz(true);
-      
-      // Ensure all sections are submitted
-      const updatedSections = sections.map(s => 
-        s.submitted ? s : {...s, submitted: true}
+  
+      // Warn if no answers are present
+      const totalAnswers = Object.values(sectionAnswers).reduce(
+        (sum, section) => sum + Object.keys(section).length,
+        0
       );
-      setSections(updatedSections);
-      
-      // Submit all answers
+      if (totalAnswers === 0) {
+        toast.warning('No answers provided. Submitting empty quiz.');
+      }
+  
+      // Submit current section if not submitted
+      const currentSectionObj = sections.find(s => s.name === currentSection);
+      if (currentSectionObj && !currentSectionObj.submitted && sectionAnswers[currentSection]) {
+        await axios.post(`/api/quiz/${shareCode}/answers`, {
+          section: currentSection,
+          answers: sectionAnswers[currentSection] || {},
+        });
+        setSections(prev =>
+          prev.map(s =>
+            s.name === currentSection ? { ...s, submitted: true } : s
+          )
+        );
+      }
+  
+      // Submit quiz
       await axios.post(`/api/quiz/${shareCode}/complete`, {
-        answers: sectionAnswers
+        answers: sectionAnswers,
       });
-      
-      // Clear local storage
+  
       localStorage.removeItem(`quiz_${shareCode}_answers`);
-      
-      // Show feedback modal
       setShowFeedbackModal(true);
     } catch (err) {
       console.error('Quiz submission error:', err);
@@ -880,17 +918,17 @@ export default function QuizPlayer() {
 
       {/* Submit Confirmation Modal */}
       <SubmitConfirmationModal
-        isOpen={showSubmitModal}
-        onClose={() => setShowSubmitModal(false)}
-        onSubmit={isLastSection ? handleQuizSubmit : handleSectionSubmit}
-        title={isLastSection ? 'Submit Quiz' : `Submit ${currentSectionData?.label}`}
-        message={
-          isLastSection
-            ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
-            : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
-        }
-        isSubmitting={isSubmitting}
-      />
+  isOpen={showSubmitModal}
+  onClose={() => setShowSubmitModal(false)}
+  onSubmit={isLastSection ? handleQuizSubmit : handleSectionSubmit}
+  title={isLastSection ? 'Submit Quiz' : `Submit ${currentSectionData?.label}`}
+  message={
+    isLastSection
+      ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
+      : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
+  }
+  isSubmitting={isSubmittingQuiz} // Use isSubmittingQuiz for consistency
+/>
 
       {/* No Answers Warning Modal */}
       {showSectionWarning && (
