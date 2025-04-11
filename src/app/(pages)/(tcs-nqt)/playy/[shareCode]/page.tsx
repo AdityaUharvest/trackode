@@ -63,24 +63,26 @@ export default function QuizPlayer() {
   const [sectionData, setSectionsData] = useState<Section[]>([]);
   const [lockedSections, setLockedSections] = useState<Record<string, boolean>>({});
   const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Initialize sections and load saved answers
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
         setIsLoading(true);
-  
+
         // Fetch quiz data
         const response = await axios.get(`/api/quiz/${shareCode}`);
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         setIsPublished(response.data.quiz.isPublished);
-  
+
         // Check if quiz is already attempted
         const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
         if (attempted.data) {
           setHasAttempted(attempted.data);
         }
-  
+
         // Fetch and normalize sections
         const res = await axios.get('/api/fetchSection');
         const normalizedSections = res.data.sections.map((s: any) => ({
@@ -91,21 +93,21 @@ export default function QuizPlayer() {
           submitted: false,
           unlocked: false,
         }));
-  
+
         // Count questions in each section
         response.data.questions.forEach((q: Question) => {
-          const section = normalizedSections.find((s:any) => s.name === q.section);
+          const section = normalizedSections.find((s: any) => s.name === q.section);
           if (section) section.questionCount++;
         });
-  
+
         // Filter out sections with 0 questions
-        const filteredSections = normalizedSections.filter((s:any) => s.questionCount > 0);
-  
+        const filteredSections = normalizedSections.filter((s: any) => s.questionCount > 0);
+
         // Unlock the first section
         if (filteredSections.length > 0) {
           filteredSections[0].unlocked = true;
         }
-  
+
         // Load saved answers from localStorage
         const savedAnswers = localStorage.getItem(`quiz_${shareCode}_answers`);
         if (savedAnswers) {
@@ -113,10 +115,10 @@ export default function QuizPlayer() {
           setAnswers(parsed.answers || {});
           setSectionAnswers(parsed.sectionAnswers || {});
           setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
-  
+
           // Restore section states
           if (parsed.sectionsState) {
-            filteredSections.forEach((section:any) => {
+            filteredSections.forEach((section: any) => {
               const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
               if (savedSection) {
                 section.submitted = savedSection.submitted;
@@ -124,15 +126,15 @@ export default function QuizPlayer() {
               }
             });
           }
-  
-          const firstUnsubmitted = filteredSections.find((s:any) => !s.submitted);
+
+          const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
           if (firstUnsubmitted) {
             setCurrentSection(firstUnsubmitted.name);
           }
         } else {
           setCurrentSection(filteredSections[0]?.name || '');
         }
-  
+
         // Set final section state
         setSectionsData(normalizedSections);
         setSections(filteredSections);
@@ -142,10 +144,9 @@ export default function QuizPlayer() {
         setIsLoading(false);
       }
     };
-  
+
     fetchQuizData();
   }, [shareCode]);
-  
 
   useEffect(() => {
     if (quizStarted && sections.length > 0) {
@@ -163,64 +164,36 @@ export default function QuizPlayer() {
   }, [answers, sectionAnswers, sections, shareCode, quizStarted]);
 
   // Section timer logic
-  // useEffect(() => {
-  //   if (!quizStarted || !currentSection) return;
-
-  //   const section = sections.find(s => s.name === currentSection);
-  //   if (!section?.timeLimit || section.submitted) return;
-
-  //   setSectionTimeRemaining(section.timeLimit);
-
-  //   const timer = setInterval(() => {
-  //     setSectionTimeRemaining(prev => {
-  //       if (prev <= 1) {
-  //         clearInterval(timer);
-  //         handleSectionSubmit();
-  //         return 0;
-  //       }
-  //       return prev - 1;
-  //     });
-  //   }, 1000);
-
-  //   return () => clearInterval(timer);
-  // }, [currentSection, quizStarted, sections]);
-  
-  
   useEffect(() => {
     if (!quizStarted || !currentSection) return;
-  
+
     const section = sections.find(s => s.name === currentSection);
     if (!section?.timeLimit || section.submitted) return;
-  
+
     setSectionTimeRemaining(section.timeLimit);
-  
+
     const timer = setInterval(() => {
       setSectionTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleAutoSubmit().catch(console.error);
+          handleAutoSubmit();
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-  
+
     return () => clearInterval(timer);
   }, [currentSection, quizStarted, sections]);
 
-
-
   const startQuiz = () => {
     try {
-      // First set the state, then request fullscreen after a short delay
       setQuizStarted(true);
 
-      // Small delay to ensure state update has completed
       setTimeout(() => {
         quizContainerRef.current?.requestFullscreen()
           .catch(e => {
             console.error('Fullscreen error:', e);
-            // More descriptive error message based on the error
             if (e.name === 'NotAllowedError') {
               toast.error('Fullscreen was denied. This quiz requires fullscreen mode.');
             } else if (e.name === 'NotSupportedError') {
@@ -238,36 +211,33 @@ export default function QuizPlayer() {
     }
   };
 
-  //adding this date 07:36 11 april
   const handleAutoSubmit = async () => {
     if (isSubmittingQuiz || !currentSection) return;
-  
+
     try {
       setIsSubmittingQuiz(true);
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-  
+
       // Submit current section answers
       const answersToSubmit = sectionAnswers[currentSection] || {};
-      if (Object.keys(answersToSubmit).length > 0) {
-        await axios.post(`/api/quiz/${shareCode}/answers`, {
-          section: currentSection,
-          answers: answersToSubmit,
-        });
-      }
-  
+      await axios.post(`/api/quiz/${shareCode}/answers`, {
+        section: currentSection,
+        answers: answersToSubmit,
+      });
+
       // Mark as submitted
       setSections(prev =>
         prev.map(s =>
           s.name === currentSection ? { ...s, submitted: true } : s
         )
       );
-  
+
       // Move to next section or finish quiz
       if (currentSectionIndex < sections.length - 1) {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
-  
+
         // Unlock next section
         setSections(prev =>
           prev.map((s, idx) =>
@@ -278,7 +248,7 @@ export default function QuizPlayer() {
         // Submit the entire quiz
         await handleQuizSubmit();
       }
-  
+
       toast.warning(`Time's up! Section ${currentSection} auto-submitted`);
     } catch (err) {
       console.error('Auto-submit error:', err);
@@ -287,19 +257,17 @@ export default function QuizPlayer() {
       setIsSubmittingQuiz(false);
     }
   };
-  
-  
-  
+
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
     const currentSectionObj = sections.find(s => s.name === currentSection);
     if (currentSectionObj?.submitted) return;
     if (lockedSections[currentSection]) return;
-  
+
     setAnswers(prev => ({
       ...prev,
       [questionId]: optionIndex,
     }));
-  
+
     setSectionAnswers(prev => {
       const updatedSectionAnswers = {
         ...prev,
@@ -308,8 +276,7 @@ export default function QuizPlayer() {
           [questionId]: optionIndex,
         },
       };
-  
-      // Save to localStorage immediately
+
       localStorage.setItem(
         `quiz_${shareCode}_answers`,
         JSON.stringify({
@@ -322,7 +289,7 @@ export default function QuizPlayer() {
           })),
         })
       );
-  
+
       return updatedSectionAnswers;
     });
   };
@@ -361,28 +328,32 @@ export default function QuizPlayer() {
     setIsSubmitting(true);
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-  
+
       const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
       if (answeredQuestions === 0) {
         setShowSectionWarning(true);
+        setIsSubmitting(false);
         return;
       }
-  
-      // Submit the current section’s answers
+
+      // Submit the current section's answers
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
         answers: sectionAnswers[currentSection] || {},
       });
-  
+
       // Mark the section as submitted
       setSections(prev =>
         prev.map(s =>
           s.name === currentSection ? { ...s, submitted: true } : s
         )
       );
-  
-      // Unlock the next section if not the last
-      if (currentSectionIndex < sections.length - 1) {
+
+      // If this is the last section, submit the entire quiz
+      if (currentSectionIndex === sections.length - 1) {
+        await handleQuizSubmit();
+      } else {
+        // Unlock the next section
         setSections(prev =>
           prev.map((s, idx) =>
             idx === currentSectionIndex + 1 ? { ...s, unlocked: true } : s
@@ -391,10 +362,9 @@ export default function QuizPlayer() {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
-      } else {
-        // For the last section, explicitly call handleQuizSubmit
-        await handleQuizSubmit();
       }
+
+      toast.success(`Section ${currentSection} submitted successfully`);
     } catch (err) {
       setError('Failed to save answers. Please try again.');
       toast.error('Failed to save answers. Please try again.');
@@ -403,22 +373,13 @@ export default function QuizPlayer() {
       setShowSubmitModal(false);
     }
   };
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleQuizSubmit = async () => {
     if (isSubmittingQuiz) return;
-  
+
     try {
       setIsSubmittingQuiz(true);
-  
-      // Warn if no answers are present
-      const totalAnswers = Object.values(sectionAnswers).reduce(
-        (sum, section) => sum + Object.keys(section).length,
-        0
-      );
-      if (totalAnswers === 0) {
-        toast.warning('No answers provided. Submitting empty quiz.');
-      }
-  
+
       // Submit current section if not submitted
       const currentSectionObj = sections.find(s => s.name === currentSection);
       if (currentSectionObj && !currentSectionObj.submitted && sectionAnswers[currentSection]) {
@@ -432,12 +393,12 @@ export default function QuizPlayer() {
           )
         );
       }
-  
+
       // Submit quiz
       await axios.post(`/api/quiz/${shareCode}/complete`, {
         answers: sectionAnswers,
       });
-  
+
       localStorage.removeItem(`quiz_${shareCode}_answers`);
       setShowFeedbackModal(true);
     } catch (err) {
@@ -448,22 +409,15 @@ export default function QuizPlayer() {
       setIsSubmittingQuiz(false);
     }
   };
-  const validateSectionAnswers = (sectionName: string) => {
-    const section = sections.find(s => s.name === sectionName);
-    if (!section) return false;
-    
-    const answersExist = sectionAnswers[sectionName] && Object.keys(sectionAnswers[sectionName]).length > 0;
-    return answersExist || section.submitted;
-  };
 
   const handleFeedbackComplete = () => {
     setShowFeedbackModal(false);
     router.push('/dashboard');
   };
+
   useEffect(() => {
     if (!quizStarted) return;
 
-    // Function to handle fullscreen changes
     const handleFullscreenChange = () => {
       setIsFullScreen(!!document.fullscreenElement);
 
@@ -475,7 +429,6 @@ export default function QuizPlayer() {
         } else {
           toast.warning(`Warning ${fullscreenExits + 1}/4: Please stay in fullscreen mode`);
 
-          // Try to re-enter fullscreen after a short delay
           setTimeout(() => {
             quizContainerRef.current?.requestFullscreen().catch(e => {
               console.error('Fullscreen re-entry error:', e);
@@ -485,11 +438,10 @@ export default function QuizPlayer() {
       }
     }
 
-    // Use the correct event name for fullscreen changes
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // For Safari
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange); // For Firefox
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange); // For IE/Edge
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
@@ -497,7 +449,8 @@ export default function QuizPlayer() {
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
     };
-  }, [quizStarted, fullscreenExits, handleQuizSubmit]);
+  }, [quizStarted, fullscreenExits]);
+
   const currentQuestions = questions.filter(q => q.section === currentSection);
   const currentQuestion = currentQuestions[currentQuestionIndex];
   const currentSectionData = sections.find(s => s.name === currentSection);
@@ -630,7 +583,6 @@ export default function QuizPlayer() {
                   "Submitted sections are locked permanently",
                   "You cannot return to submitted sections",
                   "Complete all questions before time runs out",
-                 
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
@@ -665,7 +617,6 @@ export default function QuizPlayer() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-sm ml-2 font-bold truncate max-w-xs">{quiz?.title}</h1>
-
           </div>
 
           <div className="flex items-center gap-3">
@@ -751,24 +702,24 @@ export default function QuizPlayer() {
 
               {/* Options */}
               <div className="space-y-3 mb-8">
-  {currentQuestion.options.map((option, index) => (
-    <div
-      key={index}
-      onClick={() => !isSectionSubmitted && !lockedSections[currentSection] && handleAnswerSelect(currentQuestion._id, index)}
-      className={`p-4 rounded-lg transition-all border ${
-        answers[currentQuestion._id] === index
-          ? theme === 'dark'
-            ? 'border-blue-500 bg-blue-900/30'
-            : 'border-blue-500 bg-blue-50'
-          : theme === 'dark'
-          ? 'border-gray-700 hover:bg-gray-700'
-          : 'border-gray-200 hover:bg-gray-50'
-      } ${
-        isSectionSubmitted || lockedSections[currentSection]
-          ? 'cursor-not-allowed opacity-80'
-          : 'cursor-pointer'
-      }`}
-    >
+                {currentQuestion.options.map((option, index) => (
+                  <div
+                    key={index}
+                    onClick={() => !isSectionSubmitted && !lockedSections[currentSection] && handleAnswerSelect(currentQuestion._id, index)}
+                    className={`p-4 rounded-lg transition-all border ${
+                      answers[currentQuestion._id] === index
+                        ? theme === 'dark'
+                          ? 'border-blue-500 bg-blue-900/30'
+                          : 'border-blue-500 bg-blue-50'
+                        : theme === 'dark'
+                        ? 'border-gray-700 hover:bg-gray-700'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    } ${
+                      isSectionSubmitted || lockedSections[currentSection]
+                        ? 'cursor-not-allowed opacity-80'
+                        : 'cursor-pointer'
+                    }`}
+                  >
                     <div className="flex items-center">
                       <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${answers[currentQuestion._id] === index
                           ? 'border-blue-500 bg-blue-500 text-white'
@@ -918,18 +869,20 @@ export default function QuizPlayer() {
 
       {/* Submit Confirmation Modal */}
       <SubmitConfirmationModal
-  isOpen={showSubmitModal}
-  onClose={() => setShowSubmitModal(false)}
-  onSubmit={isLastSection ? handleQuizSubmit : handleSectionSubmit}
-  title={isLastSection ? 'Submit Quiz' : `Submit ${currentSectionData?.label}`}
-  message={
-    isLastSection
-      ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
-      : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
-  }
-  isSubmitting={isSubmittingQuiz} // Use isSubmittingQuiz for consistency
-/>
+        isOpen={showSubmitModal}
+        onClose={() => setShowSubmitModal(false)}
+        onSubmit={isLastSection ? handleQuizSubmit : handleSectionSubmit}
+        title={isLastSection ? 'Submit Quiz' : `Submit ${currentSectionData?.label}`}
+        message={
+          isLastSection
+            ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
+            : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
+        }
+        isSubmitting={isSubmitting}
+      />
 
+      {/* No Answers Warning Modal */}
+      
       {/* No Answers Warning Modal */}
       {showSectionWarning && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

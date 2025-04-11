@@ -30,8 +30,12 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <Navbar />
-      <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen">{children}</div>
+      
+      <div className="min-h-screen">
+        {children}
+        <ToastContainer position="top-right" autoClose={3000} />
+        </div>
+      
       <Footer />
     </ThemeProvider>
   );
