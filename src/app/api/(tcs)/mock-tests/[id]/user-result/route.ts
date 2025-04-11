@@ -92,12 +92,12 @@ export async function GET(request: NextRequest, { params }: any) {
     const sections = [
       'c-arrays',
       'ratio-proportion',
-      // 'verbal-ability',
-      // 'reasoning-ability',
-      // 'numerical-ability',
-      // 'advanced-quantitative',
-      // 'advanced-reasoning',
-      // 'advanced-coding',
+      'verbal-ability',
+      'reasoning-ability',
+      'numerical-ability',
+      'advanced-quantitative',
+      'advanced-reasoning',
+      'advanced-coding',
       
     ];
 

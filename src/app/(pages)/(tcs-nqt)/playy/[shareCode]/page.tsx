@@ -108,7 +108,58 @@ export default function QuizPlayer() {
             questionCount: 0,
             submitted: false,
             unlocked: false
+          },
+          
+          {
+            name: 'verbal-ability',
+            label: 'Verbal Ability',
+            timeLimit: 20 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
+          },
+          {
+            name: 'reasoning-ability',
+            label: 'Reasoning Ability',
+            timeLimit: 25 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
+          },
+          {
+            name: 'numerical-ability',
+            label: 'Numerical Ability',
+            timeLimit: 30 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
+          },
+          {
+            name: 'advanced-quantitative',
+            label: 'Advanced Quantitative',
+            timeLimit: 35 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
+          },
+          {
+            name: 'advanced-reasoning',
+            label: 'Advanced Reasoning',
+            timeLimit: 40 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
+          },
+          {
+            name: 'advanced-coding',
+            label: 'Advanced Coding',
+            timeLimit: 50 * 60,
+            questionCount: 0,
+            submitted: false,
+            unlocked: false
           }
+      
+
         ];
 
         response.data.questions.forEach((q: Question) => {
@@ -514,9 +565,8 @@ export default function QuizPlayer() {
                   "Submitted sections are locked permanently",
                   "You cannot return to submitted sections",
                   "Complete all questions before time runs out",
-                  "Fullscreen mode is required",
-                  "Switching tabs will be detected",
-                  "Copying text is disabled"
+                  "Belt treatment in case of cheating by Mr. Bhibhuti",
+                 
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
