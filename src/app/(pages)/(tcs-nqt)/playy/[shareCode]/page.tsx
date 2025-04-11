@@ -61,28 +61,25 @@ export default function QuizPlayer() {
   const [fullscreenExits, setFullscreenExits] = useState(0);
   const [isTabActive, setIsTabActive] = useState(true);
   const [sectionData, setSectionsData] = useState<Section[]>([]);
-  const [lockedSections, setLockedSections] = useState<Record<string, boolean>>({});
-  const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
+ 
   // Initialize sections and load saved answers
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
         setIsLoading(true);
-
+  
         // Fetch quiz data
         const response = await axios.get(`/api/quiz/${shareCode}`);
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         setIsPublished(response.data.quiz.isPublished);
-
+  
         // Check if quiz is already attempted
         const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
         if (attempted.data) {
           setHasAttempted(attempted.data);
         }
-
+  
         // Fetch and normalize sections
         const res = await axios.get('/api/fetchSection');
         const normalizedSections = res.data.sections.map((s: any) => ({
@@ -93,21 +90,21 @@ export default function QuizPlayer() {
           submitted: false,
           unlocked: false,
         }));
-
+  
         // Count questions in each section
         response.data.questions.forEach((q: Question) => {
-          const section = normalizedSections.find((s: any) => s.name === q.section);
+          const section = normalizedSections.find(s => s.name === q.section);
           if (section) section.questionCount++;
         });
-
+  
         // Filter out sections with 0 questions
-        const filteredSections = normalizedSections.filter((s: any) => s.questionCount > 0);
-
+        const filteredSections = normalizedSections.filter(s => s.questionCount > 0);
+  
         // Unlock the first section
         if (filteredSections.length > 0) {
           filteredSections[0].unlocked = true;
         }
-
+  
         // Load saved answers from localStorage
         const savedAnswers = localStorage.getItem(`quiz_${shareCode}_answers`);
         if (savedAnswers) {
@@ -115,10 +112,10 @@ export default function QuizPlayer() {
           setAnswers(parsed.answers || {});
           setSectionAnswers(parsed.sectionAnswers || {});
           setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
-
+  
           // Restore section states
           if (parsed.sectionsState) {
-            filteredSections.forEach((section: any) => {
+            filteredSections.forEach(section => {
               const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
               if (savedSection) {
                 section.submitted = savedSection.submitted;
@@ -126,15 +123,15 @@ export default function QuizPlayer() {
               }
             });
           }
-
-          const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
+  
+          const firstUnsubmitted = filteredSections.find(s => !s.submitted);
           if (firstUnsubmitted) {
             setCurrentSection(firstUnsubmitted.name);
           }
         } else {
           setCurrentSection(filteredSections[0]?.name || '');
         }
-
+  
         // Set final section state
         setSectionsData(normalizedSections);
         setSections(filteredSections);
@@ -144,9 +141,10 @@ export default function QuizPlayer() {
         setIsLoading(false);
       }
     };
-
+  
     fetchQuizData();
   }, [shareCode]);
+  
 
   useEffect(() => {
     if (quizStarted && sections.length > 0) {
@@ -176,7 +174,7 @@ export default function QuizPlayer() {
       setSectionTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleAutoSubmit();
+          handleSectionSubmit();
           return 0;
         }
         return prev - 1;
@@ -187,13 +185,18 @@ export default function QuizPlayer() {
   }, [currentSection, quizStarted, sections]);
 
   const startQuiz = () => {
+
+
     try {
+      // First set the state, then request fullscreen after a short delay
       setQuizStarted(true);
 
+      // Small delay to ensure state update has completed
       setTimeout(() => {
         quizContainerRef.current?.requestFullscreen()
           .catch(e => {
             console.error('Fullscreen error:', e);
+            // More descriptive error message based on the error
             if (e.name === 'NotAllowedError') {
               toast.error('Fullscreen was denied. This quiz requires fullscreen mode.');
             } else if (e.name === 'NotSupportedError') {
@@ -211,87 +214,23 @@ export default function QuizPlayer() {
     }
   };
 
-  const handleAutoSubmit = async () => {
-    if (isSubmittingQuiz || !currentSection) return;
-
-    try {
-      setIsSubmittingQuiz(true);
-      const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-
-      // Submit current section answers
-      const answersToSubmit = sectionAnswers[currentSection] || {};
-      await axios.post(`/api/quiz/${shareCode}/answers`, {
-        section: currentSection,
-        answers: answersToSubmit,
-      });
-
-      // Mark as submitted
-      setSections(prev =>
-        prev.map(s =>
-          s.name === currentSection ? { ...s, submitted: true } : s
-        )
-      );
-
-      // Move to next section or finish quiz
-      if (currentSectionIndex < sections.length - 1) {
-        const nextSection = sections[currentSectionIndex + 1].name;
-        setCurrentSection(nextSection);
-        setCurrentQuestionIndex(0);
-
-        // Unlock next section
-        setSections(prev =>
-          prev.map((s, idx) =>
-            idx === currentSectionIndex + 1 ? { ...s, unlocked: true } : s
-          )
-        );
-      } else {
-        // Submit the entire quiz
-        await handleQuizSubmit();
-      }
-
-      toast.warning(`Time's up! Section ${currentSection} auto-submitted`);
-    } catch (err) {
-      console.error('Auto-submit error:', err);
-      toast.error('Failed to auto-submit section');
-    } finally {
-      setIsSubmittingQuiz(false);
-    }
-  };
 
   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
     const currentSectionObj = sections.find(s => s.name === currentSection);
     if (currentSectionObj?.submitted) return;
-    if (lockedSections[currentSection]) return;
 
     setAnswers(prev => ({
       ...prev,
-      [questionId]: optionIndex,
+      [questionId]: optionIndex
     }));
 
-    setSectionAnswers(prev => {
-      const updatedSectionAnswers = {
-        ...prev,
-        [currentSection]: {
-          ...prev[currentSection],
-          [questionId]: optionIndex,
-        },
-      };
-
-      localStorage.setItem(
-        `quiz_${shareCode}_answers`,
-        JSON.stringify({
-          answers: { ...answers, [questionId]: optionIndex },
-          sectionAnswers: updatedSectionAnswers,
-          sectionsState: sections.map(s => ({
-            name: s.name,
-            submitted: s.submitted,
-            unlocked: s.unlocked,
-          })),
-        })
-      );
-
-      return updatedSectionAnswers;
-    });
+    setSectionAnswers(prev => ({
+      ...prev,
+      [currentSection]: {
+        ...prev[currentSection],
+        [questionId]: optionIndex
+      }
+    }));
   };
 
   const changeSection = (sectionName: string) => {
@@ -325,88 +264,63 @@ export default function QuizPlayer() {
   };
 
   const handleSectionSubmit = async () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
 
       const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
       if (answeredQuestions === 0) {
         setShowSectionWarning(true);
-        setIsSubmitting(false);
         return;
       }
 
-      // Submit the current section's answers
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
-        answers: sectionAnswers[currentSection] || {},
+        answers: sectionAnswers[currentSection] || {}
       });
 
-      // Mark the section as submitted
-      setSections(prev =>
-        prev.map(s =>
-          s.name === currentSection ? { ...s, submitted: true } : s
-        )
-      );
+      setSections(prev => prev.map(s =>
+        s.name === currentSection
+          ? { ...s, submitted: true }
+          : s
+      ));
 
-      // If this is the last section, submit the entire quiz
-      if (currentSectionIndex === sections.length - 1) {
-        await handleQuizSubmit();
-      } else {
-        // Unlock the next section
-        setSections(prev =>
-          prev.map((s, idx) =>
-            idx === currentSectionIndex + 1 ? { ...s, unlocked: true } : s
-          )
-        );
+      if (currentSectionIndex < sections.length - 1) {
+        setSections(prev => prev.map((s, idx) =>
+          idx === currentSectionIndex + 1
+            ? { ...s, unlocked: true }
+            : s
+        ));
+      }
+
+      if (currentSectionIndex < sections.length - 1) {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
+      } else {
+        handleQuizSubmit();
       }
-
-      toast.success(`Section ${currentSection} submitted successfully`);
     } catch (err) {
       setError('Failed to save answers. Please try again.');
-      toast.error('Failed to save answers. Please try again.');
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
     }
   };
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleQuizSubmit = async () => {
-    if (isSubmittingQuiz) return;
-
+    setIsSubmitting(true);
     try {
-      setIsSubmittingQuiz(true);
-
-      // Submit current section if not submitted
-      const currentSectionObj = sections.find(s => s.name === currentSection);
-      if (currentSectionObj && !currentSectionObj.submitted && sectionAnswers[currentSection]) {
-        await axios.post(`/api/quiz/${shareCode}/answers`, {
-          section: currentSection,
-          answers: sectionAnswers[currentSection] || {},
-        });
-        setSections(prev =>
-          prev.map(s =>
-            s.name === currentSection ? { ...s, submitted: true } : s
-          )
-        );
-      }
-
-      // Submit quiz
       await axios.post(`/api/quiz/${shareCode}/complete`, {
-        answers: sectionAnswers,
+        answers: sectionAnswers
       });
-
       localStorage.removeItem(`quiz_${shareCode}_answers`);
       setShowFeedbackModal(true);
     } catch (err) {
-      console.error('Quiz submission error:', err);
       setError('Failed to submit quiz. Please try again.');
-      toast.error('Failed to submit quiz. Please try again.');
     } finally {
-      setIsSubmittingQuiz(false);
+      setIsSubmitting(false);
+      setShowSubmitModal(false);
     }
   };
 
@@ -414,10 +328,10 @@ export default function QuizPlayer() {
     setShowFeedbackModal(false);
     router.push('/dashboard');
   };
-
   useEffect(() => {
     if (!quizStarted) return;
 
+    // Function to handle fullscreen changes
     const handleFullscreenChange = () => {
       setIsFullScreen(!!document.fullscreenElement);
 
@@ -429,6 +343,7 @@ export default function QuizPlayer() {
         } else {
           toast.warning(`Warning ${fullscreenExits + 1}/4: Please stay in fullscreen mode`);
 
+          // Try to re-enter fullscreen after a short delay
           setTimeout(() => {
             quizContainerRef.current?.requestFullscreen().catch(e => {
               console.error('Fullscreen re-entry error:', e);
@@ -438,10 +353,11 @@ export default function QuizPlayer() {
       }
     }
 
+    // Use the correct event name for fullscreen changes
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange); // For Safari
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange); // For Firefox
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange); // For IE/Edge
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
@@ -449,8 +365,7 @@ export default function QuizPlayer() {
       document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
       document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
     };
-  }, [quizStarted, fullscreenExits]);
-
+  }, [quizStarted, fullscreenExits, handleQuizSubmit]);
   const currentQuestions = questions.filter(q => q.section === currentSection);
   const currentQuestion = currentQuestions[currentQuestionIndex];
   const currentSectionData = sections.find(s => s.name === currentSection);
@@ -506,32 +421,32 @@ export default function QuizPlayer() {
     );
   }
 
-  if (hasAttempted) {
-    return (
-      <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-sm text-red-400 font-semibold mb-4">
-            <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
-            You have already attempted this mock test
-            <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
-          </h2>
+  // if (hasAttempted) {
+  //   return (
+  //     <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+  //       <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+  //         <h2 className="text-sm text-red-400 font-semibold mb-4">
+  //           <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
+  //           You have already attempted this mock test
+  //           <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
+  //         </h2>
 
-          <button
-            onClick={() => router.push('/dashboard')}
-            className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-          >
-            Go to your Dashboard
-          </button>
-          <button
-            onClick={() => router.push('/quiz-list')}
-            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-          >
-            Explore Free Live Quizes
-          </button>
-        </div>
-      </div>
-    );
-  }
+  //         <button
+  //           onClick={() => router.push('/dashboard')}
+  //           className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+  //         >
+  //           Go to your Dashboard
+  //         </button>
+  //         <button
+  //           onClick={() => router.push('/quiz-list')}
+  //           className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+  //         >
+  //           Explore Free Live Quizes
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (!quizStarted) {
     return (
@@ -583,6 +498,7 @@ export default function QuizPlayer() {
                   "Submitted sections are locked permanently",
                   "You cannot return to submitted sections",
                   "Complete all questions before time runs out",
+                 
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
@@ -617,6 +533,7 @@ export default function QuizPlayer() {
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-sm ml-2 font-bold truncate max-w-xs">{quiz?.title}</h1>
+
           </div>
 
           <div className="flex items-center gap-3">
@@ -705,20 +622,18 @@ export default function QuizPlayer() {
                 {currentQuestion.options.map((option, index) => (
                   <div
                     key={index}
-                    onClick={() => !isSectionSubmitted && !lockedSections[currentSection] && handleAnswerSelect(currentQuestion._id, index)}
-                    className={`p-4 rounded-lg transition-all border ${
-                      answers[currentQuestion._id] === index
+                    onClick={() => !isSectionSubmitted && handleAnswerSelect(currentQuestion._id, index)}
+                    className={`p-4 rounded-lg transition-all border ${answers[currentQuestion._id] === index
                         ? theme === 'dark'
                           ? 'border-blue-500 bg-blue-900/30'
                           : 'border-blue-500 bg-blue-50'
                         : theme === 'dark'
-                        ? 'border-gray-700 hover:bg-gray-700'
-                        : 'border-gray-200 hover:bg-gray-50'
-                    } ${
-                      isSectionSubmitted || lockedSections[currentSection]
+                          ? 'border-gray-700 hover:bg-gray-700'
+                          : 'border-gray-200 hover:bg-gray-50'
+                      } ${isSectionSubmitted
                         ? 'cursor-not-allowed opacity-80'
                         : 'cursor-pointer'
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center">
                       <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${answers[currentQuestion._id] === index
@@ -881,8 +796,6 @@ export default function QuizPlayer() {
         isSubmitting={isSubmitting}
       />
 
-      {/* No Answers Warning Modal */}
-      
       {/* No Answers Warning Modal */}
       {showSectionWarning && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
