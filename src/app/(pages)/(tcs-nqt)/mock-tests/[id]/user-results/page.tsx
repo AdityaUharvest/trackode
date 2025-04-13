@@ -43,6 +43,7 @@ export default function UserQuizResult() {
   const [error, setError] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
+  const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
   const [loadingExplanations, setLoadingExplanations] = useState<Record<string, boolean>>({});
   const [detailedExplanations, setDetailedExplanations] = useState<Record<string, string>>({});
 
@@ -92,6 +93,13 @@ export default function UserQuizResult() {
     }));
   };
 
+  const toggleQuestion = (questionId: string) => {
+    setExpandedQuestions(prev => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }));
+  };
+  
   const toggleQuestionExplanation = async (
     questionId: string,
     questionText: string,
@@ -100,8 +108,8 @@ export default function UserQuizResult() {
     options: string[]
   ) => {
     // If already expanded, just toggle
-    if (expandedQuestions[questionId]) {
-      setExpandedQuestions(prev => ({
+    if (expandedExplanations[questionId]) {
+      setExpandedExplanations(prev => ({
         ...prev,
         [questionId]: !prev[questionId]
       }));
@@ -140,8 +148,8 @@ export default function UserQuizResult() {
         [questionId]: data.instructions
       }));
 
-      // Expand the question
-      setExpandedQuestions(prev => ({
+      // Expand the explanation
+      setExpandedExplanations(prev => ({
         ...prev,
         [questionId]: true
       }));
@@ -289,106 +297,115 @@ export default function UserQuizResult() {
                 {expandedSections[section.sectionName] && (
                   <div className="p-3 space-y-6">
                     <div className="grid gap-4">
-                      {section.questions.map((question,index) => (
-                        <div 
-                          key={question._id} 
-                          className={`p-2 rounded-lg ${cardBg} ${borderColor} border`}
-                        >
-                          <div className="flex justify-between items-start gap-4">
-                            <h3 className="font-medium text-base">Q{index+1}: {question.text}</h3>
-                            <div className="flex-shrink-0">
+                      {section.questions.map((question, index) => (
+                        <div key={question._id} className={`p-4 rounded-lg mb-4 ${cardBg} ${borderColor} border`}>
+                          <div 
+                            className="flex justify-between items-center cursor-pointer"
+                            onClick={() => toggleQuestion(question._id)}
+                          >
+                            <div className="flex items-center gap-3">
+                              <h3 className="font-medium">{index+1}: {question.text}</h3>
                               {question.userAnswer === question.correctAnswer ? (
-                                <Badge variant="default" className="gap-1">
-                                  <CheckCircle2 className="h-4 w-4" />
-                                  Correct
-                                </Badge>
+                                <CheckCircle2 className="h-5 w-5 text-green-500" />
                               ) : (
-                                <Badge variant="destructive" className="gap-1">
-                                  <XCircle className="h-4 w-4" />
-                                  Incorrect
-                                </Badge>
+                                <XCircle className="h-5 w-5 text-red-500" />
                               )}
                             </div>
-                          </div>
-
-                          {/* Options */}
-                          <div className="space-y-3 my-4">
-                            {question.options.map((option, index) => (
-                              <div
-                                key={index}
-                                className={`p-3 rounded-lg border ${
-                                  index === question.correctAnswer
-                                    ? correctOptionBg
-                                    : index === question.userAnswer && index !== question.correctAnswer
-                                    ? wrongOptionBg
-                                    : `${neutralOptionBg} ${borderColor}`
-                                }`}
-                              >
-                                <div className="flex items-start">
-                                  <span className="mr-2 font-medium mt-0.5">{String.fromCharCode(65 + index)}.</span>
-                                  <div>
-                                    <p className="text-sm">{option}</p>
-                                    {index === question.correctAnswer && (
-                                      <p className="text-xs mt-1 text-green-600 dark:text-green-400 flex items-center gap-1">
-                                        <CheckCircle2 className="h-3 w-3" />
-                                        Correct Answer
-                                      </p>
-                                    )}
-                                    {index === question.userAnswer && index !== question.correctAnswer && (
-                                      <p className="text-xs mt-1 text-red-600 dark:text-red-400 flex items-center gap-1">
-                                        <XCircle className="h-3 w-3" />
-                                        Your Answer
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Explanation */}
-                          <div>
-                            <button
-                              onClick={() => toggleQuestionExplanation(
-                                question._id,
-                                question.text,
-                                question.userAnswer,
-                                question.correctAnswer,
-                                question.options
-                              )}
-                              disabled={loadingExplanations[question._id]}
-                              className={`flex items-center text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} transition-colors`}
-                            >
-                              {loadingExplanations[question._id] ? (
-                                <>
-                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-                                  Generating...
-                                </>
-                              ) : expandedQuestions[question._id] ? (
-                                <>
-                                  Hide Explanation
-                                  <ChevronUp className="h-4 w-4 ml-1" />
-                                </>
+                            <button className="p-1">
+                              {expandedQuestions[question._id] ? (
+                                <ChevronUp className="h-5 w-5" />
                               ) : (
-                                <>
-                                  Show Explanation
-                                  <ChevronDown className="h-4 w-4 ml-1" />
-                                </>
+                                <ChevronDown className="h-5 w-5" />
                               )}
                             </button>
-
-                            {expandedQuestions[question._id] && (
-                              <div className={`mt-3 p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} border ${borderColor}`}>
-                                <p className="font-medium mb-2 flex items-center gap-2">
-                                  <Trophy className="h-4 w-4 text-yellow-500" />
-                                  Explanation:
-                                </p>
-                                <p className="text-sm">
-                                  {detailedExplanations[question._id] || question.explanation || 'No explanation available.'}
-                                </p>
-                              </div>
-                            )}
                           </div>
+
+                          {/* Collapsible content */}
+                          {expandedQuestions[question._id] && (
+                            <div className="mt-4">
+                              {/* Options list */}
+                              <div className="space-y-2">
+                                {question.options.map((option, index) => (
+                                  <div
+                                    key={index}
+                                    className={`p-3 rounded border ${
+                                      index === question.correctAnswer
+                                        ? correctOptionBg
+                                        : index === question.userAnswer
+                                        ? wrongOptionBg
+                                        : neutralOptionBg
+                                    }`}
+                                  >
+                                    <div className="flex items-start">
+                                      <span className="mr-2 font-medium">{String.fromCharCode(65 + index)}.</span>
+                                      <div>
+                                        <p>{option}</p>
+                                        {index === question.correctAnswer && (
+                                          <p className="text-xs mt-1 text-green-600 flex items-center gap-1">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            Correct Answer
+                                          </p>
+                                        )}
+                                        {index === question.userAnswer && index !== question.correctAnswer && (
+                                          <p className="text-xs mt-1 text-red-600 flex items-center gap-1">
+                                            <XCircle className="h-3 w-3" />
+                                            Your Answer
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Explanation section */}
+                              <div className="mt-4">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleQuestionExplanation(
+                                      question._id,
+                                      question.text,
+                                      question.userAnswer,
+                                      question.correctAnswer,
+                                      question.options
+                                    );
+                                  }}
+                                  disabled={loadingExplanations[question._id]}
+                                  className={`flex items-center text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} transition-colors`}
+                                >
+                                  {loadingExplanations[question._id] ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                      Generating...
+                                    </>
+                                  ) : expandedExplanations[question._id] ? (
+                                    <>
+                                      Hide Explanation
+                                      <ChevronUp className="h-4 w-4 ml-1" />
+                                    </>
+                                  ) : (
+                                    <>
+                                      Show Explanation
+                                      <ChevronDown className="h-4 w-4 ml-1" />
+                                    </>
+                                  )}
+                                </button>
+
+                                {expandedExplanations[question._id] && (
+                                  <div className={`mt-3 p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} border ${borderColor}`}>
+                                    <p className="font-medium mb-2 flex items-center gap-2">
+                                      <Trophy className="h-4 w-4 text-yellow-500" />
+                                      Explanation:
+                                    </p>
+                                    <p className="text-sm">
+                                      {detailedExplanations[question._id] || question.explanation || 'No explanation available.'}
+                                    </p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
