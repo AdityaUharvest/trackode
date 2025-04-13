@@ -269,10 +269,7 @@ export default function QuizPlayer() {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
 
       const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
-      if (answeredQuestions === 0) {
-        setShowSectionWarning(true);
-        return;
-      }
+      
 
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
@@ -372,7 +369,34 @@ export default function QuizPlayer() {
   const isLastSection = sections.findIndex(s => s.name === currentSection) === sections.length - 1;
   const hasQuestions = currentQuestions.length > 0;
   const isSectionSubmitted = currentSectionData?.submitted || false;
+  // Add these useEffect hooks to your component
+useEffect(() => {
+  // Prevent context menu (long press on mobile)
+  const handleContextMenu = (e: Event) => e.preventDefault();
+  document.addEventListener('contextmenu', handleContextMenu);
+  
+  // Prevent text selection
+  const handleSelectStart = (e: Event) => e.preventDefault();
+  document.addEventListener('selectstart', handleSelectStart);
+  
+  return () => {
+    document.removeEventListener('contextmenu', handleContextMenu);
+    document.removeEventListener('selectstart', handleSelectStart);
+  };
+}, []);
 
+// Add this to prevent copying
+useEffect(() => {
+  const handleCopy = (e: ClipboardEvent) => {
+    if (quizStarted) {
+      e.preventDefault();
+      toast.warning('Copying is disabled during the quiz');
+    }
+  };
+  
+  document.addEventListener('copy', handleCopy);
+  return () => document.removeEventListener('copy', handleCopy);
+}, [quizStarted]);
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -529,6 +553,34 @@ export default function QuizPlayer() {
       ref={quizContainerRef}
       className={`${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'} overflow-y-auto`}
     >
+<style jsx global>{`
+  /* Disable text selection */
+  body {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+  }
+  
+  /* Disable long-press on mobile */
+  * {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome and Opera */
+  }
+  
+  /* Prevent image dragging */
+  img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+  }
+`}</style>
       <header className={`sticky top-0 z-10 mt-5 shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -797,36 +849,7 @@ export default function QuizPlayer() {
       />
 
       {/* No Answers Warning Modal */}
-      {showSectionWarning && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`p-6 rounded-lg max-w-md w-full mx-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="flex items-start gap-3 mb-4">
-              <AlertTriangle className="text-yellow-500 mt-1 flex-shrink-0" />
-              <div>
-                <h3 className="font-bold text-lg">No Answers Submitted</h3>
-                <p className="mt-1">You haven't answered any questions in this section. Are you sure you want to submit?</p>
-              </div>
-            </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowSectionWarning(false)}
-                className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowSectionWarning(false);
-                  handleSectionSubmit();
-                }}
-                className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-600'} text-white`}
-              >
-                Submit Anyway
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
 
       {/* Tab Switch Warning */}
       {!isTabActive && (
