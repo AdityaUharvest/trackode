@@ -43,6 +43,8 @@ export default function UserQuizResult() {
   const [error, setError] = useState<string | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
+  const [loadingExplanations, setLoadingExplanations] = useState<Record<string, boolean>>({});
+  const [detailedExplanations, setDetailedExplanations] = useState<Record<string, string>>({});
 
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
@@ -90,12 +92,73 @@ export default function UserQuizResult() {
     }));
   };
 
-  const toggleQuestionExplanation = (questionId: string) => {
-    
-    setExpandedQuestions(prev => ({
-      ...prev,
-      [questionId]: !prev[questionId]
-    }));
+  const toggleQuestionExplanation = async (
+    questionId: string,
+    questionText: string,
+    userAnswerIndex: number,
+    correctAnswerIndex: number,
+    options: string[]
+  ) => {
+    // If already expanded, just toggle
+    if (expandedQuestions[questionId]) {
+      setExpandedQuestions(prev => ({
+        ...prev,
+        [questionId]: !prev[questionId]
+      }));
+      return;
+    }
+
+    try {
+      // Set loading state for this question
+      setLoadingExplanations(prev => ({ ...prev, [questionId]: true }));
+      
+      // Call the API to get detailed explanation
+      const response = await fetch('/api/chat-gpt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Question: ${questionText}
+          Options: ${options.join(', ')}
+          Your answer: ${options[userAnswerIndex]}
+          Correct answer: ${options[correctAnswerIndex]}
+
+          Explain why the correct answer is ${options[correctAnswerIndex]} for the above question in not more than 100 words and in single sentence without topics.`
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate explanation');
+      }
+
+      const data = await response.json();
+      
+      // Store the detailed explanation
+      setDetailedExplanations(prev => ({
+        ...prev,
+        [questionId]: data.instructions
+      }));
+
+      // Expand the question
+      setExpandedQuestions(prev => ({
+        ...prev,
+        [questionId]: true
+      }));
+    } catch (error) {
+      console.error('Error generating explanation:', error);
+      // Fall back to the original explanation if available
+      const question = result?.sections
+        .flatMap(s => s.questions)
+        .find(q => q._id === questionId);
+      
+      setDetailedExplanations(prev => ({
+        ...prev,
+        [questionId]: question?.explanation || 'Could not generate detailed explanation.'
+      }));
+    } finally {
+      setLoadingExplanations(prev => ({ ...prev, [questionId]: false }));
+    }
   };
 
   if (loading) {
@@ -153,8 +216,9 @@ export default function UserQuizResult() {
               </span>
             </div>
           </div>
-          </div>
         </div>
+        
+        {/* Quiz Summary */}
         <div className={`mt-8 p-2 mb-5 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-blue-50'} border ${borderColor}`}>
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <Trophy className="h-5 w-5 text-yellow-500" />
@@ -175,17 +239,15 @@ export default function UserQuizResult() {
             </div>
           </div>
         </div>
-        {/* Overall performance */}
         
         {/* Sections */}
         <div className="space-y-6">
           {result.sections.map((section) => {
-
             const sectionPercentage = Math.round((section.correct / section.total) * 100);
-
             const sectionPerformanceColor = sectionPercentage >= 70 ? 'text-green-500' : 
                                           sectionPercentage >= 40 ? 'text-yellow-500' : 'text-red-500';
             if (section.total === 0) return null; // Skip empty sections
+            
             return (
               <div key={section.sectionName} className={`rounded-lg border ${borderColor} overflow-hidden`}>
                 {/* Section header */}
@@ -225,15 +287,15 @@ export default function UserQuizResult() {
 
                 {/* Section content (questions) */}
                 {expandedSections[section.sectionName] && (
-                  <div className="p-2 space-y-6">
+                  <div className="p-3 space-y-6">
                     <div className="grid gap-4">
-                      {section.questions.map((question) => (
+                      {section.questions.map((question,index) => (
                         <div 
                           key={question._id} 
                           className={`p-2 rounded-lg ${cardBg} ${borderColor} border`}
                         >
                           <div className="flex justify-between items-start gap-4">
-                            <h3 className="font-medium text-base">{question.text}</h3>
+                            <h3 className="font-medium text-base">Q{index+1}: {question.text}</h3>
                             <div className="flex-shrink-0">
                               {question.userAnswer === question.correctAnswer ? (
                                 <Badge variant="default" className="gap-1">
@@ -287,17 +349,31 @@ export default function UserQuizResult() {
                           {/* Explanation */}
                           <div>
                             <button
-                              onClick={() => toggleQuestionExplanation(question._id)
-                                
-
-                              }
+                              onClick={() => toggleQuestionExplanation(
+                                question._id,
+                                question.text,
+                                question.userAnswer,
+                                question.correctAnswer,
+                                question.options
+                              )}
+                              disabled={loadingExplanations[question._id]}
                               className={`flex items-center text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-500'} transition-colors`}
                             >
-                              {expandedQuestions[question._id] ? 'Hide Explanation' : 'Show Explanation'}
-                              {expandedQuestions[question._id] ? (
-                                <ChevronUp className="h-4 w-4 ml-1" />
+                              {loadingExplanations[question._id] ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                                  Generating...
+                                </>
+                              ) : expandedQuestions[question._id] ? (
+                                <>
+                                  Hide Explanation
+                                  <ChevronUp className="h-4 w-4 ml-1" />
+                                </>
                               ) : (
-                                <ChevronDown className="h-4 w-4 ml-1" />
+                                <>
+                                  Show Explanation
+                                  <ChevronDown className="h-4 w-4 ml-1" />
+                                </>
                               )}
                             </button>
 
@@ -307,7 +383,9 @@ export default function UserQuizResult() {
                                   <Trophy className="h-4 w-4 text-yellow-500" />
                                   Explanation:
                                 </p>
-                                <p className="text-sm">{question.explanation || 'No explanation provided.'}</p>
+                                <p className="text-sm">
+                                  {detailedExplanations[question._id] || question.explanation || 'No explanation available.'}
+                                </p>
                               </div>
                             )}
                           </div>
@@ -320,10 +398,7 @@ export default function UserQuizResult() {
             );
           })}
         </div>
-
-        {/* Summary at bottom */}
-        
       </div>
-    
+    </div>
   );
 }
