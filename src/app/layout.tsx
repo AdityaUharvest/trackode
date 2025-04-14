@@ -6,7 +6,8 @@ import StructuredData from "@/components/StructuredData";
 import ClientLayout from "@/app/client-layout/ClientLayout";
 import { SessionProvider } from "next-auth/react";
 import { Metadata } from 'next'
-
+import { Inter } from "next/font/google";
+const inter = Inter({ subsets: ["latin"] });
 import "./globals.css";
 export const metadata: Metadata = {
   title: {
@@ -18,8 +19,6 @@ export const metadata: Metadata = {
   icons: {
     icon: '/trackode.png',
     shortcut: '/favicon.ico',
-    
-    
   },
   
   keywords: ['Trackode', 'Coding', 'Quizzes', 'Mock Tests', 'AI Challenges', 'Programming', 'Contests', 'Knowledge Tracking', 'Skill Improvement', 'Interactive Learning', 'Coding Skills', 'Developer Tools', 'Tech Challenges', 'Online Learning', 'Coding Platform', 'Software Development', 'Programming Contests', 'AI-Generated Challenges'],
@@ -35,7 +34,7 @@ export const metadata: Metadata = {
     siteName: 'Trackode',
     images: [
       {
-        url: 'https://trackode.in/trackode.png',
+        url: 'https://trackode.in/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Trackode Coding Platform',
@@ -74,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       </head>
 
-      <body>
+      <body className={inter.className}>
         <SessionProvider>
           <ClientLayout>
             <Analytics />

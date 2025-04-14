@@ -139,7 +139,7 @@ const Navbar: React.FC = () => {
                       </li>
                       <li>
                         <Link
-                          href="/profile"
+                          href={`/profile/${session.user?.email}`}
                           className={`flex items-center px-4 py-2 text-sm font-medium hover:bg-blue-500 hover:text-white transition-colors ${theme === "light" ? "text-gray-700" : "text-gray-200"}`}
                         >
                           <User size={16} className="mr-2" />

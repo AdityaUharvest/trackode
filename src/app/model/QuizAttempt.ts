@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import MockTest from './MoockTest';
+
 interface IQuizAttempt extends Document {
   quizId: mongoose.Types.ObjectId;
   userId: string;

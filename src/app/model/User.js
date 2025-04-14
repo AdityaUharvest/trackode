@@ -30,27 +30,7 @@ const user = new mongoose.Schema({
     twitter:{
         type: String,
     },
-    facebook:{
-        type: String,
-    },
-    instagram:{
-        type: String,
-    },
-    geeksforgeeks:{
-        type: String,
-    },
-    codeforces:{
-        type: String,
-    },
-    codechef:{
-        type: String,
-    },
-    hackerrank:{
-        type: String,
-    },
-    hackerearth:{
-        type: String,
-    },
+    
     provider:{
         type: String,
         default:"credentials"
@@ -65,8 +45,53 @@ const user = new mongoose.Schema({
     },
     slug:{
         type:String,
-    
-    }
+    },
+    bio:{
+      type:String, 
+    },
+    dob:{
+        type:Date,
+    },
+    college:{
+        type:String,
+    },
+    branch:{
+        type:String,
+    },
+    year:{
+        type:String,
+    },
+    interests:{
+        
+        type: [String],
+
+    },
+    languages:{
+        
+        type: [String],
+    },
+    achievements:{
+        type: [String],
+    },
+    public:{
+        type: Boolean,
+        default: true,
+    },
+    followers:{
+        type: [String],
+    },
+    college:{
+        type: String,
+    },
+    branch:{
+        type: String,
+    },
+    year:{
+        type: String,
+    },
+    skills:{
+        type: [String],
+    },
 });
 const User = mongoose.models.User || mongoose.model("User", user);
 export default User;

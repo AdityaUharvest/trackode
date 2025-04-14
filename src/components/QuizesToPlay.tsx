@@ -503,14 +503,14 @@ const QuizDashboard = () => {
         )}
 
         {/* Quizzes Section */}
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col  lg:flex-row gap-6">
           {/* Filters Sidebar - Visible on large screens */}
           
 
           {/* Quizzes Content */}
-          <div className="flex-1">
-            <div className="mb-6">
-              <div className='flex gap-2 items-center'>
+          <div className="flex-1 ">
+            <div className="mb-6 ">
+              <div className='flex gap-2 ml-2 items-center'>
                 <span>
                   <svg className={`w-7 h-7 ${
                       theme === "dark" ? "text-white" : "text-blue-600"
@@ -518,22 +518,22 @@ const QuizDashboard = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </span>
-                <h2 className={`text-xl font-bold text-blue-500`}>Available Quizzes</h2>
+                <h2 className={`text-xl  font-bold text-blue-500`}>Available Quizzes</h2>
               </div>
             </div>
 
             {/* Organized Quizzes */}
-            <div className="space-y-4">
+            <div className="space-y-4 p-3">
               {Object.keys(organizedQuizzes).map((section) => (
                 <div
                   key={section}
-                  className={`rounded-xl shadow-sm border overflow-hidden transition-all duration-200 ${
+                  className={`rounded-xl  shadow-sm border overflow-hidden transition-all duration-200 ${
                     theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
                   }`}
                 >
                   {/* Section Header */}
                   <div
-                    className={`p-2 flex justify-between items-center cursor-pointer transition-all duration-200 ${
+                    className={` flex p-5 justify-between items-center cursor-pointer transition-all duration-200 ${
                       theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => toggleSection(section)}
@@ -697,6 +697,25 @@ const QuizDashboard = () => {
                   )}
                 </div>
               ))}
+             
+            </div>
+            <div className='flex justify-between mt-6'>
+              <Link href="/contact">
+                <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}>
+                  Contact Us for More Quizzes
+                </button>
+              </Link>
+              <Link href="/quiz-setup">
+                <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  theme === 'dark' ? 'bg-blue-600 text-white hover:bg-blue-500' : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                }`}>
+                  Contribute More Quizzes
+
+                </button>
+                
+              </Link>
             </div>
           </div>
           <div className="lg:w-64 flex-shrink-0">

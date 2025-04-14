@@ -197,109 +197,105 @@ const QuizDashboard = () => {
   }
 
   return (
-    <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
-      <div className="container mx-auto p-1">
-        {/* Enhanced Stats Section */}
-       
-
-        {/* Quizzes Section */}
-        <div className={`rounded-xl shadow-sm border overflow-hidden ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
-          <div className={`p-1 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
-            <div className="flex justify-between items-center">
-              
-              <input
-                type="text"
-                placeholder="Search quizzes..."
-                className={`w-64 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${inputStyles[theme]}`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className={tableStyles[theme].header}>
-                <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textStyles[theme].secondary}`}>Quiz</th>
-                  {/* <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textStyles[theme].secondary}`}>Status</th> */}
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textStyles[theme].secondary}`}>Participants</th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textStyles[theme].secondary}`}>Your Score</th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${textStyles[theme].secondary}`}>Action</th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                {filteredQuizzes.map((quiz) => (
-                  <tr key={quiz._id} className={tableStyles[theme].row}>
-                    <td className="p-5">
-                    {getStatusBadge(quiz.active)}
-                      <div className={`text-sm ${textStyles[theme].primary}`}>{quiz.name}
-                        
+    <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300 `}>
+  <div className="mx-auto ">
+    {/* Quizzes Section - Compact Design */}
+    <div className={`rounded-lg shadow-sm border overflow-hidden ${theme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-100 bg-white'}`}>
+      {/* Search Header */}
+      <div className={`p-2 border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+        <input
+          type="text"
+          placeholder="Search quizzes..."
+          className={`w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${inputStyles[theme]}`}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      
+      {/* Compact Table */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className={tableStyles[theme].header}>
+            <tr>
+              <th className={`p-2 text-left text-xs font-medium uppercase ${textStyles[theme].secondary}`}>Quiz</th>
+              <th className={`p-2 text-left text-xs font-medium uppercase ${textStyles[theme].secondary}`}>Play</th>
+              <th className={`p-2 text-left text-xs font-medium uppercase ${textStyles[theme].secondary}`}>Action</th>
+            </tr>
+          </thead>
+          <tbody className={`divide-y ${theme === 'dark' ? 'divide-gray-700' : 'divide-gray-200'}`}>
+            {filteredQuizzes.map((quiz) => (
+              <tr key={quiz._id} className={tableStyles[theme].row}>
+                {/* Quiz Name and Description */}
+                <td className="p-2">
+                  <div className="flex items-center">
+                    <span className="mr-1">{getStatusBadge(quiz.active)}</span>
+                    <div>
+                      <div className={`text-xs font-medium ${textStyles[theme].primary} truncate`} title={quiz.name}>
+                        {quiz.name}
                       </div>
-                      <div className={`text-sm ${textStyles[theme].secondary}`}>{quiz.description}</div>
                       
-                    </td>
+                    </div>
+                  </div>
+                </td>
+                
+                {/* Combined Stats Cell */}
+                <td className="p-2">
+                  <div className={`text-xs ${textStyles[theme].secondary}`}>
+                   
+                    <div>📝 {quiz.totalRegistrations}</div>
                     
-                    <td className={`px-6 py-4 text-sm ${textStyles[theme].secondary}`}>
-                      <div>{quiz.totalPlayed}</div>
-                      <div className={`text-xs ${textStyles[theme].muted}`}>{quiz.totalRegistrations} registered</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {quiz.userPlayed ? (
-                        <div className="flex items-center">
-                          <div className={`w-3 h-3 text-xs rounded-full mr-2 ${
-                            quiz.userScore && quiz.maxScore 
-                              ? (quiz.userScore / quiz.maxScore) >= 0.7 
-                                ? 'bg-green-500' 
-                                : (quiz.userScore / quiz.maxScore) >= 0.4 
-                                  ? 'bg-yellow-500' 
-                                  : 'bg-red-500'
-                              : 'bg-gray-500'
-                          }`}></div>
-                          <span className={textStyles[theme].secondary}>
-                            {quiz.userScore !== undefined && quiz.maxScore !== undefined 
-                              ? `${quiz.userScore}/${quiz.maxScore} (${Math.round(
-                                  (quiz.userScore / quiz.maxScore) * 100
-                                )}%)`
-                              : 'Completed'}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className={textStyles[theme].muted}>Not attempted</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      {quiz.active && quiz.userPlayed ? (
-                        <Link href={`/quiz-play/${quiz?._id}`}>
-                          <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                            quiz.userPlayed 
-                              ? theme === 'dark' 
-                                ? 'bg-blue-900 text-blue-200 hover:bg-blue-800' 
-                                : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
-                              : theme === 'dark' 
-                                ? 'bg-green-900 text-green-200 hover:bg-green-800' 
-                                : 'bg-green-50 text-green-700 hover:bg-green-100'
-                          }`}>
-                            {quiz.userPlayed ? 'LeaderBoard | My Result' : 'Start Quiz'}
-                          </button>
-                        </Link>
-                      ) : (
-                        <button 
-                          className="px-4 py-2 rounded-lg text-sm font-medium cursor-not-allowed bg-red-700 text-white "
-                          disabled
-                        >
-                          {new Date(quiz.startDate) > new Date() ? 'Coming Soon' : 'Not Live'}
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </div>
+                </td>
+                
+                {/* Action Button */}
+                <td className="p-2">
+                  {quiz.active ? (
+                    <Link href={`/quiz-play/${quiz?._id}`}>
+                      <button className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${
+                        quiz.userPlayed 
+                          ? theme === 'dark' 
+                            ? 'bg-blue-900 text-blue-200 hover:bg-blue-800' 
+                            : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                          : theme === 'dark' 
+                            ? 'bg-green-900 text-green-200 hover:bg-green-800' 
+                            : 'bg-green-50 text-green-700 hover:bg-green-100'
+                      }`}>
+                        {quiz.userPlayed ? 'Results' : 'Start'}
+                        {quiz.userPlayed && (
+                      <div className="flex items-center">
+                        <div className={`w-2 h-2 rounded-full mr-1 ${
+                          quiz.userScore && quiz.maxScore 
+                            ? (quiz.userScore / quiz.maxScore) >= 0.7 
+                              ? 'bg-green-500' 
+                              : (quiz.userScore / quiz.maxScore) >= 0.4 
+                                ? 'bg-yellow-500' 
+                                : 'bg-red-500'
+                            : 'bg-gray-500'
+                        }`}></div>
+                        {quiz.userScore !== undefined && quiz.maxScore !== undefined 
+                          ? `${Math.round((quiz.userScore / quiz.maxScore) * 100)}%`
+                          : '✓'}
+                      </div>
+                    )}
+                      </button>
+                    </Link>
+                  ) : (
+                    <button 
+                      className="px-2 py-1 text-xs rounded-md font-medium cursor-not-allowed bg-red-700 text-white"
+                      disabled
+                    >
+                      {new Date(quiz.startDate) > new Date() ? 'Soon' : 'Closed'}
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
+  </div>
+</div>
   );
 };
 
