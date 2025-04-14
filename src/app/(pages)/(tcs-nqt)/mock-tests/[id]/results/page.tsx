@@ -13,6 +13,8 @@ import React from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import Markdown from 'react-markdown';
+
 interface SectionStats {
   answered: number;
   correct: number;
@@ -41,6 +43,7 @@ export default function QuizResultsDashboard({ params }: any) {
   const { id } = useParams();
   const quizId = id;
   const { data: session } = useSession();
+  const [feedback, setFeedback] = useState<Record<string, string>>({});
   const [attempts, setAttempts] = useState<UserAttempt[]>([]);
   const [filteredAttempts, setFilteredAttempts] = useState<UserAttempt[]>([]);
   const [topPerformers, setTopPerformers] = useState<UserAttempt[]>([]);
@@ -72,7 +75,22 @@ export default function QuizResultsDashboard({ params }: any) {
   const [sections, setSections] = useState<any[]>([]);
   const printingRef = React.useRef<HTMLDivElement>(null);
   let sectionss = [];
-
+  const getPersonalizedFeedback = async (sectionStats: Record<string, SectionStats>, userName: string) => {
+    try {
+      // Prepare the prompt with section data
+      const prompt = `Provide concise personalized feedback for ${userName} based on these quiz section results:\n\n${
+        Object.entries(sectionStats).map(([section, stats]) => 
+          `${section}: Answered ${stats.answered}/${stats.totalQuestions}, Correct ${stats.correct}, Accuracy ${Math.round((stats.correct / stats.answered) * 100)}%`
+        ).join('\n')
+      }\n\nPlease provide specific feedback highlighting strengths, areas for improvement, and study recommendations.`;
+  
+      const response = await axios.post('/api/generate-feedback', { prompt });
+      return response.data.instructions;
+    } catch (error) {
+      console.error('Error getting personalized feedback:', error);
+      return null;
+    }
+  };
   useEffect(() => {
     const fetchSection = async () => {
       try {
@@ -173,13 +191,24 @@ export default function QuizResultsDashboard({ params }: any) {
     }));
   };
 
-  const toggleExpandAttempt = (attemptId: string) => {
+  const toggleExpandAttempt = async (attemptId: string) => {
     setExpandedAttempt(prev => {
       const newState = prev === attemptId ? null : attemptId;
       if (newState !== null) {
         // Trigger confetti effect when expanding
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 3000);
+        
+        // Fetch personalized feedback if we don't have it already
+        const attempt = attempts.find(a => a._id === attemptId);
+        if (attempt && !feedback[attemptId]) {
+          getPersonalizedFeedback(attempt.sectionStats, attempt.userName)
+            .then(fb => {
+              if (fb) {
+                setFeedback(prev => ({ ...prev, [attemptId]: fb }));
+              }
+            });
+        }
       }
       return newState;
     });
@@ -523,11 +552,11 @@ export default function QuizResultsDashboard({ params }: any) {
             ) : (
               filteredAttempts.map(attempt => (
                 <React.Fragment key={attempt._id}>
-                  <TableRow className={`${hoverBg} ${borderColor} ${attempt.rank && attempt.rank <= 3 ? 'animate-pulse' : ''}`}>
+                  <TableRow className={`${hoverBg} ${borderColor}`}>
                     <TableCell>
                       <div className="flex items-center justify-center">
                         {attempt.rank && attempt.rank <= 3 ? (
-                          <div className="relative">
+                          <div className="relative animate-pulse">
                             {renderMedal(attempt.rank)}
                             {renderRankBadge(attempt.rank)}
                           </div>
@@ -609,7 +638,7 @@ export default function QuizResultsDashboard({ params }: any) {
                             )}
                           </div>
                           
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                             {Object.entries(attempt.sectionStats).map(([section, stats]) => (
                               stats.answered > 0 && (
                                 <div 
@@ -674,7 +703,7 @@ export default function QuizResultsDashboard({ params }: any) {
                                   
                                   {/* Animated Performance Indicator */}
                                   <div className="mt-4 flex items-center justify-center">
-                                    <div className={`relative w-24 h-24 rounded-full flex items-center justify-center ${
+                                    <div className={`relative w-12 rounded-full flex items-center justify-center ${
                                       Math.round((stats.correct / stats.answered) * 100) >= 80 ? 'bg-green-100' :
                                       Math.round((stats.correct / stats.answered) * 100) >= 50 ? 'bg-yellow-100' : 'bg-red-100'
                                     }`}>
@@ -753,51 +782,7 @@ export default function QuizResultsDashboard({ params }: any) {
                               </div>
                             </div>
                           </div>
-                          
-                          {/* Performance Assessment */}
-                          <div className={`mt-4 p-4 rounded-lg ${
-                            attempt.accuracy >= 80 ? 'bg-green-100 border-green-500' : 
-                            attempt.accuracy >= 50 ? 'bg-yellow-100 border-yellow-500' : 'bg-red-100 border-red-500'
-                          } border ${theme === 'dark' ? 'bg-opacity-20' : ''}`}>
-                            <div className="flex items-start">
-                              <div className={`rounded-full p-2 mr-4 ${
-                                attempt.accuracy >= 80 ? 'bg-green-200' : 
-                                attempt.accuracy >= 50 ? 'bg-yellow-200' : 'bg-red-200'
-                              }`}>
-                                <svg className={`w-6 h-6 ${
-                                  attempt.accuracy >= 80 ? 'text-green-700' : 
-                                  attempt.accuracy >= 50 ? 'text-yellow-700' : 'text-red-700'
-                                }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  {attempt.accuracy >= 80 ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                  ) : attempt.accuracy >= 50 ? (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                  ) : (
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                  )}
-                                </svg>
-                              </div>
-                              <div>
-                                <h4 className={`font-bold ${
-                                  attempt.accuracy >= 80 ? 'text-green-800' : 
-                                  attempt.accuracy >= 50 ? 'text-yellow-800' : 'text-red-800'
-                                } ${theme === 'dark' ? 'text-opacity-90' : ''}`}>
-                                  {attempt.accuracy >= 80 ? 'Excellent Performance!' : 
-                                   attempt.accuracy >= 50 ? 'Good Effort - Room for Improvement' : 'Needs More Practice'}
-                                </h4>
-                                <p className={`mt-1 ${
-                                  attempt.accuracy >= 80 ? 'text-green-700' : 
-                                  attempt.accuracy >= 50 ? 'text-yellow-700' : 'text-red-700'
-                                } ${theme === 'dark' ? 'text-opacity-80' : ''}`}>
-                                  {attempt.accuracy >= 80 ? 
-                                    `${attempt.userName} demonstrated exceptional understanding with an accuracy of ${attempt.accuracy}%.` : 
-                                   attempt.accuracy >= 50 ? 
-                                    `${attempt.userName} showed good progress with an accuracy of ${attempt.accuracy}%. Focus on improving weaker sections.` : 
-                                    `${attempt.userName} needs additional practice with an accuracy of ${attempt.accuracy}%. Consider revisiting the fundamentals.`}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
+
                         </div>
                       </TableCell>
                     </TableRow>

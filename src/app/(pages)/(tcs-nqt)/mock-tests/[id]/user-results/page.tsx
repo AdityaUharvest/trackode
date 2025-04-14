@@ -5,9 +5,10 @@ import { useSession } from 'next-auth/react';
 import { useTheme } from '@/components/ThemeContext';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Printer, AlertCircle, Loader2, Trophy, CheckCircle2, XCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Printer, AlertCircle, Loader2, Trophy, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'react-toastify';
 
 interface QuestionResult {
   _id: string;
@@ -46,6 +47,12 @@ export default function UserQuizResult() {
   const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
   const [loadingExplanations, setLoadingExplanations] = useState<Record<string, boolean>>({});
   const [detailedExplanations, setDetailedExplanations] = useState<Record<string, string>>({});
+  const [sectionFeedback, setSectionFeedback] = useState<Record<string, string>>({});
+  const [overallFeedback, setOverallFeedback] = useState<string>('');
+  const [loadingFeedback, setLoadingFeedback] = useState({
+    overall: false,
+    sections: {} as Record<string, boolean>
+  });
 
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
@@ -56,6 +63,7 @@ export default function UserQuizResult() {
   const correctOptionBg = theme === 'dark' ? 'bg-green-900/30 border-green-600' : 'bg-green-50 border-green-500';
   const wrongOptionBg = theme === 'dark' ? 'bg-red-900/30 border-red-600' : 'bg-red-50 border-red-500';
   const neutralOptionBg = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50';
+  const feedbackBg = theme === 'dark' ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200';
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -121,19 +129,32 @@ export default function UserQuizResult() {
       setLoadingExplanations(prev => ({ ...prev, [questionId]: true }));
       
       // Call the API to get detailed explanation
-      const response = await fetch('/api/chat-gpt', {
+      const response = await fetch('/api/generate-feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prompt: `Question: ${questionText}
-          Options: ${options.join(', ')}
-          Your answer: ${options[userAnswerIndex]}
-          Correct answer: ${options[correctAnswerIndex]}
-
-          Explain why the correct answer is ${options[correctAnswerIndex]} for the above question in not more than 100 words and in single sentence without topics.`
-        }),
+          prompt: `Analyze this quiz question and provide a detailed explanation:
+          
+          **Question:** ${questionText}
+          
+          **Options:**
+          ${options.map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt}`).join('\n')}
+          
+          **User's Answer:** ${options[userAnswerIndex]} 
+          ${userAnswerIndex === correctAnswerIndex ? '(Correct)' : '(Incorrect)'}
+          
+          **Correct Answer:** ${options[correctAnswerIndex]}
+          
+          Please provide:
+          1. A concise explanation of why the correct answer is right (50-100 words)
+          2. Analysis of why the user's answer was ${userAnswerIndex === correctAnswerIndex ? 'correct' : 'incorrect'}
+          3. Key concepts tested by this question
+          4. Tips for remembering this concept
+          
+          Format your response in clear paragraphs with no headings.`
+        })
       });
 
       if (!response.ok) {
@@ -155,6 +176,7 @@ export default function UserQuizResult() {
       }));
     } catch (error) {
       console.error('Error generating explanation:', error);
+      toast.error('Failed to generate detailed explanation');
       // Fall back to the original explanation if available
       const question = result?.sections
         .flatMap(s => s.questions)
@@ -166,6 +188,115 @@ export default function UserQuizResult() {
       }));
     } finally {
       setLoadingExplanations(prev => ({ ...prev, [questionId]: false }));
+    }
+  };
+
+  const generateSectionFeedback = async (sectionName: string, correct: number, total: number) => {
+    try {
+      setLoadingFeedback(prev => ({
+        ...prev,
+        sections: { ...prev.sections, [sectionName]: true }
+      }));
+
+      const response = await fetch('/api/generate-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Analyze this quiz section performance and provide personalized feedback:
+        
+          **Section Name:** ${sectionName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+          
+          **Performance:** ${correct} out of ${total} correct (${Math.round((correct / total) * 100)}%)
+          
+          Please provide:
+          1. A brief assessment of this performance level (beginner/intermediate/advanced)
+          2. 2-3 key strengths demonstrated in this section
+          3. 2-3 areas needing improvement
+          4. Specific study recommendations for these weak areas
+          5. Encouragement and motivation tips
+          
+          Format your response in clear paragraphs with no headings. Keep it concise (150-200 words) and focused on actionable advice.`
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate section feedback');
+      }
+
+      const data = await response.json();
+      setSectionFeedback(prev => ({
+        ...prev,
+        [sectionName]: data.instructions
+      }));
+    } catch (error) {
+      console.error('Error generating section feedback:', error);
+      toast.error('Failed to generate section feedback');
+      setSectionFeedback(prev => ({
+        ...prev,
+        [sectionName]: 'Could not generate feedback for this section.'
+      }));
+    } finally {
+      setLoadingFeedback(prev => ({
+        ...prev,
+        sections: { ...prev.sections, [sectionName]: false }
+      }));
+    }
+  };
+
+  const generateOverallFeedback = async () => {
+    try {
+      if (!result) return;
+      
+      setLoadingFeedback(prev => ({ ...prev, overall: true }));
+
+      const response = await fetch('/api/generate-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Generate detailed overall performance analysis for this quiz attempt:
+        
+          **Overall Score:** ${result.totalScore}/${result.totalQuestions} (${Math.round((result.totalScore / result.totalQuestions) * 100)}%)
+        
+          **Section Breakdown:**
+          ${
+            result.sections.map(section => (
+            `- ${section.sectionName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}: ` +
+            `${section.correct}/${section.total} (${Math.round((section.correct / section.total) * 100)}%)`
+          )).join('\n')}
+        
+          Please provide:
+          1. Overall performance assessment (beginner/intermediate/advanced)
+          2. 3 key strengths across all sections
+          3. 3 main areas needing improvement
+          4. Personalized study plan recommendations
+          5. Motivational closing statement
+        
+          Structure your response with:
+          - Brief introduction summarizing performance
+          - Clear bullet points for strengths/weaknesses
+          - Specific action items for improvement
+          - Positive encouragement
+        
+          Keep it professional yet encouraging (200-250 words).`
+        })
+          });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate overall feedback');
+      }
+
+      const data = await response.json();
+      setOverallFeedback(data.instructions);
+    } catch (error) {
+      console.error('Error generating overall feedback:', error);
+      toast.error('Failed to generate overall feedback');
+      setOverallFeedback('Could not generate overall feedback.');
+    } finally {
+      setLoadingFeedback(prev => ({ ...prev, overall: false }));
     }
   };
 
@@ -243,8 +374,44 @@ export default function UserQuizResult() {
             </div>
             <div className="p-3 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
               <p className="text-sm text-gray-500 dark:text-gray-400">Overall Score</p>
-              <p className="text-sm font-semibold">{overallPercentage}%</p>
+              <p className={`text-sm font-semibold ${performanceColor}`}>{overallPercentage}%</p>
             </div>
+          </div>
+
+          {/* Overall Feedback */}
+          <div className={`mt-4 p-4 rounded-lg ${feedbackBg} border ${borderColor}`}>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-blue-500" />
+                AI-Powered Performance Analysis
+              </h4>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={generateOverallFeedback}
+                disabled={loadingFeedback.overall}
+              >
+                {loadingFeedback.overall ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : overallFeedback ? (
+                  'Regenerate'
+                ) : (
+                  'Get Feedback'
+                )}
+              </Button>
+            </div>
+            {overallFeedback ? (
+              <div className="prose prose-sm dark:prose-invert max-w-none">
+                <p>{overallFeedback}</p>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Click "Get Feedback" to receive personalized performance analysis.
+              </p>
+            )}
           </div>
         </div>
         
@@ -296,6 +463,59 @@ export default function UserQuizResult() {
                 {/* Section content (questions) */}
                 {expandedSections[section.sectionName] && (
                   <div className="p-3 space-y-6">
+                    {/* Section Feedback */}
+                    <div className={`p-4 rounded-lg ${feedbackBg} border ${borderColor}`}>
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-blue-500" />
+                          Section Analysis
+                        </h4>
+                        <Button 
+                          size="sm" 
+                          variant="ghost" 
+                          onClick={() => generateSectionFeedback(section.sectionName, section.correct, section.total)}
+                          disabled={loadingFeedback.sections[section.sectionName]}
+                        >
+                          {loadingFeedback.sections[section.sectionName] ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Generating...
+                            </>
+                          ) : sectionFeedback[section.sectionName] ? (
+                            'Regenerate'
+                          ) : (
+                            'Analyze'
+                          )}
+                        </Button>
+                      </div>
+                      
+                      {sectionFeedback[section.sectionName] ? (
+                        <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <p>{sectionFeedback[section.sectionName]}</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Click "Analyze" to get personalized feedback for this section.
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Performance</span>
+                        <span className={`font-medium ${sectionPerformanceColor}`}>
+                          {sectionPercentage}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={sectionPercentage} 
+                        className="h-2"
+                        
+                      />
+                    </div>
+
+                    {/* Questions list */}
                     <div className="grid gap-4">
                       {section.questions.map((question, index) => (
                         <div key={question._id} className={`p-4 rounded-lg mb-4 ${cardBg} ${borderColor} border`}>
@@ -341,13 +561,13 @@ export default function UserQuizResult() {
                                       <div>
                                         <p>{option}</p>
                                         {index === question.correctAnswer && (
-                                          <p className="text-xs mt-1 text-green-600 flex items-center gap-1">
+                                          <p className="text-xs mt-1 text-green-600 dark:text-green-400 flex items-center gap-1">
                                             <CheckCircle2 className="h-3 w-3" />
                                             Correct Answer
                                           </p>
                                         )}
                                         {index === question.userAnswer && index !== question.correctAnswer && (
-                                          <p className="text-xs mt-1 text-red-600 flex items-center gap-1">
+                                          <p className="text-xs mt-1 text-red-600 dark:text-red-400 flex items-center gap-1">
                                             <XCircle className="h-3 w-3" />
                                             Your Answer
                                           </p>
@@ -393,14 +613,14 @@ export default function UserQuizResult() {
                                 </button>
 
                                 {expandedExplanations[question._id] && (
-                                  <div className={`mt-3 p-2 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} border ${borderColor}`}>
+                                  <div className={`mt-3 p-3 rounded-lg ${feedbackBg} border ${borderColor}`}>
                                     <p className="font-medium mb-2 flex items-center gap-2">
-                                      <Trophy className="h-4 w-4 text-yellow-500" />
-                                      Explanation:
+                                      <Sparkles className="h-4 w-4 text-blue-500" />
+                                      AI Explanation:
                                     </p>
-                                    <p className="text-sm">
-                                      {detailedExplanations[question._id] || question.explanation || 'No explanation available.'}
-                                    </p>
+                                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                                      <p>{detailedExplanations[question._id] || question.explanation || 'No explanation available.'}</p>
+                                    </div>
                                   </div>
                                 )}
                               </div>
