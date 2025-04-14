@@ -184,7 +184,12 @@ export default function QuizResultsDashboard({ params }: any) {
       return newState;
     });
   };
-
+  useEffect(
+    ()=>{
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+    },[]
+  )
   // Medal rendering functions
   const renderMedal = (rank: number) => {
     if (rank === 1) return <Trophy className="h-8 w-8 text-yellow-500" />;
@@ -238,6 +243,7 @@ export default function QuizResultsDashboard({ params }: any) {
                     backgroundColor: ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'][
                       Math.floor(Math.random() * 16)
                     ],
+                    
                     animationDelay: `${animationDelay}s`,
                   }}
                 />
