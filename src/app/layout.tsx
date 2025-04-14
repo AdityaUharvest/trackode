@@ -62,14 +62,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 <meta property="og:url" content="https://trackode.in/" />
 <meta property="og:title" content="Trackode - Free Mock Tests & AI-powered Quizzes" />
 <meta property="og:description" content="Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively." />
-<meta property="og:image" content="https://metatags.io/images/meta-tags.png" />
+<meta property="og:image" content="https://trackode.in/og-image.png" />
 
 
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content="https://trackode.in/" />
 <meta property="twitter:title" content="Trackode - Free Mock Tests & AI-powered Quizzes" />
 <meta property="twitter:description" content="Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges.Improve your programming skills effectively." />
-<meta property="twitter:image" content="https://metatags.io/images/meta-tags.png" />
+<meta property="twitter:image"  content="https://trackode.in/og-image.png" />
 
       </head>
 
