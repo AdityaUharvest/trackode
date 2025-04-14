@@ -280,7 +280,7 @@ export default function QuizResultsDashboard({ params }: any) {
       {topPerformers.length > 0 && (
         <div className={`mb-8 p-6 rounded-lg shadow border ${cardBg} ${borderColor}`}>
           <h2 className="text-2xl font-bold text-center mb-6">Leaderboard</h2>
-          <div className="flex flex-col  md:flex-row items-end justify-center gap-10">
+          <div className="flex flex-col sm:flex-row  md:flex-row items-end justify-center gap-10">
             {/* 2nd Place */}
             {topPerformers.length >= 2 && (
               <div className="flex flex-col items-center">
