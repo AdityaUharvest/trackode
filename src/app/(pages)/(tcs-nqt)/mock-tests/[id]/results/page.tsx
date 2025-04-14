@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer, Trophy, Medal, Award } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
+
 interface SectionStats {
   answered: number;
   correct: number;
@@ -31,6 +33,7 @@ interface UserAttempt {
   totalQuestions: number;
   accuracy: number;
   sectionStats: Record<string, SectionStats>;
+  rank?: number;
 }
 
 export default function QuizResultsDashboard({ params }: any) {
@@ -40,12 +43,13 @@ export default function QuizResultsDashboard({ params }: any) {
   const { data: session } = useSession();
   const [attempts, setAttempts] = useState<UserAttempt[]>([]);
   const [filteredAttempts, setFilteredAttempts] = useState<UserAttempt[]>([]);
+  const [topPerformers, setTopPerformers] = useState<UserAttempt[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<{ 
     key: string; 
     direction: 'asc' | 'desc' 
   }>({ 
-    key: 'completedAt', 
+    key: 'accuracy', 
     direction: 'desc' 
   });
   const [expandedAttempt, setExpandedAttempt] = useState<string | null>(null);
@@ -55,8 +59,7 @@ export default function QuizResultsDashboard({ params }: any) {
     quizTitle: '',
     totalParticipants: 0
   });
-
-  
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
@@ -68,37 +71,46 @@ export default function QuizResultsDashboard({ params }: any) {
   const secondaryText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
   const [sections, setSections] = useState<any[]>([]);
   const printingRef = React.useRef<HTMLDivElement>(null);
-  let sectionss=[];
-  useEffect(
-    ()=>{
-      const fetchSection = async () => {
-        try {
-          const res = await axios.get('/api/fetchSection');
-          console.log(res.data.sections);
-          setSections(res.data.sections);
-        } catch (error) {
-          console.error('Failed to fetch sections', error);
-        }
-      };
-      fetchSection();
-    },[]
-  )
-  for(let i =0;i<sections.length;i++){
+  let sectionss = [];
+
+  useEffect(() => {
+    const fetchSection = async () => {
+      try {
+        const res = await axios.get('/api/fetchSection');
+        setSections(res.data.sections);
+      } catch (error) {
+        console.error('Failed to fetch sections', error);
+      }
+    };
+    fetchSection();
+  }, []);
+
+  for (let i = 0; i < sections.length; i++) {
     sectionss.push(sections[i].value);
   }
-  console.log(sections);
+
   useEffect(() => {
     const fetchAttempts = async () => {
       try {
         setIsLoading(true);
         const response = await fetch(`/api/mock-tests/${quizId}/results`);
         const data = await response.json();
-        setAttempts(data.attempts);
+        
+        // Sort attempts by accuracy and add ranking
+        const sortedAttempts = [...data.attempts].sort((a, b) => b.accuracy - a.accuracy);
+        const rankedAttempts = sortedAttempts.map((attempt, index) => ({
+          ...attempt,
+          rank: index + 1
+        }));
+        
+        setAttempts(rankedAttempts);
+        setTopPerformers(rankedAttempts.slice(0, 3));
+        setFilteredAttempts(rankedAttempts);
+        
         setQuizStats({
           quizTitle: data.quizTitle,
           totalParticipants: data.totalParticipants
         });
-        setFilteredAttempts(data.attempts);
       } catch (error) {
         console.error("Failed to fetch attempts:", error);
       } finally {
@@ -162,7 +174,39 @@ export default function QuizResultsDashboard({ params }: any) {
   };
 
   const toggleExpandAttempt = (attemptId: string) => {
-    setExpandedAttempt(prev => prev === attemptId ? null : attemptId);
+    setExpandedAttempt(prev => {
+      const newState = prev === attemptId ? null : attemptId;
+      if (newState !== null) {
+        // Trigger confetti effect when expanding
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 3000);
+      }
+      return newState;
+    });
+  };
+
+  // Medal rendering functions
+  const renderMedal = (rank: number) => {
+    if (rank === 1) return <Trophy className="h-8 w-8 text-yellow-500" />;
+    if (rank === 2) return <Medal className="h-7 w-7 text-gray-400" />;
+    if (rank === 3) return <Medal className="h-6 w-6 text-amber-700" />;
+    return null;
+  };
+
+  const renderRankBadge = (rank: number) => {
+    if (rank > 3) return null;
+    
+    const badgeColors = {
+      1: 'bg-yellow-500',
+      2: 'bg-gray-400',
+      3: 'bg-amber-700'
+    };
+    
+    return (
+      <span className={`${badgeColors[rank as keyof typeof badgeColors]} text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center`}>
+        {rank}
+      </span>
+    );
   };
 
   if (isLoading) {
@@ -175,28 +219,108 @@ export default function QuizResultsDashboard({ params }: any) {
 
   return (
     <div className={`container mx-auto px-4 py-8 min-h-screen ${bgColor} ${textColor}`}>
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          <div className="confetti-container">
+            {Array.from({ length: 100 }).map((_, i) => {
+              const left = Math.random() * 100;
+              const animationDelay = Math.random() * 2;
+              const size = Math.floor(Math.random() * 8) + 6;
+              
+              return (
+                <div
+                  key={i}
+                  className="confetti"
+                  style={{
+                    left: `${left}%`,
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    backgroundColor: ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'][
+                      Math.floor(Math.random() * 16)
+                    ],
+                    animationDelay: `${animationDelay}s`,
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-lg font-bold"> Welcome {session?.user?.name}</h1>
+        <h1 className="text-xl font-bold">Welcome {session?.user?.name}</h1>
         <div className="flex items-center space-x-4">
-            <Button
+          <Button
             variant="outline"
             onClick={() => {
               if (printingRef.current) {
-              const printContents = printingRef.current.innerHTML;
-              const originalContents = document.body.innerHTML;
-              document.body.innerHTML = printContents;
-              window.print();
-              document.body.innerHTML = originalContents;
-              window.location.reload();
+                const printContents = printingRef.current.innerHTML;
+                const originalContents = document.body.innerHTML;
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+                window.location.reload();
               }
             }}
             className={`gap-2 ${borderColor}`}
-            >
+          >
             <Printer className="h-4 w-4" />
             Export Results
-            </Button>
+          </Button>
         </div>
       </div>
+
+      {/* Leaderboard Podium */}
+      {topPerformers.length > 0 && (
+        <div className={`mb-8 p-6 rounded-lg shadow border ${cardBg} ${borderColor}`}>
+          <h2 className="text-2xl font-bold text-center mb-6">Leaderboard</h2>
+          <div className="flex flex-col  md:flex-row items-end justify-center gap-10">
+            {/* 2nd Place */}
+            {topPerformers.length >= 2 && (
+              <div className="flex flex-col items-center">
+                <div className={`w-24 h-24 rounded-full overflow-hidden border-4 border-gray-400 mb-2 flex items-center justify-center ${cardBg}`}>
+                  <span className="text-4xl font-bold text-gray-400">2</span>
+                </div>
+                <div className="h-32 w-24 p-3 bg-gray-200 rounded-t-lg flex flex-col items-center justify-end ">
+                  <Trophy className="h-6 w-6 text-gray-400 mb-1" />
+                  <p className="font-bold  text-gray-700 text-center w-full">{topPerformers[1].userName}</p>
+                  <p className="text-sm text-gray-600">{topPerformers[1].accuracy}%</p>
+                </div>
+              </div>
+            )}
+            
+            {/* 1st Place */}
+            {topPerformers.length >= 1 && (
+              <div className="flex flex-col items-center">
+                <div className="w-6 h-6 bg-yellow-500 transform rotate-45 mb-1"></div>
+                <div className={`w-28 h-28 rounded-full overflow-hidden border-4 border-yellow-500 mb-2 flex items-center justify-center ${cardBg}`}>
+                  <span className="text-4xl font-bold text-yellow-500">1</span>
+                </div>
+                <div className="h-40 w-28 bg-yellow-100 rounded-t-lg flex flex-col items-center justify-end p-2">
+                  <Trophy className="h-8 w-8 text-yellow-500 mb-1" />
+                  <p className="font-bold text-gray-800 text-center  w-full">{topPerformers[0].userName}</p>
+                  <p className="text-sm text-gray-700">{topPerformers[0].accuracy}%</p>
+                </div>
+              </div>
+            )}
+            
+            {/* 3rd Place */}
+            
+            {topPerformers.length >= 3 && (
+              <div className="flex flex-col items-center">
+                <div className={`w-24 h-24 rounded-full overflow-hidden border-4 border-green-400 mb-2 flex items-center justify-center ${cardBg}`}>
+                  <span className="text-4xl font-bold text-gray-400">3</span>
+                </div>
+                <div className="h-32 w-24 p-3 bg-gray-200 rounded-t-lg flex flex-col items-center justify-end ">
+                  <Trophy className="h-6 w-6 text-green-400 mb-1" />
+                  <p className="font-bold  text-gray-700 text-center w-full">{topPerformers[2].userName}</p>
+                  <p className="text-sm text-gray-600">{topPerformers[2].accuracy}%</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="relative">
@@ -267,26 +391,25 @@ export default function QuizResultsDashboard({ params }: any) {
       </div>
 
       <div 
-      ref={printingRef}
-      className={`rounded-lg shadow overflow-hidden border ${cardBg} ${borderColor}`}>
-        <div className="flex justify-evenly border-b-blue-200 border-b-2">
-        <p className='text-center p-2 '>
-          <span className=' text-blue-600'>Total Participants:</span> {quizStats.totalParticipants} 
-        </p>
-        <p className='text-center p-2 '>
-          <span className=' text-blue-600'>Quiz Title:</span> {quizStats.quizTitle}
-        </p>
-        <p className='text-center p-2 '>
-          <span className=' text-blue-600'>Visit:</span> www.trackode.in/
-        </p>
-       
+        ref={printingRef}
+        className={`rounded-lg shadow overflow-hidden border ${cardBg} ${borderColor}`}
+      >
+        <div className="flex justify-evenly border-b-blue-500 border-b-2 p-3">
+          <p className='text-center'>
+            <span className='text-blue-600 font-medium'>Total Participants:</span> {quizStats.totalParticipants} 
+          </p>
+          <p className='text-center'>
+            <span className='text-blue-600 font-medium'>Quiz Title:</span> {quizStats.quizTitle}
+          </p>
+          <p className='text-center'>
+            <span className='text-blue-600 font-medium'>Visit:</span> www.trackode.in/
+          </p>
         </div>
         
         <Table>
-          
           <TableHeader className={headerBg}>
-          
             <TableRow className={borderColor}>
+              <TableHead className={`w-12 ${textColor}`}>Rank</TableHead>
               <TableHead className={textColor}>
                 <Button 
                   variant="ghost" 
@@ -353,33 +476,37 @@ export default function QuizResultsDashboard({ params }: any) {
                   )}
                 </Button>
               </TableHead>
-              <TableHead className={`text-right ${textColor}`}>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleSort('timeTaken')}
-                  className={`px-0 hover:bg-transparent font-medium ${textColor}`}
-                >
-                  Time taken {sortConfig.key === 'timeTaken' && (
-                    sortConfig.direction === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
-                  )}
-                </Button>
-              </TableHead>
+              <TableHead className={`text-right ${textColor}`}>Time taken</TableHead>
               <TableHead className={`text-right ${textColor}`}>Details</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAttempts.length === 0 ? (
               <TableRow className={borderColor}>
-                <TableCell colSpan={7} className={`text-center py-8 ${secondaryText}`}>
+                <TableCell colSpan={8} className={`text-center py-8 ${secondaryText}`}>
                   No attempts found matching your criteria
                 </TableCell>
               </TableRow>
             ) : (
               filteredAttempts.map(attempt => (
                 <React.Fragment key={attempt._id}>
-                  <TableRow className={`${hoverBg} ${borderColor}`}>
+                  <TableRow className={`${hoverBg} ${borderColor} ${attempt.rank && attempt.rank <= 3 ? 'animate-pulse' : ''}`}>
                     <TableCell>
-                      <div className={`font-medium ${textColor}`}>{attempt.userName}</div>
+                      <div className="flex items-center justify-center">
+                        {attempt.rank && attempt.rank <= 3 ? (
+                          <div className="relative">
+                            {renderMedal(attempt.rank)}
+                            {renderRankBadge(attempt.rank)}
+                          </div>
+                        ) : (
+                          <span className={`${textColor} font-medium`}>{attempt.rank}</span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className={`font-medium ${textColor} ${attempt.rank && attempt.rank <= 3 ? 'font-bold' : ''}`}>
+                        {attempt.userName}
+                      </div>
                       <div className={`text-sm ${secondaryText}`}>{attempt.email}</div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -389,30 +516,29 @@ export default function QuizResultsDashboard({ params }: any) {
                     <TableCell className="text-right">
                       <span className={`font-medium ${textColor}`}>{attempt.totalCorrect}</span>
                       <span className={`text-sm ${secondaryText}`}>/{attempt.totalQuestions}</span>
-                     
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={`font-medium ${textColor}`}>{attempt.totalCorrect}</span>/
                       <span className={`text-sm ${secondaryText}`}>{attempt.totalAnswered}</span>
                     </TableCell>
                     <TableCell className="text-right">
-                      <span className={`font-medium ${textColor}`}>{attempt.accuracy}%</span>
+                      <span className={`font-medium ${textColor} ${attempt.rank && attempt.rank <= 3 ? 'text-green-500 font-bold' : ''}`}>
+                        {attempt.accuracy}%
+                      </span>
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={textColor}>{new Date(attempt.completedAt).toLocaleDateString()}</span>
                       <div className={`text-xs ${secondaryText}`}>
                         {new Date(attempt.startedAt).toLocaleTimeString()}
                       </div>
-                      
                     </TableCell>
                     <TableCell className="text-right">
-                    <div className={`text-sm ${secondaryText}`}>
+                      <div className={`text-sm ${textColor}`}>
                         {((new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000).toFixed(2)} min
-                    </div>
-                    <div className={`text-xs ${secondaryText}`}>
+                      </div>
+                      <div className={`text-xs ${secondaryText}`}>
                         {new Date(attempt.completedAt).toLocaleTimeString()}
                       </div>
-                      
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -436,41 +562,208 @@ export default function QuizResultsDashboard({ params }: any) {
 
                   {expandedAttempt === attempt._id && (
                     <TableRow className={borderColor}>
-                      <TableCell colSpan={7} className="p-0">
-                        <div className={`p-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                          <h3 className={`font-medium mb-3 ${textColor}`}>Section-wise Performance</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <TableCell colSpan={9} className="p-0">
+                        <div className={`p-6 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className={`text-xl font-bold ${textColor}`}>Performance Analysis</h3>
+                            {attempt.rank && attempt.rank <= 3 && (
+                              <div className="flex items-center">
+                                {renderMedal(attempt.rank)}
+                                <span className={`ml-2 font-bold ${attempt.rank === 1 ? 'text-yellow-500' : attempt.rank === 2 ? 'text-gray-400' : 'text-amber-700'}`}>
+                                  {attempt.rank === 1 ? 'Gold Medal' : attempt.rank === 2 ? 'Silver Medal' : 'Bronze Medal'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {Object.entries(attempt.sectionStats).map(([section, stats]) => (
                               stats.answered > 0 && (
-                                <div key={section} className={`border rounded-lg p-4 ${cardBg} ${borderColor}`}>
-                                  <h4 className={`font-medium mb-2 ${textColor}`}>
+                                <div 
+                                  key={section} 
+                                  className={`border rounded-lg p-5 ${cardBg} ${borderColor} transform transition-all duration-300 hover:scale-105 hover:shadow-lg`}
+                                >
+                                  <h4 className={`font-bold text-lg mb-3 ${textColor}`}>
                                     {section.split('-').map(word => 
                                       word.charAt(0).toUpperCase() + word.slice(1)
                                     ).join(' ')}
                                   </h4>
-                                  <div className="space-y-2">
-                                    <div className="flex justify-between items-center">
-                                      <span className={`text-sm ${secondaryText}`}>Answered:</span>
-                                      <span className={`font-medium ${textColor}`}>
-                                        {stats.answered}/{stats.totalQuestions}
-                                      </span>
+                                  
+                                  <div className="space-y-4">
+                                    <div>
+                                      <div className="flex justify-between items-center mb-1">
+                                        <span className={`text-sm ${secondaryText}`}>Answered:</span>
+                                        <span className={`font-medium ${textColor}`}>
+                                          {stats.answered}/{stats.totalQuestions}
+                                        </span>
+                                      </div>
+                                      <div className="w-full bg-gray-300 rounded-full h-2">
+                                        <div 
+                                          className="bg-blue-500 h-2 rounded-full" 
+                                          style={{ width: `${(stats.answered / stats.totalQuestions) * 100}%` }}
+                                        ></div>
+                                      </div>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className={`text-sm ${secondaryText}`}>Correct:</span>
-                                      <span className={`font-medium ${textColor}`}>
-                                        {stats.correct}/{stats.answered}
-                                      </span>
+                                    
+                                    <div>
+                                      <div className="flex justify-between items-center mb-1">
+                                        <span className={`text-sm ${secondaryText}`}>Correct:</span>
+                                        <span className={`font-medium ${textColor}`}>
+                                          {stats.correct}/{stats.answered}
+                                        </span>
+                                      </div>
+                                      <div className="w-full bg-gray-300 rounded-full h-2">
+                                        <div 
+                                          className="bg-green-500 h-2 rounded-full" 
+                                          style={{ width: `${(stats.correct / stats.answered) * 100}%` }}
+                                        ></div>
+                                      </div>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className={`text-sm ${secondaryText}`}>Accuracy:</span>
-                                      <span className={`font-medium ${textColor}`}>
-                                        {Math.round((stats.correct / stats.answered) * 100)}%
-                                      </span>
+                                    
+                                    <div>
+                                      <div className="flex justify-between items-center mb-1">
+                                        <span className={`text-sm ${secondaryText}`}>Accuracy:</span>
+                                        <span className={`font-medium ${textColor}`}>
+                                          {Math.round((stats.correct / stats.answered) * 100)}%
+                                        </span>
+                                      </div>
+                                      <div className="w-full bg-gray-300 rounded-full h-2">
+                                        <div 
+                                          className={`h-2 rounded-full ${
+                                            Math.round((stats.correct / stats.answered) * 100) >= 80 ? 'bg-green-500' : 
+                                            Math.round((stats.correct / stats.answered) * 100) >= 50 ? 'bg-yellow-500' : 'bg-red-500'
+                                          }`}
+                                          style={{ width: `${(stats.correct / stats.answered) * 100}%` }}
+                                        ></div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Animated Performance Indicator */}
+                                  <div className="mt-4 flex items-center justify-center">
+                                    <div className={`relative w-24 h-24 rounded-full flex items-center justify-center ${
+                                      Math.round((stats.correct / stats.answered) * 100) >= 80 ? 'bg-green-100' :
+                                      Math.round((stats.correct / stats.answered) * 100) >= 50 ? 'bg-yellow-100' : 'bg-red-100'
+                                    }`}>
+                                      <svg className="w-full h-full" viewBox="0 0 36 36">
+                                        <path
+                                          className="stroke-current text-gray-300"
+                                          fill="none"
+                                          strokeWidth="3"
+                                          d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        />
+                                        <path
+                                          className={`stroke-current ${
+                                            Math.round((stats.correct / stats.answered) * 100) >= 80 ? 'text-green-500' :
+                                            Math.round((stats.correct / stats.answered) * 100) >= 50 ? 'text-yellow-500' : 'text-red-500'
+                                          }`}
+                                          fill="none"
+                                          strokeWidth="3"
+                                          strokeDasharray={`${Math.round((stats.correct / stats.answered) * 100)}, 100`}
+                                          d="M18 2.0845
+                                            a 15.9155 15.9155 0 0 1 0 31.831
+                                            a 15.9155 15.9155 0 0 1 0 -31.831"
+                                        />
+                                        <text x="18" y="20.5" className="text-3xl font-bold" textAnchor="middle" fill={theme === 'dark' ? '#e5e7eb' : '#374151'}>
+                                          {Math.round((stats.correct / stats.answered) * 100)}%
+                                        </text>
+                                      </svg>
                                     </div>
                                   </div>
                                 </div>
                               )
                             ))}
+                          </div>
+                          
+                          {/* Performance Summary */}
+                          <div className={`mt-6 p-5 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-white'} border ${borderColor}`}>
+                            <h4 className={`font-bold mb-4 ${textColor}`}>Overall Performance</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                <div className={`text-sm mb-1 ${secondaryText}`}>Time Spent</div>
+                                <div className="flex items-center">
+                                  <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <span className={`font-medium ${textColor}`}>
+                                    {((new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000).toFixed(2)} minutes
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <div className={`text-sm mb-1 ${secondaryText}`}>Completion Rate</div>
+                                <div className="flex items-center">
+                                  <svg className="w-5 h-5 mr-2 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <span className={`font-medium ${textColor}`}>
+                                    {Math.round((attempt.totalAnswered / attempt.totalQuestions) * 100)}%
+                                  </span>
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <div className={`text-sm mb-1 ${secondaryText}`}>Overall Ranking</div>
+                                <div className="flex items-center">
+                                  {attempt.rank && attempt.rank <= 3 ? renderMedal(attempt.rank) : (
+                                    <svg className="w-5 h-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                    </svg>
+                                  )}
+                                  <span className={`font-medium ${textColor}`}>
+                                    {attempt.rank ? `#${attempt.rank} of ${attempts.length}` : 'N/A'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Performance Assessment */}
+                          <div className={`mt-4 p-4 rounded-lg ${
+                            attempt.accuracy >= 80 ? 'bg-green-100 border-green-500' : 
+                            attempt.accuracy >= 50 ? 'bg-yellow-100 border-yellow-500' : 'bg-red-100 border-red-500'
+                          } border ${theme === 'dark' ? 'bg-opacity-20' : ''}`}>
+                            <div className="flex items-start">
+                              <div className={`rounded-full p-2 mr-4 ${
+                                attempt.accuracy >= 80 ? 'bg-green-200' : 
+                                attempt.accuracy >= 50 ? 'bg-yellow-200' : 'bg-red-200'
+                              }`}>
+                                <svg className={`w-6 h-6 ${
+                                  attempt.accuracy >= 80 ? 'text-green-700' : 
+                                  attempt.accuracy >= 50 ? 'text-yellow-700' : 'text-red-700'
+                                }`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  {attempt.accuracy >= 80 ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  ) : attempt.accuracy >= 50 ? (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                  ) : (
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                  )}
+                                </svg>
+                              </div>
+                              <div>
+                                <h4 className={`font-bold ${
+                                  attempt.accuracy >= 80 ? 'text-green-800' : 
+                                  attempt.accuracy >= 50 ? 'text-yellow-800' : 'text-red-800'
+                                } ${theme === 'dark' ? 'text-opacity-90' : ''}`}>
+                                  {attempt.accuracy >= 80 ? 'Excellent Performance!' : 
+                                   attempt.accuracy >= 50 ? 'Good Effort - Room for Improvement' : 'Needs More Practice'}
+                                </h4>
+                                <p className={`mt-1 ${
+                                  attempt.accuracy >= 80 ? 'text-green-700' : 
+                                  attempt.accuracy >= 50 ? 'text-yellow-700' : 'text-red-700'
+                                } ${theme === 'dark' ? 'text-opacity-80' : ''}`}>
+                                  {attempt.accuracy >= 80 ? 
+                                    `${attempt.userName} demonstrated exceptional understanding with an accuracy of ${attempt.accuracy}%.` : 
+                                   attempt.accuracy >= 50 ? 
+                                    `${attempt.userName} showed good progress with an accuracy of ${attempt.accuracy}%. Focus on improving weaker sections.` : 
+                                    `${attempt.userName} needs additional practice with an accuracy of ${attempt.accuracy}%. Consider revisiting the fundamentals.`}
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </TableCell>
@@ -496,6 +789,36 @@ export default function QuizResultsDashboard({ params }: any) {
           </Button>
         </div>
       </div>
+      
+      {/* Add CSS for confetti animation */}
+      <style jsx global>{`
+        .confetti-container {
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          top: 0;
+          left: 0;
+          pointer-events: none;
+        }
+        
+        .confetti {
+          position: absolute;
+          top: -10px;
+          animation: confetti-fall 10s linear forwards;
+        }
+        
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(105vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }

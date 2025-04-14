@@ -16,8 +16,9 @@ import {
 import { useTheme } from "@/components/ThemeContext";
 import { Loader2, Award, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import Quiz from "@/app/model/Quiz";
 
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 interface QuizResult {
@@ -40,7 +41,9 @@ export default function QuizResults({ params }: any) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showAnimation, setShowAnimation] = useState(false);
-
+  const [showAnimations, setShowAnimations] = useState(true);
+  const { width, height } = useWindowSize();
+  
   useEffect(() => {
     const fetchResults = async () => {
       try {
@@ -57,7 +60,14 @@ export default function QuizResults({ params }: any) {
     };
 
     fetchResults();
-  }, [id]);
+
+
+    const timer = setTimeout(() => {
+      setShowAnimations(false);
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, []);
   console.log(results);
   const sortedResults = [...results].sort((a, b) => {
     if (sortBy === "score") return b?.score - a?.score;
@@ -113,6 +123,15 @@ export default function QuizResults({ params }: any) {
     <div className={`min-h-screen p-4 md:p-8 ${
       theme === "light" ? "bg-gradient-to-b from-indigo-50 to-white text-gray-900" : "bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100"
     }`}>
+      {showAnimations && (
+        <Confetti
+          width={width}
+          height={height}
+          numberOfPieces={300}
+          gravity={0.3}
+          recycle={false}
+        />
+      )}
       <motion.h1 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
