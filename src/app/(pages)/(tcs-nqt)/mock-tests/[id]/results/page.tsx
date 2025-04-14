@@ -278,19 +278,21 @@ export default function QuizResultsDashboard({ params }: any) {
 
       {/* Leaderboard Podium */}
       {topPerformers.length > 0 && (
-        <div className={`mb-8 p-6 rounded-lg shadow border ${cardBg} ${borderColor}`}>
-          <h2 className="text-2xl font-bold text-center mb-6">Leaderboard</h2>
-          <div className="flex flex-col sm:flex-row  md:flex-row items-end justify-center gap-10">
+        <div className="relative flex flex-col items-center">
+          {/* Top 3 Podium */}
+          <div className="flex items-end justify-center w-full mb-8 space-x-2 md:space-x-4">
             {/* 2nd Place */}
             {topPerformers.length >= 2 && (
               <div className="flex flex-col items-center">
-                <div className={`w-24 h-24 rounded-full overflow-hidden border-4 border-gray-400 mb-2 flex items-center justify-center ${cardBg}`}>
-                  <span className="text-4xl font-bold text-gray-400">2</span>
+                <div className="bg-gray-200 rounded-t-lg w-24 p-4 flex flex-col items-center h-24">
+                  <div className="text-xl font-bold text-gray-700">2</div>
+                  <div className="text-sm font-semibold text-gray-700 ' max-w-full">
+                    {topPerformers[1].userName}
+                  </div>
+                  <div className="text-sm font-bold text-gray-700">{topPerformers[1].accuracy}%</div>
                 </div>
-                <div className="h-32 w-24 p-3 bg-gray-200 rounded-t-lg flex flex-col items-center justify-end ">
-                  <Trophy className="h-6 w-6 text-gray-400 mb-1" />
-                  <p className="font-bold  text-gray-700 text-center w-full">{topPerformers[1].userName}</p>
-                  <p className="text-sm text-gray-600">{topPerformers[1].accuracy}%</p>
+                <div className="bg-gray-300 h-16 w-24 flex items-center justify-center">
+                  <div className="text-2xl">🥈</div>
                 </div>
               </div>
             )}
@@ -298,33 +300,55 @@ export default function QuizResultsDashboard({ params }: any) {
             {/* 1st Place */}
             {topPerformers.length >= 1 && (
               <div className="flex flex-col items-center">
-                <div className="w-6 h-6 bg-yellow-500 transform rotate-45 mb-1"></div>
-                <div className={`w-28 h-28 rounded-full overflow-hidden border-4 border-yellow-500 mb-2 flex items-center justify-center ${cardBg}`}>
-                  <span className="text-4xl font-bold text-yellow-500">1</span>
+                <div className="bg-yellow-100 rounded-t-lg w-24 p-4 flex flex-col items-center h-32">
+                  <div className="text-xl font-bold text-yellow-700">1</div>
+                  <div className="text-sm font-semibold text-yellow-800  max-w-full">
+                    {topPerformers[0].userName}
+                  </div>
+                  <div className="text-sm font-bold text-yellow-700">{topPerformers[0].accuracy}%</div>
                 </div>
-                <div className="h-40 w-28 bg-yellow-100 rounded-t-lg flex flex-col items-center justify-end p-2">
-                  <Trophy className="h-8 w-8 text-yellow-500 mb-1" />
-                  <p className="font-bold text-gray-800 text-center  w-full">{topPerformers[0].userName}</p>
-                  <p className="text-sm text-gray-700">{topPerformers[0].accuracy}%</p>
+                <div className="bg-yellow-200 h-20 w-24 flex items-center justify-center">
+                  <div className="text-3xl">🏆</div>
                 </div>
               </div>
             )}
             
             {/* 3rd Place */}
-            
             {topPerformers.length >= 3 && (
               <div className="flex flex-col items-center">
-                <div className={`w-24 h-24 rounded-full overflow-hidden border-4 border-green-400 mb-2 flex items-center justify-center ${cardBg}`}>
-                  <span className="text-4xl font-bold text-gray-400">3</span>
+                <div className="bg-orange-100 rounded-t-lg w-24 p-4 flex flex-col items-center h-20">
+                  <div className="text-xl font-bold text-orange-700">3</div>
+                  <div className="text-sm font-semibold text-orange-800  max-w-full">
+                    {topPerformers[2].userName}
+                  </div>
+                  <div className="text-sm font-bold text-orange-700">{topPerformers[2].accuracy}%</div>
                 </div>
-                <div className="h-32 w-24 p-3 bg-gray-200 rounded-t-lg flex flex-col items-center justify-end ">
-                  <Trophy className="h-6 w-6 text-green-400 mb-1" />
-                  <p className="font-bold  text-gray-700 text-center w-full">{topPerformers[2].userName}</p>
-                  <p className="text-sm text-gray-600">{topPerformers[2].accuracy}%</p>
+                <div className="bg-orange-200 h-12 w-24 flex items-center justify-center">
+                  <div className="text-2xl">🥉</div>
                 </div>
               </div>
             )}
           </div>
+          
+          {/* Other rankings */}
+          {topPerformers.length > 3 && (
+            <div className="w-full mt-4">
+              <h3 className="text-lg font-semibold mb-2">Other Top Performers</h3>
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                {topPerformers.slice(3).map((performer, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 border-b last:border-0">
+                    <div className="flex items-center">
+                      <span className="text-gray-600 font-bold mr-3">{index + 4}</span>
+                      <span className="font-medium">{performer.userName}</span>
+                    </div>
+                    <span className="bg-blue-100 text-blue-800 py-1 px-2 rounded-full text-sm">
+                      {performer.accuracy}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
