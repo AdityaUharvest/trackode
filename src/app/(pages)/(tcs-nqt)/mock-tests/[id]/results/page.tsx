@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer, Trophy, Medal, Award } from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer, Trophy, Medal, Award} from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { useSession } from 'next-auth/react';
 import React from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
-
+import Link from 'next/link';
 interface SectionStats {
   answered: number;
   correct: number;
@@ -284,9 +284,9 @@ export default function QuizResultsDashboard({ params }: any) {
             {/* 2nd Place */}
             {topPerformers.length >= 2 && (
               <div className="flex flex-col items-center">
-                <div className="bg-gray-200 rounded-t-lg w-24 p-4 flex flex-col items-center h-24">
+                <div className="bg-gray-200 rounded-t-lg w-24 p-4 flex flex-col items-center h-28">
                   <div className="text-xl font-bold text-gray-700">2</div>
-                  <div className="text-sm font-semibold text-gray-700 ' max-w-full">
+                  <div className="text-sm text-center font-semibold text-gray-700  max-w-full">
                     {topPerformers[1].userName}
                   </div>
                   <div className="text-sm font-bold text-gray-700">{topPerformers[1].accuracy}%</div>
@@ -302,7 +302,7 @@ export default function QuizResultsDashboard({ params }: any) {
               <div className="flex flex-col items-center">
                 <div className="bg-yellow-100 rounded-t-lg w-24 p-4 flex flex-col items-center h-32">
                   <div className="text-xl font-bold text-yellow-700">1</div>
-                  <div className="text-sm font-semibold text-yellow-800  max-w-full">
+                  <div className="text-sm text-center font-semibold text-yellow-800  max-w-full">
                     {topPerformers[0].userName}
                   </div>
                   <div className="text-sm font-bold text-yellow-700">{topPerformers[0].accuracy}%</div>
@@ -316,9 +316,9 @@ export default function QuizResultsDashboard({ params }: any) {
             {/* 3rd Place */}
             {topPerformers.length >= 3 && (
               <div className="flex flex-col items-center">
-                <div className="bg-orange-100 rounded-t-lg w-24 p-4 flex flex-col items-center h-20">
+                <div className="bg-orange-100 rounded-t-lg w-24 p-4 flex flex-col items-center h-28">
                   <div className="text-xl font-bold text-orange-700">3</div>
-                  <div className="text-sm font-semibold text-orange-800  max-w-full">
+                  <div className="text-sm text-center font-semibold text-orange-800  max-w-full">
                     {topPerformers[2].userName}
                   </div>
                   <div className="text-sm font-bold text-orange-700">{topPerformers[2].accuracy}%</div>
@@ -426,14 +426,17 @@ export default function QuizResultsDashboard({ params }: any) {
       >
         <div className="flex justify-evenly border-b-blue-500 border-b-2 p-3">
           <p className='text-center'>
-            <span className='text-blue-600 font-medium'>Total Participants:</span> {quizStats.totalParticipants} 
+            <span className='text-blue-600 text-sm font-medium'>Participants: {quizStats.totalParticipants}</span> 
           </p>
           <p className='text-center'>
-            <span className='text-blue-600 font-medium'>Quiz Title:</span> {quizStats.quizTitle}
+            <span className='text-blue-600 text-sm font-medium'>{quizStats.quizTitle}</span> 
           </p>
-          <p className='text-center'>
-            <span className='text-blue-600 font-medium'>Visit:</span> www.trackode.in/
-          </p>
+          <span className='text-center text-blue-600 text-sm font-medium'>
+            Visit:
+            <Link href='www.trackode.in/'> www.trackode.in</Link>
+          </span>
+          
+          
         </div>
         
         <Table>
@@ -696,7 +699,7 @@ export default function QuizResultsDashboard({ params }: any) {
                                             a 15.9155 15.9155 0 0 1 0 31.831
                                             a 15.9155 15.9155 0 0 1 0 -31.831"
                                         />
-                                        <text x="18" y="20.5" className="text-3xl font-bold" textAnchor="middle" fill={theme === 'dark' ? '#e5e7eb' : '#374151'}>
+                                        <text x="18" y="20.5" className="text-xs font-bold" textAnchor="middle" fill={theme === 'dark' ? '#e5e7eb' : '#374151'}>
                                           {Math.round((stats.correct / stats.answered) * 100)}%
                                         </text>
                                       </svg>
