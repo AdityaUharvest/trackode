@@ -645,7 +645,7 @@ const QuizDashboard = () => {
                                         <Link href={`/quiz-result/${quiz._id}`} className={`text-xs ${
                                           theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"
                                         }`}>
-                                          View Leaderboard
+                                          Leaderboard
                                         </Link>
                                       </div>
                                       <Link

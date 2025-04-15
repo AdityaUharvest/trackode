@@ -641,10 +641,10 @@ const RunningQuizes: React.FC = () => {
   const handleShareQuiz = async (quizId:any) => {
     
         // Copy the share link to clipboard
-        const shareLink = `${window.location.origin}/quiz-play/${quizId}`;
+        const shareLink = `${quizId}`;
         await navigator.clipboard.writeText(shareLink);
         setShareLink(shareLink);
-        toast.success("Quiz link copied to clipboard!");
+        toast.success("Quiz code copied to clipboard!");
      
   };
   return (
