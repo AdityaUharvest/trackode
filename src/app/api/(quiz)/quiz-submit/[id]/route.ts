@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectDB from "@/lib/util";
-import Question from "@/app/model/Question"
+import Question from "@/app/model/Question";
 import Quiz from "@/app/model/Quiz";
-import Result from "@/app/model/Attempted";
 import Attempted from "@/app/model/Attempted";
-
 
 export async function POST(req: NextRequest, { params }: any) {
   await connectDB();
-  const { id } =await params;
+  const { id } = params;
 
-  // Get authenticated user
-  
-   
+  // Find the quiz
   const quiz = await Quiz.findById(id);
-  const startTime= quiz.startTime;
   
   if (!quiz) {
     return NextResponse.json(
@@ -23,10 +18,21 @@ export async function POST(req: NextRequest, { params }: any) {
     );
   }
 
-  const { answers,session } = await req.json();
-  
+  // Get the data from the request
+  const { 
+    answers, 
+    userId, 
+    quizId, 
+    fullScreenViolations, 
+    visibilityChanged, 
+    submittedAutomatically,
+    timeLeft 
+  } = await req.json();
+
+  // Get all questions for this quiz
   const questions = await Question.find({ _id: { $in: quiz.questions } });
-  
+
+  // Calculate score and prepare results
   let score = 0;
   const results = [];
 
@@ -35,7 +41,7 @@ export async function POST(req: NextRequest, { params }: any) {
     const isCorrect = userAnswer === question.correctAnswer;
     
     if (isCorrect) score++;
-
+    
     results.push({
       question: question.question,
       userAnswer,
@@ -43,30 +49,33 @@ export async function POST(req: NextRequest, { params }: any) {
       isCorrect
     });
   }
-  
-  // answer me question ki id aa rhi hai aur uss question ka user ka answer aa rha hai
+
   // Store result in database
   const result = await Attempted.create({
-    student: session.user.id,
+    student: userId,
     createdBy: quiz.createdBy,
     quiz: id,
-    title:quiz.name,
+    title: quiz.name,
     score,
     totalQuestions: questions.length,
     answers: results,
     attempted: true,
     correctAnswers: score,
     incorrectAnswers: questions.length - score,
-    startTime:quiz.startTime,
+    startTime: quiz.startTime,
+    // Add new fields from frontend
+    fullScreenViolations,
+    visibilityChanged,
+    submittedAutomatically,
+    timeLeft
   });
 
   return NextResponse.json({
-    success:true,
+    success: true,
     message: "Quiz submitted successfully",
     resultId: result._id,
     score,
     incorrectAnswers: questions.length - score,
     totalQuestions: questions.length
-
   });
 }

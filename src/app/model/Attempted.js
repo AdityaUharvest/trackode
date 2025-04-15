@@ -64,7 +64,23 @@ const resultSchema = new Schema({
     type:Boolean,
     default:false
   },
-  
+  fullScreenViolations: {
+    type: Number,
+    default: 0
+  },
+        visibilityChanged: {
+          type: Number,
+          default: 0
+        },
+
+        submittedAutomatically: {
+          type: Boolean,
+          default: false
+        },
+        timeLeft: {
+          type: Number,
+          default: 0
+        },
 
 });
 
