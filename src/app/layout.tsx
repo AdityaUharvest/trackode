@@ -19,10 +19,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/trackode.png' },
-      { url: '/favicon.ico' }
+      { url: 'https://trackode.in/trackode.png' },
+      { url: 'https://trackode.in/favicon.ico' }
     ],
-    shortcut: '/favicon.ico',
+    shortcut: 'https://trackode.in/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
   keywords: ['Trackode', 'Coding', 'Quizzes', 'Mock Tests', 'AI Challenges', 'Programming', 'Contests', 'Knowledge Tracking', 'Skill Improvement', 'Interactive Learning', 'Coding Skills', 'Developer Tools', 'Tech Challenges', 'Online Learning', 'Coding Platform', 'Software Development', 'Programming Contests', 'AI-Generated Challenges'],
