@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone",
+  serverOptions: {
+    port: 3001
+  },
   env: {
     MONGODB_URI: process.env.MONGO_URI,
   },
@@ -14,9 +18,7 @@ const nextConfig = {
         ],
       },
     ];
-  },
+  }
 };
 
-module.exports = {
-  output: "standalone",
-  nextConfig};
+module.exports = nextConfig;
