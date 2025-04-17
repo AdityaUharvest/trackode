@@ -144,7 +144,7 @@ export default function HomePage() {
 
                 <div className="flex  lg:mr-44 justify-evenly pt-4">
                   <Link
-                    href="/admin-dashboard"
+                    href="/dashboard"
                     className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 border-2 border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:scale-105"
                     role="button"
                   >
@@ -152,7 +152,7 @@ export default function HomePage() {
                   </Link>
 
                   <Link
-                    href="/dashboard"
+                    href="/admin-dashboard"
                     className={`inline-flex items-center justify-center px-6 py-3 text-base font-bold transition-all duration-300 transform border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${theme === "dark"
                       ? "text-white border-gray-400 hover:bg-gray-800 focus:bg-gray-800"
                       : "text-black border-gray-400 hover:bg-gray-100 focus:bg-gray-100"
