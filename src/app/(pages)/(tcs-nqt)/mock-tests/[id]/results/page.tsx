@@ -283,7 +283,14 @@ export default function QuizResultsDashboard({ params }: any) {
       )}
 
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-xl font-bold">Welcome {session?.user?.name}</h1>
+      <h1 className="text-lg font-semibold text-blue-500">
+  {(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  })()} {session?.user?.name} ✨
+</h1>
         <div className="flex items-center space-x-4">
           <Button
             variant="outline"

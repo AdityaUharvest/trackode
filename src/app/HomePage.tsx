@@ -49,166 +49,170 @@ export default function HomePage() {
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
         <section
-          className={`py-16 sm:py-24 ${theme === "dark" ? "bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" : "bg-gradient-to-br from-blue-50 via-white to-blue-50"}`}
-          aria-labelledby="hero-heading"
-        >
-          {/* Trackode Animated background elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-0 left-0 w-full h-full">
-              {theme === "dark" ? (
-                <>
-                  <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-blue-600 opacity-10 blur-3xl"></div>
-                  <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-600 opacity-10 blur-3xl"></div>
-                </>
-              ) : (
-                <>
-                  <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-blue-300 opacity-20 blur-3xl"></div>
-                  <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-300 opacity-20 blur-3xl"></div>
-                </>
-              )}
-            </div>
+  className={`py-16 sm:py-24 ${theme === "dark" ? "bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" : "bg-gradient-to-br from-blue-50 via-white to-blue-50"}`}
+  aria-labelledby="hero-heading"
+>
+  {/* Background elements */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute top-0 left-0 w-full h-full">
+      {theme === "dark" ? (
+        <>
+          <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-blue-600 opacity-10 blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-600 opacity-10 blur-3xl"></div>
+        </>
+      ) : (
+        <>
+          <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-blue-300 opacity-20 blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-300 opacity-20 blur-3xl"></div>
+        </>
+      )}
+    </div>
+  </div>
+
+  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative z-10">
+    <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+      {/* Content area - improved layout */}
+      <div className="w-full lg:w-1/2 space-y-8">
+        {/* "Now Live" badge - centered on mobile */}
+        <div className="flex justify-center lg:justify-end lg:mr-20">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
+            <span className="animate-pulse h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+            <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400">
+              Now Live
+            </span>
           </div>
+        </div>
 
-          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-              {/* Trackode now live you can create quizzes- Content */}
-              <div className="w-full lg:w-1/2 space-y-6">
-                <div className="flex items-center justify-end lg:mr-20 space-x-2">
-                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
-                    <span className="animate-pulse h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
-                    <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400">
-                      Now Live
-                    </span>
-                  </div>
-                </div>
+        {/* Main heading */}
+        <div className="text-center lg:text-left">
+          <h1
+            id="hero-heading"
+            className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
+          >
+            <div className="flex justify-center lg:justify-start items-center mb-4">
+              <span className="text-blue-600 mr-2">
+                <SplitText
+                  text="Track"
+                  className="font-bold"
+                  delay={150}
+                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                  threshold={0.2}
+                  rootMargin="-50px"
+                  onLetterAnimationComplete={handleAnimationComplete}
+                />
+              </span>
+              <span className="relative">
+                <span className="absolute -left-1 -right-1 h-3 bottom-0 bg-blue-200 dark:bg-blue-800 opacity-50 rounded"></span>
+                <SplitText
+                  onLetterAnimationComplete={handleAnimationComplete}
+                  text="Code"
+                  className="font-bold relative z-10"
+                  delay={250}
+                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                  threshold={0.2}
+                  rootMargin="-50px"
+                />
+              </span>
+              <span className="ml-2">
+                <SplitText
+                  onLetterAnimationComplete={handleAnimationComplete}
+                  text="Quiz"
+                  className="font-bold"
+                  delay={350}
+                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                  threshold={0.2}
+                  rootMargin="-50px"
+                />
+              </span>
+            </div>
+          </h1>
+          
+          <div className="mt-6">
+            <GradientText
+              colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+              animationSpeed={15}
+              showBorder={false}
+              className="text-2xl sm:text-2xl font-bold leading-tight"
+            >
+              Navigate Your Coding Journey
+            </GradientText>
+          </div>
+          
+          <p className="mt-6 text-lg text-gray-600 dark:text-gray-300 max-w-lg mx-auto lg:mx-0">
+            Test your skills, track your progress, and compete with developers worldwide.
+          </p>
+        </div>
 
-                <h1
-                  id="hero-heading"
-                  className="text-3xl font-bold leading-tight sm:text-5xl lg:text-6xl"
+        {/* Buttons - better spacing and alignment */}
+        <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-6">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 border-2 border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:scale-105 w-full sm:w-auto"
+            role="button"
+          >
+            Get Started
+          </Link>
+
+          <Link
+            href="/admin-dashboard"
+            className={`inline-flex items-center justify-center px-6 py-3 text-base font-bold transition-all duration-300 transform border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 w-full sm:w-auto ${theme === "dark"
+              ? "text-white border-gray-400 hover:bg-gray-800 focus:bg-gray-800"
+              : "text-black border-gray-400 hover:bg-gray-100 focus:bg-gray-100"
+              }`}
+            role="button"
+          >
+            <svg
+              className="w-5 h-5 mr-2"
+              viewBox="0 0 18 18"
+              fill="none"
+              stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M8.18003 13.4261C6.8586 14.3918 5 13.448 5 11.8113V5.43865C5 3.80198 6.8586 2.85821 8.18003 3.82387L12.5403 7.01022C13.6336 7.80916 13.6336 9.44084 12.5403 10.2398L8.18003 13.4261Z"
+                strokeWidth="2"
+                strokeMiterlimit="10"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Dashboard
+          </Link>
+        </div>
+
+        {/* User avatars - better alignment */}
+        <div className="flex flex-col items-center lg:items-start pt-8">
+          <div className="flex items-center space-x-3">
+            <div className="flex -space-x-2">
+              {['aditya.png', 'rohit.png', 'rohitk.png', 'kaju.png'].map((img, i) => (
+                <div
+                  key={i}
+                  className={`w-10 h-10 rounded-full border-2 ${theme === "dark" ? "border-gray-800" : "border-white"} overflow-hidden`}
                 >
-                  <div className="flex ml-10 lg:ml-0 items-center mb-2">
-                    <span className="text-blue-600 mr-2">
-                      <SplitText
-                        text="Track"
-                        className="font-bold"
-                        delay={150}
-                        animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-                        animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                        threshold={0.2}
-                        rootMargin="-50px"
-                        onLetterAnimationComplete={handleAnimationComplete}
-                      />
-                    </span>
-                    <span className="relative">
-                      <span className="absolute -left-1 -right-1 h-3 bottom-0 bg-blue-200 dark:bg-blue-800 opacity-50 rounded"></span>
-                      <SplitText
-                        onLetterAnimationComplete={handleAnimationComplete}
-                        text="Code"
-                        className="font-bold relative z-10"
-                        delay={250}
-                        animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-                        animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                        threshold={0.2}
-                        rootMargin="-50px"
-                      />
-                    </span>
-                    <span className="ml-2">
-                      <SplitText
-                        onLetterAnimationComplete={handleAnimationComplete}
-                        text="Quiz"
-                        className="font-bold"
-                        delay={350}
-                        animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-                        animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                        threshold={0.2}
-                        rootMargin="-50px"
-                      />
-                    </span>
-                  </div>
-                  <div className="mt-4">
-                    <GradientText
-                      colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
-                      animationSpeed={15}
-                      showBorder={false}
-                      className="text-2xl sm:text-2xl font-bold leading-tight lg:text-3xl"
-                    >
-                      Navigate Your Coding Journey
-                    </GradientText>
-                  </div>
-                </h1>
-
-                <h1 className="text-sm p-2 leading-relaxed text-gray-600 dark:text-gray-300 max-w-lg backdrop-blur-sm bg-white/10 dark:bg-gray-900/10 rounded-lg">
-                  Join Trackode, over 494 developers improving their skills with our interactive
-                  coding challenges, quizzes designed to accelerate your growth.
-                </h1>
-
-                <div className="flex  lg:mr-44 justify-evenly pt-4">
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 border-2 border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:scale-105"
-                    role="button"
-                  >
-                    Get Started
-                  </Link>
-
-                  <Link
-                    href="/admin-dashboard"
-                    className={`inline-flex items-center justify-center px-6 py-3 text-base font-bold transition-all duration-300 transform border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${theme === "dark"
-                      ? "text-white border-gray-400 hover:bg-gray-800 focus:bg-gray-800"
-                      : "text-black border-gray-400 hover:bg-gray-100 focus:bg-gray-100"
-                      }`}
-                    role="button"
-                  >
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      stroke="currentColor"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M8.18003 13.4261C6.8586 14.3918 5 13.448 5 11.8113V5.43865C5 3.80198 6.8586 2.85821 8.18003 3.82387L12.5403 7.01022C13.6336 7.80916 13.6336 9.44084 12.5403 10.2398L8.18003 13.4261Z"
-                        strokeWidth="2"
-                        strokeMiterlimit="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Dashboard
-                  </Link>
+                  <img
+                    alt="User"
+                    src={img}
+                    loading='lazy'
+                    className={`w-full h-full ${['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500'][i]}`}
+                  />
                 </div>
-
-                <div className="flex items-center ml-5 pt-2 space-x-2">
-                  <div className="flex -space-x-2">
-                    {['aditya.png', 'rohit.png', 'rohitk.png', 'kaju.png'].map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-8 h-8 rounded-full border-2 ${theme === "dark" ? "border-gray-800" : "border-white"} overflow-hidden`}
-                      >
-                        <img
-                          alt="User"
-
-                          src={`${[_]}`}
-                          loading='lazy'
-                          className={`w-full h-full ${['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500'][i]}`}
-                        ></img>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    <span className="font-medium">+ 494</span> developers already joined
-                  </p>
-                </div>
-              </div>
-
-
-              <QuizJoinComponent />
+              ))}
             </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="font-medium">+ 506</span> developers already joined
+            </p>
           </div>
+        </div>
+      </div>
 
-
-
-        </section>
+      {/* Right side component - unchanged */}
+      <QuizJoinComponent />
+    </div>
+  </div>
+</section>
         {/* here the hero section of the trackode ends */}
 
         {/* Trackode Image Section */}
