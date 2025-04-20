@@ -65,7 +65,7 @@ export async function GET(request: NextRequest, { params }: any) {
     for(let i =0;i<section.length;i++){
       sections.push(section[i].value);
     }
-    console.log(sections);
+   
 
     // Fetch all questions with proper typing
     const allQuestions = await Question.find({ mockTestId: quizId }).lean<IQuestion[]>();

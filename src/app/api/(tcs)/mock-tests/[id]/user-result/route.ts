@@ -95,7 +95,7 @@ export async function GET(request: NextRequest, { params }: any) {
     for(let i =0;i<section.length;i++){
       sections.push(section[i].value);
     }
-    console.log(sections);
+    
 
 
     const sectionResults: ISectionResult[] = sections.map((sectionName:any) => {

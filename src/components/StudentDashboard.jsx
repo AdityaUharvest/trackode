@@ -36,7 +36,7 @@ export default function StudentDashboard() {
           const attemptsRes = await axios.get('/api/mock-tests/dashboard/attempts');
          
           setAttempts(attemptsRes.data);
-          console.log(attemptsRes.data)
+          
           
         } catch (error) {
           console.error('Error fetching dashboard data:', error);
@@ -47,7 +47,7 @@ export default function StudentDashboard() {
         fetchData();
       }
     }, [session]);
-  console.log(attempts)
+  
   useEffect(() => {
     const fetchQuizResults = async () => {
       const response = await axios.get("/api/attempted");

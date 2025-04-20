@@ -80,7 +80,7 @@ export default function MockTestDashboard() {
         const attemptsRes = await fetch('/api/mock-tests/dashboard/attempts');
         const attemptsData = await attemptsRes.json();
         setAttempts(attemptsData);
-        console.log('attemptsData', attemptsData);
+       
         
         const statsRes = await fetch('/api/mock-tests/dashboard/stats');
         const statsData = await statsRes.json();

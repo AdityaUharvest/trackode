@@ -45,7 +45,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       const fetchSection = async () => {
         try {
           const res = await axios.get('/api/fetchSection');
-          console.log(res.data.sections);
+          
           setSections(res.data.sections);
         } catch (error) {
           console.error('Failed to fetch sections', error);
@@ -54,7 +54,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       fetchSection();
     },[]
   )
-  console.log(sections)
+  
   const { theme } = useTheme();
   const params = useParams();
   const { data: session } = useSession();

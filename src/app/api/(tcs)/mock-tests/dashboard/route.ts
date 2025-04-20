@@ -26,9 +26,9 @@ export async function GET(request: Request) {
       const attempts = await QuizAttempt.find({ quizId: mockTests[i]._id });
       
       mockTests[i].attempts = attempts.length;
-      console.log(mockTests[i].attempts)
+      
     }
-    console.log(mockTests)
+    
     return NextResponse.json(mockTests);
   } catch (error) {
     console.error('Error fetching mock tests:', error);

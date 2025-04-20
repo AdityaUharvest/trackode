@@ -68,7 +68,7 @@ export default function QuizResults({ params }: any) {
 
     return () => clearTimeout(timer);
   }, []);
-  console.log(results);
+  
   const sortedResults = [...results].sort((a, b) => {
     if (sortBy === "score") return b?.score - a?.score;
     if (sortBy === "timeTaken") return new Date(a.attemptedAt).getTime() - new Date(b.attemptedAt).getTime();

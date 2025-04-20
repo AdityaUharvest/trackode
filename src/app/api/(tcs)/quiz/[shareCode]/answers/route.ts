@@ -12,7 +12,7 @@ export async function POST(
     const {shareCode} =await params;
     const session = await auth();
     const { section, answers } = await request.json();
-    console.log(section, answers)
+    
     // In a real app, you'd want to authenticate the user
     const quiz = await MockTest.findOne({ shareCode: shareCode });
     if (!quiz) {
@@ -41,7 +41,7 @@ export async function POST(
     
     // Update answers for this section
     attempt.answers[section] = answers;
-    console.log(attempt.answers)
+    
     await attempt.save();
     
     return NextResponse.json({ success: true });

@@ -104,7 +104,7 @@ const QuizDashboard = () => {
       const percentages = quizResults.map(
         (result: any) => Number(((result?.score / result?.totalQuestions) * 100).toFixed(1))
       );
-      console.log(quizResults.filter((r: any) => r.attempted).length)
+      
       let accuracyTrend = 'stable';
       if (totalQuizzes >= 3) {
         const firstHalf = percentages.slice(0, Math.floor(percentages.length/2));
@@ -182,7 +182,7 @@ const QuizDashboard = () => {
     const fetchQuizResults = async () => {
       const response = await axios.get("/api/attempted-public");
       setQuizResults(response.data);
-      console.log(response.data);
+      
       setLoading(false);
     };
     fetchQuizResults();

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       .populate('quizId', 'title')
       .sort({ completedAt: -1 })
       .lean();
-    console.log(attempts)
+   
     const formattedAttempts = attempts.map(attempt => ({
       _id: attempt._id,
       quizId: attempt.quizId,

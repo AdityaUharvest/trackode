@@ -37,7 +37,7 @@ export default function FreeTechQuizClient({ params }: any) {
   //convert the techName into object
     const techNameObject = JSON.parse(techNameString);
     const techName=techNameObject.techname;
-  console.log("Tech Name:", techName);
+
   const { theme } = useTheme();
   const [organizedQuizzes, setOrganizedQuizzes] = useState<SectionLevels>({});
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
@@ -50,7 +50,7 @@ export default function FreeTechQuizClient({ params }: any) {
         const response = await axios.get("/api/total-quizes");
         const quizData = response.data.quizes;
         const organized = organizeQuizzesBySectionAndLevel(quizData);
-        console.log("Organized Quizzes:", organized);
+        
         if (response) {
           setLoading(false);
         }
