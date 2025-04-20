@@ -24,7 +24,7 @@ const SignInButton = () => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      toast.success("You're successfully signed in!");
+      toast.success("Signin Successful!");
     }
   }, [status]);
 

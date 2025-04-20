@@ -74,7 +74,7 @@ export default function HomePage() {
       {/* Content area - improved layout */}
       <div className="w-full lg:w-1/2 space-y-8">
         {/* "Now Live" badge - centered on mobile */}
-        <div className="flex justify-center lg:justify-end lg:mr-20">
+        <div className="flex justify-center lg:justify-end lg:mr-32">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
             <span className="animate-pulse h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
             <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -84,10 +84,10 @@ export default function HomePage() {
         </div>
 
         {/* Main heading */}
-        <div className="text-center lg:text-left">
+        <div className=" lg:text-left">
           <h1
             id="hero-heading"
-            className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl"
+            className="text-4xl font-bold leading-tight sm:text-3xl lg:text-5xl"
           >
             <div className="flex justify-center lg:justify-start items-center mb-4">
               <span className="text-blue-600 mr-2">
@@ -130,18 +130,17 @@ export default function HomePage() {
             </div>
           </h1>
           
-          <div className="mt-6">
-            <GradientText
-              colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
-              animationSpeed={15}
-              showBorder={false}
-              className="text-2xl sm:text-2xl font-bold leading-tight"
-            >
-              Navigate Your Coding Journey
-            </GradientText>
-          </div>
+          <div className="mt-6 w-full  lg:text-left">
+  <GradientText
+    colors={["#40ffaa", "#4079ff"]}
+    align="center" // or "left" for lg screens if needed
+    className="text-xl sm:text-xl font-semibold leading-tight"
+  >
+    Navigate Your Coding Journey
+  </GradientText>
+</div>
           
-          <p className="mt-6 text-lg text-gray-600 dark:text-gray-300 max-w-lg mx-auto lg:mx-0">
+          <p className="mt-6 text-base font-serif text-gray-600 dark:text-gray-300 max-w-lg mx-auto lg:mx-0">
             Test your skills, track your progress, and compete with developers worldwide.
           </p>
         </div>

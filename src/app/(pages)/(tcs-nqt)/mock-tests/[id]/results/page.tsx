@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer, Trophy, Medal, Award} from 'lucide-react';
+import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer, Trophy, Medal, Award, Loader2} from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { useSession } from 'next-auth/react';
 import React from 'react';
@@ -246,7 +246,9 @@ export default function QuizResultsDashboard({ params }: any) {
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center h-screen ${bgColor}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
+          <Loader2 className="h-6 w-6 text-blue-500 animate-spin" />
+        </div>
       </div>
     );
   }

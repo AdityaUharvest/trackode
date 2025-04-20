@@ -14,13 +14,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     
     if (!hasVisited) {
       toast.success("🎉 Welcome to Trackode!", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
+        
       });
       localStorage.setItem("hasVisited", "true");
       setIsFirstVisit(true);
@@ -29,11 +23,12 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   
   return (
     <ThemeProvider>
+      <ToastContainer position="top-center" autoClose={3000}  />
       <Navbar />
       
       <div className="min-h-screen">
         {children}
-        <ToastContainer position="top-right" autoClose={3000} />
+       
         </div>
       
       <Footer />

@@ -42,7 +42,7 @@ export default function QuizJoinComponent() {
       return;
     }
 
-    toast.success("Try First | Fail First | Learn First | Win First | Kyu nhi ho rhi padhai?");
+    toast.success("Joining the quiz...");
     
     if (quizCode.length === 7) {
       handleJoinCode(quizCode);

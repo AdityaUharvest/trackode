@@ -6,6 +6,7 @@ interface GradientTextProps {
     colors?: string[];
     animationSpeed?: number;
     showBorder?: boolean;
+    align?: 'left' | 'center' | 'right'; // New alignment prop
 }
 
 export default function GradientText({
@@ -14,26 +15,32 @@ export default function GradientText({
     colors = ["#ffaa40", "#9c40ff", "#ffaa40"],
     animationSpeed = 8,
     showBorder = false,
+    align = 'center', // Default alignment
 }: GradientTextProps) {
     const gradientStyle = {
         backgroundImage: `linear-gradient(to right, ${colors.join(", ")})`,
         animationDuration: `${animationSpeed}s`,
     };
 
+    // Alignment classes
+    const alignmentClasses = {
+        left: 'justify-start mr-auto',
+        center: 'justify-center mx-auto',
+        right: 'justify-end ml-auto'
+    };
+
     return (
         <div
-            className={`relative mx-auto flex max-w-fit flex-row items-center justify-center rounded-[1.25rem] font-medium backdrop-blur transition-shadow duration-500 overflow-hidden cursor-pointer ${className}`}
+            className={`relative w-full ${alignmentClasses[align]} flex items-center rounded-[1.25rem] font-medium backdrop-blur transition-shadow duration-500 overflow-hidden cursor-pointer ${className}`}
         >
             {showBorder && (
-                <div
-                    className="absolute inset-0 bg-cover z-0 pointer-events-none animate-gradient"
+                <div className="absolute inset-0 bg-cover z-0 pointer-events-none animate-gradient"
                     style={{
                         ...gradientStyle,
                         backgroundSize: "300% 100%",
                     }}
                 >
-                    <div
-                        className="absolute inset-0 bg-black rounded-[1.25rem] z-[-1]"
+                    <div className="absolute inset-0 bg-black rounded-[1.25rem] z-[-1]"
                         style={{
                             width: "calc(100% - 2px)",
                             height: "calc(100% - 2px)",
@@ -58,22 +65,3 @@ export default function GradientText({
         </div>
     );
 }
-
-// tailwind.config.js
-// module.exports = {
-//   theme: {
-//     extend: {
-//       keyframes: {
-//         gradient: {
-//           '0%': { backgroundPosition: '0% 50%' },
-//           '50%': { backgroundPosition: '100% 50%' },
-//           '100%': { backgroundPosition: '0% 50%' },
-//         },
-//       },
-//       animation: {
-//         gradient: 'gradient 8s linear infinite'
-//       },
-//     },
-//   },
-//   plugins: [],
-// };
