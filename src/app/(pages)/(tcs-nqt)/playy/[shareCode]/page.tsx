@@ -61,7 +61,7 @@ export default function QuizPlayer() {
   const [fullscreenExits, setFullscreenExits] = useState(0);
   const [isTabActive, setIsTabActive] = useState(true);
   const [sectionData, setSectionsData] = useState<Section[]>([]);
-  const [isTimeUpSubmission, setIsTimeUpSubmission] = useState(false);
+ 
   // Initialize sections and load saved answers
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -174,7 +174,6 @@ export default function QuizPlayer() {
       setSectionTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
-          setIsTimeUpSubmission(true);
           handleSectionSubmit();
           return 0;
         }
@@ -265,33 +264,32 @@ export default function QuizPlayer() {
   };
 
   const handleSectionSubmit = async () => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
+
+      const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
       
-      // Save current section's answers first
+
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
         answers: sectionAnswers[currentSection] || {}
       });
-      
-      // Update sections state with the current section marked as submitted
-      const updatedSections = sections.map(s =>
-        s.name === currentSection ? { ...s, submitted: true } : s
-      );
-      
-      // If there's a next section, unlock it
-      if (currentSectionIndex < updatedSections.length - 1) {
-        updatedSections[currentSectionIndex + 1].unlocked = true;
+
+      setSections(prev => prev.map(s =>
+        s.name === currentSection
+          ? { ...s, submitted: true }
+          : s
+      ));
+
+      if (currentSectionIndex < sections.length - 1) {
+        setSections(prev => prev.map((s, idx) =>
+          idx === currentSectionIndex + 1
+            ? { ...s, unlocked: true }
+            : s
+        ));
       }
-      
-      // Update state with all changes at once
-      setSections(updatedSections);
-      
-      // Wait a moment to ensure state updates are processed
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Navigate to next section or submit the quiz
+
       if (currentSectionIndex < sections.length - 1) {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
@@ -300,12 +298,10 @@ export default function QuizPlayer() {
         handleQuizSubmit();
       }
     } catch (err) {
-      console.error("Section submission error:", err);
       setError('Failed to save answers. Please try again.');
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
-      setIsTimeUpSubmission(false); // Reset flag
     }
   };
   const [isSubmitting, setIsSubmitting] = useState(false);
