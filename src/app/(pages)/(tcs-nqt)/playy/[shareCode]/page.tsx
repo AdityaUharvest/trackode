@@ -85,7 +85,7 @@
          const normalizedSections = res.data.sections.map((s: any) => ({
            name: s.value,
            label: s.label,
-           timeLimit: 0.2 * 60,
+           timeLimit: 0.5 * 60,
            questionCount: 0,
            submitted: false,
            unlocked: false,
