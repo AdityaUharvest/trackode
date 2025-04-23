@@ -145,23 +145,14 @@ export default function UserQuizResult() {
         },
         body: JSON.stringify({
           prompt: `Analyze this quiz question and provide a detailed explanation:
-          
           **Question:** ${questionText}
-          
-          **Options:**
-          ${options.map((opt, i) => `${String.fromCharCode(65 + i)}. ${opt}`).join('\n')}
-          
           **User's Answer:** ${options[userAnswerIndex]} 
           ${userAnswerIndex === correctAnswerIndex ? '(Correct)' : '(Incorrect)'}
           
           **Correct Answer:** ${options[correctAnswerIndex]}
           
           Please provide:
-          1. A concise explanation of why the correct answer is right (50-100 words)
-          2. Analysis of why the user's answer was ${userAnswerIndex === correctAnswerIndex ? 'correct' : 'incorrect'}
-          3. Key concepts tested by this question
-          4. Tips for remembering this concept
-          
+          1. A concise explanation of why the correct answer is right (15-20 words)
           Format your response in clear paragraphs with no headings.`
         })
       });
@@ -200,59 +191,7 @@ export default function UserQuizResult() {
     }
   };
 
-  const generateSectionFeedback = async (sectionName: string, correct: number, total: number) => {
-    try {
-      setLoadingFeedback(prev => ({
-        ...prev,
-        sections: { ...prev.sections, [sectionName]: true }
-      }));
-
-      const response = await fetch('/api/generate-feedback', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          prompt: `Analyze this quiz section performance and provide personalized feedback:
-        
-          **Section Name:** ${sectionName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-          
-          **Performance:** ${correct} out of ${total} correct (${Math.round((correct / total) * 100)}%)
-          
-          Please provide:
-          1. A brief assessment of this performance level (beginner/intermediate/advanced)
-          2. 2-3 key strengths demonstrated in this section
-          3. 2-3 areas needing improvement
-          4. Specific study recommendations for these weak areas
-          5. Encouragement and motivation tips
-          
-          Format your response in clear paragraphs with no headings. Keep it concise (150-200 words) and focused on actionable advice.`
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate section feedback');
-      }
-
-      const data = await response.json();
-      setSectionFeedback(prev => ({
-        ...prev,
-        [sectionName]: data.instructions
-      }));
-    } catch (error) {
-      console.error('Error generating section feedback:', error);
-      toast.error('Failed to generate section feedback');
-      setSectionFeedback(prev => ({
-        ...prev,
-        [sectionName]: 'Could not generate feedback for this section.'
-      }));
-    } finally {
-      setLoadingFeedback(prev => ({
-        ...prev,
-        sections: { ...prev.sections, [sectionName]: false }
-      }));
-    }
-  };
+  
 
   const generateOverallFeedback = async () => {
     try {
@@ -367,7 +306,7 @@ export default function UserQuizResult() {
             <div className="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30">
               <AlertCircle className="h-12 w-12 text-yellow-500" />
             </div>
-            <h2 className={`text-xl font-semibold ${textColor}`}>No Results Found</h2>
+            <h2 className={`text-sm font-semibold ${textColor}`}>No Results Found</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>You haven't attempted this quiz yet.</p>
             <Button 
               asChild
@@ -396,7 +335,7 @@ export default function UserQuizResult() {
           <div className={`h-2 w-full ${performanceBadge.color}`}></div>
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2">
             <div>
-              <CardTitle className="text-xl md:text-xl">{result.quizTitle}</CardTitle>
+              <CardTitle className="text-sm md:text-sm">{result.quizTitle}</CardTitle>
               <CardDescription className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mt-1">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
@@ -474,7 +413,7 @@ export default function UserQuizResult() {
                         />
                       </svg>
                       <div className="absolute flex flex-col items-center">
-                        <span className="text-3xl font-bold">{overallPercentage}%</span>
+                        <span className="text-sm font-bold">{overallPercentage}%</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">Overall Score</span>
                       </div>
                     </div>
@@ -487,12 +426,13 @@ export default function UserQuizResult() {
                   {/* Section Performance */}
                   <div className={`p-6 rounded-lg ${cardBg} border ${borderColor} col-span-1 md:col-span-2`}>
                     <h3 className="font-medium mb-4 flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5 text-blue-500" />
+                      <BarChart3 className="h-2 w-2 text-blue-500" />
                       Section Performance
                     </h3>
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                       {result.sections.map((section) => {
                         const sectionPercentage = Math.round((section.correct / section.total) * 100);
+        
                         const sectionBadge = getScoreBadge(sectionPercentage);
                         
                         if (section.total === 0) return null;
@@ -508,6 +448,7 @@ export default function UserQuizResult() {
                                 </span>
                                 <Badge variant="outline" className="text-xs">
                                   {section.correct}/{section.total}
+                                  {section.questions.length}
                                 </Badge>
                               </div>
                               <span className={`text-sm font-medium ${
@@ -530,7 +471,7 @@ export default function UserQuizResult() {
                         );
                       })}
                     </div>
-                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
+                    <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                       <Button 
                         variant="outline" 
                         onClick={() => setActiveTab('sections')}
@@ -547,8 +488,8 @@ export default function UserQuizResult() {
                 {/* AI Analysis */}
                 <Card className={`${highlightBg} border ${borderColor}`}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Brain className="h-5 w-5 text-indigo-500" />
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Brain className="h-2 w-2 text-indigo-500" />
                       AI Performance Analysis
                     </CardTitle>
                     <CardDescription>
@@ -627,7 +568,7 @@ export default function UserQuizResult() {
                         onClick={() => toggleSection(section.sectionName)}
                       >
                         <div>
-                          <CardTitle className="text-lg flex items-center gap-2">
+                          <CardTitle className="text-sm flex items-center gap-2">
                             {section.sectionName.split('-').map(word => 
                               word.charAt(0).toUpperCase() + word.slice(1)
                             ).join(' ')}
@@ -649,96 +590,15 @@ export default function UserQuizResult() {
                           }}
                         >
                           {expandedSections[section.sectionName] ? (
-                            <ChevronUp className="h-5 w-5" />
+                            <ChevronUp className="h-2 w-2" />
                           ) : (
-                            <ChevronDown className="h-5 w-5" />
+                            <ChevronDown className="h-2 w-2" />
                           )}
                         </button>
                       </CardHeader>
 
                       {expandedSections[section.sectionName] && (
                         <CardContent className="p-4 space-y-6">
-                          {/* Progress bar */}
-                          <div className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                              <span>Performance</span>
-                              <span className={`font-medium ${
-                                sectionPercentage >= 70 ? 'text-green-500' : 
-                                sectionPercentage >= 60 ? 'text-yellow-500' : 
-                                sectionPercentage >= 50 ? 'text-orange-500' : 'text-red-500'
-                              }`}>
-                                {sectionPercentage}%
-                              </span>
-                            </div>
-                            <Progress 
-                              value={sectionPercentage} 
-                              className="h-2"
-                            />
-                          </div>
-                          
-                          {/* AI Section Analysis */}
-                          <Card className={`${feedbackBg} border ${borderColor}`}>
-                            <CardHeader className="pb-2 relative">
-                              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                <Lightbulb className="h-4 w-4 text-blue-500" />
-                                Section Analysis
-                              </CardTitle>
-                              <Button 
-                                size="sm" 
-                                variant="ghost" 
-                                onClick={() => generateSectionFeedback(section.sectionName, section.correct, section.total)}
-                                disabled={loadingFeedback.sections[section.sectionName]}
-                                className="absolute top-3 right-4"
-                              >
-                                {loadingFeedback.sections[section.sectionName] ? (
-                                  <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Generating...
-                                  </>
-                                ) : sectionFeedback[section.sectionName] ? (
-                                  'Regenerate'
-                                ) : (<>
-                                  <Sparkles className="h-4 w-4 mr-2" />
-                                  Analyze
-                                </>
-                              )}
-                            </Button>
-                          </CardHeader>
-                          
-                          <CardContent>
-                            {sectionFeedback[section.sectionName] ? (
-                              <div className="prose prose-sm dark:prose-invert max-w-none">
-                                <p>{sectionFeedback[section.sectionName]}</p>
-                              </div>
-                            ) : (
-                              <div className="text-center py-4">
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                                  Get personalized feedback and targeted recommendations for this section
-                                </p>
-                                <Button 
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => generateSectionFeedback(section.sectionName, section.correct, section.total)}
-                                  disabled={loadingFeedback.sections[section.sectionName]}
-                                  className="w-full md:w-auto"
-                                >
-                                  {loadingFeedback.sections[section.sectionName] ? (
-                                    <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                      Analyzing...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Sparkles className="h-4 w-4 mr-2" />
-                                      Generate Analysis
-                                    </>
-                                  )}
-                                </Button>
-                              </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                        
                         {/* Questions summary for this section */}
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm flex items-center gap-2">
@@ -758,11 +618,11 @@ export default function UserQuizResult() {
                                   }}
                                 >
                                   <CardContent className="p-3 flex flex-col items-center text-center">
-                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${isCorrect ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${isCorrect ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
                                       {isCorrect ? (
-                                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                        <CheckCircle2 className="h-2 w-2 text-green-500" />
                                       ) : (
-                                        <XCircle className="h-5 w-5 text-red-500" />
+                                        <XCircle className="h-2 w-2 text-red-500" />
                                       )}
                                     </div>
                                     <span className="text-xs font-medium">Question {idx + 1}</span>
@@ -796,8 +656,8 @@ export default function UserQuizResult() {
                 
                 return (
                   <div key={section.sectionName} className="space-y-4">
-                    <h3 className="font-medium text-lg flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-indigo-500" />
+                    <h3 className="font-medium text-sm flex items-center gap-2">
+                      <BookOpen className="h-2 w-2 text-indigo-500" />
                       {section.sectionName.split('-').map(word => 
                         word.charAt(0).toUpperCase() + word.slice(1)
                       ).join(' ')}
@@ -808,7 +668,7 @@ export default function UserQuizResult() {
                     
                     <div className="space-y-4">
                       {section.questions.map((question, index) => (
-                        <Card key={question._id} className={`border ${
+                        <Card key={question._id} className={`border text-xm ${
                           question.userAnswer === question.correctAnswer ? 
                           'border-green-500 dark:border-green-700' : 
                           'border-red-500 dark:border-red-700'
@@ -824,9 +684,9 @@ export default function UserQuizResult() {
                                 'bg-red-100 dark:bg-red-900/30'
                               }`}>
                                 {question.userAnswer === question.correctAnswer ? (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                  <CheckCircle2 className="h-2 w-2 text-green-500" />
                                 ) : (
-                                  <XCircle className="h-5 w-5 text-red-500" />
+                                  <XCircle className="h-2 w-2 text-red-500" />
                                 )}
                               </div>
                               <div>
@@ -844,9 +704,9 @@ export default function UserQuizResult() {
                               }}
                             >
                               {expandedQuestions[question._id] ? (
-                                <ChevronUp className="h-5 w-5" />
+                                <ChevronUp className="h-2 w-2" />
                               ) : (
-                                <ChevronDown className="h-5 w-5" />
+                                <ChevronDown className="h-2 w-2" />
                               )}
                             </button>
                           </CardHeader>
@@ -854,10 +714,6 @@ export default function UserQuizResult() {
                           {expandedQuestions[question._id] && (
                             <CardContent className="space-y-4 pt-0">
                               <Separator />
-                              
-                              <div className="rounded-lg px-4 py-3 bg-gray-50 dark:bg-gray-900/60">
-                                <p className="font-medium">{question.text}</p>
-                              </div>
                               
                               {/* Options list */}
                               <div className="space-y-2 mt-2">
@@ -870,16 +726,16 @@ export default function UserQuizResult() {
                                   
                                   if (isCorrect) {
                                     optionClass = correctOptionBg;
-                                    iconComponent = <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />;
+                                    iconComponent = <CheckCircle2 className="h-2 w-2 text-green-500 flex-shrink-0" />;
                                   } else if (isUserSelection) {
                                     optionClass = wrongOptionBg;
-                                    iconComponent = <XCircle className="h-5 w-5 text-red-500 flex-shrink-0" />;
+                                    iconComponent = <XCircle className="h-2 w-2 text-red-500 flex-shrink-0" />;
                                   }
                                   
                                   return (
                                     <div
                                       key={index}
-                                      className={`p-3 rounded-lg border ${optionClass}`}
+                                      className={`p-3 text-xs rounded-lg border ${optionClass}`}
                                     >
                                       <div className="flex items-start justify-between">
                                         <div className="flex items-start">

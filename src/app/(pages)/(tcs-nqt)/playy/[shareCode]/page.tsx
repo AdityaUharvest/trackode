@@ -85,7 +85,7 @@
          const normalizedSections = res.data.sections.map((s: any) => ({
            name: s.value,
            label: s.label,
-           timeLimit: 0.5 * 60,
+           timeLimit: 25 * 60,
            questionCount: 0,
            submitted: false,
            unlocked: false,
@@ -162,27 +162,33 @@
    }, [answers, sectionAnswers, sections, shareCode, quizStarted]);
  
    // Section timer logic
-   useEffect(() => {
-     if (!quizStarted || !currentSection) return;
+   // Add this to your component's state variables
+const [isTimeUp, setIsTimeUp] = useState(false);
+
+// Update the timer effect to handle timer expiration
+useEffect(() => {
+  if (!quizStarted || !currentSection) return;
+
+  const section = sections.find(s => s.name === currentSection);
+  if (!section?.timeLimit || section.submitted) return;
  
-     const section = sections.find(s => s.name === currentSection);
-     if (!section?.timeLimit || section.submitted) return;
-    
-     setSectionTimeRemaining(section.timeLimit);
- 
-     const timer = setInterval(() => {
-       setSectionTimeRemaining(prev => {
-         if (prev <= 1) {
-           clearInterval(timer);
-           handleSectionSubmit();
-           return 0;
-         }
-         return prev - 1;
-       });
-     }, 1000);
- 
-     return () => clearInterval(timer);
-   }, [currentSection, quizStarted, sections]);
+  setSectionTimeRemaining(section.timeLimit);
+
+  const timer = setInterval(() => {
+    setSectionTimeRemaining(prev => {
+      if (prev <= 1) {
+        clearInterval(timer);
+        // Set time up state to true and open submit modal
+        setIsTimeUp(true);
+        setShowSubmitModal(true);
+        return 0;
+      }
+      return prev - 1;
+    });
+  }, 1000);
+
+  return () => clearInterval(timer);
+}, [currentSection, quizStarted, sections]);
  
    const startQuiz = () => {
  
@@ -213,25 +219,43 @@
        setQuizStarted(false);
      }
    };
+   useEffect(() => {
+    // If time is up and the modal is closed, submit the section
+    if (isTimeUp && !showSubmitModal) {
+      handleSectionSubmit();
+      setIsTimeUp(false); // Reset for next section
+    }
+  }, [isTimeUp, showSubmitModal]);
  
- 
-   const handleAnswerSelect = (questionId: string, optionIndex: number) => {
-     const currentSectionObj = sections.find(s => s.name === currentSection);
-     if (currentSectionObj?.submitted) return;
- 
-     setAnswers(prev => ({
-       ...prev,
-       [questionId]: optionIndex
-     }));
- 
-     setSectionAnswers(prev => ({
-       ...prev,
-       [currentSection]: {
-         ...prev[currentSection],
-         [questionId]: optionIndex
-       }
-     }));
-   };
+  const handleAnswerSelect = (questionId: string, optionIndex: number) => {
+    const currentSectionObj = sections.find(s => s.name === currentSection);
+    // Add isTimeUp check to prevent selection when time is up
+    if (currentSectionObj?.submitted || isTimeUp) return;
+  
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: optionIndex
+    }));
+  
+    setSectionAnswers(prev => {
+      // Create a new object to avoid mutation
+      const newSectionAnswers = { ...prev };
+      
+      // Make sure the current section exists
+      if (!newSectionAnswers[currentSection]) {
+        newSectionAnswers[currentSection] = {};
+      }
+      
+      // Add this answer to the current section
+      newSectionAnswers[currentSection] = {
+        ...newSectionAnswers[currentSection],
+        [questionId]: optionIndex
+      };
+      
+      return newSectionAnswers;
+    });
+  };
+  
  
    const changeSection = (sectionName: string) => {
      const targetSection = sections.find(s => s.name === sectionName);
@@ -312,11 +336,24 @@
     setIsSubmitting(true);
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-  
+      console.log('Current Section:', currentSectionIndex, currentSection);
+      
+      // Check if we have answers for this section
+      const sectionAnswersObj = sectionAnswers[currentSection] || {};
+      console.log('Submitting answers for section:', currentSection, sectionAnswersObj);
+      
+      // Make sure we have answers to submit
+      const answeredQuestions = Object.keys(sectionAnswersObj).length;
+      if (answeredQuestions === 0) {
+        setShowSectionWarning(true);
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Submit answers for the current section
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
-        answers: sectionAnswers[currentSection] || {},
+        answers: sectionAnswersObj
       });
   
       // Mark current section as submitted
@@ -341,35 +378,48 @@
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
-        toast.success(`${currentSectionData?.label} submitted successfully! Moving to next section.`);
       } else {
         // If last section, submit the entire quiz
         await handleQuizSubmit();
       }
     } catch (err) {
+      console.error('Error submitting section:', err);
       setError('Failed to save answers. Please try again.');
-      toast.error('Failed to submit section. Please try again.');
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
       setShowSectionWarning(false);
     }
   };
-   const handleQuizSubmit = async () => {
-     setIsSubmitting(true);
-     try {
-       await axios.post(`/api/quiz/${shareCode}/complete`, {
-         answers: sectionAnswers
-       });
-       localStorage.removeItem(`quiz_${shareCode}_answers`);
-       setShowFeedbackModal(true);
-     } catch (err) {
-       setError('Failed to submit quiz. Please try again.');
-     } finally {
-       setIsSubmitting(false);
-       setShowSubmitModal(false);
-     }
-   };
+  const handleQuizSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      // Debug the answers structure
+      console.log('Submitting all answers:', sectionAnswers);
+      
+      // Validate that we have answers to submit
+      const totalAnswers = Object.values(sectionAnswers).reduce(
+        (count, sectionObj) => count + Object.keys(sectionObj || {}).length, 
+        0
+      );
+      
+      console.log('Total answers count:', totalAnswers);
+      
+      // Submit all answers
+      await axios.post(`/api/quiz/${shareCode}/complete`, {
+        answers: sectionAnswers
+      });
+      
+      localStorage.removeItem(`quiz_${shareCode}_answers`);
+      setShowFeedbackModal(true);
+    } catch (err) {
+      console.error('Error submitting quiz:', err);
+      setError('Failed to submit quiz. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+      setShowSubmitModal(false);
+    }
+  };
  
    const handleFeedbackComplete = () => {
      setShowFeedbackModal(false);
@@ -729,35 +779,38 @@
  
                {/* Options */}
                <div className="space-y-3 mb-8">
-                 {currentQuestion.options.map((option, index) => (
-                   <div
-                     key={index}
-                     onClick={() => !isSectionSubmitted && handleAnswerSelect(currentQuestion._id, index)}
-                     className={`p-4 rounded-lg transition-all border ${answers[currentQuestion._id] === index
-                         ? theme === 'dark'
-                           ? 'border-blue-500 bg-blue-900/30'
-                           : 'border-blue-500 bg-blue-50'
-                         : theme === 'dark'
-                           ? 'border-gray-700 hover:bg-gray-700'
-                           : 'border-gray-200 hover:bg-gray-50'
-                       } ${isSectionSubmitted
-                         ? 'cursor-not-allowed opacity-80'
-                         : 'cursor-pointer'
-                       }`}
-                   >
-                     <div className="flex items-center">
-                       <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${answers[currentQuestion._id] === index
-                           ? 'border-blue-500 bg-blue-500 text-white'
-                           : theme === 'dark'
-                             ? 'border-gray-500'
-                             : 'border-gray-300'
-                         }`}>
-                         {String.fromCharCode(65 + index)}
-                       </div>
-                       <span className="break-words">{option}</span>
-                     </div>
-                   </div>
-                 ))}
+               {currentQuestion.options.map((option, index) => (
+  <div
+    key={index}
+    onClick={() => !isSectionSubmitted && !isTimeUp && handleAnswerSelect(currentQuestion._id, index)}
+    className={`p-4 rounded-lg transition-all border ${
+      answers[currentQuestion._id] === index
+        ? theme === 'dark'
+          ? 'border-blue-500 bg-blue-900/30'
+          : 'border-blue-500 bg-blue-50'
+        : theme === 'dark'
+          ? 'border-gray-700 hover:bg-gray-700'
+          : 'border-gray-200 hover:bg-gray-50'
+      } ${
+        isSectionSubmitted || isTimeUp
+        ? 'cursor-not-allowed opacity-80'
+        : 'cursor-pointer'
+      }`}
+  >
+    <div className="flex items-center">
+      <div className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
+        answers[currentQuestion._id] === index
+          ? 'border-blue-500 bg-blue-500 text-white'
+          : theme === 'dark'
+            ? 'border-gray-500'
+            : 'border-gray-300'
+      }`}>
+        {String.fromCharCode(65 + index)}
+      </div>
+      <span className="break-words">{option}</span>
+    </div>
+  </div>
+))}
                </div>
  
                {/* Navigation Buttons */}
@@ -786,6 +839,8 @@
                        if (nextSection) {
                          changeSection(nextSection.name);
                        } else {
+                          handleSectionSubmit();
+
                          handleQuizSubmit();
                        }
                      }}
@@ -894,17 +949,27 @@
  
        {/* Submit Confirmation Modal */}
        <SubmitConfirmationModal
-         isOpen={showSubmitModal}
-         onClose={() => setShowSubmitModal(false)}
-         onSubmit={isLastSection ? handleQuizSubmit : handleSectionSubmit}
-         title={isLastSection ? 'Submit Quiz' : `Submit ${currentSectionData?.label}`}
-         message={
-           isLastSection
-             ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
-             : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
-         }
-         isSubmitting={isSubmitting}
-       />
+  isOpen={showSubmitModal}
+  onClose={() => {
+    if (isTimeUp) {
+      // If time is up, don't allow closing without submitting
+      handleSectionSubmit();
+    }
+    setShowSubmitModal(false);
+  }}
+  onSubmit={isLastSection ? handleQuizSubmit : handleSectionSubmit}
+  title={isTimeUp ? 'Time\'s Up!' : (isLastSection ? 'Submit Quiz' : `Submit ${currentSectionData?.label}`)}
+  message={
+    isTimeUp 
+      ? `Time has expired for the ${currentSectionData?.label} section. Your answers will be submitted now.`
+      : isLastSection
+        ? 'Are you ready to submit your entire quiz? You cannot return to any sections after submission.'
+        : `Are you ready to submit the ${currentSectionData?.label} section? You cannot return to this section.`
+  }
+  isSubmitting={isSubmitting}
+  // Add this prop to modify the modal appearance for time-up case
+  isTimeUp={isTimeUp}
+/>
  
       
        
