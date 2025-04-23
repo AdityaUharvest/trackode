@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
     <div className={`${scrolled ? 'shadow-md' : ''}   `}>
-      <Link href="/premium-mock-tests">
+      <Link href="/mocks">
         <div className={`flex py-2 justify-center ${theme === "light" ? "bg-blue-50" : "bg-blue-900 bg-opacity-30"}`}>
           <div className="flex items-center gap-2">
             <div className="relative px-4 py-1 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-teal-400">

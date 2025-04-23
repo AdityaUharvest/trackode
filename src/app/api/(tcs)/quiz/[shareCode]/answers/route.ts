@@ -41,7 +41,7 @@ export async function POST(
     
     // Update answers for this section
     attempt.answers[section] = answers;
-    
+   
     await attempt.save();
     
     return NextResponse.json({ success: true });

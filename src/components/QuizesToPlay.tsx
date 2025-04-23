@@ -539,6 +539,18 @@ const QuizDashboard = () => {
                     onClick={() => toggleSection(section)}
                   >
                     <div className="flex items-center">
+                      {/* section first letter in box */}
+                      <div
+                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 ${
+                          theme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'
+                        }`}>
+                      <span className={`text-lg font-bold ${theme === 'dark' ? 'text-gray-200' : 'text-gray-800'}`}>
+                        {section.charAt(0).toUpperCase()}
+                      </span>
+                      </div>
+                      {/* Section Name and Quiz Count */}
+
+                      
                       <h3 className={`text-base text-blue-600 font-semibold `}>
                         {section}
                       </h3>

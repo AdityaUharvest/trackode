@@ -11,6 +11,7 @@ export async function POST(
     await connectDB();
     const { shareCode } = await params;
     const { answers } = await request.json();
+    
     const session = await auth();
     const quiz = await MockTest.findOne({ shareCode: shareCode });
     if (!quiz) {
@@ -33,7 +34,7 @@ export async function POST(
           completedAt: new Date()
         }
       },
-      { new: true, upsert: true }
+      { new: true, upsert:true}
     );
     
     return NextResponse.json({ success: true });
