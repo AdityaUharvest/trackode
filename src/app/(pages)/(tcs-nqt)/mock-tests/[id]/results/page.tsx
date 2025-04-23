@@ -247,7 +247,7 @@ export default function QuizResultsDashboard({ params }: any) {
     return (
       <div className={`flex items-center justify-center h-screen ${bgColor}`}>
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
-          <Loader2 className="h-6 w-6 text-blue-500 animate-spin" />
+          
         </div>
       </div>
     );

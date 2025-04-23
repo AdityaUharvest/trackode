@@ -129,7 +129,9 @@ export default function QuizJoinComponent() {
             Quick join • No Registration required
           </div>
         </div>
+        
       </div>
+      
     </div>
   );
 }

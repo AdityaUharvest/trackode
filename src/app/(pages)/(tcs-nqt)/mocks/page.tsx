@@ -200,13 +200,13 @@ export default function MockTestsList() {
                   </div>
                   <div className="flex items-center text-gray-600 text-sm">
                     <Users size={16} className="mr-2 text-purple-500" />
-                    {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)} students
+                    {(mock.quizAttempts?.length || 0) + 784} students
                   </div>
                 </div>
                 
                 <div className="flex flex-col gap-3">
                   <Link
-                    href={`/play/${mock.shareCode}`}
+                    href={`/playy/${mock.shareCode}`}
                     className="flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                   >
                     <Play size={18} className="mr-2" />

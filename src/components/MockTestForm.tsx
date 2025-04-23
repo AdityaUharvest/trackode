@@ -3,10 +3,14 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Info } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTheme } from './ThemeContext';
-
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 interface FormData {
   title: string;
   description: string;
@@ -14,6 +18,7 @@ interface FormData {
   endTime: string;
   durationMinutes: number;
   instructions?: string;
+  public: boolean;
   generatedInstructions?: string;
 }
 
@@ -25,6 +30,7 @@ const MockTestCreator: React.FC = () => {
     startTime: '',
     endTime: '',
     durationMinutes: 180,
+    public: false,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,18 +43,22 @@ const MockTestCreator: React.FC = () => {
       ...prev,
       [name]: name === 'durationMinutes' ? parseInt(value) || 0 : value,
     }));
+    // Debugging line to check form data
   };
-
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
+     // Debugging line to check form data before submission
     try {
       const response = await axios.post<{ id: string }>('/api/mock-tests', formData);
+         // Debugging line to check response data
+        if(response.data?.success){
+          toast.success('Mock test created successfully!');
+          router.push(`mock-tests/${response.data.id}/questions`);
+        }
         
-        toast.success('Mock test created successfully!');
-        router.push(`mock-tests/${response.data.id}/questions`);
     
       
     } catch (err) {
@@ -97,14 +107,14 @@ const MockTestCreator: React.FC = () => {
 
   return (
     <div >
-      <h1 className="text-lg ml-3 mr-3 text-center mt-4  mb-2 text-gray-950">Tata Consultancy National Qualifier Mock Test</h1>
+     
     
     <div className={`flex justify-center ${containerClasses}`}>
       
      
       <form onSubmit={handleSubmit} className={formClasses}>
         {error && <div className={errorClasses}>{error}</div>}
-
+        <h2 className={`text-xl text-center font-semibold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Create Mock Test</h2>
         <div className="mb-4">
           <label className={labelClasses}>Test Title</label>
           <input
@@ -154,30 +164,52 @@ const MockTestCreator: React.FC = () => {
             required
           />
         </div>
+        <div className="flex mb-4 items-center gap-3 pt-2">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Make Public</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" className="focus:outline-none">
+                    <Info className="h-4 w-4 text-gray-500 hover:text-blue-600" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-3 text-sm">
+                  <p className="mb-2 font-medium">Public Mock Information:</p>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li>Visible to all platform users of Trackode!</li>
+                    <li>Appears in public quiz listings</li>
+                    <li>No invitation required</li>
+                    <li>Can be taken by anyone</li>
+                    <li>Anybody can play this quiz all over the network without invitation</li>
+                  </ul>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <button
+              type="button"
+              
+              onClick={() => setFormData({ ...formData, public: !formData.public })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors text-white ${
+                formData.public ? 'bg-green-500 ' : 'bg-gray-500'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  formData.public ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className="text-sm ">
+              {formData.public ? 'Public' : 'Private'}
+            </span>
+          </div>
 
-        <div className="mb-4">
-          <label className={labelClasses}>Description</label>
-          <Button
-            onClick={generateInstructions}
-            disabled={isGenerating}
-            className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700"
-          >
-            {isGenerating && <Loader2 className="animate-spin" />}
-            Generate with AI ✨
-          </Button>
-          <textarea
-            name="description"
-            value={formData?.generatedInstructions || formData.description}
-            onChange={handleChange}
-            className={`${inputClasses} mt-2`}
-            rows={5}
-          />
-        </div>
+        
 
         <button
           type="submit"
           disabled={isLoading}
-          className={`px-4 py-2 rounded hover:bg-blue-700 disabled:bg-blue-300 ${
+          className={`px-4 flex mx-auto py-2 rounded hover:bg-blue-700 disabled:bg-blue-300 ${
             theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
           }`}
         >

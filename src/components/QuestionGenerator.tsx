@@ -41,26 +41,26 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   //fetching sections from the server
   const [sections, setSections] = useState<Section[]>([]);
   useEffect(
-    ()=>{
+    () => {
       const fetchSection = async () => {
         try {
           const res = await axios.get('/api/fetchSection');
-          
+
           setSections(res.data.sections);
         } catch (error) {
           console.error('Failed to fetch sections', error);
         }
       };
       fetchSection();
-    },[]
+    }, []
   )
-  
+
   const { theme } = useTheme();
   const params = useParams();
   const { data: session } = useSession();
 
   const mockTestId = params.id as string;
-  
+
   const [selectedSection, setSelectedSection] = useState('verbal-ability');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [editingQuestion, setEditingQuestion] = useState<EditingQuestion | null>(null);
@@ -71,14 +71,14 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [errorMessage, setErrorMessage] = useState('');
   const [shareLink, setShareLink] = useState('');
   // for sections
-  
+
   // Theme-based classes
   const containerClasses = `space-y-6 ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`;
   const selectClasses = `p-2 border rounded ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`;
   const questionCardClasses = `border p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`;
-  const optionClasses = (isCorrect: boolean) => 
-    `p-2 border rounded ${isCorrect ? 
-      (theme === 'dark' ? 'bg-green-900 border-green-700' : 'bg-green-50 border-green-300') : 
+  const optionClasses = (isCorrect: boolean) =>
+    `p-2 border rounded ${isCorrect ?
+      (theme === 'dark' ? 'bg-green-900 border-green-700' : 'bg-green-50 border-green-300') :
       (theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200')}`;
   const explanationClasses = `p-3 rounded text-sm ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`;
   const errorClasses = `p-3 rounded ${theme === 'dark' ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-700'}`;
@@ -106,18 +106,18 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       return questionBlocks.map(block => {
         const lines = block.split('\n').filter(l => l.trim());
         if (lines.length < 3) return null;
-        
+
         const text = lines[0].replace(/^\d+\.\s*/, '').trim();
         const options = lines.slice(1, 5)
           .map(l => l.replace(/^[a-dA-D][\.\)]\s*/, '').trim());
         const correctLine = lines.find(l => l.toLowerCase().includes('correct'));
-        const correctAnswer = correctLine 
+        const correctAnswer = correctLine
           ? options.indexOf(correctLine.replace(/.*correct.*?([a-dA-D])/i, '$1').toUpperCase())
           : 0;
-          
-        return { 
-          text, 
-          options, 
+
+        return {
+          text,
+          options,
           correctAnswer,
         };
       }).filter(q => q !== null) as Question[];
@@ -151,47 +151,39 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchQuestions();
   }, [mockTestId, selectedSection]);
-  
-  
+
+
   const generateQuestions = async () => {
     try {
       setIsGenerating(true);
       setErrorMessage('');
-      
+
       // Generate all 25 questions in a single API call
-      const res = await axios.post('/api/chat-gpt', { 
-        prompt: `You are an expert in creating high-quality TCS NQT exam questions. Generate exactly 25 easy and medium level ${selectedSection} questions. 
-
-Each question must:
-- Be conceptually challenging with clear, unambiguous wording
-- Have exactly 4 options (labeled options 0-3)
-- Have a single correct answer
-
-
-
-Return a valid JSON array with 25 objects following this exact format:
-[
-  {
-    "text": "Question text here",
-    "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-    "correctAnswer": 0
-  },
-  ...
-]
-
-The "correctAnswer" field must be the index (0-3) of the correct option. 
-
-DO NOT include any explanations, markdown formatting, or additional text outside the JSON array. Ensure the JSON is properly formatted and parseable.`
+      const res = await axios.post('/api/chat-gpt', {
+        prompt: `Generate exactly 25 medium, hard and challenging level ${selectedSection} questions.Each question must:
+        - Have exactly 4 options, accurate dont do any error (labeled options 0-3)
+        - Have a single correct answer
+        - Return a valid JSON array with 25 objects following this exact format:
+        [
+          {
+          "text": "Question text here",
+          "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
+          "correctAnswer": 0
+          },
+        ...
+        ]
+        The "correctAnswer" field must be the index (0-3) of the correct option. 
+        DO NOT include any explanations, markdown formatting, or additional text outside the JSON array. Ensure the JSON is properly formatted and parseable.`
       }, {
         timeout: API_TIMEOUT
       });
-      
+
       const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
-      
+
       if (parsedQuestions.length > 0) {
         setQuestions(parsedQuestions.slice(0, 25)); // Limit to 25 questions max
         setSuccessMessage(`Successfully generated ${parsedQuestions.length} questions!`);
@@ -211,7 +203,7 @@ DO NOT include any explanations, markdown formatting, or additional text outside
     try {
       setIsSubmitting(true);
       setErrorMessage('');
-      
+
       // Submit all questions at once
       const response = await axios.post(
         `/api/mock-tests/${mockTestId}/questions`,
@@ -228,7 +220,7 @@ DO NOT include any explanations, markdown formatting, or additional text outside
           timeout: API_TIMEOUT
         }
       );
-  
+
       if (response.data.success) {
         setSuccessMessage(`Successfully saved ${questions.length} questions!`);
         setTimeout(() => setSuccessMessage(''), 3000);
@@ -267,8 +259,8 @@ DO NOT include any explanations, markdown formatting, or additional text outside
 
   const [copied, setCopied] = useState(false);
   const handleShareLink = async () => {
-    
-    
+
+
     navigator.clipboard.writeText(`${window.location.origin}/playy/${shareCode}`).then(
       () => {
         setSuccessMessage('Share link copied to clipboard!');
@@ -282,7 +274,7 @@ DO NOT include any explanations, markdown formatting, or additional text outside
     <div className={containerClasses}>
       <div className="p-4 flex justify-between items-center">
         {isPublished && (
-          <Button 
+          <Button
             className="dark:bg-green-600 bg-white text-blue hover:bg-blue-700 hover:text-white"
             onClick={handleShareLink}
             disabled={isGenerating || isSubmitting || copied}
@@ -304,7 +296,7 @@ DO NOT include any explanations, markdown formatting, or additional text outside
           </span>
         )}
       </div>
-      
+
       <div className="flex items-center justify-between gap-4">
         <div className="flex gap-2">
           <select
@@ -387,7 +379,7 @@ DO NOT include any explanations, markdown formatting, or additional text outside
                     </div>
                   </div>
                   <p className="mb-3">{q.text}</p>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
                     {q.options.map((opt, i) => (
                       <div

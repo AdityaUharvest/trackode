@@ -1,4 +1,5 @@
 import { createMockTest } from "@/app/api/mockTests"
+
 import { NextResponse ,NextRequest} from 'next/server';
 
 export async function POST(request: Request) {
@@ -7,6 +8,7 @@ export async function POST(request: Request) {
     const mockTest = await createMockTest(data);
     return NextResponse.json({
       id: mockTest._id,
+      success:true,
       message: 'Mock test created successfully'
     }, { status: 201 });
   } catch (error) {

@@ -8,6 +8,7 @@ export async function createMockTest(data: {
   startTime: Date;
   endTime: Date;
   durationMinutes: number;
+  public: boolean;
 }) {
   await connectDB();
   const session = await auth();
@@ -19,6 +20,7 @@ export async function createMockTest(data: {
     shareCode,
     createdAt: new Date(),
     createdBy: session?.user?.id
+    
   });
   
   

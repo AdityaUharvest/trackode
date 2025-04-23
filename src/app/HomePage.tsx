@@ -72,9 +72,13 @@ export default function HomePage() {
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative z-10">
     <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
       {/* Content area - improved layout */}
-      <div className="w-full lg:w-1/2 space-y-8">
+      <div className="w-full lg:w-1/2 mx-auto space-y-8">
         {/* "Now Live" badge - centered on mobile */}
-        <div className="flex justify-center lg:justify-end lg:mr-32">
+        
+
+        {/* Main heading */}
+        <div className=" lg:text-left">
+        <div className="flex justify-center lg:ml-32 mb-2">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
             <span className="animate-pulse h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
             <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -82,9 +86,6 @@ export default function HomePage() {
             </span>
           </div>
         </div>
-
-        {/* Main heading */}
-        <div className=" lg:text-left">
           <h1
             id="hero-heading"
             className="text-4xl font-bold leading-tight sm:text-3xl lg:text-5xl"
@@ -130,19 +131,17 @@ export default function HomePage() {
             </div>
           </h1>
           
-          <div className="mt-6 w-full  lg:text-left">
+          <div className="mt-2 w-full  ">
   <GradientText
     colors={["#40ffaa", "#4079ff"]}
-    align="center" // or "left" for lg screens if needed
-    className="text-xl sm:text-xl font-semibold leading-tight"
+    align="left" // or "left" for lg screens if needed
+    className="text-base  sm:text-base text-center font-semibold leading-tight"
   >
-    Navigate Your Coding Journey
+    Navigate Your Journey of Success with Trackode
   </GradientText>
 </div>
           
-          <p className="mt-6 text-base font-serif text-gray-600 dark:text-gray-300 max-w-lg mx-auto lg:mx-0">
-            Test your skills, track your progress, and compete with developers worldwide.
-          </p>
+          
         </div>
 
         {/* Buttons - better spacing and alignment */}

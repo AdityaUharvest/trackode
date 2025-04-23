@@ -61,7 +61,7 @@ export default function QuizPlayer() {
   const [fullscreenExits, setFullscreenExits] = useState(0);
   const [isTabActive, setIsTabActive] = useState(true);
   const [sectionData, setSectionsData] = useState<Section[]>([]);
- 
+  const [isTimeUpSubmission, setIsTimeUpSubmission] = useState(false);
   // Initialize sections and load saved answers
   useEffect(() => {
     const fetchQuizData = async () => {
@@ -85,7 +85,7 @@ export default function QuizPlayer() {
         const normalizedSections = res.data.sections.map((s: any) => ({
           name: s.value,
           label: s.label,
-          timeLimit: 25 * 60,
+          timeLimit: 0.1 * 60,
           questionCount: 0,
           submitted: false,
           unlocked: false,
@@ -174,6 +174,7 @@ export default function QuizPlayer() {
       setSectionTimeRemaining(prev => {
         if (prev <= 1) {
           clearInterval(timer);
+          setIsTimeUpSubmission(true);
           handleSectionSubmit();
           return 0;
         }
@@ -264,32 +265,33 @@ export default function QuizPlayer() {
   };
 
   const handleSectionSubmit = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const currentSectionIndex = sections.findIndex(s => s.name === currentSection);
-
-      const answeredQuestions = Object.keys(sectionAnswers[currentSection] || {}).length;
       
-
+      // Save current section's answers first
       await axios.post(`/api/quiz/${shareCode}/answers`, {
         section: currentSection,
         answers: sectionAnswers[currentSection] || {}
       });
-
-      setSections(prev => prev.map(s =>
-        s.name === currentSection
-          ? { ...s, submitted: true }
-          : s
-      ));
-
-      if (currentSectionIndex < sections.length - 1) {
-        setSections(prev => prev.map((s, idx) =>
-          idx === currentSectionIndex + 1
-            ? { ...s, unlocked: true }
-            : s
-        ));
+      
+      // Update sections state with the current section marked as submitted
+      const updatedSections = sections.map(s =>
+        s.name === currentSection ? { ...s, submitted: true } : s
+      );
+      
+      // If there's a next section, unlock it
+      if (currentSectionIndex < updatedSections.length - 1) {
+        updatedSections[currentSectionIndex + 1].unlocked = true;
       }
-
+      
+      // Update state with all changes at once
+      setSections(updatedSections);
+      
+      // Wait a moment to ensure state updates are processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Navigate to next section or submit the quiz
       if (currentSectionIndex < sections.length - 1) {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
@@ -298,10 +300,12 @@ export default function QuizPlayer() {
         handleQuizSubmit();
       }
     } catch (err) {
+      console.error("Section submission error:", err);
       setError('Failed to save answers. Please try again.');
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
+      setIsTimeUpSubmission(false); // Reset flag
     }
   };
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -409,7 +413,7 @@ useEffect(() => {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-xl font-bold mb-4">The Quiz is ended</h2>
+          <h2 className="text-sm font-bold mb-4">The Quiz is ended</h2>
           <p className="mb-6">This quiz is not yet published. Please check back later.</p>
           <button
             onClick={() => router.push('/dashboard')}
@@ -432,7 +436,7 @@ useEffect(() => {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-xl font-bold mb-4">Error</h2>
+          <h2 className="text-sm font-bold mb-4">Error</h2>
           <p className="mb-6">{error}</p>
           <button
             onClick={() => router.push('/')}
@@ -445,39 +449,39 @@ useEffect(() => {
     );
   }
 
-  if (hasAttempted) {
-    return (
-      <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-sm text-red-400 font-semibold mb-4">
-            <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
-            You have already attempted this mock test
-            <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
-          </h2>
+  // if (hasAttempted) {
+  //   return (
+  //     <div className={`flex p-4 items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+  //       <div className={`p-4 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+  //         <h2 className="text-sm text-red-400 font-semibold mb-4">
+  //           <span className='animate-pulse bg-red-500 rounded-full px-5 mr-3 text-white'></span>
+  //           You have already attempted this mock test
+  //           <span className='animate-pulse ml-3 bg-green-500 rounded-full px-5 text-white'></span>
+  //         </h2>
 
-          <button
-            onClick={() => router.push('/dashboard')}
-            className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-          >
-            Go to your Dashboard
-          </button>
-          <button
-            onClick={() => router.push('/quiz-list')}
-            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-          >
-            Explore Free Live Quizes
-          </button>
-        </div>
-      </div>
-    );
-  }
+  //         <button
+  //           onClick={() => router.push('/dashboard')}
+  //           className={`px-4 mb-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+  //         >
+  //           Go to your Dashboard
+  //         </button>
+  //         <button
+  //           onClick={() => router.push('/quiz-list')}
+  //           className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+  //         >
+  //           Explore Free Live Quizes
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   if (!quizStarted) {
     return (
       <div className={`flex items-center justify-center min-h-[calc(100vh-4rem)] py-8 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-8 rounded-xl shadow-lg w-full max-w-3xl mx-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">{quiz?.title}</h1>
+            <h1 className="text-lg font-bold mb-2">{quiz?.title}</h1>
             {hasAttemptedQuestions && (
               <div className={`inline-block px-4 py-2 rounded-full mb-4 ${theme === 'dark' ? 'bg-blue-900/50 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
                 You have an in-progress attempt
@@ -487,7 +491,7 @@ useEffect(() => {
 
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div>
-              <h2 className="text-xl font-semibold mb-4">Sections</h2>
+              <h2 className="text-sm font-semibold mb-4">Sections</h2>
               <div className="space-y-3">
                 {sections.map(section => (
                   <div key={section.name} className={`p-4 rounded-lg border flex items-center justify-between ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
@@ -495,7 +499,7 @@ useEffect(() => {
                     }`}>
                     <div className="flex items-center gap-3">
                       {!section.unlocked && <Lock size={16} className="flex-shrink-0" />}
-                      <span className="font-medium">{section.label}</span>
+                      <span className="text-sm">{section.label}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`px-2 py-1 text-xs rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'}`}>
@@ -513,7 +517,7 @@ useEffect(() => {
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold mb-4">Instructions</h2>
+              <h2 className="text-sm font-semibold mb-4">Instructions</h2>
               <ul className="space-y-3">
                 {[
                   "Sections must be completed in sequence",
@@ -538,7 +542,7 @@ useEffect(() => {
           <div className="text-center">
             <button
               onClick={startQuiz}
-              className={`px-8 py-3 rounded-lg font-medium text-lg ${theme === 'dark' ? 'bg-green-700 hover:bg-green-600' : 'bg-green-600 hover:bg-green-700'} text-white shadow-md transition-all`}
+              className={`px-8 py-3 rounded-lg font-medium text-sm ${theme === 'dark' ? 'bg-green-700 hover:bg-green-600' : 'bg-green-600 hover:bg-green-700'} text-white shadow-md transition-all`}
             >
               {hasAttemptedQuestions ? 'Continue Attempt' : 'Start Quiz Now'}
             </button>
@@ -856,7 +860,7 @@ useEffect(() => {
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
           <div className="bg-red-600 text-white p-8 rounded-lg max-w-md text-center">
             <AlertTriangle className="h-12 w-12 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-4">Warning!</h2>
+            <h2 className="text-lg font-bold mb-4">Warning!</h2>
             <p className="mb-6">You have switched away from the quiz. Please return immediately or your progress may be submitted.</p>
             <button
               onClick={() => setIsTabActive(true)}
@@ -882,9 +886,7 @@ useEffect(() => {
       <QuizResultModal
         isOpen={showResultModal}
         onClose={() => router.push('/quiz-list')}
-
         quizId={quiz?._id}
-
       />
     </div>
   );

@@ -105,7 +105,7 @@ export default function DashBoard() {
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className={`p-2 text-xm mb-2 rounded-md ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} w-full text-left`}
         >
-          {sidebarCollapsed ? '☰' : '◄ Minimize'}
+          {sidebarCollapsed ? '☰' : '◄ Collapse'}
         </button>
         
         <nav>
