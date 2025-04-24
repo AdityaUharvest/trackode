@@ -80,7 +80,7 @@ export default function HomePage() {
         </div>
 
         {/* Main heading with gradient and animation */}
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-4xl lg:text-6xl">
+        <h1 className="text-3xl font-extrabold tracking-tight sm:text-3xl lg:text-6xl">
           <span className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
             Master Coding Through
           </span>
