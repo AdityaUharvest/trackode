@@ -14,7 +14,7 @@ const otpStorageSchema = new mongoose.Schema(
         createdAt: {
             type: Date,
             default: Date.now,
-            expires: '10m' // OTP expires after 5 minutes
+            expires: '10m'
         }
     },
     { timestamps: true }

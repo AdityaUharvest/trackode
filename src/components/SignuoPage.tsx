@@ -2,11 +2,11 @@
 import SignInButton from "./Signin";
 import axios from "axios";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { useTheme } from "./ThemeContext";
-import { FiUser, FiMail, FiLock, FiCheck } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiCheck, FiEye, FiEyeOff } from "react-icons/fi";
 import Head from "next/head";
 
 interface ThemeContextType {
@@ -23,7 +23,27 @@ export default function SignUp() {
   const [otp, setOtp] = useState<string>("");
   const [otpVerified, setOtpVerified] = useState<boolean>(false);
   const [otpLoading, setOtpLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number>(0);
   const { theme } = useTheme() as ThemeContextType;
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
+
+  const startCountdown = () => {
+    setCountdown(120); // 2 minutes in seconds
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const sendOtp = async () => {
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
@@ -33,19 +53,17 @@ export default function SignUp() {
 
     setOtpLoading(true);
     try {
-      // API call to send OTP
-      const response = await axios.post("api/otp/send-otp", {
-        email
-      });
+      const response = await axios.post("api/otp/send-otp", { email });
 
       if (response.data.success) {
         setOtpSent(true);
-        toast.success("OTP sent successfully!");
-      } else {
+        startCountdown();
+        toast.success("OTP sent successfully! Check your email.");
+      } else if (response.data.message === "User already exists") {
         toast.error(response.data.message || "Failed to send OTP");
       }
     } catch (error) {
-      toast.error("An error occurred while sending OTP");
+      toast.error("Email already exists or an error occurred while sending OTP");
     } finally {
       setOtpLoading(false);
     }
@@ -59,11 +77,7 @@ export default function SignUp() {
 
     setOtpLoading(true);
     try {
-      // API call to verify OTP
-      const response = await axios.post("api/otp/verify-otp", {
-        email,
-        otp
-      });
+      const response = await axios.post("api/otp/verify-otp", { email, otp });
 
       if (response.data.success) {
         setOtpVerified(true);
@@ -82,14 +96,10 @@ export default function SignUp() {
     e.preventDefault();
     
     if (!email || !password || !name) {
-      toast.error("Please fill all required fields", {
-        autoClose: 3000,
-        closeOnClick: true,
-      });
+      toast.error("Please fill all required fields");
       return;
     }
 
-    // Check if email was not verified
     if (!otpVerified) {
       toast.error("Please verify your email address");
       return;
@@ -98,21 +108,20 @@ export default function SignUp() {
     setIsLoading(true);
     
     try {
-      const response = await axios.post("api/user/signup", {
-        email,
-        password,
-        name,
-      });
+      const response = await axios.post("api/user/signup", { email, password, name });
 
       if (response.data.success) {
         toast.success(response.data.message || "Registration successful!");
-        setTimeout(() => {
-          router.push("/signin");
-        }, 1500);
+        setTimeout(() => router.push("/signin"), 1500);
       } else if (response.data.message === "User is already registered") {
         toast.error(response.data.message || "User already exists");
         router.push("/signin");
-      } else {
+
+      } 
+      else if( response.data.message === "OTP already sent ! Failed to send OTP") {
+        toast.error("OTP already sent! Please check your email.");
+      }
+      else {
         toast.error(response.data.message || "Registration failed");
       }
     } catch (error) {
@@ -175,8 +184,11 @@ export default function SignUp() {
                         type="text"
                         autoComplete="name"
                         required
-                        className={`block w-full pl-10 pr-3 py-2 rounded-md border ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"} 
-                        placeholder- ${theme === "dark" ? "gray-400 text-sm" : "gray-500 text-sm"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                        className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                            : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                         placeholder="John Doe"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -199,7 +211,13 @@ export default function SignUp() {
                           type="email"
                           autoComplete="email"
                           required
-                          className={`block w-full pl-10 pr-3 py-2 rounded-md border ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"} placeholder- ${theme === "dark" ? "gray-400 text-sm" : "gray-500 text-sm"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${otpVerified ? "border-green-500" : ""}`}
+                          className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${
+                            theme === "dark"
+                              ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                              : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                            otpVerified ? "border-green-500" : ""
+                          }`}
                           placeholder="you@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -212,15 +230,19 @@ export default function SignUp() {
                         )}
                       </div>
                       {!otpVerified && (
-                        <button
-                          type="button"
-                          onClick={sendOtp}
-                          disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email)}
-                          className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${otpLoading ? "opacity-75 cursor-not-allowed" : ""}`}
-                        >
-                          {otpLoading ? "Sending..." : otpSent ? "Resend OTP" : "Send OTP"}
-                        </button>
-                      )}
+          <button
+            type="button"
+            onClick={sendOtp}
+            disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email) || countdown > 0}
+            className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+              otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
+            }`}
+          >
+            {otpLoading ? "Sending..." : 
+             countdown > 0 ? `⌛${formatTime(countdown)}` : 
+             otpSent ? "Resend OTP" : "Send OTP"}
+          </button>
+        )}
                     </div>
 
                     {otpSent && !otpVerified && (
@@ -234,7 +256,11 @@ export default function SignUp() {
                             name="otp"
                             type="text"
                             maxLength={6}
-                            className={`block flex-grow pl-3 pr-3 py-2 rounded-md border ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"} placeholder- ${theme === "dark" ? "gray-400 text-sm" : "gray-500 text-sm"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                            className={`block flex-grow pl-3 pr-3 py-2 rounded-md border text-sm ${
+                              theme === "dark"
+                                ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                                : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                             placeholder="123456"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
@@ -243,7 +269,9 @@ export default function SignUp() {
                             type="button"
                             onClick={verifyOtp}
                             disabled={otpLoading || otp.length !== 6}
-                            className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${otpLoading ? "opacity-75 cursor-not-allowed" : ""}`}
+                            className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+                              otpLoading ? "opacity-75 cursor-not-allowed" : ""
+                            }`}
                           >
                             {otpLoading ? "Verifying..." : "Verify"}
                           </button>
@@ -266,14 +294,29 @@ export default function SignUp() {
                       <input
                         id="password"
                         name="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         autoComplete="new-password"
                         required
-                        className={`block w-full pl-10 pr-3 py-2 rounded-md border ${theme === "dark" ? "bg-gray-700 border-gray-600 text-white" : "bg-white border-gray-300 text-gray-900"} placeholder- ${theme === "dark" ? "gray-400 text-sm" : "gray-500 text-sm"} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                        className={`block w-full pl-10 pr-10 py-2 rounded-md border text-sm ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                            : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                       />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <FiEyeOff className={`h-5 w-5 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`} />
+                        ) : (
+                          <FiEye className={`h-5 w-5 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`} />
+                        )}
+                      </button>
                     </div>
                     {password && password.length < 8 && (
                       <p className="mt-1 text-sm text-red-600">Password must be at least 8 characters</p>
@@ -287,10 +330,25 @@ export default function SignUp() {
                     name="terms"
                     type="checkbox"
                     required
-                    className={`h-4 w-4 rounded ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"} focus:ring-blue-500`}
+                    className={`h-4 w-4 rounded ${
+                      theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"
+                    } focus:ring-blue-500`}
                   />
                   <label htmlFor="terms" className={`ml-2 block text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-                    I agree to the <Link href="/terms" className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}>Terms of Service</Link> and <Link href="/privacy" className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}>Privacy Policy</Link>
+                    I agree to the{" "}
+                    <Link
+                      href="/terms"
+                      className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                    >
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/privacy"
+                      className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                    >
+                      Privacy Policy
+                    </Link>
                   </label>
                 </div>
 
@@ -298,13 +356,31 @@ export default function SignUp() {
                   <button
                     type="submit"
                     disabled={isLoading || !otpVerified}
-                    className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${(isLoading || !otpVerified) ? "opacity-75 cursor-not-allowed" : ""}`}
+                    className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                      isLoading || !otpVerified ? "opacity-75 cursor-not-allowed" : ""
+                    }`}
                   >
                     {isLoading ? (
                       <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
                         </svg>
                         Creating account...
                       </>
@@ -317,7 +393,10 @@ export default function SignUp() {
 
               <div className={`text-sm text-center ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
                 Already have an account?{" "}
-                <Link href="/signin" className={`font-medium ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}>
+                <Link
+                  href="/signin"
+                  className={`font-medium ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                >
                   Sign in
                 </Link>
               </div>
