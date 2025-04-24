@@ -157,7 +157,7 @@ export default function HomePage() {
       </div>
 
       {/* Right side component */}
-      <div className="relative w-full mb-5  lg:w-1/2">
+      <div className="relative w-full  lg:w-1/2">
       
       <QuizJoinComponent />
         
