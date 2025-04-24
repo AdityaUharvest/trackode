@@ -914,7 +914,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                         onSubmit={handleSubmitQuestion}
                         onCancel={() => setActiveQuizIndex(null)}
                         theme={theme}
-                        className="mt-3"
+                        
                       />
                     )}
                   </AccordionContent>

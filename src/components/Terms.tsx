@@ -98,7 +98,7 @@ export default function TermsOfService() {
               8. Contact Us
             </h2>
             <p className={`mt-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-              If you have any questions about these Terms, please contact us at legal@trackode.com.
+              If you have any questions about these Terms, please contact us at .
             </p>
           </section>
         </div>

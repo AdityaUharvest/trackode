@@ -414,7 +414,7 @@ function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondar
                       </Link>
                       <Button
                         onClick={()=>{
-                          navigator.clipboard.writeText(`https://trackode.com/playy/${mock.shareCode}`);
+                          navigator.clipboard.writeText(`https://trackode.in/playy/${mock.shareCode}`);
                           toast.success('Share link copied to clipboard!');
                         }}
                         className={`text-xs sm:text-sm px-2 py-1 rounded ${
