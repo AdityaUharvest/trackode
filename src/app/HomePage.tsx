@@ -80,7 +80,7 @@ export default function HomePage() {
         </div>
 
         {/* Main heading with gradient and animation */}
-        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-4xl lg:text-6xl">
           <span className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
             Master Coding Through
           </span>
@@ -93,7 +93,7 @@ export default function HomePage() {
         </h1>
 
         {/* Subheading */}
-        <p className={`max-w-2xl tracking-wider mx-auto mt-6 text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-500"} lg:mx-0`}>
+        <p className={`max-w-2xl tracking-wider mx-auto mt-6 lg:text-lg text-base ${theme === "dark" ? "text-gray-300" : "text-gray-500"} lg:mx-0`}>
           Trackode Quiz helps you level up your coding skills with AI-powered challenges, real-time feedback, and detailed progress tracking.
         </p>
 
@@ -157,7 +157,7 @@ export default function HomePage() {
       </div>
 
       {/* Right side component */}
-      <div className="relative w-full mb-52  lg:w-1/2">
+      <div className="relative w-full   lg:w-1/2">
       
       <QuizJoinComponent />
         
