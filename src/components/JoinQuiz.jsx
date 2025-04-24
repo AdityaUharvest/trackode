@@ -52,11 +52,11 @@ export default function QuizJoinComponent() {
   };
 
   return (
-    <div className="w-full lg:w-2/5">
+    <div className="w-full p-4 ">
       <div
         className="relative p-6 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-xl transform transition-all duration-700 hover:shadow-2xl"
         style={{
-          animation: "float 6s ease-in-out infinite"
+          animation: "float 8s ease-in-out infinite"
         }}
       >
         <div className="absolute -top-3 -right-3">

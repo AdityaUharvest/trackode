@@ -67,14 +67,14 @@ const Navbar: React.FC = () => {
       </Link>
       
 
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-3">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
               src="https://i.ibb.co/jvr3wb6b/trackode.png" 
-              className="h-8 rounded-lg"
+              className="h-9 rounded-lg"
               alt="Trackode Logo"
             />
-            <span className={`self-center text-lg font-extrabold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
+            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 text-2xl font-bold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
               Trackode
             </span>
           </Link>

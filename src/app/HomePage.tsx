@@ -48,135 +48,79 @@ export default function HomePage() {
 
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
-        <section
-  className={`py-16 sm:py-24 ${theme === "dark" ? "bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" : "bg-gradient-to-br from-blue-50 via-white to-blue-50"}`}
-  aria-labelledby="hero-heading"
->
-  {/* Background elements */}
+        <section className={`relative overflow-hidden ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+  {/* Animated background elements */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
-    <div className="absolute top-0 left-0 w-full h-full">
-      {theme === "dark" ? (
-        <>
-          <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-blue-600 opacity-10 blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-600 opacity-10 blur-3xl"></div>
-        </>
-      ) : (
-        <>
-          <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-blue-300 opacity-20 blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-indigo-300 opacity-20 blur-3xl"></div>
-        </>
-      )}
-    </div>
+    {theme === "dark" ? (
+      <>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-900 rounded-full opacity-10 filter blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-900 rounded-full opacity-10 filter blur-3xl"></div>
+      </>
+    ) : (
+      <>
+        <div className="absolute top-0 left-0 w-64 h-64 bg-blue-200 rounded-full opacity-20 filter blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-200 rounded-full opacity-20 filter blur-3xl"></div>
+      </>
+    )}
   </div>
 
-  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative z-10">
-    <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-      {/* Content area - improved layout */}
-      <div className="w-full lg:w-1/2 mx-auto space-y-8">
-        {/* "Now Live" badge - centered on mobile */}
-        
+  <div className="relative px-4 py-24 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:py-24">
+    <div className="flex flex-col items-center justify-between gap-12 lg:flex-row">
+      {/* Content area */}
+      <div className="w-full lg:w-1/2 text-center lg:text-left">
+        {/* Live badge with animation */}
+        <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full bg-blue-100 dark:bg-blue-900/50 backdrop-blur-sm">
+          <span className="relative flex h-2 w-2 mr-2">
+            <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-blue-600 dark:bg-blue-400"></span>
+            <span className="relative inline-flex w-2 h-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+          </span>
+          <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+            Now Live - Join 500+ Developers
+          </span>
+        </div>
 
-        {/* Main heading */}
-        <div className="mt-10 lg:text-left">
-        <div className="flex justify-center lg:ml-32 mb-5">
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
-            <span className="animate-pulse h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
-            <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400">
-              Now Live
+        {/* Main heading with gradient and animation */}
+        <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+          <span className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+            Master Coding Through
+          </span>
+          <span className="relative">
+            <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
+              Interactive Quizzes
             </span>
-          </div>
-        </div>
-          <h1
-            id="hero-heading"
-            className="text-4xl font-bold leading-tight sm:text-2xl lg:text-5xl"
-          >
-            <div className="flex justify-center lg:justify-start items-center mb-4">
-              <span className="text-blue-600 mr-2">
-                <SplitText
-                  text="Track"
-                  className="font-bold"
-                  delay={150}
-                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                  threshold={0.2}
-                  rootMargin="-50px"
-                  onLetterAnimationComplete={handleAnimationComplete}
-                />
-              </span>
-              <span className="relative">
-                <span className="absolute -left-1 -right-1 h-3 bottom-0 bg-blue-200 dark:bg-blue-800 opacity-50 rounded"></span>
-                <SplitText
-                  onLetterAnimationComplete={handleAnimationComplete}
-                  text="Code"
-                  className="font-bold relative z-10"
-                  delay={250}
-                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                  threshold={0.2}
-                  rootMargin="-50px"
-                />
-              </span>
-              <span className="ml-2">
-                <SplitText
-                  onLetterAnimationComplete={handleAnimationComplete}
-                  text="Quiz"
-                  className="font-bold"
-                  delay={350}
-                  animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
-                  animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
-                  threshold={0.2}
-                  rootMargin="-50px"
-                />
-              </span>
-            </div>
-          </h1>
-          
-            <div className="mt-2 lg:text-left text-center w-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent font-extrabold text-xl">
-            Navigate Your Journey of Success with Trackode
-            </div>
-          
-          
-        </div>
+            <span className="absolute inset-x-0 bottom-0 h-3 -mt-2 bg-blue-100 dark:bg-blue-900/50 rounded-full opacity-75"></span>
+          </span>
+        </h1>
 
-        {/* Buttons - better spacing and alignment */}
-        <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-6">
+        {/* Subheading */}
+        <p className={`max-w-2xl tracking-wider mx-auto mt-6 text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-500"} lg:mx-0`}>
+          Trackode Quiz helps you level up your coding skills with AI-powered challenges, real-time feedback, and detailed progress tracking.
+        </p>
+
+        {/* CTA buttons */}
+        <div className="flex flex-col items-center mt-10 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 lg:justify-start">
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center px-8 py-3 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 border-2 border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 hover:scale-105 w-full sm:w-auto"
-            role="button"
+            className="relative px-8 py-4 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 group"
           >
-            Get Started
+            <span className="relative z-10">Get Started for Free</span>
+            <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
           </Link>
 
           <Link
             href="/admin-dashboard"
-            className={`inline-flex items-center justify-center px-6 py-3 text-base font-bold transition-all duration-300 transform border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 w-full sm:w-auto ${theme === "dark"
-              ? "text-white border-gray-400 hover:bg-gray-800 focus:bg-gray-800"
-              : "text-black border-gray-400 hover:bg-gray-100 focus:bg-gray-100"
-              }`}
-            role="button"
+            className={`flex items-center px-6 py-4 text-base font-medium transition-all duration-300 transform rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${theme === "dark" ? "text-white border border-gray-700 hover:bg-gray-800 focus:ring-gray-500" : "text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300"}`}
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              viewBox="0 0 18 18"
-              fill="none"
-              stroke="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M8.18003 13.4261C6.8586 14.3918 5 13.448 5 11.8113V5.43865C5 3.80198 6.8586 2.85821 8.18003 3.82387L12.5403 7.01022C13.6336 7.80916 13.6336 9.44084 12.5403 10.2398L8.18003 13.4261Z"
-                strokeWidth="2"
-                strokeMiterlimit="10"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
             </svg>
             Dashboard
           </Link>
         </div>
 
-        {/* User avatars - better alignment */}
-        <div className="flex flex-col items-center lg:items-start pt-8">
+        {/* Trust indicators */}
+                <div className="flex flex-col items-center lg:items-start pt-8">
           <div className="flex items-center space-x-3">
             <div className="flex -space-x-2">
               {['aditya.png', 'rohit.png', 'rohitk.png', 'kaju.png'].map((img, i) => (
@@ -193,22 +137,45 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-medium">+ 506</span> developers already joined
-            </p>
+            <p className={`text-xs uppercase tracking-wider ${theme === "dark" ? "text-gray-400" : "text-gray-500"} `}>
+            + Trusted by developers at
+          </p>
+          </div>
+        </div>
+              
+
+        <div className="mt-5">
+         
+          <div className="flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+            {['Google', 'Microsoft', 'Amazon', 'TCS', 'Infosys'].map((company, index) => (
+              <div key={index} className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-600"} opacity-80 hover:opacity-100 transition-opacity`}>
+                {company}
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Right side component - unchanged */}
+      {/* Right side component */}
+      <div className="relative w-full mb-52  lg:w-1/2">
+      
       <QuizJoinComponent />
+        
+        
+        {/* Floating animation elements */}
+        <div className="absolute -top-10 -left-10 w-32 h-32 rounded-full bg-blue-500 opacity-10 animate-float"></div>
+        <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-purple-500 opacity-10 animate-float animation-delay-2000"></div>
+      </div>
     </div>
   </div>
+
+  {/* Animation styles */}
+
 </section>
         {/* here the hero section of the trackode ends */}
 
         {/* Trackode Image Section */}
-        <section className={`py-20 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+        <section className={`py-8 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <div className="absolute top-1/3 left-0 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob"></div>
@@ -217,7 +184,7 @@ export default function HomePage() {
 
             <div className="relative">
               {/* Image container with advanced animation */}
-              <div className="lg:max-w-3xl mx-auto mb-16 relative">
+              <div className="lg:max-w-3xl mx-auto mb-5 relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl opacity-20 blur-lg transform scale-105"></div>
                 <div
                   className="relative transform transition-all duration-700"
