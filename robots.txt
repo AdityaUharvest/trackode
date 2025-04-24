@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://trackode.vercel.app/sitemap.xml",
+    sitemap: "https://trackode.in/sitemap.xml",
   };
 }

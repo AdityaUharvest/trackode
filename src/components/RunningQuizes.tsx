@@ -273,13 +273,18 @@ const PreviewModal: React.FC<{
     </div>
   );
 };
+interface RunningQuizesProps {
+  quizes: Quiz[];
+  setQuizes: React.Dispatch<React.SetStateAction<Quiz[]>>;
+  getQuizes: () => Promise<void>;
+}
 
-const RunningQuizes: React.FC = () => {
-  const { data: session, status } = useSession();
+const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuizes }) => {
+  
   const { theme } = useTheme();
-  const [quizes, setQuizes] = useState<Quiz[]>([]);
+
   const [quizId, setQuizId] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeQuizIndex, setActiveQuizIndex] = useState<number | null>(null);
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [newQuestion, setNewQuestion] = useState<Question>({
@@ -293,30 +298,8 @@ const RunningQuizes: React.FC = () => {
   const [previewQuestions, setPreviewQuestions] = useState<Question[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [editablePreviewQuestions, setEditablePreviewQuestions] = useState<Question[]>([]);
-
-  const getQuizes = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/quiz-get`);
-      if (response.data.success) {
-        const quizesWithQuestions = response.data.quizzes.map((quiz: Quiz) => ({
-          ...quiz,
-          questions: quiz.questions || [],
-        }));
-        setQuizes(quizesWithQuestions);
-      } else {
-        toast.success("You can start by creating a new quiz");
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    getQuizes();
-  }, [getQuizes]);
+  
+  
 
   const handleAddQuestion = (index: number, quizid: string) => {
     setActiveQuizIndex(index); // Always set to the clicked index
@@ -641,8 +624,17 @@ const RunningQuizes: React.FC = () => {
   const handleShareQuiz = async (quizId:any) => {
     
         // Copy the share link to clipboard
-        const shareLink = `${quizId}`;
+        const shareLink = `https://trackode.in/quiz-play/${quizId}`;
+
         await navigator.clipboard.writeText(shareLink);
+        await navigator.share(
+          {
+          title: "Share Quiz",
+          text: "Check out this quiz!",
+          url: shareLink,
+        }).catch((error) => {
+          console.error("Error sharing the link:", error);
+        })
         setShareLink(shareLink);
         toast.success("Quiz code copied to clipboard!");
      
@@ -650,8 +642,7 @@ const RunningQuizes: React.FC = () => {
   return (
     <Card className={`w-full mx-auto ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-black"}`}>
       <TooltipProvider> 
-        
-        <CardContent>
+        <CardContent className="p-2 sm:p-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"}`}></div>
@@ -661,152 +652,164 @@ const RunningQuizes: React.FC = () => {
               No quizzes available. Create one to get started!
             </div>
           ) : (
-            <Accordion type="single" className="p-1  overflow-auto w-full rounded-lg" collapsible >
+            <Accordion type="single" className="w-full space-y-3" collapsible>
               {quizes.map((quiz, index) => (
-                
-                  <AccordionItem className="border-2  border-blue-400 mb-4 mt-2 p-1 rounded-lg "
-                  key={index} value={`item-${index}`}>
-                  <AccordionTrigger className="  hover:no-underline">
-                    <div className=" p-2  w-full pr-4">
-                      <div className="flex mb-3 items-center justify-between gap-4">
-                        <span className="text-sm font-semibold">{quiz.name}</span>
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`}
+                  className={`border rounded-lg transition-all ${theme === "dark" ? "border-blue-800 bg-gray-800" : "border-blue-200 bg-white"}`}
+                >
+                  <AccordionTrigger className="hover:no-underline px-3 py-2 sm:px-4 sm:py-3">
+                    <div className="flex flex-1 items-center justify-between gap-2">
+                      <div className="flex flex-col items-start overflow-hidden">
+                        <span className="text-sm font-medium sm:text-base truncate max-w-[180px] sm:max-w-xs">
+                          {quiz.name}
+                        </span>
+                        <div className="flex gap-2 mt-1">
+                          <span className="text-xs text-gray-500">
+                            {quiz.questions?.length || 0} questions
+                          </span>
+                          <span className="hidden sm:inline text-xs text-gray-500">
+                            • {new Date(quiz.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
                         <Badge
                           variant={quiz.active ? "outline" : "destructive"}
-                          className={quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700 text-white" : "bg-green-600 text-white hover:bg-green-700") : ""}
+                          className={`text-xs ${quiz.active ? (theme === "dark" ? "bg-green-500 hover:bg-green-700 text-white" : "bg-green-600 text-white hover:bg-green-700") : ""}`}
                         >
                           {quiz.active ? "Active" : "Inactive"}
                         </Badge>
-                        
+                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
                       </div>
-
-                      {/* quiz action button starts here */}
-                      <div className="flex mb-2 items-center justify-between">
-                      <span className="text-xs text-gray-500">
-                          {quiz.questions?.length || 0} questions
-                        </span>
-                        <span className="text-xs text-gray-500">Created on {new Date(quiz.createdAt).toLocaleDateString()}</span>
-                      
-                      </div>
-                      
-                    {/* quiz action button ends here */}
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent>
-                    
+  
+                  <AccordionContent className="px-3 py-2 sm:px-4">
                     <Tabs defaultValue="info" className="w-full">
-                      <TabsList className={`grid w-full grid-cols-2 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
-                        <TabsTrigger value="info">Quiz Settings</TabsTrigger>
-                        <TabsTrigger value="questions">Questions ({quiz.questions?.length || 0})</TabsTrigger>
-                        
+                      <TabsList className={`grid w-full grid-cols-2 ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"} h-10`}>
+                        <TabsTrigger value="info" className="text-xs sm:text-sm py-1">Settings</TabsTrigger>
+                        <TabsTrigger value="questions" className="text-xs sm:text-sm py-1">
+                          Questions ({quiz.questions?.length || 0})
+                        </TabsTrigger>
                       </TabsList>
-                      <TabsContent value="info">
-    <div className="p-4 space-y-6">
-      {/* Quiz action buttons in a grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <Button 
-          onClick={() => handleAddQuestion(index, quiz._id)}
-          className={`${theme === "dark" ? "bg-blue-700 hover:bg-blue-800" : "bg-blue-600 hover:bg-blue-700"} text-white`}
-        >
-          <Plus size={16} className="mr-2" />
-          Add Question
-        </Button>
-        
-        <Button 
-          asChild
-          variant="outline"
-          className={`${theme === "dark" ? "border-blue-700 text-blue-400" : "border-blue-600 text-blue-700"}`}
-        >
-          <Link href={`quiz-result/${quiz._id}`}>
-            <BarChart2 size={16} className="mr-2" />
-            View Results
-          </Link>
-        </Button>
-        
-        <Button 
-          onClick={() => handlePublishQuiz(quiz._id, quiz.active)}
-          className={`${theme === "dark" ? "bg-green-700 hover:bg-green-800" : "bg-green-600 hover:bg-green-700"} text-white`}
-        >
-          <Globe size={16} className="mr-2" />
-         {!quiz.active? 'Publish Quiz' : 'Unpublish Quiz'} 
-        </Button>
-        
-        <Button 
-          asChild
-          variant="outline"
-          className={`${theme === "dark" ? "border-gray-700 text-gray-400" : "border-gray-300 text-gray-700"}`}
-        >
-          <Link href={`admin-dashboard/quiz-settings/${quiz._id}`}>
-            <Pencil size={16} className="mr-2" />
-            Edit Settings
-          </Link>
-        </Button>
-        
-        <Button 
-          onClick={() => handleShareQuiz(quiz._id)}
-          variant="outline"
-          className={`${theme === "dark" ? "border-purple-700 text-purple-400" : "border-purple-600 text-purple-700"}`}
-        >
-          <Share2 size={16} className="mr-2" />
-          Share Quiz
-        </Button>
-        
-        <Button 
-          onClick={() => handleDeleteQuiz(quiz._id)}
-          variant="outline"
-          className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-        >
-          <Trash2 size={16} className="mr-2" />
-          Delete Quiz
-        </Button>
-      </div>
-      
-      
-      {/* Copy link section */}
-      <div className={`p-4 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
-        <h3 className="font-medium mb-3">Share Quiz</h3>
-        <div className="flex gap-2">
-          <Input 
-            value={`${quiz.shareCode}`} 
-            readOnly 
-            className="flex-1 bg-opacity-50"
-          />
-          <Button variant="outline" onClick={() => handleShareQuiz(quiz.shareCode)} >
-            <Copy size={16} className="mr-2" /> Copy
-          </Button>
-        </div>
-      </div>
-    </div>
-  </TabsContent>
-                      
-                      <TabsContent value="questions">
-                      <div className="mb-6 p-4 rounded-lg bg-opacity-50" style={{ backgroundColor: theme === "dark" ? "rgba(59, 130, 246, 0.1)" : "rgba(59, 130, 246, 0.05)" }}>
-                      <h4 className="font-medium mb-3">Bulk Generate Questions</h4>
-                      <div className="flex items-center gap-4">
-                        <Input
-                          type="number"
-                          value={bulkQuestionCount}
-                          onChange={(e) => setBulkQuestionCount(Number(e.target.value))}
-                          placeholder="Number of questions"
-                          className="w-32"
-                          min={1}
-                          max={20}
-                        />
-                        <Button
-                          onClick={() => handleGenerateBulkQuestions(index, quiz._id)}
-                          disabled={isGeneratingBulkQuestions}
-                          className="flex bg-green-600 text-white hover:bg-green-700 items-center gap-2"
-                        >
-                          {isGeneratingBulkQuestions ? (
-                            <>
-                              <Loader2 className="animate-spin" />
-                              <span>Generating ✨</span>
-                            </>
-                          ) : (
-                            <>Generate {bulkQuestionCount} Questions</>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
+  
+                      {/* Settings Tab */}
+                      <TabsContent value="info" className="mt-3">
+                        <div className="space-y-3">
+                          {/* Action Buttons Grid */}
+                          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
+                            <Button 
+                              onClick={() => handleAddQuestion(index, quiz._id)}
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "bg-blue-700 hover:bg-blue-800" : "bg-blue-600 hover:bg-blue-700"} text-white`}
+                            >
+                              <Plus size={14} className="mr-1 sm:mr-2" />
+                              Add
+                            </Button>
+                            
+                            <Button 
+                              asChild
+                              variant="outline"
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "border-blue-700 text-blue-400" : "border-blue-600 text-blue-700"}`}
+                            >
+                              <Link href={`quiz-result/${quiz._id}`}>
+                                <BarChart2 size={14} className="mr-1 sm:mr-2" />
+                                Results
+                              </Link>
+                            </Button>
+                            
+                            <Button 
+                              onClick={() => handlePublishQuiz(quiz._id, quiz.active)}
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "bg-green-700 hover:bg-green-800" : "bg-green-600 hover:bg-green-700"} text-white`}
+                            >
+                              <Globe size={14} className="mr-1 sm:mr-2" />
+                              {!quiz.active ? 'Publish' : 'Unpublish'}
+                            </Button>
+                            
+                            <Button 
+                              asChild
+                              variant="outline"
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "border-gray-700 text-gray-400" : "border-gray-300 text-gray-700"}`}
+                            >
+                              <Link href={`admin-dashboard/quiz-settings/${quiz._id}`}>
+                                <Pencil size={14} className="mr-1 sm:mr-2" />
+                                Settings
+                              </Link>
+                            </Button>
+                            
+                            <Button 
+                              onClick={() => handleShareQuiz(quiz._id)}
+                              variant="outline"
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "border-purple-700 text-purple-400" : "border-purple-600 text-purple-700"}`}
+                            >
+                              <Share2 size={14} className="mr-1 sm:mr-2" />
+                              Share
+                            </Button>
+                            
+                            <Button 
+                              onClick={() => handleDeleteQuiz(quiz._id)}
+                              variant="outline"
+                              className="text-xs sm:text-sm h-8 border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                            >
+                              <Trash2 size={14} className="mr-1 sm:mr-2" />
+                              Delete
+                            </Button>
+                          </div>
+  
+                          {/* Share Section */}
+                          <div className={`p-3 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"}`}>
+                            <h3 className="font-medium text-sm mb-2">Share Quiz</h3>
+                            <div className="flex gap-2">
+                              <Input 
+                                value={`${quiz.shareCode}`} 
+                                readOnly 
+                                className="flex-1 h-8 text-xs sm:text-sm"
+                              />
+                              <Button 
+                                variant="outline" 
+                                onClick={() => handleShareQuiz(quiz.shareCode)}
+                                className="h-8 px-2"
+                              >
+                                <Copy size={14} className="mr-1 sm:mr-2" />
+                                <span className="hidden sm:inline">Copy</span>
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </TabsContent>
+  
+                      {/* Questions Tab */}
+                      <TabsContent value="questions" className="mt-3">
+                        <div className={`mb-4 p-3 rounded-lg ${theme === "dark" ? "bg-gray-700" : "bg-gray-100"}`}>
+                          <h4 className="font-medium text-sm mb-2">Bulk Generate Questions</h4>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="number"
+                              value={bulkQuestionCount}
+                              onChange={(e) => setBulkQuestionCount(Number(e.target.value))}
+                              placeholder="Number"
+                              className="w-20 h-8 text-xs sm:text-sm"
+                              min={1}
+                              max={20}
+                            />
+                            <Button
+                              onClick={() => handleGenerateBulkQuestions(index, quiz._id)}
+                              disabled={isGeneratingBulkQuestions}
+                              className="flex-1 h-8 text-xs sm:text-sm bg-green-600 text-white hover:bg-green-700"
+                            >
+                              {isGeneratingBulkQuestions ? (
+                                <>
+                                  <Loader2 className="animate-spin h-4 w-4 mr-1" />
+                                  <span>Generating</span>
+                                </>
+                              ) : (
+                                <>Generate {bulkQuestionCount}</>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+  
                         {quiz.questions && quiz.questions.length > 0 ? (
                           <div className="mt-4 space-y-4">
                             {quiz.questions.map((q, qIndex) => (
@@ -894,19 +897,16 @@ const RunningQuizes: React.FC = () => {
                             ))}
                           </div>
                         ) : (
-                          <div className={`mt-4 p-8 text-center rounded-lg ${theme === "dark" ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}>
-                            <FileQuestion size={24} className="mx-auto mb-2" />
-                            <p>No questions yet</p>
-                            <p className="text-sm mt-1">Add your first question to get started</p>
+                          <div className={`p-6 text-center rounded-lg ${theme === "dark" ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-500"}`}>
+                            <FileQuestion size={20} className="mx-auto mb-2" />
+                            <p className="text-sm">No questions yet</p>
+                            <p className="text-xs mt-1">Add your first question to get started</p>
                           </div>
                         )}
                       </TabsContent>
-                      
-                      
                     </Tabs>
-                    {/* Action Dropdown */}
-                    
-                    {/* Question Form - Rendered outside Tabs */}
+  
+                    {/* Question Form */}
                     {activeQuizIndex === index && !editingQuestionId && (
                       <QuestionForm
                         newQuestion={newQuestion}
@@ -914,17 +914,16 @@ const RunningQuizes: React.FC = () => {
                         onSubmit={handleSubmitQuestion}
                         onCancel={() => setActiveQuizIndex(null)}
                         theme={theme}
+                        className="mt-3"
                       />
                     )}
                   </AccordionContent>
                 </AccordionItem>
-               
-                
               ))}
             </Accordion>
           )}
         </CardContent>
-
+  
         {/* Preview Modal */}
         {showPreview && (
           <PreviewModal

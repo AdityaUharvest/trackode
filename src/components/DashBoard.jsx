@@ -1,21 +1,23 @@
 'use client';
 import { useTheme } from '@/components/ThemeContext';
-import Quizes from './Quizes';
-import ProfileLeftCard from './ProfileLeftCard';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useEffect, useState,useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import MockDashboard from './Mock';
 import { Loader2 } from 'lucide-react';
+import Quizes from './Quizes';
 
 // Key for localStorage
 const DASHBOARD_TAB_KEY = 'dashboard-active-tab';
 
 export default function DashBoard() {
-  const [quizes, setQuizes] = useState([]);
+  const [quizzes, setQuizzes] = useState([]);
   const [participants, setParticipants] = useState([]);
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [mockTests, setMockTests] = useState([]);
+  const [attempts, setAttempts] = useState([]);
+  const [stats, setStats] = useState(null);
   const [activeTab, setActiveTab] = useState(() => {
     // Initialize from localStorage if available
     if (typeof window !== 'undefined') {
@@ -27,10 +29,10 @@ export default function DashBoard() {
   const { theme, toggleTheme } = useTheme();
 
   // Calculate stats
-  const activeQuizes = quizes.filter(quiz => quiz.active).length;
+  const activeQuizes = quizzes.filter(quiz => quiz.active).length;
   const totalmarks = participants.reduce((sum, participant) => sum + (participant.correctAnswers / participant.totalQuestions * 100), 0);
   
-  const participationData = quizes.map(quiz => ({
+  const participationData = quizzes.map(quiz => ({
     name: quiz.name,
     participants: participants.filter(p => p.quiz._id === quiz._id).length
   }));
@@ -43,7 +45,7 @@ export default function DashBoard() {
   }));
 
   const quizStats = {
-    totalQuizzes: quizes.length,
+    totalQuizzes: quizzes.length,
     activeQuizzes: activeQuizes,
     totalParticipants: participants.length,
     totalParticipantsInRecentQuizzes: recent.length,
@@ -55,7 +57,7 @@ export default function DashBoard() {
     try {
       setLoading(true);
       const response = await axios.get('/api/quiz-get');
-      setQuizes(response.data.quizzes);
+      setQuizzes(response.data.quizzes);
       setParticipants(response.data.participants);
       setRecent(response.data.recentParticipants);
     } catch (error) {
@@ -64,7 +66,39 @@ export default function DashBoard() {
       setLoading(false);
     }
   }
-
+  //for mocks
+  useEffect(() => {
+      const fetchData = async () => {
+        setIsLoading(true);
+        try {
+          const [mocksRes, attemptsRes, statsRes] = await Promise.all([
+            fetch('/api/mock-tests/dashboard?creator=true'),
+            fetch('/api/mock-tests/dashboard/attempts'),
+            fetch('/api/mock-tests/dashboard/stats')
+          ]);
+          
+          const [mocksData, attemptsData, statsData] = await Promise.all([
+            mocksRes.json(),
+            attemptsRes.json(),
+            statsRes.json()
+          ]);
+          
+          setMockTests(mocksData);
+          setAttempts(attemptsData);
+          setStats(statsData);
+        } catch (error) {
+          console.error('Error fetching dashboard data:', error);
+          toast.error('Failed to load dashboard data');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+  
+     
+        fetchData();
+      
+    }, []);
+  
   // Memoize the fetchQuiz function to prevent unnecessary recreations
   useEffect(() => {
     fetchQuiz();
@@ -77,6 +111,34 @@ export default function DashBoard() {
     }
   }, [activeTab]);
 
+
+
+  const [quizes, setQuizes] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const API_BASE_URL = "/api"; // Adjust the base URL as needed
+    const getQuizes = useCallback(async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`${API_BASE_URL}/quiz-get`);
+        if (response.data.success) {
+          const quizesWithQuestions = response.data.quizzes.map((quiz) => ({
+            ...quiz,
+            questions: quiz.questions || [],
+          }));
+          setQuizes(quizesWithQuestions);
+        } else {
+          toast.success("You can start by creating a new quiz");
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }, []);
+    useEffect(() => {
+      getQuizes();
+    }, [getQuizes]);
+    console.log(quizes);
   const StatCard = ({ title, value, trend, theme }) => (
     <div className={`p-3 rounded-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} shadow`}>
       <h3 className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>{title}</h3>
@@ -227,10 +289,7 @@ export default function DashBoard() {
       {/* Main Content */}
       <div className={`flex-1 p-3 ${sidebarCollapsed ? 'md:ml-2' : 'md:ml-2'} transition-all duration-200`}>
         {/* Profile Card at top for mobile */}
-        <div className="md:hidden overflow-hidden mb-4">
-          <ProfileLeftCard />
-        </div>
-
+        
         {activeTab === 'dashboard' && (
           <div className="space-y-4">
             <h1 className="text-lg font-medium">Dashboard</h1>
@@ -299,7 +358,7 @@ export default function DashBoard() {
 
         {activeTab === 'quizzes' && (
           <div>
-            <Quizes />
+            <Quizes quizes={quizes} setQuizes={setQuizes} getQuizes={getQuizes} />
           </div>
         )}
 
@@ -310,7 +369,7 @@ export default function DashBoard() {
                 <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
               </div>
             ) : (
-              <MockDashboard />
+              <MockDashboard mockTests={mockTests} stats={stats} attempts={attempts} setAttempts={setAttempts} setMockTests={mockTests} setStats={setStats} />
             )}
           </div>
         )}

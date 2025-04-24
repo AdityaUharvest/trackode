@@ -77,8 +77,8 @@ export default function HomePage() {
         
 
         {/* Main heading */}
-        <div className=" lg:text-left">
-        <div className="flex justify-center lg:ml-32 mb-2">
+        <div className="mt-10 lg:text-left">
+        <div className="flex justify-center lg:ml-32 mb-5">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900">
             <span className="animate-pulse h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-400"></span>
             <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -88,7 +88,7 @@ export default function HomePage() {
         </div>
           <h1
             id="hero-heading"
-            className="text-4xl font-bold leading-tight sm:text-3xl lg:text-5xl"
+            className="text-4xl font-bold leading-tight sm:text-2xl lg:text-5xl"
           >
             <div className="flex justify-center lg:justify-start items-center mb-4">
               <span className="text-blue-600 mr-2">
@@ -131,15 +131,9 @@ export default function HomePage() {
             </div>
           </h1>
           
-          <div className="mt-2 w-full  ">
-  <GradientText
-    colors={["#40ffaa", "#4079ff"]}
-    align="left" // or "left" for lg screens if needed
-    className="text-base  sm:text-base text-center font-semibold leading-tight"
-  >
-    Navigate Your Journey of Success with Trackode
-  </GradientText>
-</div>
+            <div className="mt-2 lg:text-left text-center w-full bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent font-extrabold text-xl">
+            Navigate Your Journey of Success with Trackode
+            </div>
           
           
         </div>
@@ -284,7 +278,7 @@ export default function HomePage() {
         <section className={`py-10 feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+              <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">
                 Why Choose <span className="text-blue-600">Trackode Quizzes</span>
               </h1>
               <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">
@@ -301,7 +295,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">AI Powered Quiz Generation</h1>
+                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">AI Powered Quiz Generation</h1>
                 <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
                   Generate quizzes tailored to your learning needs using our AI-driven platform.
                 </p>
@@ -315,7 +309,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Interactive Challenges</h1>
+                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">Interactive Challenges</h1>
                 <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
                   Hands-on coding exercises with real-time feedback to improve your skills efficiently.
                 </p>
@@ -330,7 +324,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Progress Tracking</h1>
+                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">Progress Tracking</h1>
                 <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
                   Monitor your growth with detailed analytics and personalized skill assessments.
                 </p>
@@ -345,7 +339,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-xl font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h1>
+                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h1>
                 <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
                   Detailed dashboard for student with leaderboard and result analysis, AI based personlaized feedback.
                 </p>
@@ -356,10 +350,10 @@ export default function HomePage() {
         {/* How it Works Section with Card Hover Effects */}
         <section className={`py-15 mb-0 ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`} aria-labelledby="features-heading">
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-10">
+            <div className="max-w-3xl mx-auto text-center mb-5">
 
 
-              <h2 id="features-heading" className={`text-2xl font-bold tracking-tight sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              <h2 id="features-heading" className={`text-lg font-bold tracking-tight sm:text-2xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 How Trackode Works
               </h2>
               <span className={`inline-block mt-1 px-4 py-1 rounded-full text-sm font-semibold mb-2 ${theme === "dark" ? "bg-gray-700 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
@@ -397,7 +391,7 @@ export default function HomePage() {
                   <div className="relative">
                     <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-blue-300" : "text-blue-600"
                       }`}>1</span>
-                    <h3 className={`text-xl font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
+                    <h3 className={`text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
                       }`}>Create Your Quiz</h3>
                   </div>
 
@@ -433,7 +427,7 @@ export default function HomePage() {
                   <div className="relative">
                     <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-purple-300" : "text-purple-600"
                       }`}>2</span>
-                    <h3 className={`text-xl font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
+                    <h3 className={`text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
                       }`}>Host it Live</h3>
                   </div>
 
@@ -469,7 +463,7 @@ export default function HomePage() {
                   <div className="relative">
                     <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-green-300" : "text-green-600"
                       }`}>3</span>
-                    <h3 className={`text-xl font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
+                    <h3 className={`text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
                       }`}>Real-time Leaderboard</h3>
                   </div>
 
@@ -502,13 +496,13 @@ export default function HomePage() {
               </div>
 
               {/* Content */}
-              <div className="relative px-6 py-16 text-center sm:py-20 sm:px-16">
+              <div className="relative px-6 py-12 text-center sm:py-12 sm:px-16">
                 <div className="inline-flex items-center px-4 py-1 mb-6 rounded-full bg-white bg-opacity-20 text-white text-sm font-medium">
                   <span className="w-2 h-2 mr-2 rounded-full bg-green-400 animate-pulse"></span>
                   Boost Your Skills
                 </div>
 
-                <h2 id="cta-heading" className="text-2xl font-bold text-white sm:text-3xl max-w-2xl mx-auto leading-tight">
+                <h2 id="cta-heading" className="text-lg font-bold text-white sm:text-2xl max-w-2xl mx-auto leading-tight">
                   Ready to accelerate your coding journey?
                 </h2>
 
@@ -541,25 +535,25 @@ export default function HomePage() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-6 mx-auto mt-12 lg:grid-cols-5  max-w-3xl">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">4+</div>
+                    <div className="text-lg font-bold text-white">4+</div>
                     <div className="mt-1 text-blue-200">Active Mocks</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">525</div>
+                    <div className="text-lg font-bold text-white">525</div>
                     <div className="mt-1 text-blue-200">Active Developers</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">120+</div>
+                    <div className="text-lg font-bold text-white">120+</div>
                     <div className="mt-1 text-blue-200">Coding Challenges</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-white">25+</div>
+                    <div className="text-lg font-bold text-white">25+</div>
                     <div className="mt-1 text-blue-200">Tech Stacks</div>
                   </div>
                   <Link href="devblogger.in" className="text-center">
 
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-white">100+ blogs</div>
+                      <div className="text-lg font-bold text-white">100+ blogs</div>
                       <div className="mt-1 text-blue-200">Blogs</div>
                     </div>
                   </Link>
@@ -571,12 +565,12 @@ export default function HomePage() {
         </section>
 
         {/* Technologies Section with Animation */}
-        <section id="technology" className={`py-12 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
+        <section id="technology" className={`py-8 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
           <div className="px-4 mx-auto max-w-7xl sm:px-5 lg:px-8">
             <TechStackQuizSystem />
 
 
-            <div className="flex mt-10 flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex mt-5 flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/quiz-list"
                 className={`group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base font-bold transition-all duration-300 rounded-xl shadow-md ${theme === "dark"
@@ -611,7 +605,7 @@ export default function HomePage() {
               </Link>
 
               <Link
-                href="/premium-mock-tests"
+                href="/mocks"
                 className="group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base font-bold transition-all duration-300 rounded-xl shadow-md bg-green-600 hover:bg-green-700 text-white"
                 role="button"
                 aria-label="Access premium coding mock tests"
@@ -631,19 +625,7 @@ export default function HomePage() {
           </div>
 
         </section>
-        <section  className={`text-center mt-7 mb-5 p-2 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
-        <h2 className={`text-2xl font-bold mb-4 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`}>
-          Your Favorite Coding Platform
-          <span className="inline-block ml-2 relative">
-            <span className="absolute inset-0 bg-blue-200 dark:bg-blue-900 opacity-30 rounded transform -rotate-2"></span>
-            <span className="relative">⭐</span>
-          </span>
-        </h2>
-
-        <p className={`mt-4 text-xl font-medium ${theme === "dark" ? "text-blue-200" : "text-blue-800"}`}>
-          Effortless coding practice & contests with Trackode
-        </p>
-        </section>
+        
         {/* Final CTA Section */}
         
         <section id="faq" className={` ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>

@@ -1,46 +1,41 @@
 "use client";
 import React, { useState } from "react";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Link from "next/link";
-import PastQuizes from "./PastQuizes";
 import RunningQuizes from "./RunningQuizes";
 import { useTheme } from "./ThemeContext"; // Adjust the import path as necessary
-import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen, ChevronDown } from "lucide-react";
+import { Plus, Settings, Save, X, Edit, Trash2, Check, NotebookPen, ChevronDown, Loader2 } from "lucide-react";
 import { Button } from "./ui/button";
+interface Quiz {
+  _id: string;
+  name: string;
+  active: boolean;
+  questions?: Question[];
+  createdAt: string;
+  public?: boolean;
+  randomize?: boolean;
+  shareCode:String;
+  isPublished?: boolean;
+}
+interface Question {
+  _id?: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  imageUrl?: string;
+}
 
-export default function Quizes() {
+export default function Quizes({ quizes,setQuizes,getQuizes }: { quizes: Quiz[]; setQuizes: React.Dispatch<React.SetStateAction<Quiz[]>>; getQuizes: () => Promise<void>; }) {
   const [isOpen, setIsOpen] = useState(false);
   const { theme } = useTheme(); // Use the theme context
-
-  const toggleDropdown = () => setIsOpen(!isOpen);
-
-  // Determine the background colors based on the theme
-  const buttonBgColor = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
-  const dropdownBgColor = theme === "dark" ? "bg-gray-900" : "bg-gray-50";
-  const buttonHoverBgColor = theme === "dark" ? "hover:bg-gray-900" : "hover:bg-amber-50";
-  const dropdownBorderColor = theme === "dark" ? "border-gray-700" : "border-amber-50";
-
+  
+   // Adjust the base URL as neede
   return (
-    <div>
-      {/* Replace the outer <button> with a <div> */}
-      <div
-        className={`w-full ${buttonBgColor} ${buttonHoverBgColor} text-${theme === "dark" ? "white" : "black"} px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-900`}
-        role="button" // Make it accessible
-        tabIndex={0} // Make it focusable
-        onClick={toggleDropdown} // Add the click handler here
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            toggleDropdown();
-          }
-        }} // Handle keyboard events
-      >
-        <div className="flex items-center gap-2">
+    <div className={`flex flex-col gap-4 p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+      <div className="flex justify-between items-center">
+        {/* Replace the outer <button> with a <div> */}
+        <div className={`flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>
           <span className="text-sm font-semibold">My Quiz</span>
-          <ChevronDown
-            size={20}
-            className={`transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-          />
         </div>
         <div className="flex flex-row lg:gap-2 sm:gap-1">
           <Link href="/quiz-setup">
@@ -56,14 +51,9 @@ export default function Quizes() {
           </Link>
         </div>
       </div>
-
-      {/* Dropdown Content */}
-      {isOpen && (
-        <div className={`right-0 ${dropdownBgColor} text-${theme === "dark" ? "white" : "black"} mt-2 p-0 rounded-sm shadow-lg border ${dropdownBorderColor}`}>
-          <RunningQuizes />
-          {/* <PastQuizes /> */}
-        </div>
-      )}
+      <RunningQuizes quizes={quizes} setQuizes={setQuizes} getQuizes={getQuizes}/>
+      
     </div>
   );
 }
+    

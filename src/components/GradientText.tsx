@@ -15,7 +15,7 @@ export default function GradientText({
     colors = ["#ffaa40", "#9c40ff", "#ffaa40"],
     animationSpeed = 8,
     showBorder = false,
-    align = 'center', // Default alignment
+    align = 'left', // Default alignment
 }: GradientTextProps) {
     const gradientStyle = {
         backgroundImage: `linear-gradient(to right, ${colors.join(", ")})`,

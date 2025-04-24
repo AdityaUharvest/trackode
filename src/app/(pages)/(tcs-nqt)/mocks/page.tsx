@@ -79,7 +79,7 @@ export default function MockTestsList() {
       <div className="flex items-center justify-center h-64">
         <div className="animate-pulse flex flex-col items-center">
           <div className="h-8 w-8 bg-blue-500 rounded-full mb-2"></div>
-          <div className="text-lg font-medium text-gray-600">Loading mock tests...</div>
+          <div className="text-sm font-medium text-gray-600">Loading mock tests...</div>
         </div>
       </div>
     );
@@ -88,7 +88,7 @@ export default function MockTestsList() {
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg font-medium text-red-600">
+        <div className="text-sm font-medium text-red-600">
           Error: {error}
           <button 
             onClick={() => window.location.reload()}
@@ -113,7 +113,7 @@ export default function MockTestsList() {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-xl md:text-2xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
           TCS Mock Tests
         </h1>
         <p className="text-gray-600 max-w-2xl mx-auto">
@@ -152,7 +152,7 @@ export default function MockTestsList() {
       
       {filteredTests.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 text-lg mb-4">No mock tests found</div>
+          <div className="text-gray-500 text-sm mb-4">No mock tests found</div>
           <button 
             onClick={() => {
               setSearchTerm('');
@@ -172,7 +172,7 @@ export default function MockTestsList() {
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold text-gray-800">{mock.title}</h2>
+                  <h2 className="text-sm font-semibold text-gray-800">{mock.title}</h2>
                   <span className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(mock.difficulty || '')}`}>
                     {mock.difficulty}
                   </span>

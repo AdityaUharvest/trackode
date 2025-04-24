@@ -96,16 +96,16 @@ export default function Faq() {
   const categories = Array.from(new Set(faqItems.map(item => item.category)));
 
   return (
-    <div className="py-10">
+    <div className="py-5">
       <div
-        className={`rounded-3xl px-8 py-16 max-w-6xl mx-auto shadow-xl ${
+        className={`rounded-3xl px-5 py-8 max-w-6xl mx-auto shadow-xl ${
           theme === "dark" 
             ? "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700" 
             : "bg-gradient-to-br from-white to-gray-50 border border-gray-100"
         }`}
       >
         {/* Header Section */}
-        <div className="text-center mb-5">
+        <div className="text-center mb-2">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -119,14 +119,14 @@ export default function Faq() {
               Trackode Support Center
             </p>
             <h2
-              className={`text-2xl md:text-2xl font-extrabold mb-4 ${
+              className={`text-xl md:text-xl font-extrabold mb-4 ${
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
               Frequently Asked Questions
             </h2>
             <p
-              className={`max-w-2xl mx-auto text-lg ${
+              className={`max-w-2xl mx-auto text-sm ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
@@ -136,10 +136,10 @@ export default function Faq() {
         </div>
 
         {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-12">
+        <div className="max-w-2xl mx-auto mb-2">
           <div
             className={`flex items-center p-3 rounded-lg ${
-              theme === "dark" ? "bg-gray-800 border border-gray-700" : "bg-white border border-gray-200"
+              theme === "dark" ? "bg-gray-800  border-gray-700" : "bg-white "
             }`}
           >
             <svg
@@ -192,7 +192,7 @@ export default function Faq() {
         </div>
 
         {/* Category Tabs (simplified version) */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        <div className="flex flex-wrap justify-center gap-2 mb-5">
           <button
             onClick={() => setFilteredItems(faqItems)}
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
@@ -221,7 +221,7 @@ export default function Faq() {
         {/* FAQ List */}
         <div className="max-w-4xl mx-auto">
           {searchTerm && filteredItems.length === 0 ? (
-            <div className="text-center py-10">
+            <div className="text-center py-5">
               <svg
                 className={`w-16 h-16 mx-auto mb-4 ${
                   theme === "dark" ? "text-gray-600" : "text-gray-400"
@@ -272,7 +272,7 @@ export default function Faq() {
                     aria-expanded={openIndex === index ? "true" : "false"}
                     onClick={() => toggleFAQ(index)}
                   >
-                    <span className={`flex-1 font-medium text-lg ${
+                    <span className={`flex-1 font-medium text-sm ${
                       openIndex === index 
                         ? theme === "dark" ? "text-blue-400" : "text-blue-600" 
                         : ""
@@ -340,7 +340,7 @@ export default function Faq() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-16 text-center">
+        <div className="mt-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -352,7 +352,7 @@ export default function Faq() {
             }`}
           >
             <h3
-              className={`text-xl font-bold mb-2 ${
+              className={`text-lg font-bold mb-2 ${
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >

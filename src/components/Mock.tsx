@@ -41,7 +41,7 @@ type UserStats = {
   recentActivity: { date: Date; count: number }[];
 };
 const DASHBOARD_TAB_KEY = 'overview-active-tab';
-export default function Dashboard() {
+export default function Dashboard({mockTests, setMockTests, attempts, setAttempts, stats, setStats}: {mockTests: MockTest[]; setMockTests: React.Dispatch<React.SetStateAction<MockTest[]>>; attempts: Attempt[]; setAttempts: React.Dispatch<React.SetStateAction<Attempt[]>>; stats: UserStats | null; setStats: React.Dispatch<React.SetStateAction<UserStats | null>>}) { 
   const { theme } = useTheme();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState(() => {
@@ -51,9 +51,7 @@ export default function Dashboard() {
     }
     return 'overview';
   });
-  const [mockTests, setMockTests] = useState<MockTest[]>([]);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [stats, setStats] = useState<UserStats | null>(null);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   
@@ -81,45 +79,9 @@ export default function Dashboard() {
       localStorage.setItem(DASHBOARD_TAB_KEY, activeTab);
     }
   }, [activeTab]);
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [mocksRes, attemptsRes, statsRes] = await Promise.all([
-          fetch('/api/mock-tests/dashboard?creator=true'),
-          fetch('/api/mock-tests/dashboard/attempts'),
-          fetch('/api/mock-tests/dashboard/stats')
-        ]);
-        
-        const [mocksData, attemptsData, statsData] = await Promise.all([
-          mocksRes.json(),
-          attemptsRes.json(),
-          statsRes.json()
-        ]);
-        
-        setMockTests(mocksData);
-        setAttempts(attemptsData);
-        setStats(statsData);
-      } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        toast.error('Failed to load dashboard data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+ 
 
-    if (session) {
-      fetchData();
-    }
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className={`flex items-center justify-center min-h-screen ${bgColor}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
+  
   
   return (
     <div className={`min-h-screen ${bgColor}`}>

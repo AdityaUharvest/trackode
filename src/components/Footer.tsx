@@ -15,7 +15,7 @@ export default function Footer() {
     }`}>
       {/* Main Footer Content */}
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
           {/* Company Info Column */}
           <div className="flex flex-col">
             <div className="mb-6 flex flex-col items-center md:items-start">
@@ -28,9 +28,7 @@ export default function Footer() {
                   alt="Trackode Logo"
                 />
               </div>
-              <h1 className={`mt-4 text-lg font-bold ${
-                theme === "dark" ? "text-white" : "text-gray-800"
-              }`}>Trackode</h1>
+              
               <p className="mt-2 text-sm opacity-75 max-w-xs text-center md:text-left">
                 Enhancing coding skills through interactive challenges, competitions, and personalized learning paths.
               </p>
@@ -251,64 +249,7 @@ export default function Footer() {
           </div>
           
           {/* Newsletter Column */}
-          <div>
-            <h3 className={`text-lg font-bold mb-6 ${
-              theme === "dark" ? "text-white" : "text-gray-800"
-            }`}>Newsletter</h3>
-            <p className="text-sm mb-6 opacity-75">
-              Subscribe to our newsletter to get the latest updates on new features, coding challenges, and special offers.
-            </p>
-            <form className="flex flex-col">
-              <div className={`flex flex-col sm:flex-row mb-3 ${
-                theme === "dark" ? "bg-gray-800" : "bg-white"
-              } rounded-lg overflow-hidden p-1`}>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className={`flex-grow p-1 text-sm outline-none border-none ${
-                    theme === "dark" ? "bg-gray-800 text-white" : "bg-white text-gray-800"
-                  }`}
-                  required
-                />
-                <button
-                  type="submit"
-                  className={`mt-2 sm:mt-0 py-2 px-4 rounded-md text-sm font-medium ${
-                    theme === "dark" 
-                      ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                      : "bg-blue-600 hover:bg-blue-700 text-white"
-                  }`}
-                >
-                  Subscribe
-                </button>
-              </div>
-              <p className="text-xs mt-2 opacity-75">We respect your privacy. No spam, ever.</p>
-            </form>
-            
-            {/* Account Links */}
-            <div className="mt-4">
-              <h4 className={`text-base font-semibold mb-4 ${
-                theme === "dark" ? "text-white" : "text-gray-800"
-              }`}>Account</h4>
-              <div className="flex flex-wrap gap-3">
-                <Link 
-                  href="/signin" 
-                  className={`text-sm px-4 py-2 rounded-full transition-all ${
-                    theme === "dark" 
-                      ? "bg-gray-800 hover:bg-gray-700" 
-                      : "bg-white hover:bg-gray-100 border border-gray-200"
-                  }`}
-                >
-                  Sign In
-                </Link>
-                <Link 
-                  href="/signup" 
-                  className="text-sm px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-all"
-                >
-                  Join Us
-                </Link>
-              </div>
-            </div>
-          </div>
+         
         </div>
         
         {/* Secondary Footer */}
@@ -316,7 +257,7 @@ export default function Footer() {
           theme === "dark" ? "border-gray-800" : "border-gray-200"
         }`}>
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
+            <div className="mb-2 md:mb-0">
               <ul className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2">
                 <li>
                   <Link href="/terms" className="text-xs hover:underline">
