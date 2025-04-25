@@ -71,23 +71,17 @@ const Navbar: React.FC = () => {
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
               src="https://i.ibb.co/jvr3wb6b/trackode.png" 
-              className="h-9 rounded-lg"
+              className="h-8 rounded-lg"
               alt="Trackode Logo"
             />
-            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 text-2xl font-bold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
+            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 lg:text-2xl text-xl font-bold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
               Trackode
             </span>
           </Link>
 
           <div className="flex items-center md:order-2 space-x-4 rtl:space-x-reverse">
             {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${theme === "light" ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-800 hover:bg-gray-700"}`}
-              aria-label="Toggle theme"
-            >
-              {theme === "light" ? <Moon size={18} className="text-gray-700" /> : <Sun size={18} className="text-yellow-300" />}
-            </button>
+            
 
             {/* Profile button */}
             {status === "authenticated" ? (
@@ -191,7 +185,7 @@ const Navbar: React.FC = () => {
               isNavOpen ? "block" : "hidden"
             }`}
           >
-            <ul className={`flex flex-col font-medium p-4 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
+            <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
               <NavItem href="/premium-mock-tests" theme={theme} icon={<BookOpen size={18} />}>
                 Mock Test
               </NavItem>
@@ -208,9 +202,14 @@ const Navbar: React.FC = () => {
               >
                 Quiz Tracker
               </NavItem>
-              <NavItem href="/contact" theme={theme} icon={<MessageSquare size={18} />}>
-                Contact
-              </NavItem>
+              <button
+              onClick={toggleTheme}
+              className={`flex justify-center p-2 rounded-full transition-all duration-300 hover:scale-20 ${theme === "light" ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-800 hover:bg-gray-700"}`}
+              aria-label="Toggle theme"
+            >
+              {theme === "light" ? <Moon size={22} className="text-gray-700" /> : <Sun size={22} className="text-yellow-300" />}
+            </button>
+              
             </ul>
           </div>
         </div>

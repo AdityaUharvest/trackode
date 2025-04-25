@@ -80,7 +80,7 @@ export default function HomePage() {
         </div>
 
         {/* Main heading with gradient and animation */}
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-3xl lg:text-6xl">
+        <h1 className="text-2xl font-extrabold tracking-tight sm:text-2xl lg:text-6xl">
           <span className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
             Master Coding Through
           </span>
@@ -98,10 +98,10 @@ export default function HomePage() {
         </p>
 
         {/* CTA buttons */}
-        <div className="flex flex-col items-center mt-10 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 lg:justify-start">
+        <div className="flex flex-col items-center mt-10 space-y-4 sm:flex-row sm:space-y-0 sm:space-x-7 lg:justify-start">
           <Link
             href="/dashboard"
-            className="relative px-8 py-4 text-base font-bold text-white transition-all duration-300 transform bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 group"
+            className="relative px-2 py-4 w-full flex justify-center text-base font-bold text-white transition-all duration-300 transform bg-blue-600 rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:scale-105 group"
           >
             <span className="relative z-10">Get Started for Free</span>
             <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -109,7 +109,7 @@ export default function HomePage() {
 
           <Link
             href="/admin-dashboard"
-            className={`flex items-center px-6 py-4 text-base font-medium transition-all duration-300 transform rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${theme === "dark" ? "text-white border border-gray-700 hover:bg-gray-800 focus:ring-gray-500" : "text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300"}`}
+            className={`items-center flex justify-center w-full px-2 py-4 text-base font-medium transition-all duration-300 transform rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 hover:scale-105 ${theme === "dark" ? "text-white border border-gray-700 hover:bg-gray-800 focus:ring-gray-500" : "text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-300"}`}
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>

@@ -94,7 +94,7 @@ export default function SignUp() {
 
   const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!email || !password || !name) {
       toast.error("Please fill all required fields");
       return;
@@ -106,7 +106,7 @@ export default function SignUp() {
     }
 
     setIsLoading(true);
-    
+
     try {
       const response = await axios.post("api/user/signup", { email, password, name });
 
@@ -117,8 +117,8 @@ export default function SignUp() {
         toast.error(response.data.message || "User already exists");
         router.push("/signin");
 
-      } 
-      else if( response.data.message === "OTP already sent ! Failed to send OTP") {
+      }
+      else if (response.data.message === "OTP already sent ! Failed to send OTP") {
         toast.error("OTP already sent! Please check your email.");
       }
       else {
@@ -184,11 +184,10 @@ export default function SignUp() {
                         type="text"
                         autoComplete="name"
                         required
-                        className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${
-                          theme === "dark"
+                        className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                             : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                         placeholder="John Doe"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -211,13 +210,11 @@ export default function SignUp() {
                           type="email"
                           autoComplete="email"
                           required
-                          className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${
-                            theme === "dark"
+                          className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${theme === "dark"
                               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                               : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            otpVerified ? "border-green-500" : ""
-                          }`}
+                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${otpVerified ? "border-green-500" : ""
+                            }`}
                           placeholder="you@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
@@ -230,19 +227,18 @@ export default function SignUp() {
                         )}
                       </div>
                       {!otpVerified && (
-          <button
-            type="button"
-            onClick={sendOtp}
-            disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email) || countdown > 0}
-            className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-              otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
-            }`}
-          >
-            {otpLoading ? "Sending..." : 
-             countdown > 0 ? `⌛${formatTime(countdown)}` : 
-             otpSent ? "Resend OTP" : "Send OTP"}
-          </button>
-        )}
+                        <button
+                          type="button"
+                          onClick={sendOtp}
+                          disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email) || countdown > 0}
+                          className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
+                            }`}
+                        >
+                          {otpLoading ? "Sending..." :
+                            countdown > 0 ? `⌛${formatTime(countdown)}` :
+                              otpSent ? "Resend" : "Verify"}
+                        </button>
+                      )}
                     </div>
 
                     {otpSent && !otpVerified && (
@@ -256,11 +252,10 @@ export default function SignUp() {
                             name="otp"
                             type="text"
                             maxLength={6}
-                            className={`block flex-grow pl-3 pr-3 py-2 rounded-md border text-sm ${
-                              theme === "dark"
+                            className={`block flex-grow pl-3 pr-3 py-2 rounded-md border text-sm ${theme === "dark"
                                 ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                                 : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                              } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                             placeholder="123456"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
@@ -269,9 +264,8 @@ export default function SignUp() {
                             type="button"
                             onClick={verifyOtp}
                             disabled={otpLoading || otp.length !== 6}
-                            className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-                              otpLoading ? "opacity-75 cursor-not-allowed" : ""
-                            }`}
+                            className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${otpLoading ? "opacity-75 cursor-not-allowed" : ""
+                              }`}
                           >
                             {otpLoading ? "Verifying..." : "Verify"}
                           </button>
@@ -297,11 +291,10 @@ export default function SignUp() {
                         type={showPassword ? "text" : "password"}
                         autoComplete="new-password"
                         required
-                        className={`block w-full pl-10 pr-10 py-2 rounded-md border text-sm ${
-                          theme === "dark"
+                        className={`block w-full pl-10 pr-10 py-2 rounded-md border text-sm ${theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                             : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -330,9 +323,8 @@ export default function SignUp() {
                     name="terms"
                     type="checkbox"
                     required
-                    className={`h-4 w-4 rounded ${
-                      theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"
-                    } focus:ring-blue-500`}
+                    className={`h-4 w-4 rounded ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"
+                      } focus:ring-blue-500`}
                   />
                   <label htmlFor="terms" className={`ml-2 block text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                     I agree to the{" "}
@@ -356,9 +348,8 @@ export default function SignUp() {
                   <button
                     type="submit"
                     disabled={isLoading || !otpVerified}
-                    className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                      isLoading || !otpVerified ? "opacity-75 cursor-not-allowed" : ""
-                    }`}
+                    className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isLoading || !otpVerified ? "opacity-75 cursor-not-allowed" : ""
+                      }`}
                   >
                     {isLoading ? (
                       <>
