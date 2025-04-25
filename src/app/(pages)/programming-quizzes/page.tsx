@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: "Quiz List | Trackode",
     description:
       "Explore a variety of quizzes and challenges to test your coding skills. Join now and start learning!",
-    url: "https://trackode.in/quiz-list",
+    url: "https://trackode.in/programming-quizzes",
     type: "website",
   },
 };

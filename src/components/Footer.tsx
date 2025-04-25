@@ -149,7 +149,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="/quiz-list" 
+                  href="/programming-quizzes" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -213,7 +213,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="/quiz-list" 
+                  href="/programming-quizzes" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">

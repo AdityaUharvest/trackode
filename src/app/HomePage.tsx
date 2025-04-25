@@ -479,7 +479,7 @@ export default function HomePage() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
                   <Link
-                    href="/quiz-list"
+                    href="/programming-quizzes"
                     className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-blue-700 transition-all duration-300 bg-white border border-transparent rounded-xl hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white hover:shadow-lg transform hover:scale-105"
                     role="button"
                     aria-label="Sign up for Trackode"
@@ -539,7 +539,7 @@ export default function HomePage() {
 
             <div className="flex mt-5 flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                href="/quiz-list"
+                href="/programming-quizzes"
                 className={`group relative overflow-hidden inline-flex items-center justify-center px-8 py-4 text-base font-bold transition-all duration-300 rounded-xl shadow-md ${theme === "dark"
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-blue-600 hover:bg-blue-700 text-white"

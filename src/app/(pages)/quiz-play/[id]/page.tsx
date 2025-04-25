@@ -294,7 +294,7 @@ export default function QuizPage({ params }: any) {
         toast.success(response.data.message || "Quiz submitted successfully");
         setTimeout(() => {
           document.exitFullscreen().catch(() => {});
-          router.push(`/quiz-list`);
+          router.push(`/programming-quizzes`);
         }, 1500);
       } else {
         throw new Error(response.data.message || "Submission failed");

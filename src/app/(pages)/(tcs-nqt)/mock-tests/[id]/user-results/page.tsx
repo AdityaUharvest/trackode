@@ -860,7 +860,7 @@ export default function UserQuizResult() {
               <a href={`/mocks`}>Explore Mocks</a>
             </Button>
             <Button  size="sm" asChild>
-              <a href={`/quiz-list`}>More Quizzes</a>
+              <a href={`/programming-quizzes`}>More Quizzes</a>
             </Button>
           </div>
         </div>

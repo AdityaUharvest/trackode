@@ -25,7 +25,7 @@ export default function QuizHistory({ results }: any) {
             No quiz attempts recorded yet
           </p>
           <a
-            href="/quiz-list"
+            href="/programming-quizzes"
             className={`inline-block ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'} text-white px-6 py-2 rounded-lg transition-colors`}
           >
             Check Avialable Quizzes

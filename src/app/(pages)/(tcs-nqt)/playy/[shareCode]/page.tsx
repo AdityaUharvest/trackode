@@ -478,7 +478,7 @@ export default function QuizPlayer() {
           Go to Dashboard
         </button>
         <button
-          onClick={() => router.push('/quiz-list')}
+          onClick={() => router.push('/programming-quizzes')}
           className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
         >
           Explore Free Live Quizzes
@@ -507,7 +507,7 @@ export default function QuizPlayer() {
             Student Dashboard
           </button>
           <button
-            onClick={() => router.push('/quiz-list')}
+            onClick={() => router.push('/programming-quizzes')}
             className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
             Explore Free Live Quizes
@@ -993,7 +993,7 @@ export default function QuizPlayer() {
       />
 
       {/* Results Modal */}
-      <QuizResultModal isOpen={showResultModal} onClose={() => router.push('/quiz-list')} quizId={quiz?._id} />
+      <QuizResultModal isOpen={showResultModal} onClose={() => router.push('/programming-quizzes')} quizId={quiz?._id} />
     </div>
   );
 }

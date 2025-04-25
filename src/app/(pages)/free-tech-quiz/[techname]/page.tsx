@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     openGraph: {
       title: `${techName} Quizzes | QuizApp`,
       description: `Practice ${techName} with our free interactive quizzes`,
-      url: `https://trackode.in/quiz-list/${techName}`,
+      url: `https://trackode.in/programming-quizzes/${techName}`,
       type: 'website',
     },
   };

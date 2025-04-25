@@ -134,7 +134,7 @@ export default function FreeTechQuizClient({ params }: any) {
   };
 
   const handleBackToTechs = () => {
-    router.push('/quiz-list');
+    router.push('/programming-quizzes');
   };
 
   if (loading) {
