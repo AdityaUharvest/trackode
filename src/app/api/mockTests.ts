@@ -9,6 +9,8 @@ export async function createMockTest(data: {
   endTime: Date;
   durationMinutes: number;
   public: boolean;
+  userPlayed?: number;
+
 }) {
   await connectDB();
   const session = await auth();
@@ -19,8 +21,8 @@ export async function createMockTest(data: {
     isPublished: false,
     shareCode,
     createdAt: new Date(),
-    createdBy: session?.user?.id
-    
+    createdBy: session?.user?.id,
+    userPlayed:Math.floor(Math.random() * 500) + 203,
   });
   
   
