@@ -267,7 +267,7 @@ const QuizSetup = () => {
   ];
 
   return (
-    <div className={`container mx-auto p-6  ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div className={`container min-h-screen  mx-auto p-6  ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <div className={`flex justify-between items-center mb-4 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -275,7 +275,7 @@ const QuizSetup = () => {
               <Button
                 key={index}
                 onClick={() => setCurrentStep(index + 1)}
-                className={`flex-1 mx-2 ${currentStep === index + 1 ? 'bg-blue-800 text-white'  : 'bg-blue-500'} hover:bg-blue-700 hover:text-white `}
+                className={`flex-1 text-white mx-2 ${currentStep === index + 1 ? 'bg-blue-600 text-white'  : 'bg-blue-500'} hover:bg-blue-700 hover:text-white `}
               >
                 {step.title}
               </Button>

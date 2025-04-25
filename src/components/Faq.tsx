@@ -112,148 +112,18 @@ export default function Faq() {
             transition={{ duration: 0.6 }}
           >
             <p
-              className={`inline-block font-semibold mb-2 px-4 py-1.5 rounded-full ${
+              className={`inline-block font-semibold text-lg mb-2 px-4 py-1.5 rounded-full ${
                 theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
               }`}
             >
-              Trackode Support Center
+              Trackode Support Center - FAQs
             </p>
-            <h2
-              className={`text-xl md:text-xl font-extrabold mb-4 ${
-                theme === "dark" ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Frequently Asked Questions
-            </h2>
-            <p
-              className={`max-w-2xl mx-auto text-sm ${
-                theme === "dark" ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Find answers to common questions about Trackode's features, account management, and technical details.
-            </p>
+            
           </motion.div>
         </div>
 
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-2">
-          <div
-            className={`flex items-center p-3 rounded-lg ${
-              theme === "dark" ? "bg-gray-800  border-gray-700" : "bg-white "
-            }`}
-          >
-            <svg
-              className={`w-5 h-5 mr-3 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              ></path>
-            </svg>
-            <input
-              type="text"
-              placeholder="Search FAQ..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full rounded-full ${
-                theme === "dark" ? "bg-gray-800 text-white placeholder-gray-400" : "bg-white text-gray-800 placeholder-gray-500"
-              }`}
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className={`p-1 rounded-full ${
-                  theme === "dark" ? "hover:bg-gray-700 text-gray-400" : "hover:bg-gray-100 text-gray-500"
-                }`}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Category Tabs (simplified version) */}
-        <div className="flex flex-wrap justify-center gap-2 mb-5">
-          <button
-            onClick={() => setFilteredItems(faqItems)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-              theme === "dark"
-                ? "bg-blue-900/30 text-blue-400 hover:bg-blue-800/40"
-                : "bg-blue-100 text-blue-600 hover:bg-blue-200"
-            }`}
-          >
-            All Questions
-          </button>
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setFilteredItems(faqItems.filter(item => item.category === category))}
-              className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition-all ${
-                theme === "dark"
-                  ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* FAQ List */}
         <div className="max-w-4xl mx-auto">
-          {searchTerm && filteredItems.length === 0 ? (
-            <div className="text-center py-5">
-              <svg
-                className={`w-16 h-16 mx-auto mb-4 ${
-                  theme === "dark" ? "text-gray-600" : "text-gray-400"
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <p
-                className={`text-xl font-medium ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                No matching FAQs found
-              </p>
-              <p
-                className={`mt-2 ${
-                  theme === "dark" ? "text-gray-500" : "text-gray-500"
-                }`}
-              >
-                Try adjusting your search terms or browse all questions
-              </p>
-            </div>
-          ) : (
+        
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredItems.map((item, index) => (
                 <motion.li
@@ -266,13 +136,13 @@ export default function Faq() {
                   } rounded-lg transition-colors`}
                 >
                   <button
-                    className={`relative flex items-center w-full py-6 px-4 text-left ${
+                    className={`relative flex items-center w-full p-3 text-left ${
                       theme === "dark" ? "text-white" : "text-black"
                     }`}
                     aria-expanded={openIndex === index ? "true" : "false"}
                     onClick={() => toggleFAQ(index)}
                   >
-                    <span className={`flex-1 font-medium text-sm ${
+                    <span className={`flex-1 font-medium text-base ${
                       openIndex === index 
                         ? theme === "dark" ? "text-blue-400" : "text-blue-600" 
                         : ""
@@ -317,7 +187,7 @@ export default function Faq() {
                         className="overflow-hidden"
                       >
                         <div
-                          className={`px-4 pb-6 leading-relaxed ${
+                          className={`p-3 leading-relaxed ${
                             theme === "dark" ? "text-gray-300" : "text-gray-700"
                           }`}
                         >
@@ -336,16 +206,16 @@ export default function Faq() {
                 </motion.li>
               ))}
             </ul>
-          )}
+        
         </div>
 
         {/* Contact Section */}
-        <div className="mt-8 text-center">
+        <div className="mt-4 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className={`max-w-2xl mx-auto p-6 rounded-xl ${
+            className={`max-w-2xl mx-auto p-3 rounded-xl ${
               theme === "dark" 
                 ? "bg-gray-800/50 border border-gray-700" 
                 : "bg-blue-50 border border-blue-100"
