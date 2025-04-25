@@ -147,7 +147,7 @@ export default function SignUp() {
               <h1 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 Create your account
               </h1>
-              <p className={`mt-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+              <p className={`mt-2 text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 Join Trackode to get started
               </p>
             </div>

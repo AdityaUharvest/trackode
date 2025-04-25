@@ -145,7 +145,7 @@ export default function ForgotPassword() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+        <div className={`min-h-screen flex items-center justify-evenly ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
           <div className={`w-full max-w-md mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-lg`}>
             <div className="text-center">
               <h1 className={`text-xl font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
@@ -189,7 +189,7 @@ export default function ForgotPassword() {
                         type="button"
                         onClick={sendOtp}
                         disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email) || countdown > 0}
-                        className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                        className={`p-2 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                           otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
                         }`}
                       >

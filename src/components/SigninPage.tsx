@@ -64,7 +64,7 @@ export default function Signin() {
     <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className={`w-full max-w-md mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-lg`}>
         <div className="text-center">
-          <h1 className={`text-xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          <h1 className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
             Welcome back
           </h1>
           <p className={`mt-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>

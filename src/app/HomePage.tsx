@@ -48,7 +48,7 @@ export default function HomePage() {
 
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
-        <section className={`relative overflow-hidden ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+        <section className={`relative animate-slide-up overflow-hidden ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
   {/* Animated background elements */}
   <div className="absolute inset-0 overflow-hidden pointer-events-none">
     {theme === "dark" ? (
@@ -65,9 +65,9 @@ export default function HomePage() {
   </div>
 
   <div className="relative px-4 py-24 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:py-24">
-    <div className="flex flex-col items-center justify-between gap-12 lg:flex-row">
+    <div className="flex flex-col animate-in items-center justify-between gap-12 lg:flex-row">
       {/* Content area */}
-      <div className="w-full lg:w-1/2 text-center lg:text-left">
+      <div className="w-full lg:w-1/2  text-center  lg:text-left">
         {/* Live badge with animation */}
         <div className="inline-flex items-center px-3 py-1 mb-6 rounded-full bg-blue-100 dark:bg-blue-900/50 backdrop-blur-sm">
           <span className="relative flex h-2 w-2 mr-2">
@@ -81,13 +81,13 @@ export default function HomePage() {
 
         {/* Main heading with gradient and animation */}
         <h1 className="text-2xl font-extrabold tracking-tight sm:text-2xl lg:text-6xl">
-          <span className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+          <span className="block mb-2  text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
             Master Coding Through
           </span>
+          <SplitText text="Interactive Quizzes" onLetterAnimationComplete={handleAnimationComplete} className="relative z-10 text-blue-500  " />
           <span className="relative">
-            <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-              Interactive Quizzes
-            </span>
+            
+            
             <span className="absolute inset-x-0 bottom-0 h-3 -mt-2 bg-blue-100 dark:bg-blue-900/50 rounded-full opacity-75"></span>
           </span>
         </h1>
@@ -242,10 +242,10 @@ export default function HomePage() {
   `}</style>
         </section>
 
-        <section className={`py-10 feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
+        <section className={`py-10  feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h1 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">
+              <h1 className="text-lg  font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">
                 Why Choose <span className="text-blue-600">Trackode Quizzes</span>
               </h1>
               <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">
