@@ -33,7 +33,7 @@ export default function QuizResultClient({ result }: { result: any }) {
     <div className={`min-h-screen sm:text-sm lg:p-8 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
       <div className="max-w-4xl mx-auto">
         <div className={`p-4 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
-          <h1 className="text-xl font-bold mb-4">
+          <h1 className="text-lg font-medium mb-4">
             {result.title} 
           </h1>
 
@@ -41,11 +41,11 @@ export default function QuizResultClient({ result }: { result: any }) {
           <div className="mb-8">
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
-                <p className="font-semibold text-green-600">Score:</p>
-                <p className="text-xl">{result.score}/{result.totalQuestions}</p>
+                <p className="font-medium text-green-600">Score:</p>
+                <p className="text-base">{result.score}/{result.totalQuestions}</p>
               </div>
               <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
-                <p className="font-semibold text-blue-800">Date Attempted:</p>
+                <p className="font-medium text-blue-800">Date Attempted:</p>
                 <p>{new Date(result.attemptedAt).toLocaleDateString()}</p>
               </div>
             </div>
@@ -64,7 +64,7 @@ export default function QuizResultClient({ result }: { result: any }) {
               >
                 {/* Question UI */}
                 <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-lg">
+                  <h3 className="font-medium text-sm">
                     Question {index + 1}
                   </h3>
                   <span
@@ -110,7 +110,7 @@ export default function QuizResultClient({ result }: { result: any }) {
 
                   {explanation[index] && (
                     <div className={`mt-2 p-4 rounded-lg ${theme === 'dark' ? 'border-blue-600 bg-gray-900 text-gray-50' : 'bg-gray-100'}`}>
-                      <h4 className="font-semibold mb-2">Explanation</h4>
+                      <h4 className="font-medium mb-2">Explanation</h4>
                       <p>{explanation[index]}</p>
                     </div>
                   )}

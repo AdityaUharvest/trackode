@@ -4,7 +4,7 @@ import MockTest from "@/app/model/MoockTest";
 import QuizAttempt from "@/app/model/QuizAttempt";
 export async function GET(request: NextRequest) {
     await connectDB();
-    const mocks = await MockTest.find({public:true}).sort({createdAt:-1});
+    const mocks = await MockTest.find({public:true,isPublished:true}).sort({createdAt:-1});
     // filter out those results of these mocks
     const mockIds = mocks.map((mock) => mock._id);
     const quizAttempts = await QuizAttempt.find({ quizId: { $in: mockIds } });

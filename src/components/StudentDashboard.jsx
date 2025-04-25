@@ -97,7 +97,7 @@ export default function StudentDashboard() {
     <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} p-4`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-        <h1 className={`text-xl font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} flex items-center gap-3`}>
+        <h1 className={`lext-lg font-bold ${theme === 'dark' ? 'text-gray-300' : 'text-gray-800'} flex items-center gap-3`}>
             <span className={`${theme === 'dark' ? 'bg-blue-600' : 'bg-blue-500'} p-1 rounded-lg`}>
               📊
             </span>
@@ -112,7 +112,7 @@ export default function StudentDashboard() {
             </TabsTrigger>
             
             <TabsTrigger value="available-quizzes" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
-            Free Available quizzes
+            Available quizzes
             </TabsTrigger>
             <TabsTrigger value="mocks" className={`data-[state=active]:${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`}>
               Mocks
@@ -129,7 +129,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 p-3 rounded-full">
-                    <span className="text-blue-600 text-xl">📚</span>
+                    <span className="text-blue-600 lext-lg">📚</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Overall Progress</h3>
@@ -142,7 +142,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-green-100 p-3 rounded-full">
-                    <span className="text-green-600 text-xl">🏆</span>
+                    <span className="text-green-600 lext-lg">🏆</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Highest Score</h3>
@@ -155,7 +155,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-orange-100 p-3 rounded-full">
-                    <span className="text-orange-600 text-xl">⏱</span>
+                    <span className="text-orange-600 lext-lg">⏱</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Recent Performance</h3>
@@ -168,7 +168,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-purple-100 p-3 rounded-full">
-                    <span className="text-purple-600 text-xl">📈</span>
+                    <span className="text-purple-600 lext-lg">📈</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Average Performance</h3>
@@ -191,7 +191,7 @@ export default function StudentDashboard() {
 
             {/* Recent Activity Timeline */}
             <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg`}>
-              <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Recent Activity</h3>
+              <h3 className={`text-base font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Recent Activity</h3>
               <div className="space-y-4">
                 {quizResults.map((quiz, index) => (
                   <div key={index} className="flex items-start gap-4">
@@ -213,7 +213,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 p-3 rounded-full">
-                    <span className="text-blue-600 text-xl">📚</span>
+                    <span className="text-blue-600 lext-lg">📚</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Overall Progress</h3>
@@ -226,7 +226,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-green-100 p-3 rounded-full">
-                    <span className="text-green-600 text-xl">🏆</span>
+                    <span className="text-green-600 lext-lg">🏆</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Highest Score</h3>
@@ -239,7 +239,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-orange-100 p-3 rounded-full">
-                    <span className="text-orange-600 text-xl">⏱</span>
+                    <span className="text-orange-600 lext-lg">⏱</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Recent Performance</h3>
@@ -252,7 +252,7 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-purple-100 p-3 rounded-full">
-                    <span className="text-purple-600 text-xl">📈</span>
+                    <span className="text-purple-600 lext-lg">📈</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Average Performance</h3>
@@ -272,11 +272,11 @@ export default function StudentDashboard() {
               <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
                 <div className="flex items-center gap-4">
                   <div className="bg-blue-100 p-3 rounded-full">
-                    <span className="text-blue-600 text-xl">📚</span>
+                    <span className="text-blue-600 lext-lg">📚</span>
                   </div>
                   <div>
                     <h3 className={`${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'} text-base`}>Total Quizzes Taken</h3>
-                    <p className="text-xl font-bold">{totalQuizzes}</p>
+                    <p className="lext-lg font-bold">{totalQuizzes}</p>
                   </div>
                 </div>
               </Card>
@@ -285,7 +285,7 @@ export default function StudentDashboard() {
 
             {/* Recent Activity Timeline */}
             <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg`}>
-              <h3 className={`text-lg font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Recent Activity</h3>
+              <h3 className={`text-base font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Recent Activity</h3>
               <div className="space-y-4">
                 {quizResults.map((quiz, index) => (
                   <div key={index} className="flex items-start gap-4">
