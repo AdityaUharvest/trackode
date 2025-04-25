@@ -14,8 +14,11 @@ export async function GET(req: NextRequest, { params }: any) {
     const isAttempted = await QuizAttempt.findOne({ quizId: quizId, userId: userId });
     
     if (isAttempted) {
-        return NextResponse.json(
-            true
+        return NextResponse.json({
+            isAttempted: true,
+            
+        }
+           
         );
     }
     return NextResponse.json(
