@@ -22,8 +22,6 @@ RUN pnpm run build
 # Expose the port (use a unique port to avoid conflicts, e.g., 3001)
 EXPOSE 3001
 
-
-
 # Start the app
 CMD ["pnpm", "start"]
 
