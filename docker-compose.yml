@@ -4,7 +4,7 @@ services:
   nextjs:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: DockerFile
     container_name: nextjs_container
     ports:
       - "9004:3000"  # Exposing port for Next.js app
