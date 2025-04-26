@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import axios from "axios";
 import { Edit, Save, X, Trash2, Check, Share, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,15 +85,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       
       if (response.data.success) {
         setQuiz(updatedQuiz);
-        toast.success("Quiz updated successfully!",{
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-        });
+        toast.success("Quiz updated successfully");
         setIsEditingQuiz(false);
       } else {
         toast.error(response.data.message);
@@ -113,15 +105,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       const response = await axios.delete(`${API_BASE_URL}/quiz-update/${quizId}`);
       if (response.data.success) {
         
-        toast.success("Quiz Deleted successfully!",{
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-        });
+        toast.success("Quiz Deleted successfully!");
         window.location.href = "/admin-dashboard"
       } else {
         toast.error(response.data.message);
@@ -136,15 +120,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const response = await axios.put(`${API_BASE_URL}/questions`, {questionId,newQuestion:updatedQuestion})
     
     if(response.data.success){
-      toast.success("Question Updated Successfully",{
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: false,
-        progress: undefined,
-      });
+      toast.success("Question Updated Successfully");
       
     }
     // const updatedQuestions = quiz?.questions?.map((q) => (q._id === questionId ? updatedQuestion : q));
@@ -228,15 +204,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                     const link = `${window.location.origin}/quiz-play/${quizId}`;
                     navigator.clipboard.writeText(link)
                       .then(() => {
-                        toast.success("Link copied to clipboard!",{
-                          position: "top-right",
-                          autoClose: 2000,
-                          hideProgressBar: true,
-                          closeOnClick: true,
-                          pauseOnHover: false,
-                          draggable: false,
-                          progress: undefined,
-                        });
+                        toast.success("Link copied to clipboard!");
                       })
                       .catch((error) => {
                        

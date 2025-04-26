@@ -1,7 +1,7 @@
 "use client";
 import { signIn } from 'next-auth/react';
 import { useSession } from "next-auth/react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useEffect } from "react";
 import { useTheme } from "./ThemeContext";
 import { Button } from './ui/button';

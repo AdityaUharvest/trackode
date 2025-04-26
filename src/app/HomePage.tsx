@@ -7,7 +7,7 @@ import "@/app/globals.css";
 import Faq from "../components/Faq";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useTheme } from "../components/ThemeContext";
 import SplitText from "../components/SplitText";
 import GradientText from "@/components/GradientText";

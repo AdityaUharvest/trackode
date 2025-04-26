@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import QuestionEditor from './QuestionEditor';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import { Loader2 } from 'lucide-react';
 interface Question {
   _id?: string;

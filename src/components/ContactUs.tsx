@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from './ThemeContext';
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useSession } from 'next-auth/react';
 import Head from 'next/head';
 export default function ContactForm() {
@@ -37,15 +37,7 @@ export default function ContactForm() {
 
       if (response.ok) {
         setStatus('Message sent successfully!');
-        toast.success('Message sent successfully!',{
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-        });
+        toast.success('Message sent successfully!');
         setFormData({ name: '', email: '', message: '' });
       } else {
         setStatus('Failed to send message.');

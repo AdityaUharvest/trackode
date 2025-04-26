@@ -7,7 +7,7 @@ import axios from 'axios';
 import { Button } from './ui/button';
 import { useTheme } from './ThemeContext';
 import { Loader2 } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import Section from "@/app/model/Section"
 interface Question {

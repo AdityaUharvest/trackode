@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useSession } from "next-auth/react";
 import { useTheme } from "@/components/ThemeContext";
 import Link from "next/link";
@@ -81,7 +81,7 @@ export default function QuizPage({ params }: any) {
             toast.error("Quiz submitted due to leaving app 3 times");
             return 3;
           }
-          toast.warn(`Warning ${newCount}/3: Return to quiz immediately`);
+          toast.dismiss(`Warning ${newCount}/3: Return to quiz immediately`);
           return newCount;
         });
       }

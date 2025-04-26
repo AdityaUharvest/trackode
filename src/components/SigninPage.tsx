@@ -2,7 +2,7 @@
 import SignInButton from "./Signin";
 import Link from "next/link";
 import { use, useState,useEffect } from "react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTheme } from "./ThemeContext";
@@ -25,15 +25,12 @@ export default function Signin() {
   const submitHandler = async (e: any) => {
     e.preventDefault();
     if (!email || !password) {
-      toast.error("Please fill all the fields", {
-        autoClose: 3000,
-        closeOnClick: true,
-      });
+      toast.error("Please fill all the fields");
       return;
     }
 
     setIsLoading(true);
-    toast.info("Signing you in");
+    toast.loading("Signing you in");
 
     try {
       const response = await signIn("credentials", {

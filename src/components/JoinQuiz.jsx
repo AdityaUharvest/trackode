@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 
 export default function QuizJoinComponent() {
   const [quizCode, setQuizCode] = useState('');

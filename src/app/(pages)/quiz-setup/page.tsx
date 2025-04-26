@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import { useTheme } from "@/components/ThemeContext";
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -144,7 +144,8 @@ const QuizSetup = () => {
               <label className="text-sm font-medium">Make Public</label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" className="focus:outline-none">
+                  <button title="More Info" aria-label="More Info"
+                  type="button" className="focus:outline-none">
                     <Info className="h-4 w-4 text-gray-500 hover:text-blue-600" />
                   </button>
                 </PopoverTrigger>

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Loader2, Info } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import { useTheme } from './ThemeContext';
 import {
   Popover,

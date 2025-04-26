@@ -9,7 +9,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useTheme } from '@/components/ThemeContext'; // Import your theme context
 import { Button } from '@/components/ui/button';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
 const localizer = momentLocalizer(moment);
 

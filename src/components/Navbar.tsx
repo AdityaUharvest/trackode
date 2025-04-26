@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useTheme } from "./ThemeContext";
 import { Moon, Sun, ChevronDown, Menu, X, User, LogOut, Home, BarChart, Users, MessageSquare, BookOpen } from "lucide-react";
 import GradientText from "@/components/GradientText";
@@ -26,10 +26,7 @@ const Navbar: React.FC = () => {
 
   // Handle sign-out
   const handleSignOut = async () => {
-    toast.success("Signed out successfully", {
-      autoClose: 3000,
-      closeOnClick: false,
-    });
+    toast.success("Signed out successfully");
     await signOut({ callbackUrl: '/' });
     localStorage.setItem("isFirstVisit", "true");
   };

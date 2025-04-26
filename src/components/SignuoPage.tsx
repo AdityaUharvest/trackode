@@ -3,7 +3,7 @@ import SignInButton from "./Signin";
 import axios from "axios";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import { useRouter } from "next/navigation";
 import { useTheme } from "./ThemeContext";
 import { FiUser, FiMail, FiLock, FiCheck, FiEye, FiEyeOff } from "react-icons/fi";

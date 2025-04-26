@@ -2,10 +2,10 @@
 import { ReactNode, useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ToastContainer, toast } from "react-toastify";
+// import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@/components/ThemeContext"; // Import ThemeProvider
-
+import toast, { Toaster } from 'react-hot-toast';
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   
@@ -23,12 +23,12 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   
   return (
     <ThemeProvider>
-      <ToastContainer position="top-center" autoClose={3000}  />
+     <Toaster />
       <Navbar />
       
       <div className="min-h-screen">
         {children}
-        
+         
         </div>
       
       <Footer />

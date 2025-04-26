@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -229,7 +229,7 @@ export default function UserQuizResult() {
           - Specific action items for improvement
           - Positive encouragement
         
-          Keep it professional yet encouraging (200-250 words).`
+          Keep it professional yet encouraging (50-100 words).`
         })
       });
 
@@ -441,15 +441,19 @@ export default function UserQuizResult() {
                           <div key={section.sectionName} className="space-y-2">
                             <div className="flex justify-between items-center">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium">
+                                <span className="text-xs font-medium">
                                   {section.sectionName.split('-').map(word => 
                                     word.charAt(0).toUpperCase() + word.slice(1)
                                   ).join(' ')}
                                 </span>
                                 <Badge variant="outline" className="text-xs">
-                                  {section.correct}/{section.total}
-                                  {section.questions.length}
+                                Attempted: {section.questions.length}/{section.total} 
+                                
                                 </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                Correct: {section.correct}/{section.questions.length}
+                                </Badge>
+                                
                               </div>
                               <span className={`text-sm font-medium ${
                                 sectionPercentage >= 70 ? 'text-green-500' : 

@@ -2,7 +2,7 @@
 import React from 'react';
 import axios from 'axios';
 import { useSession } from 'next-auth/react';
-import { toast } from 'react-toastify';
+import toast, { Toaster } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { useTheme } from './ThemeContext'; // Adjust the import path as necessary
 

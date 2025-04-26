@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
-import { toast } from "react-toastify";
+import toast, { Toaster } from 'react-hot-toast';;
 import axios from "axios";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -469,7 +469,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
     }
   
     if (validQuestions.length < bulkQuestionCount) {
-      toast.warning(`Generated ${validQuestions.length}/${bulkQuestionCount} questions`);
+      toast.dismiss(`Generated ${validQuestions.length}/${bulkQuestionCount} questions`);
     } else {
       toast.success(`Successfully generated ${validQuestions.length} questions`);
     }
@@ -577,15 +577,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
         setIsPublished(true);
         setShareLink(`${window.location.origin}/quiz-play/${quizId}`);
         
-        toast.success("Quiz published successfully!",{
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-        });
+        toast.success("Quiz published successfully!");
       } else {
         toast.error(response.data.message);
       }
@@ -603,15 +595,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
       const response = await axios.delete(`${API_BASE_URL}/quiz-update/${quizId}`);
       if (response.data.success) {
         
-        toast.success("Quiz Deleted successfully!",{
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: false,
-          progress: undefined,
-        });
+        toast.success("Quiz Deleted successfully!");
         setQuizes((prevQuizes) => prevQuizes.filter((quiz) => quiz._id !== quizId));
       } else {
         toast.error(response.data.message);
