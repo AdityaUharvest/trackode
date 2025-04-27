@@ -112,7 +112,7 @@ export default function HomePage() {
   <div
     className="relative px-4 py-8 sm:py-12 mx-auto  max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col"
   >
-    <div className="flex flex-col items-center sm:mt-10  justify-center h-full">
+    <div className="flex flex-col items-center   justify-center h-full">
       {/* Live indicator */}
       <div className="w-full max-w-sm sm:max-w-md mb-4 sm:mb-6">
         <QuizJoinComponent />
