@@ -11,7 +11,9 @@ import axios from 'axios';
 import Link from 'next/link';
 import QuizDashboard from './QuizesToPlay';
 import { useTheme } from '@/components/ThemeContext';
+
 import SkeletonLoader from '@/components/skeleton/student';
+
 export default function StudentDashboard() {
   const { theme, toggleTheme } = useTheme();
   const { data: session, status } = useSession();
@@ -19,7 +21,46 @@ export default function StudentDashboard() {
   const [loading, setLoading]= React.useState(true);
     
   const [attempts, setAttempts] = useState([]);
-    
+  const [quizzes, setQuizzes] = useState([]);
+  const [mockTests, setMockTests] = useState([]);
+  const [quizResultss, setQuizResultss] = useState([]);
+  useEffect(() => {
+      const fetchData = async () => {
+        try {
+          setLoading(true);
+  
+          // Fetch quizzes
+          const quizResponse = await axios.get("/api/total-quizes");
+          const quizData = quizResponse.data.quizes;
+          setQuizzes(quizData);
+  
+          // Fetch quiz results
+          const resultsResponse = await axios.get("/api/attempted-public");
+          setQuizResultss(resultsResponse.data);
+  
+          // Fetch mock tests
+          const mockResponse = await axios.get("/api/mock-tests/getAll");
+          if (!mockResponse.data) {
+            throw new Error("Failed to fetch mock tests");
+          }
+          const testsWithPlayers = mockResponse.data.mocks.map((mock) => ({
+            ...mock,
+            userPlayed: mock.userPlayed || Math.floor(Math.random() * 500) + 50,
+            category: mock.category || "TCS",
+            difficulty: mock.difficulty || ["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)],
+          }));
+          setMockTests(testsWithPlayers);
+  
+        } catch (err) {
+          console.error("Error fetching data:", err);
+          setError(err instanceof Error ? err.message : "An unknown error occurred");
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchData();
+    }, []); 
     // Theme-based styles
     const bgColor = theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50';
     const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
@@ -29,7 +70,7 @@ export default function StudentDashboard() {
     const secondaryText = theme === 'dark' ? 'text-gray-400' : 'text-gray-500';
     const tableHeaderBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50';
     const tableRowHover = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
-  
+    
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -321,7 +362,7 @@ export default function StudentDashboard() {
           </TabsContent>
           <TabsContent value="available-quizzes" className="space-y-2">
 
-           <QuizDashboard/>
+          <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResultss} />
           </TabsContent>
           
         </Tabs>

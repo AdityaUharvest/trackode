@@ -48,196 +48,348 @@ export default function HomePage() {
 
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
-        <section className={`relative min-h-screen animate-slide-up flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} overflow-hidden`}>
-      {/* Background elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        {theme === "dark" ? (
-          <>
-            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-900 rounded-full opacity-10 filter blur-3xl"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-900 rounded-full opacity-10 filter blur-3xl"></div>
-            <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-indigo-900 rounded-full opacity-10 filter blur-2xl"></div>
-          </>
-        ) : (
-          <>
-            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-200 rounded-full opacity-30 filter blur-3xl"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-200 rounded-full opacity-30 filter blur-3xl"></div>
-            <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-purple-200 rounded-full opacity-20 filter blur-2xl"></div>
-          </>
-        )}
-      </div>
-      <div className="absolute -left-10 -top-4 w-20 h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-20"></div>
-      <div className="absolute -right-4 -bottom-4 w-20 h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-20"></div>
-      
-      {/* Floating code elements */}
-      <div className="absolute hidden lg:block left-10 top-40 opacity-20 dark:opacity-10 animate-float-slow">
-        <div className="text-gray-600 dark:text-gray-400 font-mono text-sm">
-          {"function code() {"}<br />
-          {"  return expertise;"}<br />
-          {"}"}
-        </div>
-      </div>
-      <div className="absolute hidden lg:block right-10 bottom-40 opacity-20 dark:opacity-10 animate-float">
-        <div className="text-gray-600 dark:text-gray-400 font-mono text-sm">
-          {"const skill = {"}<br />
-          {"  learn: true,"}<br />
-          {"  practice: true"}<br />
-          {"}"}
-        </div>
+        <section
+  className={`relative min-h-screen animate-slide-up flex flex-col ${
+    theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"
+  } overflow-hidden`}
+>
+  {/* Background elements */}
+  <div className="absolute inset-0 pointer-events-none">
+    {theme === "dark" ? (
+      <>
+        <div
+          className="absolute top-0 left-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-900 rounded-full opacity-10 filter blur-2xl sm:blur-3xl"
+        ></div>
+        <div
+          className="absolute bottom-0 right-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-purple-900 rounded-full opacity-10 filter blur-2xl sm:blur-3xl"
+        ></div>
+        <div
+          className="absolute top-1/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-indigo-900 rounded-full opacity-10 filter blur-xl sm:blur-2xl"
+        ></div>
+      </>
+    ) : (
+      <>
+        <div
+          className="absolute top-0 left-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-200 rounded-full opacity-30 filter blur-2xl sm:blur-3xl"
+        ></div>
+        <div
+          className="absolute bottom-0 right-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-indigo-200 rounded-full opacity-30 filter blur-2xl sm:blur-3xl"
+        ></div>
+        <div
+          className="absolute top-1/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-purple-200 rounded-full opacity-20 filter blur-xl sm:blur-2xl"
+        ></div>
+      </>
+    )}
+  </div>
+  <div
+    className="absolute -left-4 -top-4 w-16 h-20 sm:w-20 sm:h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-20"
+  ></div>
+  <div
+    className="absolute -right-4 -bottom-4 w-16 h-20 sm:w-20 sm:h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-20"
+  ></div>
+
+  {/* Floating code elements - hidden on mobile */}
+  <div
+    className="absolute hidden lg:block left-4 lg:left-10 top-20 lg:top-40 opacity-20 dark:opacity-10 animate-float-slow"
+  >
+    <div className="text-gray-600 dark:text-gray-400 font-mono text-xs lg:text-sm">
+      {"function code() {"}<br />
+      {"  return expertise;"}<br />
+      {"}"}
+    </div>
+  </div>
+  <div
+    className="absolute hidden lg:block right-4 lg:right-10 bottom-20 lg:bottom-40 opacity-20 dark:opacity-10 animate-float"
+  >
+    <div className="text-gray-600 dark:text-gray-400 font-mono text-xs lg:text-sm">
+      {"const skill = {"}<br />
+      {"  learn: true,"}<br />
+      {"  practice: true"}<br />
+      {"}"}
+    </div>
+  </div>
+
+  <div
+    className="relative px-4 py-8 sm:py-12 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col"
+  >
+    <div className="flex flex-col items-center justify-center h-full">
+      {/* Live indicator */}
+      <div
+        className="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 mb-4 sm:mb-6 rounded-full bg-blue-100 dark:bg-blue-900/50"
+      >
+        <span className="relative flex h-2 w-2 sm:h-3 sm:w-3 mr-1 sm:mr-2">
+          <span
+            className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-blue-600 dark:bg-blue-400"
+          ></span>
+          <span
+            className="relative inline-flex w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-blue-600 dark:bg-blue-400"
+          ></span>
+        </span>
+        <span
+          className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400"
+        >
+          Live Now • 500+ Active Users
+        </span>
       </div>
 
-      <div className="relative px-4 py-12 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col">
-        <div className="flex flex-col items-center justify-center h-full">
-          {/* Live indicator */}
-          <div className="inline-flex items-center px-4 py-2 mb-6 rounded-full bg-blue-100 dark:bg-blue-900/50 animate-pulse">
-            <span className="relative flex h-3 w-3 mr-2">
-              <span className="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping bg-blue-600 dark:bg-blue-400"></span>
-              <span className="relative inline-flex w-3 h-3 rounded-full bg-blue-600 dark:bg-blue-400"></span>
+      {/* Hero content */}
+      <div className="text-center max-w-3xl mb-6 sm:mb-8">
+        <h1
+          className="text-xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight"
+        >
+          <span
+            className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
+          >
+            Level Up Your Skills
+          </span>
+          <span className="block text-gray-900 dark:text-white">
+            With
+            <span>
+              <SplitText
+                text=" Interactive Quizzes"
+                onLetterAnimationComplete={handleAnimationComplete}
+                className="text-blue-500"
+              />
             </span>
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              Live Now • 500+ Active Users
-            </span>
-          </div>
+          </span>
+        </h1>
+        <p
+          className={`mt-4 sm:mt-6 text-sm sm:text-base max-w-2xl ${
+            theme === "dark" ? "text-gray-300" : "text-gray-600"
+          }`}
+        >
+          Test, learn, and master programming concepts with AI-powered challenges.
+          Get instant feedback and track your progress on your coding journey.
+        </p>
+      </div>
 
-          {/* Hero content */}
-          <div className="text-center max-w-3xl mb-8">
-            <h1 className="text-2xl sm:text-2xl lg:text-5xl font-extrabold tracking-tight">
-              <span className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                Level Up Your Skills
-              </span>
-              <span className="block text-gray-900 dark:text-white">
-                With
-                <span>
-                  <SplitText text=" Interactive Quizzes"  onLetterAnimationComplete={handleAnimationComplete}
-                   className={` text-blue-500`} />
-                  </span> 
-              </span>
-            </h1>
-            <p className={`mt-6 text-base sm:text-sm max-w-2xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-              Test, learn, and master programming concepts with AI-powered challenges. 
-              Get instant feedback and track your progress on your coding journey.
-            </p>
-          </div>
+      {/* Quiz join component */}
+      <div className="w-full max-w-sm sm:max-w-md mb-4 sm:mb-6">
+        <QuizJoinComponent />
+      </div>
 
-          {/* Quiz join component */}
-          <div className=" max-w-md mb-6">
-            <QuizJoinComponent />
+      {/* CTA buttons */}
+      <div
+        className="mt-2 flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-8 sm:mb-12"
+      >
+        <Link
+          href="/dashboard"
+          className="px-6 py-2.5 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+        >
+          Get Started
+        </Link>
+        <Link
+          href="/admin-dashboard"
+          className={`px-6 py-2.5 sm:px-8 sm:py-3 text-base sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${
+            theme === "dark"
+              ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
+              : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
+          }`}
+        >
+          Dashboard
+        </Link>
+      </div>
+
+      {/* Social proof */}
+      <div className="w-full max-w-3xl">
+        <div
+          className="flex flex-col items-center sm:flex-row sm:justify-between mb-2"
+        >
+          <div className="flex flex-col sm:flex-row items-center mb-2 sm:mb-0">
+            <div className="flex -space-x-2 sm:-space-x-3">
+              {["aditya.png", "rohit.png", "rohitk.png", "kaju.png"].map(
+                (img, i) => (
+                  <div
+                    key={i}
+                    className={`w-8 h-8 sm:w-12 sm:h-12 rounded-full border-2 ${
+                      theme === "dark" ? "border-gray-800" : "border-white"
+                    } overflow-hidden shadow-lg transition-transform duration-300 hover:scale-110 hover:z-10 relative`}
+                    style={{ zIndex: 4 - i }}
+                  >
+                    <img
+                      alt={`User ${i + 1}`}
+                      src={img}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )
+              )}
+            </div>
+            <div className="ml-0 sm:ml-4 text-center sm:text-left">
+              <p
+                className={`text-xs sm:text-sm font-medium ${
+                  theme === "dark" ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                Join 500+ developers
+              </p>
+              <div className="flex items-center mt-1 justify-center sm:justify-start">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                    />
+                  </svg>
+                ))}
+                <span
+                  className={`ml-1 text-xs ${
+                    theme === "dark" ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
+                  4.3/5
+                </span>
+              </div>
+            </div>
           </div>
-          
-          {/* CTA buttons */}
-          <div className="mt-2 justify-evenly flex gap-8 mb-12">
-            <Link
-              href="/dashboard"
-              className="px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+          <div className="flex items-center">
+            <svg
+              className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                theme === "dark" ? "text-blue-400" : "text-blue-600"
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              Get Started
-            </Link>
-            <Link
-              href="/admin-dashboard"
-              className={`px-8 py-3  text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${
-                theme === "dark"
-                  ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
-                  : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+            <p
+              className={`ml-1 sm:ml-2 text-xs sm:text-sm font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              Dashboard
-            </Link>
+              Trusted by developers at leading companies
+            </p>
           </div>
-          
-          {/* Social proof */}
-          {/* Social proof - Improved version */}
-          <div className="w-full max-w-3xl">
-  {/* Testimonial avatars and trust statement */}
-  <div className="flex flex-col md:flex-row items-center justify-between mb-2">
-    <div className="flex items-center mb-2 md:mb-0">
-      <div className="flex -space-x-3">
-        {['aditya.png', 'rohit.png', 'rohitk.png', 'kaju.png'].map((img, i) => (
-          <div 
-            key={i} 
-            className={`w-12 h-12 rounded-full border-2 ${theme === "dark" ? "border-gray-800" : "border-white"} 
-            overflow-hidden shadow-lg transition-transform duration-300 hover:scale-110 hover:z-10 relative`}
-            style={{ zIndex: 4-i }}
-          >
-            <img 
-              alt={`User ${i+1}`} 
-              src={img} 
-              loading='lazy' 
-              className={`w-full h-full ${['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-red-500'][i]}`} 
-            />
-          </div>
-        ))}
-      </div>
-      <div className="ml-4">
-        <p className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-          Join 500+ developers
-        </p>
-        <div className="flex items-center mt-1">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <svg key={star} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-            </svg>
-          ))}
-          <span className={`ml-1 text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>4.3/5</span>
         </div>
-      </div>
-    </div>
-    
-    <div className="flex items-center">
-      <div className="mr-2">
-        <svg className={`w-5 h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      </div>
-      <p className={`text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
-        Trusted by developers at leading companies
-      </p>
-    </div>
-  </div>
-  
-  {/* Company logos */}
- 
-  
-  {/* Trust badges */}
-  <div className="flex justify-center mt-8 space-x-6">
-    <div className={`flex items-center px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
-      <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-      </svg>
-      <span className={`text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>100% Secure</span>
-    </div>
-    <div className={`flex items-center px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
-      <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-      <span className={`text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>High Performance</span>
-    </div>
-    <div className={`flex items-center px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
-      <svg className="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span className={`text-xs font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Global Support</span>
-    </div>
-  </div>
-</div>
-        </div>
-      </div>
 
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes float-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-15px); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-float-slow {
-          animation: float-slow 8s ease-in-out infinite;
-        }
-      `}</style>
-    </section>
+        {/* Trust badges */}
+        <div className="flex flex-wrap justify-center mt-4 sm:mt-6 gap-3 sm:gap-4">
+          <div
+            className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg ${
+              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+            }`}
+          >
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+              />
+            </svg>
+            <span
+              className={`text-xs font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              100% Secure
+            </span>
+          </div>
+          <div
+            className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg ${
+              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+            }`}
+          >
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            <span
+              className={`text-xs font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              High Performance
+            </span>
+          </div>
+          <div
+            className={`flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg ${
+              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+            }`}
+          >
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-purple-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span
+              className={`text-xs font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Global Support
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style jsx>{`
+    @keyframes float {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    @keyframes float-slow {
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    .animate-float-slow {
+      animation: float-slow 8s ease-in-out infinite;
+    }
+    @media (max-width: 640px) {
+      .animate-pulse {
+        animation: none;
+      }
+    }
+  `}</style>
+</section>
         {/* here the hero section of the trackode ends */}
 
         {/* Trackode Image Section */}

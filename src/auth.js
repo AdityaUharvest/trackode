@@ -48,6 +48,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
   },
+  trustHost: true,
+  secret: process.env.AUTH_SECRET,
   useSecureCookies: process.env.NODE_ENV === "production",
   callbacks: {
     async signIn({ user, account, profile }) {

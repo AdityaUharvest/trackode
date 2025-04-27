@@ -71,7 +71,6 @@ interface Props {
 
 const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
   const { theme } = useTheme();
-  const { data: session, status } = useSession();
   const [filteredQuizzes, setFilteredQuizzes] = useState<Quiz[]>(quizzes);
   const [filteredMockTests, setFilteredMockTests] = useState<MockTest[]>(mockTests);
   const [searchTerm, setSearchTerm] = useState("");
