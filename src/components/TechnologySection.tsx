@@ -215,7 +215,7 @@ export default function TechStackQuizSystem() {
                   <button
                     key={tech}
                     onClick={() => handleTechClick(tech)}
-                    className={`flex flex-col items-center p-5 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg cursor-pointer ${
+                    className={`flex border-l-2 border-${color}-400 flex-col items-center p-5 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg cursor-pointer ${
                       theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-white hover:bg-gray-50"
                     }`}
                     style={{

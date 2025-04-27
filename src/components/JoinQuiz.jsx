@@ -66,7 +66,7 @@ export  default  function QuizJoinComponent() {
             </svg>
           </span>
           <span className="ml-2 font-semibold text-gray-800 dark:text-white whitespace-nowrap">
-            Join Quiz:
+            Join as a participant ?
           </span>
         </div>
         
