@@ -22,5 +22,5 @@ jobs:
           set -e
           if [ "${GITHUB_REF##*/}" == "main" ]; then
             echo "Deploying to trackode environment..."
-            ssh -o StrictHostKeyChecking=no root@212.38.94.94 'cd /var/www/trackode && git pull origin mian && docker-compose -f docker-compose.yml down && docker-compose -f docker-compose.yml up -d --build'
+            ssh -o StrictHostKeyChecking=no root@212.38.94.94 'cd /var/www/trackode && git pull origin main && docker-compose -f docker-compose.yml down && docker-compose -f docker-compose.yml up -d --build'
           fi
