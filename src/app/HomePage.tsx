@@ -49,43 +49,43 @@ export default function HomePage() {
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
         <section
-  className={`relative min-h-screen justify-center animate-slide-up flex flex-col ${
+  className={`relative justify-center animate-slide-up flex flex-col ${
     theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"
-  } overflow-hidden`}
+  } overflow-hidden min-h-[auto] sm:min-h-screen`} // Changed min-h-screen to auto on mobile
 >
   {/* Background elements */}
   <div className="absolute inset-0 pointer-events-none">
     {theme === "dark" ? (
       <>
         <div
-          className="absolute top-0 left-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-900 rounded-full opacity-10 filter blur-2xl sm:blur-3xl"
+          className="absolute top-0 left-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-900 rounded-full opacity-10 filter blur-xl sm:blur-3xl" // Reduced size on mobile
         ></div>
         <div
-          className="absolute bottom-0 right-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-purple-900 rounded-full opacity-10 filter blur-2xl sm:blur-3xl"
+          className="absolute bottom-0 right-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-purple-900 rounded-full opacity-10 filter blur-xl sm:blur-3xl"
         ></div>
         <div
-          className="absolute top-1/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-indigo-900 rounded-full opacity-10 filter blur-xl sm:blur-2xl"
+          className="absolute top-1/4 right-1/4 w-24 h-24 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-indigo-900 rounded-full opacity-10 filter blur-xl sm:blur-2xl"
         ></div>
       </>
     ) : (
       <>
         <div
-          className="absolute top-0 left-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-200 rounded-full opacity-30 filter blur-2xl sm:blur-3xl"
+          className="absolute top-0 left-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-200 rounded-full opacity-30 filter blur-xl sm:blur-3xl"
         ></div>
         <div
-          className="absolute bottom-0 right-0 w-48 h-48 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-indigo-200 rounded-full opacity-30 filter blur-2xl sm:blur-3xl"
+          className="absolute bottom-0 right-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-indigo-200 rounded-full opacity-30 filter blur-xl sm:blur-3xl"
         ></div>
         <div
-          className="absolute top-1/4 right-1/4 w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-purple-200 rounded-full opacity-20 filter blur-xl sm:blur-2xl"
+          className="absolute top-1/4 right-1/4 w-24 h-24 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-purple-200 rounded-full opacity-20 filter blur-xl sm:blur-2xl"
         ></div>
       </>
     )}
   </div>
   <div
-    className="absolute -left-4 -top-4 w-16 h-20 sm:w-20 sm:h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-20"
+    className="absolute -left-4 -top-4 w-12 h-16 sm:w-20 sm:h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-20" // Reduced size on mobile
   ></div>
   <div
-    className="absolute -right-4 -bottom-4 w-16 h-20 sm:w-20 sm:h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-20"
+    className="absolute -right-4 -bottom-4 w-12 h-16 sm:w-20 sm:h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-20"
   ></div>
 
   {/* Floating code elements - hidden on mobile */}
@@ -108,26 +108,23 @@ export default function HomePage() {
       {"}"}
     </div>
   </div>
-  <div className="w-full pt-4 px-4 sm:px-6 z-20 relative"> {/* z-20 to stay above backgrounds */}
-    <div className="max-w-sm sm:max-w-md mx-auto">
+  <div className="w-full pt-4 px-4 sm:px-6 z-20 relative">
+    <div className="max-w-md mx-auto"> {/* Increased max-width for mobile */}
       <QuizJoinComponent />
     </div>
   </div>
 
-  <div className="relative px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]"> 
-    {/* Modified container below */}
-    <div className="flex flex-col items-center justify-center w-full">
-      {/* Live indicator */}
-      
-      
-
+  <div
+    className="relative px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col min-h-[auto] sm:min-h-[calc(100vh-80px)]" // Reduced padding and min-h on mobile
+  >
+    <div className="flex mt-12 flex-col items-center justify-start w-full sm:justify-center"> {/* Changed to justify-start on mobile */}
       {/* Hero content */}
-      <div className="text-center max-w-3xl mb-6 sm:mb-8">
+      <div className="text-center max-w-3xl mb-4 sm:mb-8">
         <h1
-          className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight"
+          className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight" // Reduced font size on mobile
         >
           <span
-            className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
+            className="block mb-1 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" // Reduced margin
           >
             Level Up Your Skills
           </span>
@@ -143,31 +140,28 @@ export default function HomePage() {
           </span>
         </h1>
         <p
-          className={`mt-4 sm:mt-6 text-sm sm:text-base max-w-2xl ${
+          className={`mt-3 sm:mt-6 text-xs sm:text-base max-w-2xl ${
             theme === "dark" ? "text-gray-300" : "text-gray-600"
-          }`}
+          }`} // Reduced margin and font size on mobile
         >
           Test, learn, and master programming concepts with AI-powered challenges.
           Get instant feedback and track your progress on your coding journey.
         </p>
       </div>
 
-      {/* Quiz join component */}
-      
-
       {/* CTA buttons */}
       <div
-        className="mt-2 flex gap-3 lg:gap-28 justify-center mb-8 sm:mb-12"
+        className="mt-2 flex gap-3 justify-center mb-6 sm:mb-12" // Reduced gaps and margins
       >
         <Link
           href="/dashboard"
-          className="px-7 py-2.5  sm:py-3 text-base sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+          className="px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
         >
           Get Started
         </Link>
         <Link
           href="/admin-dashboard"
-          className={`px-7 py-2.5  sm:py-3 text-base sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${
+          className={`px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${
             theme === "dark"
               ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
               : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
@@ -178,37 +172,37 @@ export default function HomePage() {
       </div>
 
       {/* Social proof */}
-      <div className="w-full max-w-3xl">
-        <div className="items   justify-center flex  gap-11 lg:gap-24 ">
-          
-          <div className="flex  sm:mb-0">
+      <div className="w-full mt-10 mb-16 max-w-3xl">
+        <div className="items-center justify-center flex gap-6 sm:gap-24"> {/* Reduced gap */}
+          <div className="flex sm:mb-0">
             <div className="flex -space-x-2">
-              {["aditya.png", "rohit.png", "rohitk.png", "kaju.png"].map((img, i) => (
-                <div
-                  key={i}
-                  className={`w-7 h-7 sm:w-10 sm:h-10 rounded-full border-2 ${
-                    theme === "dark" ? "border-gray-800" : "border-white"
-                  } overflow-hidden shadow-md transition-transform duration-300 hover:scale-110 hover:z-10 relative`}
-                  style={{ zIndex: 4 - i }}
-                >
-                  <img
-                    alt={`User ${i + 1}`}
-                    src={img}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+              {["aditya.png", "rohit.png", "rohitk.png", "kaju.png"].map(
+                (img, i) => (
+                  <div
+                    key={i}
+                    className={`w-6 h-6 sm:w-10 sm:h-10 rounded-full border-2 ${
+                      theme === "dark" ? "border-gray-800" : "border-white"
+                    } overflow-hidden shadow-md transition-transform duration-300 hover:scale-110 hover:z-10 relative`} // Reduced size on mobile
+                    style={{ zIndex: 4 - i }}
+                  >
+                    <img
+                      alt={`User ${i + 1}`}
+                      src={img}
+                      loading="lazy"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )
+              )}
             </div>
-            
           </div>
-          
-          <div className="flex flex-col items-center ">
-            <div className='flex'>
+
+          <div className="flex flex-col items-center">
+            <div className="flex">
               <svg
-                className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                className={`w-3 h-3 sm:w-5 sm:h-5 ${
                   theme === "dark" ? "text-blue-400" : "text-blue-600"
-                }`}
+                }`} // Reduced size
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -221,20 +215,19 @@ export default function HomePage() {
                 />
               </svg>
               <p
-                className={`ml-1 text-xs font-medium ${
+                className={`ml-1 text-xs sm:text-sm font-medium ${
                   theme === "dark" ? "text-gray-400" : "text-gray-600"
                 }`}
               >
                 Trusted by top developers
               </p>
             </div>
-            <div className=" text-center">
-            
-              <div className="flex items-center  justify-center">
+            <div className="text-center">
+              <div className="flex items-center justify-center">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <svg
                     key={star}
-                    className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400"
+                    className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" // Reduced size
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -242,7 +235,7 @@ export default function HomePage() {
                   </svg>
                 ))}
                 <span
-                  className={`ml-1 text-xs ${
+                  className={`ml-1 text-xs sm:text-sm ${
                     theme === "dark" ? "text-gray-400" : "text-gray-500"
                   }`}
                 >
@@ -253,91 +246,92 @@ export default function HomePage() {
           </div>
         </div>
 
-  {/* Trust badges */}
-  <div className="flex flex-wrap justify-center mt-4 gap-2 sm:gap-3">
-    <div
-      className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
-        theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-      }`}
-    >
-      <svg
-        className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-green-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-        />
-      </svg>
-      <span
-        className={`text-xs sm:text-xs font-medium ${
-          theme === "dark" ? "text-gray-300" : "text-gray-700"
-        }`}
-      >
-        100% Secure
-      </span>
-    </div>
-    <div
-      className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
-        theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-      }`}
-    >
-      <svg
-        className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-blue-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        />
-      </svg>
-      <span
-        className={`text-xs sm:text-xs font-medium ${
-          theme === "dark" ? "text-gray-300" : "text-gray-700"
-        }`}
-      >
-        High Performance
-      </span>
-    </div>
-    {/* Optionally hide the third badge on mobile */}
-    <div
-      className={`hidden sm:flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
-        theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-      }`}
-    >
-      <svg
-        className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-purple-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-      <span
-        className={`text-xs sm:text-xs font-medium ${
-          theme === "dark" ? "text-gray-300" : "text-gray-700"
-        }`}
-      >
-        Global Support
-      </span>
+        {/* Trust badges */}
+        <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
+          <div
+            className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
+              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+            }`}
+          >
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-green-500" // Reduced size
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+              />
+            </svg>
+            <span
+              className={`text-xs sm:text-sm font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              100% Secure
+            </span>
+          </div>
+          <div
+            className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
+              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+              }`}
+          >
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            <span
+              className={`text-xs sm:text-sm font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              High Performance
+            </span>
+          </div>
+          <div
+            className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
+              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+            }`}
+          >
+            <svg
+              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-purple-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <span
+              className={`text-xs sm:text-sm font-medium ${
+                theme === "dark" ? "text-gray-300" : "text-gray-700"
+              }`}
+            >
+              Global Support
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
-<style jsx>{`
+  <style jsx>{`
     @keyframes float {
       0%,
       100% {
@@ -368,10 +362,6 @@ export default function HomePage() {
       }
     }
   `}</style>
-    </div>
-  </div>
-
-  
 </section>
         {/* here the hero section of the trackode ends */}
 
