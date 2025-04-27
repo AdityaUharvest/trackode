@@ -44,7 +44,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     maxAge: 30 * 24 * 60 * 60,
   },
   secret: process.env.AUTH_SECRET, // Ensure secret is set
-  trustHost: true, // Trust the host (remove in production if NEXTAUTH_URL is sufficient)
   useSecureCookies: process.env.NODE_ENV === "production",
   debug: process.env.NODE_ENV !== "production", // Enable debug logs
   callbacks: {
