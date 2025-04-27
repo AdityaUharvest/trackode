@@ -71,7 +71,7 @@ const Navbar: React.FC = () => {
               className="h-8 rounded-lg"
               alt="Trackode Logo"
             />
-            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 lg:text-2xl text-xl font-bold whitespace-nowrap ${theme === "light" ? "text-gray-900" : "text-white"}`}>
+            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 lg:text-2xl text-xl font-bold whitespace-nowrap `}>
               Trackode
             </span>
           </Link>
