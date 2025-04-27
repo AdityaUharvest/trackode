@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to Server
+        run: |
+          set -e
+          if [ "${GITHUB_REF##*/}" == "main" ]; then
+            echo "Deploying to trackode environment..."
+            ssh -o StrictHostKeyChecking=no root@212.38.94.94 'cd /var/www/trackode && git pull origin mian && docker-compose -f docker-compose.yml down && docker-compose -f docker-compose.yml up -d --build'
+          fi
