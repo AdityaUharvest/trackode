@@ -1,8 +1,10 @@
-import axios from "axios";
-import MockTestsListClient from "@/components/AvailableMocks";
 import { Metadata } from "next";
+import MockTestsListClient from "@/components/AvailableMocks";
+import connectDB from "@/lib/util";
+import MockTest from "@/app/model/MoockTest"; // (Check spelling if it's not typo!)
+import QuizAttempt from "@/app/model/QuizAttempt";
 
-interface MockTest {
+interface MockTestType {
   _id: string;
   title: string;
   durationMinutes: number;
@@ -17,13 +19,11 @@ interface MockTest {
 // Metadata for SEO
 export const metadata: Metadata = {
   title: "Free Mock Tests | Trackode",
-  description:
-    "Practice and improve your coding skills with our collection of Free  mock tests. Filter by difficulty, track your progress, and compete on leaderboards.",
+  description: "Practice and improve your coding skills with our collection of Free mock tests. Filter by difficulty, track your progress, and compete on leaderboards.",
   keywords: ["Free mock tests", "coding practice", "programming quizzes", "Trackode", "TCS mock tests"],
   openGraph: {
     title: "Free Mock Tests | Trackode",
-    description:
-      "Join 500+ developers to practice TCS mock tests and enhance your programming skills.",
+    description: "Join 500+ developers to practice TCS mock tests and enhance your programming skills.",
     url: "https://trackode.in/mocks",
     type: "website",
     images: [
@@ -39,33 +39,35 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TCS Mock Tests | Trackode",
     description: "Practice TCS mock tests to level up your coding skills.",
-    images: ["https://yourdomain.com/og-image.jpg"],
+    images: ["https://trackode.in/og-image.jpg"],
   },
 };
 
-async function fetchMockTests(): Promise<MockTest[]> {
-  try {
-    const response = await axios.get(`${process.env.NEXTAUTH_URL}/api/mock-tests/getAll`);
-    if (!response.data) {
-      throw new Error("Failed to fetch mock tests");
-    }
+async function fetchMockTests(): Promise<MockTestType[]> {
+  await connectDB();
 
-    // Add random player counts and fallback values
-    return response.data.mocks.map((mock: MockTest) => ({
-      ...mock,
-      userPlayed: mock.userPlayed || Math.floor(Math.random() * 500) + 50,
-      category: mock.category || "TCS",
-      difficulty:
-        mock.difficulty ||
-        (["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)] as
-          | "Easy"
-          | "Medium"
-          | "Hard"),
-    }));
-  } catch (err) {
-    console.error("Error fetching mock tests:", err);
-    return [];
-  }
+  const mocks = await MockTest.find({ public: true, isPublished: true }).sort({ createdAt: -1 });
+
+  const mockIds = mocks.map((mock) => mock._id);
+
+  const quizAttempts = await QuizAttempt.find({ quizId: { $in: mockIds } });
+
+  const quizAttemptMap = quizAttempts.reduce((acc, attempt) => {
+    const key = attempt.quizId.toString();
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(attempt);
+    return acc;
+  }, {} as Record<string, any[]>);
+
+  return mocks.map((mock) => ({
+    ...mock.toObject(),
+    quizAttempts: quizAttemptMap[mock._id.toString()] || [],
+    userPlayed: mock.userPlayed || Math.floor(Math.random() * 500) + 50,
+    category: mock.category || "TCS",
+    difficulty: mock.difficulty || (["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)] as "Easy" | "Medium" | "Hard"),
+  }));
 }
 
 export default async function MockTestsPage() {

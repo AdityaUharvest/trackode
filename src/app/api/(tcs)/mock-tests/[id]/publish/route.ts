@@ -9,7 +9,7 @@ export async function POST(
     await connectDB();
     const data = await request.json();
     const {id} = await params
-    console.log(id)
+    console.log('Publishing mock test with ID:', id);
     const mockTest = await MockTest.findById(id);
     
     if (!mockTest) {
@@ -29,6 +29,7 @@ export async function POST(
       {
       shareLink: `/playy/${mockTest.shareCode}`,
       message: message,
+      success: true,
       }
       
     

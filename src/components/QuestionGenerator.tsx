@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useSession } from 'next-auth/react';
 import Section from "@/app/model/Section"
+import Link from 'next/link';
 interface Question {
   text: string;
   options: string[];
@@ -70,6 +71,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [shareLink, setShareLink] = useState('');
+  const [isPublishedd, setIsPublished] = useState(isPublished);
   // for sections
 
   // Theme-based classes
@@ -83,7 +85,27 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const explanationClasses = `p-3 rounded text-sm ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50'}`;
   const errorClasses = `p-3 rounded ${theme === 'dark' ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-700'}`;
   const successClasses = `p-3 rounded ${theme === 'dark' ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-700'}`;
-
+ const handlePublish = async () => {
+    try {
+      
+      setErrorMessage('');
+      const res = await axios.post(`/api/mock-tests/${mockTestId}/publish`,{
+        isPublished: !isPublished,
+      });
+      if (res.data.success) {
+        setSuccessMessage('Quiz published successfully!');
+        setTimeout(() => setSuccessMessage(''), 3000);
+        setIsPublished(!isPublished);
+      } else {
+        throw new Error('Failed to publish quiz');
+      }
+    } catch (error) {
+      console.error('Failed to publish quiz', error);
+      setErrorMessage('Failed to publish quiz. Please try again.');
+    } finally {
+      
+    }
+  }
   const parseGeneratedQuestions = (generatedQuestions: any): Question[] => {
     // First try to parse as complete JSON
     if (typeof generatedQuestions === 'string') {
@@ -271,147 +293,209 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   };
 
   return (
-    <div className={containerClasses}>
-      <div className="p-4 flex justify-between items-center">
-        {isPublished && (
-          <Button
-            className="dark:bg-green-600 bg-white text-blue hover:bg-blue-700 hover:text-white"
-            onClick={handleShareLink}
-            disabled={isGenerating || isSubmitting || copied}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 48 48">
-              <path fill="#1976D2" d="M38.1,31.2L19.4,24l18.7-7.2c1.5-0.6,2.3-2.3,1.7-3.9c-0.6-1.5-2.3-2.3-3.9-1.7l-26,10C8.8,21.6,8,22.8,8,24s0.8,2.4,1.9,2.8l26,10c0.4,0.1,0.7,0.2,1.1,0.2c1.2,0,2.3-0.7,2.8-1.9C40.4,33.5,39.6,31.8,38.1,31.2z"></path><path fill="#1E88E5" d="M11 17A7 7 0 1 0 11 31 7 7 0 1 0 11 17zM37 7A7 7 0 1 0 37 21 7 7 0 1 0 37 7zM37 27A7 7 0 1 0 37 41 7 7 0 1 0 37 27z"></path>
-            </svg>
-            {copied ? 'Copied' : 'Share'}
-          </Button>
-        )}
-
-        {isPublished ? (
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
-            Published
-          </span>
-        ) : (
-          <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">
-            Unpublished
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-2">
-          <select
-            value={selectedSection}
-            onChange={(e) => setSelectedSection(e.target.value)}
-            className={`ml-2 text-sm ${selectClasses}`}
-            disabled={isGenerating || isSubmitting}
-          >
-            {sections.map(section => (
-              <option className='text-sm' key={section.value} value={section.value}>
-                {section.label}
-              </option>
-            ))}
-          </select>
-          <Button
-            onClick={generateQuestions}
-            disabled={isGenerating || isSubmitting}
-            className="bg-blue-600 text-white hover:bg-blue-700"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="animate-spin mr-2" />
-                Generating...
-              </>
-            ) : 'Generate Questions'}
-          </Button>
-        </div>
-      </div>
-
-      {errorMessage && (
-        toast.error(errorMessage),
-        <div className={errorClasses}>
-          {errorMessage}
-        </div>
-      )}
-
-      {successMessage && (
-        toast.success(successMessage),
-        <div className={successClasses}>
-          {successMessage}
-        </div>
-      )}
-
-      {isLoading ? (
-        <div className="text-center py-8">
-          <Loader2 className="animate-spin mx-auto" size={32} />
-          <p className="mt-2">Loading questions...</p>
-        </div>
-      ) : editingQuestion ? (
-        <QuestionEditor
-          question={editingQuestion}
-          onSave={(updatedQuestion) => handleUpdateQuestion(updatedQuestion, editingQuestion.index)}
-          onCancel={() => setEditingQuestion(null)}
-        />
-      ) : (
-        <>
-          <div className="grid sm:grid-cols-2 p-3 gap-4">
-            {questions.length === 0 ? (
-              <div className={`text-center py-8 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
-                No questions yet. Click "Generate Questions" to get started.
-              </div>
-            ) : (
-              questions.map((q, index) => (
-                <div key={index} className={questionCardClasses}>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-medium">Question {index + 1}</h3>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(index)}
-                        className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(index)}
-                        className={`${theme === 'dark' ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-800'}`}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                  <p className="mb-3">{q.text}</p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3">
-                    {q.options.map((opt, i) => (
-                      <div
-                        key={i}
-                        className={optionClasses(q.correctAnswer === i)}
-                      >
-                        {String.fromCharCode(65 + i)}. {opt}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          {questions.length > 0 && (
-            <div className="flex mb-2 justify-end">
-              <Button
-                onClick={saveQuestions}
-                disabled={isSubmitting}
-                className="bg-green-600 mb-2 mr-2 text-white hover:bg-green-700"
+<div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+          {/* Header Section */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-4">
+              {isPublished && (
+                <button
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    copied
+                      ? "bg-green-500 text-white"
+                      : "bg-blue-600 text-white hover:bg-blue-700"
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  onClick={handleShareLink}
+                  disabled={isGenerating || isSubmitting || copied}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-5 h-5"
+                    viewBox="0 0 48 48"
+                    fill="currentColor"
+                  >
+                    <path d="M38.1,31.2L19.4,24l18.7-7.2c1.5-0.6,2.3-2.3,1.7-3.9c-0.6-1.5-2.3-2.3-3.9-1.7l-26,10C8.8,21.6,8,22.8,8,24s0.8,2.4,1.9,2.8l26,10c0.4,0.1,0.7,0.2,1.1,0.2c1.2,0,2.3-0.7,2.8-1.9C40.4,33.5,39.6,31.8,38.1,31.2z"></path>
+                    <path d="M11 17A7 7 0 1 0 11 31 7 7 0 1 0 11 17zM37 7A7 7 0 1 0 37 21 7 7 0 1 0 37 7zM37 27A7 7 0 1 0 37 41 7 7 0 1 0 37 27z"></path>
+                  </svg>
+                  {copied ? "Copied!" : "Share"}
+                </button>
+              )}
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  isPublished
+                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                    : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+                }`}
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin mr-2" />
-                    Saving...
-                  </>
-                ) : 'Save Questions'}
-              </Button>
+                {isPublished ? "Published" : "Unpublished"}
+              </span>
+            </div>
+          </div>
+
+          {/* Controls Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-6">
+            <div className="flex gap-1">
+              <select
+                value={selectedSection}
+                onChange={(e) => setSelectedSection(e.target.value)}
+                className=" rounded-lg w-48 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                disabled={isGenerating || isSubmitting}
+              >
+                {sections.map((section) => (
+                  <option key={section.value} value={section.value}>
+                    {section.label}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={generateQuestions}
+                disabled={isGenerating || isSubmitting}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isGenerating && <Loader2 className="animate-spin w-5 h-5" />}
+                {isGenerating ? "Generating..." : "Generate"}
+              </button>
+            </div>
+          </div>
+
+          {/* Notifications */}
+          {errorMessage && (
+            <div className="mb-4 p-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg">
+              {errorMessage}
             </div>
           )}
-        </>
-      )}
-    </div>
+          {successMessage && (
+            <div className="mb-4 p-4 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-lg">
+              {successMessage}
+            </div>
+          )}
+
+          {/* Main Content */}
+          {isLoading ? (
+            <div className="text-center py-12">
+              <Loader2 className="animate-spin mx-auto w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <p className="mt-3 text-gray-600 dark:text-gray-300">Loading questions...</p>
+            </div>
+          ) : editingQuestion ? (
+            <QuestionEditor
+              question={editingQuestion}
+              onSave={(updatedQuestion) =>
+                handleUpdateQuestion(updatedQuestion, editingQuestion.index)
+              }
+              onCancel={() => setEditingQuestion(null)}
+            />
+          ) : (
+            <>
+              <div className="space-y-6">
+                {questions.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                    No questions yet. Click "Generate Questions" to get started.
+                  </div>
+                ) : (
+                  questions.map((q, index) => (
+                    <div
+                      key={index}
+                      className="p-6 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                          Question {index + 1}
+                        </h3>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => handleEdit(index)}
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(index)}
+                            className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                      <p className="mb-4 text-gray-700 dark:text-gray-200">{q.text}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {q.options.map((opt, i) => (
+                          <div
+                            key={i}
+                            className={`p-3 rounded-lg text-sm ${
+                              q.correctAnswer === i
+                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                                : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200"
+                            }`}
+                          >
+                            {String.fromCharCode(65 + i)}. {opt}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+              {questions.length > 0 && (
+                <>
+                <button
+                  onClick={saveQuestions}
+                  disabled={isSubmitting}
+                  className="fixed bottom-6 right-6 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                >
+                  {isSubmitting && <Loader2 className="animate-spin w-5 h-5" />}
+                  {isSubmitting  ? "Saving..." : "Save Questions"}
+                  
+                </button>
+                
+                <button
+                
+                className="fixed bottom-20 right-6 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                
+                {questions.length > 24 && (
+                  
+                   <Link href="/admin-dashboard" className="text-white text-sm font-semibold">
+                   Go to Dashboard
+                   </Link> 
+                 
+                )}
+              </button>
+              <Button
+                onClick={()=>navigator.share({
+                  title: 'Trackode Quiz',
+                  text: `Check out this quiz on Trackode! ${window.location.origin}/playy/${shareCode}`,
+                  url: `${window.location.origin}/playy/${shareCode}`,
+
+                }).then(
+                  () => {
+                    toast.success('Link Copied!');
+                  },
+                  (error) => {
+                    toast.error('Failed to share quiz. Please try again.');
+                  }
+                )}
+                className="fixed bottom-32 right-6 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                Share
+                
+               
+              </Button>
+              <Button
+                onClick={handlePublish}
+                className="fixed bottom-44 right-6 flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+              >
+                {isPublishedd ? 'Unpublish' : 'Publish'}
+
+                
+                
+               
+              </Button>
+              </>
+                
+              )}
+              
+              
+            </>
+          )}
+        </div>
   );
 }
