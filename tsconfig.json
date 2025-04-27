@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/util.js", "src/auth.js", "src/app/model/User.js", "src/app/api/user/signup/route.ts", "src/app/api/auth/[...nextauth]/route.js", "src/app/api/contact/route.ts", "src/app/dashboard/page.jsx", "src/app/quiz-play/[id]/page.tsx", "src/components/DashBoard.jsx", "src/components/skeleton/Skeleton.jsx", "src/app/(pages)/coverpage/page.jsx", "src/components/SplitText.jsx", "src/app/api/(quiz)/total-quizes/route.ts", "src/app/api/chat-gpt/route.ts", "src/app/(pages)/(dashboards)/dashboard/page.tsx", "src/components/StudentDashboard.jsx", "src/components/JoinQuiz.jsx", "src/components/TechnologySection.tsx", "src/app/(pages)/(tcs-nqt)/playy/[shareCode]/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/util.js", "src/auth.js", "src/app/model/User.js", "src/app/api/user/signup/route.ts", "src/app/api/auth/[...nextauth]/route.js", "src/app/api/contact/route.ts", "src/app/dashboard/page.jsx", "src/app/quiz-play/[id]/page.tsx", "src/components/DashBoard.jsx", "src/components/skeleton/Skeleton.jsx", "src/app/(pages)/coverpage/page.jsx", "src/components/SplitText.jsx", "src/app/api/(quiz)/total-quizes/route.ts", "src/app/api/chat-gpt/route.ts", "src/app/(pages)/(dashboards)/student-dashboard/page.tsx", "src/components/StudentDashboard.jsx", "src/components/JoinQuiz.jsx", "src/components/TechnologySection.tsx", "src/app/(pages)/(tcs-nqt)/playy/[shareCode]/page.jsx"],
   "exclude": ["node_modules"]
 }
