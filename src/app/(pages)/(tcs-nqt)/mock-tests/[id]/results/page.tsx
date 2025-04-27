@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Search, ArrowLeft, Printer, Trophy, Medal, Award, Loader2} from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { useSession } from 'next-auth/react';
+import toast from 'react-hot-toast';
 import React from 'react';
 import axios from 'axios';
 import { motion } from 'framer-motion';
@@ -89,6 +90,32 @@ export default function QuizResultsDashboard({ params }: any) {
     } catch (error) {
       console.error('Error getting personalized feedback:', error);
       return null;
+    }
+  };
+  const [isSendingEmails, setIsSendingEmails] = useState(false);
+
+  // Function to send quiz results to all students
+  const sendResultsToAll = async () => {
+    setIsSendingEmails(true);
+    try {
+      const response = await fetch('/api/otp/send-result', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Quiz results sent successfully to all participants!');
+      } else {
+        toast.error(data.message || 'Failed to send quiz results');
+      }
+    } catch (error) {
+      toast.error('An error occurred while sending quiz results');
+      console.error('Error sending quiz results:', error);
+    } finally {
+      setIsSendingEmails(false);
     }
   };
   useEffect(() => {
@@ -190,7 +217,7 @@ export default function QuizResultsDashboard({ params }: any) {
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
   };
-
+  
   const toggleExpandAttempt = async (attemptId: string) => {
     setExpandedAttempt(prev => {
       const newState = prev === attemptId ? null : attemptId;
@@ -252,6 +279,8 @@ export default function QuizResultsDashboard({ params }: any) {
       </div>
     );
   }
+  //result sending 
+  
 
   return (
     <div className={`container mx-auto px-4 py-8 min-h-screen ${bgColor} ${textColor}`}>
@@ -284,16 +313,42 @@ export default function QuizResultsDashboard({ params }: any) {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-8">
-      <h1 className="text-lg font-semibold text-blue-500">
-  {(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 17) return "Good afternoon";
-    return "Good evening";
-  })()} {session?.user?.name} ✨
-</h1>
-        <div className="flex items-center space-x-4">
+<div className="flex items-center justify-between mb-8">
+        <h1 className="text-base font-semibold text-blue-500">
+          {(() => {
+            const hour = new Date().getHours();
+            if (hour < 12) return 'Good morning';
+            if (hour < 17) return 'Good afternoon';
+            return 'Good evening';
+          })()}{' '}
+          {session?.user?.name} ✨
+        </h1>
+        <div className="items-center sm:flex-row  space-x-4">
+          <Button
+            variant="outline"
+            onClick={sendResultsToAll}
+            disabled={isSendingEmails}
+            className={`gap-2 ${borderColor}`}
+          >
+            {isSendingEmails ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                Share to Participants
+              </>
+            )}
+          </Button>
           <Button
             variant="outline"
             onClick={() => {
