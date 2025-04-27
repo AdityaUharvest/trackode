@@ -49,7 +49,7 @@ export default function HomePage() {
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
         <section
-  className={`relative  animate-slide-up flex flex-col ${
+  className={`relative min-h-screen justify-center animate-slide-up flex flex-col ${
     theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"
   } overflow-hidden`}
 >
@@ -108,21 +108,23 @@ export default function HomePage() {
       {"}"}
     </div>
   </div>
+  <div className="w-full pt-4 px-4 sm:px-6 z-20 relative"> {/* z-20 to stay above backgrounds */}
+    <div className="max-w-sm sm:max-w-md mx-auto">
+      <QuizJoinComponent />
+    </div>
+  </div>
 
-  <div
-    className="relative px-4 py-8 sm:py-12 mx-auto  max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col"
-  >
-    <div className="flex flex-col items-center   justify-center h-full">
+  <div className="relative px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col justify-center min-h-[calc(100vh-80px)]"> 
+    {/* Modified container below */}
+    <div className="flex flex-col items-center justify-center w-full">
       {/* Live indicator */}
-      <div className="w-full max-w-sm sm:max-w-md mb-4 sm:mb-6">
-        <QuizJoinComponent />
-      </div>
+      
       
 
       {/* Hero content */}
       <div className="text-center max-w-3xl mb-6 sm:mb-8">
         <h1
-          className="text-xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight"
+          className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight"
         >
           <span
             className="block mb-2 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
