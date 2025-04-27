@@ -87,8 +87,8 @@ export default function Dashboard({mockTests, setMockTests, attempts, setAttempt
     <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
       <header className={`${headerBg} shadow-sm`}>
-        <div className="max-w-7xl mx-auto p-3 sm:px-3 lg:px-2 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <h1 className={`text-lg font-semibold ${textColor}`}>TCS Dashboard</h1>
+        <div className=" mx-auto p-3 sm:px-3 lg:px-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+          <h1 className={`text-base font-semibold ${textColor}`}>Mock Test Dashboard</h1>
           <Link
             href="/mock-tests"
             className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -259,7 +259,8 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText, 
   );
 }
 
-function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover, isMobile }: 
+function MockTestsTab(
+  { mocks,setMocks, cardBg, borderColor, textColor, secondaryText, tableHeaderBg, tableRowHover, isMobile }: 
   { mocks: MockTest[];setMocks: React.Dispatch<React.SetStateAction<MockTest[]>>; cardBg: string; borderColor: string; textColor: string; 
     secondaryText: string; tableHeaderBg: string; tableRowHover: string; isMobile: boolean }) {
   
@@ -295,15 +296,7 @@ function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondar
    const { theme } = useTheme();
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-1">
-        <h2 className={`text-sm font-semibold ${textColor}`}>My Mock Tests</h2>
-        <Link
-          href="/mock-tests"
-          className="w-full sm:w-auto inline-flex justify-center items-center p-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-        >
-          New Mock Test
-        </Link>
-      </div>
+      
 
       {mocks.length === 0 ? (
         <div className={`text-center py-8 ${textColor}`}>
@@ -388,14 +381,16 @@ function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondar
                   
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-2">
+                      <Button
+                      className='bg-blue-500 text-white hover:bg-blue-600'
+>
                       <Link
                         href={`/mock-tests/${mock._id}/results`}
-                        className={`text-xs sm:text-sm px-2 py-1 rounded ${
-                          theme === 'dark' ? 'bg-green-600 text-white hover:bg-green-800' : 'bg-green-600 text-white hover:bg-green-800'
-                        }`}
+                        
                       >
                         Results
                       </Link>
+                      </Button>
                       <Button
                         onClick={() => handlePublish(mock._id, mock.isPublished)}
                         size="sm"
@@ -404,17 +399,32 @@ function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondar
                       >
                         {mock.isPublished ? 'Unpublish' : 'Publish'}
                       </Button>
+                      <Button
+                      className='bg-yellow-500 text-white hover:bg-yellow-600'>
                       <Link
                         href={`/mock-tests/${mock._id}/questions`}
-                        className={`text-xs sm:text-sm px-2 py-1 rounded ${
-                          theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
-                        }`}
+                        
                       >
                         Questions
                       </Link>
+                      </Button>
+                      
                       <Button
                         onClick={()=>{
+                          navigator.share(
+                            {
+                              title: `Mock Test: ${mock.title}`,
+                              text: 'Check out this mock test I created!',
+                              url: `https://trackode.in/playy/${mock.shareCode}`
+                            }
+                          ).catch((error) => {
+                            console.error('Error sharing:', error);
+                            toast.error('Sharing failed!');
+                          }
+              )}}
+                        onClickCapture={() => {
                           navigator.clipboard.writeText(`https://trackode.in/playy/${mock.shareCode}`);
+
                           toast.success('Share link copied to clipboard!');
                         }}
                         className={`text-xs sm:text-sm px-2 py-1 rounded ${
@@ -422,7 +432,7 @@ function MockTestsTab({ mocks,setMocks, cardBg, borderColor, textColor, secondar
                         }`}
                       >
                        <Share
-                        size={10} className="ml-1" color={theme === 'dark' ? '#fff' : '#000'} 
+                        size={10}  color={theme === 'dark' ? '#fff' : '#000'} 
                         ></Share>
                       </Button>
                     </div>

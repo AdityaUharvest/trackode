@@ -8,8 +8,9 @@ export async function POST(
   try {
     await connectDB();
     const data = await request.json();
-    
-    const mockTest = await MockTest.findById(params.id);
+    const {id} = await params
+    console.log(id)
+    const mockTest = await MockTest.findById(id);
     
     if (!mockTest) {
       return NextResponse.json(

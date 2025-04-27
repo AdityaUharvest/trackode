@@ -369,7 +369,7 @@ export default function DashBoard() {
                 <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
               </div>
             ) : (
-              <MockDashboard mockTests={mockTests} stats={stats} attempts={attempts} setAttempts={setAttempts} setMockTests={mockTests} setStats={setStats} />
+              <MockDashboard mockTests={mockTests} stats={stats} attempts={attempts} setAttempts={setAttempts} setMockTests={setMockTests} setStats={setStats}  />
             )}
           </div>
         )}

@@ -11,7 +11,7 @@ export async function middleware(req: NextRequest) {
     '/quiz-setup',
     '/premium-mock-tests',
     '/mock-tests',
-    '/playy'
+    '/playy/'
   ]
 
   // Check if the current path is protected
@@ -23,10 +23,8 @@ export async function middleware(req: NextRequest) {
     
     const token = await getToken({
       req,
-      secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET,
-      secureCookie: 
-        process.env.NODE_ENV === 'production' ||
-        process.env.VERCEL_ENV === 'production' 
+      secret: process.env.AUTH_SECRET||process.env.NEXTAUTH_SECRET ,
+      secureCookie:process.env.NODE_ENV === 'production'
     })
 
     console.log('Token exists:', !!token) // Debug log
@@ -39,10 +37,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(signInUrl)
     }
 
-    // Optional: Add role-based checks here
-    // if (path.startsWith('/admin-dashboard') && token.role !== 'admin') {
-    //   return NextResponse.redirect(new URL('/unauthorized', req.url))
-    // }
+    
   }
 
   return NextResponse.next()

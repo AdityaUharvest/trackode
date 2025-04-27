@@ -55,8 +55,9 @@ const MockTestCreator: React.FC = () => {
       const response = await axios.post<{ id: string }>('/api/mock-tests', formData);
          // Debugging line to check response data
         if(response.data.id) {
-          toast.success('Mock test created successfully!');
           router.push(`mock-tests/${response.data.id}/questions`);
+          toast.success('Mock test created successfully!');
+          
         }
         
     
@@ -69,34 +70,7 @@ const MockTestCreator: React.FC = () => {
     }
   };
 
-  const generateInstructions = async () => {
-    setIsGenerating(true);
-    try {
-      const response = await fetch('/api/generate-instructions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: `Generate clear, concise instructions for a quiz with the following details:
-            Quiz Name: ${formData.title}
-            Duration: ${formData.durationMinutes} minutes
-            Start Time: ${formData.startTime}
-            End Time: ${formData.endTime}
-            Format the instructions as a numbered list and include important points about timing, marking scheme, and submission requirements.`,
-        }),
-      });
-      const data = await response.json();
-      const cleanInstructions = data?.instructions?.replace(/\*\*/g, '');
-      setFormData(prev => ({
-        ...prev,
-        description: cleanInstructions || '',
-        generatedInstructions: cleanInstructions || '',
-      }));
-    } catch (error) {
-      toast.error('Failed to generate instructions');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+  
 
   // Theme-based classes
   const containerClasses = `container p-3 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'}`;

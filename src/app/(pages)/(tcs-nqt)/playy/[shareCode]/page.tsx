@@ -92,7 +92,7 @@ export default function QuizPlayer() {
         const normalizedSections = res.data.sections.map((s: any) => ({
           name: s.value,
           label: s.label,
-          timeLimit: 0.1 * 60,
+          timeLimit: 25 * 60,
           questionCount: 0,
           submitted: false,
           unlocked: false,
@@ -519,38 +519,38 @@ export default function QuizPlayer() {
       </div>
     );
   }
-  // if (hasAttempted) {
-  //   return (
-  //     <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-  //       <div className={`p-8 rounded-lg max-w-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-lg'}`}>
-  //         <h2 className="text-2xl font-bold mb-6">Quiz Already Attempted</h2>
-  //         <p className="text-sm mb-8 text-gray-500">
-  //           You have already completed this quiz. Explore other quizzes or mocks to continue your learning journey.
-  //         </p>
-  //         <div className="flex flex-col gap-4">
-  //           <button
-  //             onClick={() => router.push('/dashboard')}
-  //             className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
-  //           >
-  //             Go to Dashboard
-  //           </button>
-  //           <button
-  //             onClick={() => router.push('/programming-quizzes')}
-  //             className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
-  //           >
-  //             Explore Free Live Quizzes
-  //           </button>
-  //           <button
-  //             onClick={() => router.push('/mocks')}
-  //             className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
-  //           >
-  //             Explore Free Live Mocks
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (hasAttempted) {
+    return (
+      <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className={`p-8 rounded-lg max-w-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-lg'}`}>
+          <h2 className="text-2xl font-bold mb-6">Quiz Already Attempted</h2>
+          <p className="text-sm mb-8 text-gray-500">
+            You have already completed this quiz. Explore other quizzes or mocks to continue your learning journey.
+          </p>
+          <div className="flex flex-col gap-4">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+            >
+              Go to Dashboard
+            </button>
+            <button
+              onClick={() => router.push('/programming-quizzes')}
+              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+            >
+              Explore Free Live Quizzes
+            </button>
+            <button
+              onClick={() => router.push('/mocks')}
+              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+            >
+              Explore Free Live Mocks
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!isPublished) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
