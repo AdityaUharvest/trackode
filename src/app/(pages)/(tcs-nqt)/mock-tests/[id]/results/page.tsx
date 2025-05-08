@@ -327,7 +327,7 @@ export default function QuizResultsDashboard({ params }: any) {
         </h1>
         
       </div>
-      {session?.user?.id==quizStats.userId?(
+      {session?.user?.id==quizStats.createdBy?(
          <div className="flex items-center justify-between mb-8">
           <Button
             variant="outline"
