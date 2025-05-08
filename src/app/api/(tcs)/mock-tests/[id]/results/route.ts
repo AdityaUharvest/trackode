@@ -36,6 +36,7 @@ interface IQuizAttempt {
 interface IMockTest {
   _id: mongoose.Types.ObjectId;
   title: string;
+  createdBy: string;
   // Add other quiz properties
 }
 
@@ -172,7 +173,8 @@ export async function GET(request: NextRequest, { params }: any) {
       quizId,
       quizTitle: quiz.title,
       totalParticipants: results.length,
-      attempts: results
+      attempts: results,
+      createdBy: quiz.createdBy,
     });
 
   } catch (error) {

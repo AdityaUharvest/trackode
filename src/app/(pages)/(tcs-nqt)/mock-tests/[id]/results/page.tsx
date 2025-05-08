@@ -61,7 +61,8 @@ export default function QuizResultsDashboard({ params }: any) {
   const [isLoading, setIsLoading] = useState(true);
   const [quizStats, setQuizStats] = useState({
     quizTitle: '',
-    totalParticipants: 0
+    totalParticipants: 0,
+    createdBy: ''
   });
   const [showConfetti, setShowConfetti] = useState(false);
 
@@ -154,7 +155,8 @@ export default function QuizResultsDashboard({ params }: any) {
         
         setQuizStats({
           quizTitle: data.quizTitle,
-          totalParticipants: data.totalParticipants
+          totalParticipants: data.totalParticipants,
+          createdBy: data.createdBy
         });
       } catch (error) {
         console.error("Failed to fetch attempts:", error);
@@ -323,7 +325,10 @@ export default function QuizResultsDashboard({ params }: any) {
           })()}{' '}
           {session?.user?.name} ✨
         </h1>
-        <div className="items-center sm:flex-row  space-x-4">
+        
+      </div>
+      {session?.user?.id==quizStats.userId?(
+         <div className="flex items-center justify-between mb-8">
           <Button
             variant="outline"
             onClick={sendResultsToAll}
@@ -367,7 +372,8 @@ export default function QuizResultsDashboard({ params }: any) {
             Export Results
           </Button>
         </div>
-      </div>
+      ):(null)}
+     
 
       {/* Leaderboard Podium */}
       {topPerformers.length > 0 && (

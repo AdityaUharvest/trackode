@@ -60,7 +60,7 @@ export default function Dashboard({
 }) {
   const { theme } = useTheme();
   const { data: session } = useSession();
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('mocks');
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -68,7 +68,7 @@ export default function Dashboard({
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== 'undefined') {
-      const savedTab = localStorage.getItem(DASHBOARD_TAB_KEY) || 'overview';
+      const savedTab = localStorage.getItem(DASHBOARD_TAB_KEY) || 'mocks';
       setActiveTab(savedTab);
       setIsMobile(window.innerWidth < 768);
     }
