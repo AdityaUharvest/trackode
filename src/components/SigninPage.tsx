@@ -42,7 +42,7 @@ export default function Signin() {
        
       });
       
-      if (!response) {
+      if (response?.error) {
         toast.error("Password or email is incorrect");
       }
       if (response?.ok) {
