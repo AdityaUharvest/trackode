@@ -762,13 +762,13 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
         </svg>
         Completed
       </span>
-      <div className="flex gap-2">
-        <Link href={`/quiz-result/${quiz._id}`} className={`text-xs ${
-          theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"
-        }`}>
+      <div className="flex gap-3">
+        <Link href={`/quiz-result/${quiz._id}`} className="text-xs p-2 text-white bg-green-400 rounded-lg ${
+      
+        ">
           Leaderboard
         </Link>
-        <Link href={`/dashboard/result/${quiz._id}`} className={`px-4 py-1.5 text-xs font-medium rounded-full ${
+        <Link href={`/dashboard/result/${quiz._id}`} className={`px-4 py-1.5 text-xs font-medium rounded-lg ${
           theme === "dark" ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"
         } transition-colors shadow-sm hover:shadow flex items-center`}>
           <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
