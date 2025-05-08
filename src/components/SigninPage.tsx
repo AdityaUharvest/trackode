@@ -1,29 +1,27 @@
 "use client";
 import SignInButton from "./Signin";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import toast, { Toaster } from 'react-hot-toast';
-import { useRouter, useSearchParams } from "next/navigation";
+import { use, useState,useEffect } from "react";
+import toast, { Toaster } from 'react-hot-toast';;
+import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useTheme } from "./ThemeContext";
 import { useSession } from "next-auth/react";
-
 export default function Signin() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { theme } = useTheme();
-  const { status } = useSession();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
-
+  const {status} = useSession()
   useEffect(() => {
     if (status === "authenticated") {
-      router.push(callbackUrl);
+      router.push("/");
     }
-  }, [status, callbackUrl, router]);
+  })
 
+
+  
   const submitHandler = async (e: any) => {
     e.preventDefault();
     if (!email || !password) {
@@ -38,16 +36,16 @@ export default function Signin() {
       const response = await signIn("credentials", {
         email,
         password,
-        callbackUrl, // Pass the callbackUrl here
-       
+        // redirect: false,
       });
       
       if (response?.error) {
         toast.error("Password or email is incorrect");
       }
-      if (response?.ok) {
-        toast.success("Sign in successful!");
-        router.push(callbackUrl); // Redirect to callbackUrl after successful sign in
+      if (response?.ok && !response?.error) {
+        setTimeout(() => {
+          router.push(response.url || "/");
+        }, 1500);
       }
     } catch (error) {
       toast.error("Sign in failed. Please try again.");
