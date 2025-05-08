@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import QuizDashboard from "@/components/QuizesToPlay";
 
-
 interface Quiz {
   _id: string;
   name: string;
@@ -40,7 +39,8 @@ interface QuizResult {
 }
 
 export default function ProgrammingLanguageQuizzes() {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [publicQuizzes, setPublicQuizzes] = useState<Quiz[]>([]);
+  const [userQuizzes, setUserQuizzes] = useState<Quiz[]>([]);
   const [mockTests, setMockTests] = useState<MockTest[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,27 +51,37 @@ export default function ProgrammingLanguageQuizzes() {
       try {
         setLoading(true);
 
-        // Fetch quizzes
-        const quizResponse = await axios.get("/api/total-quizes");
-        const quizData = quizResponse.data.quizes;
-        setQuizzes(quizData);
-
-        // Fetch quiz results
-        const resultsResponse = await axios.get("/api/attempted-public");
-        setQuizResults(resultsResponse.data);
-
-        // Fetch mock tests
+        // First fetch public data (works for SEO)
+        const publicResponse = await axios.get("/api/public-quizzes");
+        setPublicQuizzes(publicResponse.data.quizes);
         const mockResponse = await axios.get("/api/mock-tests/getAll");
-        if (!mockResponse.data) {
-          throw new Error("Failed to fetch mock tests");
+            if (!mockResponse.data) {
+              throw new Error("Failed to fetch mock tests");
+            }
+            const testsWithPlayers = mockResponse.data.mocks.map((mock: MockTest) => ({
+              ...mock,
+              userPlayed: mock.userPlayed || Math.floor(Math.random() * 500) + 50,
+              category: mock.category || "TCS",
+              difficulty: mock.difficulty || ["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)],
+            }));
+            setMockTests(testsWithPlayers);
+        // Then fetch private data if in browser environment
+        if (typeof window !== 'undefined') {
+          try {
+            // Fetch user-specific quiz data
+            const quizResponse = await axios.get("/api/total-quizes");
+            setUserQuizzes(quizResponse.data.quizes);
+
+            // Fetch quiz results
+            const resultsResponse = await axios.get("/api/attempted-public");
+            setQuizResults(resultsResponse.data);
+
+            // Fetch mock tests
+            
+          } catch (privateError) {
+            console.log("User not authenticated, skipping private data");
+          }
         }
-        const testsWithPlayers = mockResponse.data.mocks.map((mock: MockTest) => ({
-          ...mock,
-          userPlayed: mock.userPlayed || Math.floor(Math.random() * 500) + 50,
-          category: mock.category || "TCS",
-          difficulty: mock.difficulty || ["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)],
-        }));
-        setMockTests(testsWithPlayers);
 
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -84,11 +94,15 @@ export default function ProgrammingLanguageQuizzes() {
     fetchData();
   }, []);
 
+  // Combine public and user-specific quiz data
+  const combinedQuizzes = publicQuizzes.map(publicQuiz => {
+    const userQuiz = userQuizzes.find(uq => uq._id === publicQuiz._id);
+    return userQuiz ? { ...publicQuiz, ...userQuiz } : publicQuiz;
+  });
+
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900"
-      >
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
       </div>
     );
@@ -111,6 +125,10 @@ export default function ProgrammingLanguageQuizzes() {
   }
 
   return (
-    <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResults} />
+    <QuizDashboard 
+      quizzes={combinedQuizzes} 
+      mockTests={mockTests} 
+      quizResults={quizResults} 
+    />
   );
 }

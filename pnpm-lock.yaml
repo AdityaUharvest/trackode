@@ -152,6 +152,9 @@ importers:
       react-markdown:
         specifier: ^10.1.0
         version: 10.1.0(@types/react@19.0.12)(react@18.3.1)
+      react-responsive:
+        specifier: ^10.0.1
+        version: 10.0.1(react@18.3.1)
       react-toastify:
         specifier: ^11.0.3
         version: 11.0.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -6457,6 +6460,9 @@ packages:
   matchmediaquery@0.3.1:
     resolution: {integrity: sha512-Hlk20WQHRIm9EE9luN1kjRjYXAQToHOIAHPJn9buxBwuhfTHoKUcX+lXBbxc85DVQfXYbEQ4HcwQdd128E3qHQ==}
 
+  matchmediaquery@0.4.2:
+    resolution: {integrity: sha512-wrZpoT50ehYOudhDjt/YvUJc6eUzcdFPdmbizfgvswCKNHD1/OBOHYJpHie+HXpu6bSkEGieFMYk6VuutaiRfA==}
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
@@ -7976,6 +7982,12 @@ packages:
       '@types/react':
         optional: true
 
+  react-responsive@10.0.1:
+    resolution: {integrity: sha512-OM5/cRvbtUWEX8le8RCT8scA8y2OPtb0Q/IViEyCEM5FBN8lRrkUOZnu87I88A6njxDldvxG+rLBxWiA7/UM9g==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      react: '>=16.8.0'
+
   react-responsive@8.2.0:
     resolution: {integrity: sha512-iagCqVrw4QSjhxKp3I/YK6+ODkWY6G+YPElvdYKiUUbywwh9Ds0M7r26Fj2/7dWFFbOpcGnJE6uE7aMck8j5Qg==}
     engines: {node: '>= 0.10'}
@@ -8497,6 +8509,9 @@ packages:
 
   shallow-equal@1.2.1:
     resolution: {integrity: sha512-S4vJDjHHMBaiZuT9NPb616CSmLf618jawtv3sufLl6ivK8WocjAo58cXwbRV1cgqxH0Qbv+iUt6m05eqEa2IRA==}
+
+  shallow-equal@3.1.0:
+    resolution: {integrity: sha512-pfVOw8QZIXpMbhBWvzBISicvToTiM5WBF1EeAUZDDSb5Dt29yl4AYbyywbJFSEsRUMr7gJaxqCdr4L3tQf9wVg==}
 
   shallowequal@1.1.0:
     resolution: {integrity: sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==}
@@ -11979,11 +11994,7 @@ snapshots:
       jest-runner: 26.6.3
       jest-runtime: 26.6.3
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/transform@26.6.2':
     dependencies:
@@ -17161,11 +17172,7 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-cli@26.6.3:
     dependencies:
@@ -17875,6 +17882,10 @@ snapshots:
       object-visit: 1.0.1
 
   matchmediaquery@0.3.1:
+    dependencies:
+      css-mediaquery: 0.1.2
+
+  matchmediaquery@0.4.2:
     dependencies:
       css-mediaquery: 0.1.2
 
@@ -19834,6 +19845,14 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.0.12
 
+  react-responsive@10.0.1(react@18.3.1):
+    dependencies:
+      hyphenate-style-name: 1.1.0
+      matchmediaquery: 0.4.2
+      prop-types: 15.8.1
+      react: 18.3.1
+      shallow-equal: 3.1.0
+
   react-responsive@8.2.0(react@18.3.1):
     dependencies:
       hyphenate-style-name: 1.1.0
@@ -20568,6 +20587,8 @@ snapshots:
       kind-of: 6.0.3
 
   shallow-equal@1.2.1: {}
+
+  shallow-equal@3.1.0: {}
 
   shallowequal@1.1.0: {}
 

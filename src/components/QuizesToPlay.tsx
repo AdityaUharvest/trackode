@@ -279,9 +279,35 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
         return "bg-gray-100 text-gray-800";
     }
   };
+  const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": quizzes.map((quiz, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "Quiz",
+      "name": quiz.name,
+      "description": quiz.description,
+      "educationalLevel": quiz.level || "Beginner",
+      "numberOfQuestions": quiz.maxScore || 10,
+      "dateCreated": quiz.startDate,
+      "creator": {
+        "@type": "Organization",
+        "name": "Your Quiz Platform"
+      }
+    }
+  }))
+};
 
   return (
-    <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
+  <main>
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+/>
+ <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
+
       <div className="container mx-auto px-4 py-8">
         {/* Stats Section */}
         {userStats.completedQuizzes > 0 && (
@@ -724,113 +750,53 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                                   >
                                     {quiz.userPlayed ? `Your Score: ${quiz.userScore}/${quiz.maxScore}` : ""}
                                   </p>
-                                  <p
-                                    className={`text-sm mt-2 leading-relaxed ${
-                                      theme === "dark" ? "text-gray-300" : "text-gray-600"
-                                    }`}
-                                  >
-                                    {quiz.description}
-                                  </p>
-                                  <div className="mt-4 items-center">
-                                    {quiz.userPlayed ? (
-                                      <div className="mt-4 flex justify-between items-center">
-                                        <span
-                                          className={`text-xs font-semibold flex items-center ${
-                                            theme === "dark" ? "text-green-400" : "text-green-600"
-                                          }`}
-                                        >
-                                          <svg
-                                            className="w-3.5 h-3.5 mr-1"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            ></path>
-                                          </svg>
-                                          Completed
-                                        </span>
-                                        <div className="flex gap-2">
-                                          <Link
-                                            href={`/quiz-result/${quiz._id}`}
-                                            className={`text-xs ${
-                                              theme === "dark"
-                                                ? "text-blue-400 hover:text-blue-300"
-                                                : "text-blue-600 hover:text-blue-800"
-                                            }`}
-                                          >
-                                            Leaderboard
-                                          </Link>
-                                        </div>
-                                        <Link
-                                          className={`px-4 py-1.5 text-xs font-medium rounded-full ${
-                                            theme === "dark"
-                                              ? "bg-purple-600 hover:bg-purple-500 text-white"
-                                              : "bg-purple-600 hover:bg-purple-700 text-white"
-                                          } transition-colors shadow-sm hover:shadow flex items-center`}
-                                          href={`/dashboard/result/${quiz._id}`}
-                                        >
-                                          <svg
-                                            className="w-3.5 h-3.5 mr-1"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                          >
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                                            ></path>
-                                            <path
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                            ></path>
-                                          </svg>
-                                          Result
-                                        </Link>
-                                      </div>
-                                    ) : (
-                                      <Link
-                                        href={`/quiz-play/${quiz._id}`}
-                                        className={`px-4 py-1.5 text-sm font-medium rounded-full ${
-                                          theme === "dark"
-                                            ? "bg-purple-600 hover:bg-purple-500 text-white"
-                                            : "bg-purple-600 hover:bg-purple-700 text-white"
-                                        } transition-colors shadow-sm hover:shadow flex items-center`}
-                                      >
-                                        <svg
-                                          className="w-3.5 h-3.5 mr-1"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                          xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                                          ></path>
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth="2"
-                                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                          ></path>
-                                        </svg>
-                                        Start
-                                      </Link>
-                                    )}
-                                  </div>
+                                  
+                                  <div className="mt-4 flex justify-between items-center">
+  {quiz.userPlayed ? (
+    <>
+      <span className={`text-xs font-semibold flex items-center ${
+        theme === "dark" ? "text-green-400" : "text-green-600"
+      }`}>
+        <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Completed
+      </span>
+      <div className="flex gap-2">
+        <Link href={`/quiz-result/${quiz._id}`} className={`text-xs ${
+          theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-800"
+        }`}>
+          Leaderboard
+        </Link>
+        <Link href={`/dashboard/result/${quiz._id}`} className={`px-4 py-1.5 text-xs font-medium rounded-full ${
+          theme === "dark" ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"
+        } transition-colors shadow-sm hover:shadow flex items-center`}>
+          <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Result
+        </Link>
+      </div>
+    </>
+  ) : (
+    <Link
+      href={`/quiz-play/${quiz._id}`}
+      aria-label={`Start ${quiz.name} quiz`}
+      className={`w-full text-center px-4 py-2 text-sm font-medium rounded-lg ${
+        theme === "dark" 
+          ? "bg-green-600 hover:bg-green-500 text-white" 
+          : "bg-green-600 hover:bg-green-700 text-white"
+      } transition-colors shadow-sm hover:shadow flex items-center justify-center`}
+    >
+      <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      Start Quiz
+    </Link>
+  )}
+</div>
                                 </div>
                               ))}
                             </div>
@@ -1080,6 +1046,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
         </div>
       </div>
     </div>
+  </main>
+   
   );
 };
 
