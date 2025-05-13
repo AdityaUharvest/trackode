@@ -105,14 +105,12 @@ export default function Faq() {
           >
             
             <h2
-              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+              className={`inline-block mb-2 font-semibold text-lg  px-4 py-1.5 rounded-lg ${
+                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
               }`}
             >
             Trackode Support Center 
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
-              }`}>FAQs 
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>FAQs 
               </span>
             </h2>
            

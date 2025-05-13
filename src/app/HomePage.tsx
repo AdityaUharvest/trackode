@@ -467,10 +467,10 @@ export default function HomePage() {
         </section>
 
 <section
-  className={` ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}  rounded-lg`}
+  className={` ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"} py-7 rounded-lg`}
   aria-labelledby="demo-heading"
 >
-  <div className="text-center">
+  <div className="text-center ">
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -479,13 +479,11 @@ export default function HomePage() {
             
             <h2
               className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
               }`}
             >
               Try a free
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
-              }`}>
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
 Demo Quiz 
               </span>
             </h2>
@@ -512,13 +510,11 @@ Demo Quiz
             
             <h2
               className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
               }`}
             >
               Why Choose 
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
-              }`}>
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
 Trackode
               </span>
             </h2>
@@ -607,13 +603,11 @@ Trackode
             
             <h2
               className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
               }`}
             >
              How Trackode
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
-              }`}>
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
 Works 
               </span>
             </h2>
@@ -761,13 +755,11 @@ Works
             
             <h2
               className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
               }`}
             >
              What Our
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
-              }`}>
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
 Users says 
               </span>
             </h2>
