@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-
+import { motion, AnimatePresence } from "framer-motion";
 import "flowbite";
 import { useSession } from "next-auth/react";
 import "@/app/globals.css";
@@ -456,6 +456,8 @@ export default function HomePage() {
 </section>
         <section id="technology" className={`py-8 rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
           <div className="px-4 mx-auto max-w-7xl sm:px-5 lg:px-8">
+             
+        
             <TechStackQuizSystem />
 
 
@@ -468,18 +470,66 @@ export default function HomePage() {
   className={` ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}  rounded-lg`}
   aria-labelledby="demo-heading"
 >
+  <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            
+            <h2
+              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+              }`}
+            >
+              Try a free
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
+              }`}>
+Demo Quiz 
+              </span>
+            </h2>
+           
+            
+            
+            
+          </motion.div>
+        </div>
+       
+      
   
   <InteractiveQuiz/>
 </section>
         <section className={`py-10  feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h1 className="text-lg  font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">
-                Why Choose <span className="text-blue-600">Trackode Quizzes</span>
-              </h1>
-              <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600 dark:text-gray-300">
-                Everything you need to host, create and participate in coding quizzes and mock test
-              </p>
+            <div className="text-center mb-10">
+               <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            
+            <h2
+              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+              }`}
+            >
+              Why Choose 
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
+              }`}>
+Trackode
+              </span>
+            </h2>
+           
+            
+            
+            
+          </motion.div>
+        </div>
+        
+              
             </div>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -548,17 +598,35 @@ export default function HomePage() {
           <div className="px-4 mx-auto max-w-6xl sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-5">
 
-
-              <h2 id="features-heading" className={`text-lg font-bold tracking-tight sm:text-2xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                How Trackode Works
-              </h2>
-              <span className={`inline-block mt-1 px-4 py-1 rounded-full text-sm font-semibold mb-2 ${theme === "dark" ? "bg-gray-700 text-blue-300" : "bg-blue-100 text-blue-700"}`}>
-                Simple Process
+  <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            
+            <h2
+              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+              }`}
+            >
+             How Trackode
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
+              }`}>
+Works 
               </span>
+            </h2>
+           
+            
+            
+            
+          </motion.div>
+        </div>
+    
+              
 
-              <p className={`max-w-2xl mx-auto mt-4 text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                Transform your quizzes into engaging, interactive experiences in just a few simple steps.
-              </p>
+             
             </div>
 
             <div className="grid pb-9 max-w-6xl gap-8 mx-auto sm:grid-cols-3">
@@ -682,15 +750,37 @@ export default function HomePage() {
   aria-labelledby="testimonials-heading"
 >
   <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <div className="text-center mb-12">
-      <h2
-        id="testimonials-heading"
-        className={`text-lg font-bold tracking-tight sm:text-2xl ${
-          theme === "dark" ? "text-white" : "text-gray-900"
-        }`}
-      >
-        What Our Users Say
-      </h2>
+    <div className="text-center mb-5">
+      <div className="text-center mb-2">
+            <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            
+            <h2
+              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+              }`}
+            >
+             What Our
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
+              }`}>
+Users says 
+              </span>
+            </h2>
+           
+            
+            
+            
+          </motion.div>
+        </div>
+    
+              
+        </div>
+      
       <p
         className={`mt-4 max-w-2xl mx-auto text-lg ${
           theme === "dark" ? "text-gray-300" : "text-gray-600"

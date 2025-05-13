@@ -97,30 +97,41 @@ export default function Faq() {
 
   return (
     <div className="py-5">
+  <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            
+            <h2
+              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
+              }`}
+            >
+            Trackode Support Center 
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5   ${
+                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-500 text-white"
+              }`}>FAQs 
+              </span>
+            </h2>
+           
+            
+            
+            
+          </motion.div>
+        </div>
+    
+              
       <div
-        className={`rounded-3xl px-5 py-8 max-w-6xl mx-auto shadow-xl ${
+        className={`rounded-lg px-5 py-8 max-w-6xl mx-auto shadow-xl ${
           theme === "dark" 
             ? "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700" 
             : "bg-gradient-to-br from-white to-gray-50 border border-gray-100"
         }`}
       >
         {/* Header Section */}
-        <div className="text-center mb-2">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <p
-              className={`inline-block font-semibold text-lg mb-2 px-4 py-1.5 rounded-full ${
-                theme === "dark" ? "bg-blue-900/30 text-blue-400" : "bg-blue-100 text-blue-600"
-              }`}
-            >
-              Trackode Support Center - FAQs
-            </p>
-            
-          </motion.div>
-        </div>
+        
 
         <div className="max-w-4xl mx-auto">
         
@@ -222,14 +233,14 @@ export default function Faq() {
             }`}
           >
             <h3
-              className={`text-lg font-bold mb-2 ${
+              className={`text-base font-bold mb-2 ${
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
               Still have questions?
             </h3>
             <p
-              className={`mb-4 ${
+              className={`mb-4  ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >

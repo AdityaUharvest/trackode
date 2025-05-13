@@ -589,14 +589,7 @@ const questions:Questions = {
         
       <div className="px-4 mx-auto  sm:px-6 lg:px-8">
         <div className="text-center mb-5">
-          <h2
-            id="demo-heading"
-            className={`text-xl text-blue-500 font-bold tracking-tight sm:text-2xl ${
-              theme === "dark" ? "text-blue-500" : "text-gray-600"
-            }`}
-          >
-            Try a Sample Quiz
-          </h2>
+          
           <p
             className={`mt-4 max-w-2xl mx-auto text-base ${
               theme === "dark" ? "text-gray-300" : "text-gray-600"
@@ -780,19 +773,7 @@ const questions:Questions = {
         </div>
 
         {/* Explore More Button */}
-        <div className="mt-5 text-center">
-          <Link
-              href="/programming-quizzes"
-              className="group relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
-            >
-              <span className="relative flex items-center">
-                <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
-                  <path d="M8.18 13.426C6.86 14.392 5 13.448 5 11.811V5.439C5 3.802 6.86 2.858 8.18 3.824L12.54 7.01C13.634 7.809 13.634 9.441 12.54 10.24L8.18 13.426Z" strokeWidth="2"/>
-                </svg>
-                <span>Explore Quizzes</span>
-              </span>
-            </Link>
-        </div>
+      
       </div>
     </section>
   );
