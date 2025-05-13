@@ -119,9 +119,9 @@ export default function HomePage() {
           >
             <div className="flex mt-12 flex-col items-center justify-start w-full sm:justify-center"> {/* Changed to justify-start on mobile */}
               {/* Hero content */}
-              <div className="text-center max-w-3xl mb-4 sm:mb-8">
+              <div className="text-center max-w-4xl min-w-4xl mb-4 sm:mb-8">
                 <h1
-                  className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight" // Reduced font size on mobile
+                  className="text-3xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight" // Reduced font size on mobile
                 >
                   <span
                     className="block mb-1 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" // Reduced margin
