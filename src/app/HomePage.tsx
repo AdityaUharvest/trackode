@@ -15,6 +15,7 @@ import Head from "next/head";
 import { useRouter } from "next/navigation";
 import QuizJoinComponent from '@/components/JoinQuiz';
 import TechStackQuizSystem from '@/components/TechnologySection';
+import InteractiveQuiz from '@/components/DemoQuizzes';
 const handleAnimationComplete = () => {
   console.log('All letters have animated!');
 };
@@ -49,289 +50,276 @@ export default function HomePage() {
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
         <section
-  className={`relative justify-center animate-slide-up flex flex-col ${
-    theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"
-  } overflow-hidden min-h-[auto] sm:min-h-screen`} // Changed min-h-screen to auto on mobile
->
-  {/* Background elements */}
-  <div className="absolute inset-0 pointer-events-none">
-    {theme === "dark" ? (
-      <>
-        <div
-          className="absolute top-0 left-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-900 rounded-full opacity-10 filter blur-xl sm:blur-3xl" // Reduced size on mobile
-        ></div>
-        <div
-          className="absolute bottom-0 right-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-purple-900 rounded-full opacity-10 filter blur-xl sm:blur-3xl"
-        ></div>
-        <div
-          className="absolute top-1/4 right-1/4 w-24 h-24 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-indigo-900 rounded-full opacity-10 filter blur-xl sm:blur-2xl"
-        ></div>
-      </>
-    ) : (
-      <>
-        <div
-          className="absolute top-0 left-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-200 rounded-full opacity-30 filter blur-xl sm:blur-3xl"
-        ></div>
-        <div
-          className="absolute bottom-0 right-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-indigo-200 rounded-full opacity-30 filter blur-xl sm:blur-3xl"
-        ></div>
-        <div
-          className="absolute top-1/4 right-1/4 w-24 h-24 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-purple-200 rounded-full opacity-20 filter blur-xl sm:blur-2xl"
-        ></div>
-      </>
-    )}
-  </div>
-  <div
-    className="absolute -left-4 -top-4 w-12 h-16 sm:w-20 sm:h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-20" // Reduced size on mobile
-  ></div>
-  <div
-    className="absolute -right-4 -bottom-4 w-12 h-16 sm:w-20 sm:h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-20"
-  ></div>
-
-  {/* Floating code elements - hidden on mobile */}
-  <div
-    className="absolute hidden lg:block left-4 lg:left-10 top-20 lg:top-40 opacity-20 dark:opacity-10 animate-float-slow"
-  >
-    <div className="text-gray-600 dark:text-gray-400 font-mono text-xs lg:text-sm">
-      {"function code() {"}<br />
-      {"  return expertise;"}<br />
-      {"}"}
-    </div>
-  </div>
-  <div
-    className="absolute hidden lg:block right-4 lg:right-10 bottom-20 lg:bottom-40 opacity-20 dark:opacity-10 animate-float"
-  >
-    <div className="text-gray-600 dark:text-gray-400 font-mono text-xs lg:text-sm">
-      {"const skill = {"}<br />
-      {"  learn: true,"}<br />
-      {"  practice: true"}<br />
-      {"}"}
-    </div>
-  </div>
-  <div className="w-full pt-4 px-4 sm:px-6 z-20 relative">
-    <div className="max-w-md mx-auto"> {/* Increased max-width for mobile */}
-      <QuizJoinComponent />
-    </div>
-  </div>
-
-  <div
-    className="relative px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col min-h-[auto] sm:min-h-[calc(100vh-80px)]" // Reduced padding and min-h on mobile
-  >
-    <div className="flex mt-12 flex-col items-center justify-start w-full sm:justify-center"> {/* Changed to justify-start on mobile */}
-      {/* Hero content */}
-      <div className="text-center max-w-3xl mb-4 sm:mb-8">
-        <h1
-          className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight" // Reduced font size on mobile
+          className={`relative justify-center animate-slide-up flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"
+            } overflow-hidden min-h-[auto] sm:min-h-screen`} // Changed min-h-screen to auto on mobile
         >
-          <span
-            className="block mb-1 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" // Reduced margin
+          {/* Background elements */}
+          <div className="absolute inset-0 pointer-events-none">
+            {theme === "dark" ? (
+              <>
+                <div
+                  className="absolute top-0 left-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-900 rounded-full opacity-10 filter blur-xl sm:blur-3xl" // Reduced size on mobile
+                ></div>
+                <div
+                  className="absolute bottom-0 right-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-purple-900 rounded-full opacity-10 filter blur-xl sm:blur-3xl"
+                ></div>
+                <div
+                  className="absolute top-1/4 right-1/4 w-24 h-24 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-indigo-900 rounded-full opacity-10 filter blur-xl sm:blur-2xl"
+                ></div>
+              </>
+            ) : (
+              <>
+                <div
+                  className="absolute top-0 left-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-blue-200 rounded-full opacity-30 filter blur-xl sm:blur-3xl"
+                ></div>
+                <div
+                  className="absolute bottom-0 right-0 w-32 h-32 sm:w-64 sm:h-64 lg:w-96 lg:h-96 bg-indigo-200 rounded-full opacity-30 filter blur-xl sm:blur-3xl"
+                ></div>
+                <div
+                  className="absolute top-1/4 right-1/4 w-24 h-24 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-purple-200 rounded-full opacity-20 filter blur-xl sm:blur-2xl"
+                ></div>
+              </>
+            )}
+          </div>
+          <div
+            className="absolute -left-4 -top-4 w-12 h-16 sm:w-20 sm:h-28 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full opacity-20" // Reduced size on mobile
+          ></div>
+          <div
+            className="absolute -right-4 -bottom-4 w-12 h-16 sm:w-20 sm:h-28 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full opacity-20"
+          ></div>
+
+          {/* Floating code elements - hidden on mobile */}
+          <div
+            className="absolute hidden lg:block left-4 lg:left-10 top-20 lg:top-40 opacity-20 dark:opacity-10 animate-float-slow"
           >
-            Level Up Your Skills
-          </span>
-          <span className="block text-gray-900 dark:text-white">
-            With
-            <span>
-              <SplitText
-                text=" Interactive Quizzes"
-                onLetterAnimationComplete={handleAnimationComplete}
-                className="text-blue-500"
-              />
-            </span>
-          </span>
-        </h1>
-        <p
-          className={`mt-3 sm:mt-6 text-xs sm:text-base max-w-2xl ${
-            theme === "dark" ? "text-gray-300" : "text-gray-600"
-          }`} // Reduced margin and font size on mobile
-        >
-          Test, learn, and master programming concepts with AI-powered challenges.
-          Get instant feedback and track your progress on your coding journey.
-        </p>
-      </div>
-
-      {/* CTA buttons */}
-      <div
-        className="mt-2 flex gap-3 justify-center mb-6 sm:mb-12" // Reduced gaps and margins
-      >
-        <Link
-          href="/dashboard"
-          className="px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
-        >
-          Get Started
-        </Link>
-        <Link
-          href="/admin-dashboard"
-          className={`px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${
-            theme === "dark"
-              ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
-              : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
-          }`}
-        >
-          Dashboard
-        </Link>
-      </div>
-
-      {/* Social proof */}
-      <div className="w-full mt-10 mb-16 max-w-3xl">
-        <div className="items-center justify-center flex gap-6 sm:gap-24"> {/* Reduced gap */}
-          <div className="flex sm:mb-0">
-            <div className="flex -space-x-2">
-              {["aditya.png", "rohit.png", "rohitk.png", "kaju.png"].map(
-                (img, i) => (
-                  <div
-                    key={i}
-                    className={`w-6 h-6 sm:w-10 sm:h-10 rounded-full border-2 ${
-                      theme === "dark" ? "border-gray-800" : "border-white"
-                    } overflow-hidden shadow-md transition-transform duration-300 hover:scale-110 hover:z-10 relative`} // Reduced size on mobile
-                    style={{ zIndex: 4 - i }}
-                  >
-                    <img
-                      alt={`User ${i + 1}`}
-                      src={img}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )
-              )}
+            <div className="text-gray-600 dark:text-gray-400 font-mono text-xs lg:text-sm">
+              {"function code() {"}<br />
+              {"  return expertise;"}<br />
+              {"}"}
+            </div>
+          </div>
+          <div
+            className="absolute hidden lg:block right-4 lg:right-10 bottom-20 lg:bottom-40 opacity-20 dark:opacity-10 animate-float"
+          >
+            <div className="text-gray-600 dark:text-gray-400 font-mono text-xs lg:text-sm">
+              {"const skill = {"}<br />
+              {"  learn: true,"}<br />
+              {"  practice: true"}<br />
+              {"}"}
+            </div>
+          </div>
+          <div className="w-full pt-4 px-4 sm:px-6 z-20 relative">
+            <div className="max-w-md mx-auto"> {/* Increased max-width for mobile */}
+              <QuizJoinComponent />
             </div>
           </div>
 
-          <div className="flex flex-col items-center">
-            <div className="flex">
-              <svg
-                className={`w-3 h-3 sm:w-5 sm:h-5 ${
-                  theme === "dark" ? "text-blue-400" : "text-blue-600"
-                }`} // Reduced size
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-              <p
-                className={`ml-1 text-xs sm:text-sm font-medium ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                Trusted by top developers
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <svg
-                    key={star}
-                    className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" // Reduced size
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                  </svg>
-                ))}
-                <span
-                  className={`ml-1 text-xs sm:text-sm ${
-                    theme === "dark" ? "text-gray-400" : "text-gray-500"
-                  }`}
+          <div
+            className="relative px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8 z-10 flex-1 flex flex-col min-h-[auto] sm:min-h-[calc(100vh-80px)]" // Reduced padding and min-h on mobile
+          >
+            <div className="flex mt-12 flex-col items-center justify-start w-full sm:justify-center"> {/* Changed to justify-start on mobile */}
+              {/* Hero content */}
+              <div className="text-center max-w-3xl mb-4 sm:mb-8">
+                <h1
+                  className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight" // Reduced font size on mobile
                 >
-                  4.3/5
-                </span>
+                  <span
+                    className="block mb-1 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" // Reduced margin
+                  >
+                    Level Up Your Skills
+                  </span>
+                  <span className="block text-gray-900 dark:text-white">
+                    With
+                    <span>
+                      <SplitText
+                        text=" Interactive Quizzes"
+                        onLetterAnimationComplete={handleAnimationComplete}
+                        className="text-blue-500"
+                      />
+                    </span>
+                  </span>
+                </h1>
+                <p
+                  className={`mt-3 sm:mt-6 text-xs sm:text-base max-w-2xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                    }`} // Reduced margin and font size on mobile
+                >
+                  Test, learn, and master programming concepts with AI-powered challenges.
+                  Get instant feedback and track your progress on your coding journey.
+                </p>
+              </div>
+
+              {/* CTA buttons */}
+              <div
+                className="mt-2 flex gap-3 justify-center mb-6 sm:mb-12" // Reduced gaps and margins
+              >
+                <Link
+                  href="/dashboard"
+                  className="px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
+                >
+                  Get Started
+                </Link>
+                <Link
+                  href="/admin-dashboard"
+                  className={`px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${theme === "dark"
+                    ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
+                    : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
+                    }`}
+                >
+                  Dashboard
+                </Link>
+              </div>
+
+              {/* Social proof */}
+              <div className="w-full mt-10 mb-16 max-w-3xl">
+                <div className="items-center justify-center flex gap-6 sm:gap-24"> {/* Reduced gap */}
+                  <div className="flex sm:mb-0">
+                    <div className="flex -space-x-2">
+                      {["aditya.png", "rohit.png", "rohitk.png", "kaju.png"].map(
+                        (img, i) => (
+                          <div
+                            key={i}
+                            className={`w-6 h-6 sm:w-10 sm:h-10 rounded-full border-2 ${theme === "dark" ? "border-gray-800" : "border-white"
+                              } overflow-hidden shadow-md transition-transform duration-300 hover:scale-110 hover:z-10 relative`} // Reduced size on mobile
+                            style={{ zIndex: 4 - i }}
+                          >
+                            <img
+                              alt={`User ${i + 1}`}
+                              src={img}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col items-center">
+                    <div className="flex">
+                      <svg
+                        className={`w-3 h-3 sm:w-5 sm:h-5 ${theme === "dark" ? "text-blue-400" : "text-blue-600"
+                          }`} // Reduced size
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                        />
+                      </svg>
+                      <p
+                        className={`ml-1 text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                          }`}
+                      >
+                        Trusted by top developers
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <div className="flex items-center justify-center">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <svg
+                            key={star}
+                            className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-400" // Reduced size
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ))}
+                        <span
+                          className={`ml-1 text-xs sm:text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"
+                            }`}
+                        >
+                          4.3/5
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trust badges */}
+                <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
+                  <div
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                      }`}
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-green-500" // Reduced size
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                      />
+                    </svg>
+                    <span
+                      className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      100% Secure
+                    </span>
+                  </div>
+                  <div
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                      }`}
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                    <span
+                      className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      High Performance
+                    </span>
+                  </div>
+                  <div
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                      }`}
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-purple-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span
+                      className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      Global Support
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Trust badges */}
-        <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
-          <div
-            className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
-              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-            }`}
-          >
-            <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-green-500" // Reduced size
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-              />
-            </svg>
-            <span
-              className={`text-xs sm:text-sm font-medium ${
-                theme === "dark" ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              100% Secure
-            </span>
-          </div>
-          <div
-            className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
-              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-              }`}
-          >
-            <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-blue-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
-            <span
-              className={`text-xs sm:text-sm font-medium ${
-                theme === "dark" ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              High Performance
-            </span>
-          </div>
-          <div
-            className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${
-              theme === "dark" ? "bg-gray-800" : "bg-gray-100"
-            }`}
-          >
-            <svg
-              className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-purple-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span
-              className={`text-xs sm:text-sm font-medium ${
-                theme === "dark" ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              Global Support
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style jsx>{`
+          <style jsx>{`
     @keyframes float {
       0%,
       100% {
@@ -362,11 +350,127 @@ export default function HomePage() {
       }
     }
   `}</style>
+        </section>
+        {/* level up coding and stats */}
+        <section 
+  className={`py-2 ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} rounded-2xl`} 
+  aria-labelledby="cta-heading"
+  data-aos="fade-up"
+>
+  <div className="px-4 mx-auto  sm:px-6 lg:px-4">
+    <div
+      className="relative overflow-hidden rounded-lg"
+      style={{
+        background: `linear-gradient(135deg, ${
+          theme === "dark" ? "#4f6fdd, #6b21a8" : "#60a5fa, #a5b4fc"
+        })`,
+        boxShadow: theme === "dark" 
+          ? "0 10px 25px -5px rgba(0, 0, 35, 0.4)" 
+          : "0 10px 25px -5px rgba(37, 99, 235, 0.2)"
+      }}
+    >
+      {/* Simplified decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
+        <div className="absolute -bottom-16 -right-8 w-48 h-48 rounded-full bg-white opacity-10"></div>
+        <div className="absolute top-8 left-1/4 text-white text-2xl opacity-10 animate-float">{`{ }`}</div>
+        <div className="absolute bottom-8 right-1/4 text-white text-2xl opacity-10 animate-float-delay">{`</>`}</div>
+      </div>
+
+      <div className="relative px-4 py-6 sm:py-12 sm:px-8 z-10">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="inline-flex items-center justify-center px-3 py-1.5 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
+            <span className="flex items-center">
+              <span className="w-1.5 h-1.5 mr-2 rounded-full bg-green-400 animate-pulse"></span>
+              <span className="text-white text-xs sm:text-sm font-medium tracking-wide">JOIN 1000+ DEVELOPERS</span>
+            </span>
+          </div>
+
+          <h2 id="cta-heading" className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+            Level Up Your Coding Skills <span className="text-blue-200">Today</span>
+          </h2>
+
+          <p className="max-w-xl mx-auto mt-4 text-sm sm:text-base text-blue-100 leading-relaxed">
+            Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+            <Link
+              href="/programming-quizzes"
+              className="group relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
+            >
+              <span className="relative flex items-center">
+                <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
+                  <path d="M8.18 13.426C6.86 14.392 5 13.448 5 11.811V5.439C5 3.802 6.86 2.858 8.18 3.824L12.54 7.01C13.634 7.809 13.634 9.441 12.54 10.24L8.18 13.426Z" strokeWidth="2"/>
+                </svg>
+                <span>Explore Quizzes</span>
+              </span>
+            </Link>
+
+            <Link
+              href="/mocks"
+              className="group relative overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md bg-green-600 hover:bg-green-700 text-white"
+            >
+              <span className="relative flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                <span>Free Mock Tests</span>
+              </span>
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-10 pt-6 border-t border-white border-opacity-20">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 mx-auto max-w-3xl">
+            {[
+              { value: "20+", label: "Mocks" },
+              { value: "525", label: "Developers" },
+              { value: "120+", label: "Challenges" },
+              { value: "30+", label: "Tech Stacks" },
+              { value: "100+", label: "Live Blogs" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center group transform transition-all duration-300 hover:-translate-y-1">
+                <div className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-200">{stat.value}</div>
+                <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style jsx>{`
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    .animate-float-delay {
+      animation: float 6s ease-in-out infinite 3s;
+    }
+  `}</style>
 </section>
-        {/* here the hero section of the trackode ends */}
+        <section id="technology" className={`py-8 rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
+          <div className="px-4 mx-auto max-w-7xl sm:px-5 lg:px-8">
+            <TechStackQuizSystem />
 
-        
 
+
+          </div>
+
+        </section>
+
+<section
+  className={` ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}  rounded-lg`}
+  aria-labelledby="demo-heading"
+>
+  
+  <InteractiveQuiz/>
+</section>
         <section className={`py-10  feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="text-center mb-16">
@@ -571,130 +675,105 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section 
-  className={`py-2 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} 
-  aria-labelledby="cta-heading"
+
+        {/* Technologies Section with Animation */}
+<section
+  className={`py-16 ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} rounded-2xl`}
+  aria-labelledby="testimonials-heading"
 >
-  <div className="px-4 mx-auto max-w-6xl sm:px-6 lg:px-4">
-    <div
-      className="relative overflow-hidden rounded-2xl"
-      style={{
-        background: `linear-gradient(135deg, ${theme === "dark" ? "#4f6fdd, #5f5bd9" : "#a5c8fd, #b7c1fc"})`,
-        boxShadow: theme === "dark" 
-          ? "0 10px 25px -5px rgba(0, 0, 35, 0.4)" 
-          : "0 10px 25px -5px rgba(37, 99, 235, 0.2)"
-      }}
-    >
-      {/* Simplified decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
-        <div className="absolute -bottom-16 -right-8 w-48 h-48 rounded-full bg-white opacity-10"></div>
-        
-        {/* Floating symbols */}
-        <div className="absolute top-8 left-1/4 text-white text-2xl opacity-10 animate-float">{`{ }`}</div>
-        <div className="absolute bottom-8 right-1/4 text-white text-2xl opacity-10 animate-float-delay">{`</>`}</div>
-      </div>
+  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <h2
+        id="testimonials-heading"
+        className={`text-lg font-bold tracking-tight sm:text-2xl ${
+          theme === "dark" ? "text-white" : "text-gray-900"
+        }`}
+      >
+        What Our Users Say
+      </h2>
+      <p
+        className={`mt-4 max-w-2xl mx-auto text-lg ${
+          theme === "dark" ? "text-gray-300" : "text-gray-600"
+        }`}
+      >
+        Hear from developers who have leveled up their skills with Trackode.
+      </p>
+    </div>
 
-      {/* Compact content */}
-      <div className="relative px-4 py-6 sm:py-12 sm:px-8 z-10">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center px-3 py-1.5 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
-            <span className="flex items-center">
-              <span className="w-1.5 h-1.5 mr-2 rounded-full bg-green-400 animate-pulse"></span>
-              <span className="text-white text-xs sm:text-sm font-medium tracking-wide">JOIN 1000+ DEVELOPERS</span>
-            </span>
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      {[
+        {
+          name: "Rohit Kharwar",
+          role: "Full-Stack Developer",
+          quote:
+            "Trackode's quizzes helped me master JavaScript concepts in a fun and interactive way. The real-time feedback is a game-changer!",
+          image: "/rohitk.png",
+        },
+        {
+          name: "Rohit Kumar",
+          role: "Backend Engineer",
+          quote:
+            "The AI-powered quizzes are spot-on, and the leaderboard keeps me motivated to improve my ranking.",
+          image: "/rohit.png",
+        },
+        {
+          name: "Kajal Kasaudhan",
+          role: "Frontend Developer",
+          quote:
+            "I love the detailed analytics dashboard. It helped me identify my weak areas and focus my learning.",
+          image: "/kaju.png",
+        },
+      ].map((testimonial, index) => (
+        <div
+          key={index}
+          className={`relative p-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 ${
+            theme === "dark" ? "bg-gray-700" : "bg-white"
+          } shadow-md hover:shadow-lg`}
+          data-aos="fade-up"
+          data-aos-delay={index * 100}
+        >
+          <div className="flex items-center mb-4">
+            <img
+              src={testimonial.image}
+              alt={testimonial.name}
+              className="w-12 h-12 rounded-full object-cover mr-4"
+            />
+            <div>
+              <h3
+                className={`text-lg font-medium ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {testimonial.name}
+              </h3>
+              <p
+                className={`text-sm ${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
+                {testimonial.role}
+              </p>
+            </div>
           </div>
-
-          <h2 id="cta-heading" className="text-2xl sm:text-3xl font-bold text-white leading-tight">
-            Level Up Your Coding Skills <span className="text-blue-200">Today</span>
-          </h2>
-
-          <p className="max-w-xl mx-auto mt-4 text-sm sm:text-base text-blue-100 leading-relaxed">
-            Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
+          <p
+            className={`text-base ${
+              theme === "dark" ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
+            "{testimonial.quote}"
           </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-            <Link
-              href="/programming-quizzes"
-              className={`group relative overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md ${
-                theme === "dark"
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-white hover:bg-blue-700 hover:text-white text-gray-800"
-              }`}
-            >
-              <span className="relative flex items-center">
-                <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
-                  <path d="M8.18 13.426C6.86 14.392 5 13.448 5 11.811V5.439C5 3.802 6.86 2.858 8.18 3.824L12.54 7.01C13.634 7.809 13.634 9.441 12.54 10.24L8.18 13.426Z" strokeWidth="2"/>
-                </svg>
-                <span>Explore Quizzes</span>
-              </span>
-            </Link>
-
-            <Link
-              href="/mocks"
-              className="group relative overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md bg-green-600 hover:bg-green-700 text-white"
-            >
-              <span className="relative flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                </svg>
-                <span>Mock Tests</span>
-              </span>
-            </Link>
-          </div>
         </div>
-
-        {/* Compact stats */}
-        <div className="mt-10 pt-6 border-t border-white border-opacity-20">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mx-auto max-w-3xl">
-            {[
-              { value: "10+", label: "Mocks" },
-              { value: "525", label: "Developers" },
-              { value: "120+", label: "Challenges" },
-              { value: "25+", label: "Tech Stacks" },
-              { value: "100+", label: "Blogs" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group transform transition-all duration-300 hover:-translate-y-1">
-                <div className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-200">{stat.value}</div>
-                <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   </div>
-  
-  <style jsx>{`
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    .animate-float {
-      animation: float 6s ease-in-out infinite;
-    }
-    .animate-float-delay {
-      animation: float 6s ease-in-out infinite 3s;
-    }
-  `}</style>
 </section>
-        {/* Technologies Section with Animation */}
-        <section id="technology" className={`py-8 rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
-          <div className="px-4 mx-auto max-w-7xl sm:px-5 lg:px-8">
-            <TechStackQuizSystem />
 
-
-            
-          </div>
-
-        </section>
-        
         {/* Final CTA Section */}
-        
+
         <section id="faq" className={` ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
           <Faq />
         </section>
-      
+
         {/* Add these keyframe animations to your global styles */}
 
       </div>

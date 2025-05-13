@@ -18,11 +18,11 @@ interface MockTestType {
 
 // Metadata for SEO
 export const metadata: Metadata = {
-  title: "Free Mock Tests | Trackode",
+  title: "Free Mock Tests",
   description: "Practice and improve your coding skills with our collection of Free mock tests. Filter by difficulty, track your progress, and compete on leaderboards.",
   keywords: ["Free mock tests", "coding practice", "programming quizzes", "Trackode", "TCS mock tests"],
   openGraph: {
-    title: "Free Mock Tests | Trackode",
+    title: "Free Mock Tests",
     description: "Join 500+ developers to practice TCS mock tests and enhance your programming skills.",
     url: "https://trackode.in/mocks",
     type: "website",

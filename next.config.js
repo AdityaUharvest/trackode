@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const withPWA = require('next-pwa')({
+  dest: 'public',
   
+  // Optional: Add more PWA configuration here
+  // register: true,
+  // skipWaiting: true,
+});
+
+const nextConfig = {
   env: {
     MONGODB_URI: process.env.MONGODB_URI,
   },
@@ -15,7 +22,12 @@ const nextConfig = {
         ],
       },
     ];
-  }
+  },
+  // Optional: Add other Next.js config options here
+  // reactStrictMode: true,
+  // images: {
+  //   domains: ['yourdomain.com'],
+  // },
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);

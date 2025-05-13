@@ -71,6 +71,7 @@ interface Props {
 
 const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
   const { theme } = useTheme();
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [filteredQuizzes, setFilteredQuizzes] = useState<Quiz[]>(quizzes);
   const [filteredMockTests, setFilteredMockTests] = useState<MockTest[]>(mockTests);
   const [searchTerm, setSearchTerm] = useState("");
@@ -467,180 +468,210 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
               </div>
             )}
 
-            {/* Performance Chart Section */}
-            <div className="mb-8">
-              <button
-                onClick={() => setShowPerformanceChart(!showPerformanceChart)}
-                className={`flex w-full justify-between items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
-                  theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
-                } transition-colors`}
-              >
-                <span className="font-medium">
-                  {showPerformanceChart ? "Hide Performance Chart" : "Show Performance Chart"}
-                </span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${showPerformanceChart ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {showPerformanceChart && (
-                <div
-                  className={`p-6 rounded-xl shadow-sm border ${
-                    theme === "dark" ? "border-gray-700 bg-gray-800" : "border-gray-100 bg-white"
-                  }`}
-                >
-                  <h2 className={`text-xl font-semibold mb-4 ${textStyles[theme].primary}`}>
-                    Performance Trend
-                  </h2>
-                  <div className="h-80">
-                    <PerformanceChart chartData={chartData} theme={theme} />
-                  </div>
-                </div>
-              )}
-            </div>
+            
           </div>
         )}
 
         {/* Quizzes and Mock Tests Section */}
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="lg:w-64 flex-shrink-0">
-            <div
-              className={`sticky top-4 p-4 rounded-xl border ${
-                theme === "dark" ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"
-              }`}
-            >
-              <h3 className={`font-semibold mb-4 ${textStyles[theme].primary}`}>Filters</h3>
-
-              {/* Search Input */}
-              <div className="mb-4">
-                <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
-                  Search
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Search className="text-gray-400" size={16} />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Search quizzes or mock tests..."
-                    className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-                      theme === "dark"
-                        ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-                        : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-                    }`}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Quiz Status Filter */}
-              <div className="mb-4">
-                <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
-                  Quiz Status
-                </label>
-                <div className="space-y-2">
-                  {[
-                    { value: "all", label: "All Quizzes" },
-                    { value: "active", label: "Active" },
-                    { value: "completed", label: "Completed" },
-                    { value: "ended", label: "Ended" },
-                  ].map((filter) => (
-                    <button
-                      key={filter.value}
-                      onClick={() => setActiveFilter(filter.value as QuizFilter)}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                        activeFilter === filter.value
-                          ? theme === "dark"
-                            ? "bg-blue-600 text-white shadow-lg"
-                            : "bg-blue-100 text-blue-800 shadow-md"
-                          : theme === "dark"
-                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                      }`}
-                    >
-                      {filter.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Difficulty Filter */}
-              <div>
-                <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
-                  Difficulty
-                </label>
-                <div className="space-y-2">
-                  {["All", "Easy", "Medium", "Hard"].map((level) => (
-                    <button
-                      key={level}
-                      onClick={() => {
-                        setDifficultyFilter(level.toLowerCase());
-                        setMockFilter(level as any);
-                      }}
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                        difficultyFilter === level.toLowerCase()
-                          ? theme === "dark"
-                            ? `${
-                                level === "Easy"
-                                  ? "bg-green-700 text-white"
-                                  : level === "Medium"
-                                  ? "bg-yellow-600 text-white"
-                                  : level === "Hard"
-                                  ? "bg-red-600 text-white"
-                                  : "bg-blue-600 stell-white"
-                              } shadow-md`
-                            : `${
-                                level === "Easy"
-                                  ? "bg-green-100 text-green-800"
-                                  : level === "Medium"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : level === "Hard"
-                                  ? "bg-red-100 text-red-800"
-                                  : "bg-blue-100 text-blue-800"
-                              } shadow-sm`
-                          : theme === "dark"
-                          ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
-                      }`}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Quizzes and Mock Tests Content */}
           <div className="flex-1">
             {/* Quizzes Section */}
-            <div className="mb-6">
-              <div className="flex gap-2 ml-2 items-center">
-                <svg
-                  className={`w-7 h-7 ${theme === "dark" ? "text-white" : "text-blue-600"}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <h2 className="text-xl font-bold text-blue-500">Available Quizzes</h2>
-              </div>
-            </div>
+           {/* Compact Filtering Section */}
+<div className="mb-6">
+  <div className="flex flex-col md:flex-row md:items-center gap-4">
+    {/* Search Input - Always visible */}
+    <div className="relative flex-1">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Search className="text-gray-400" size={16} />
+      </div>
+      <input
+        type="text"
+        placeholder="Search quizzes or mock tests..."
+        className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
+          theme === "dark"
+            ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
+            : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
+        }`}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+    </div>
 
-            <div className="space-y-4 p-3">
+    {/* Mobile Filter Toggle */}
+<div className="md:hidden">
+  <button
+    onClick={() => setShowMobileFilters(!showMobileFilters)}
+    className={`flex items-center gap-2 px-4 py-2 rounded-lg w-full justify-center ${
+      theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
+    }`}
+  >
+    <Filter size={16} />
+    <span>Filters</span>
+  </button>
+</div>
+
+    
+
+    {/* Desktop Filters - Always visible */}
+    <div className="hidden md:flex gap-2">
+      {/* Quiz Status Filter Dropdown */}
+      <div className="relative">
+        <select
+          value={activeFilter}
+          onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
+          className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
+              : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
+          }`}
+        >
+          <option value="all">All Quizzes</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+          <option value="ended">Ended</option>
+        </select>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+
+      {/* Difficulty Filter Dropdown */}
+      <div className="relative">
+        <select
+          value={difficultyFilter}
+          onChange={(e) => {
+            setDifficultyFilter(e.target.value);
+            setMockFilter(e.target.value as any);
+          }}
+          className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
+              : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
+          }`}
+        >
+          <option value="all">All Levels</option>
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+    </div>
+{/* Mobile Filters - Expandable */}
+{showMobileFilters && (
+  <div className="md:hidden space-y-2">
+    <div className="grid grid-cols-2 gap-2">
+      {/* Quiz Status Filter */}
+      <div>
+        <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
+          Quiz Status
+        </label>
+        <select
+          value={activeFilter}
+          onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
+          className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 text-white"
+              : "bg-white border-gray-300 text-gray-800"
+          }`}
+        >
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+          <option value="ended">Ended</option>
+        </select>
+      </div>
+
+      {/* Difficulty Filter */}
+      <div>
+        <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
+          Difficulty
+        </label>
+        <select
+          value={difficultyFilter}
+          onChange={(e) => {
+            setDifficultyFilter(e.target.value);
+            setMockFilter(e.target.value as any);
+          }}
+          className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
+            theme === "dark"
+              ? "bg-gray-700 border-gray-600 text-white"
+              : "bg-white border-gray-300 text-gray-800"
+          }`}
+        >
+          <option value="all">All</option>
+          <option value="Easy">Easy</option>
+          <option value="Medium">Medium</option>
+          <option value="Hard">Hard</option>
+        </select>
+      </div>
+    </div>
+  </div>
+)}
+    {/* Mobile Filters - Expandable */}
+    {showStats && (
+      <div className="md:hidden space-y-2">
+        <div className="grid grid-cols-2 gap-2">
+          {/* Quiz Status Filter */}
+          <div>
+            <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
+              Quiz Status
+            </label>
+            <select
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
+              className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-white"
+                  : "bg-white border-gray-300 text-gray-800"
+              }`}
+            >
+              <option value="all">All</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="ended">Ended</option>
+            </select>
+          </div>
+
+          {/* Difficulty Filter */}
+          <div>
+            <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
+              Difficulty
+            </label>
+            <select
+              value={difficultyFilter}
+              onChange={(e) => {
+                setDifficultyFilter(e.target.value);
+                setMockFilter(e.target.value as any);
+              }}
+              className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600 text-white"
+                  : "bg-white border-gray-300 text-gray-800"
+              }`}
+            >
+              <option value="all">All</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
+
+            <div className="space-y-2 ">
               {Object.keys(organizedQuizzes).map((section) => (
                 <div
                   key={section}
