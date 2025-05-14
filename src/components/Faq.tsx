@@ -110,7 +110,7 @@ export default function Faq() {
               }`}
             >
             Trackode Support Center 
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>FAQs 
+              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>FAQs 
               </span>
             </h2>
            

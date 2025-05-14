@@ -582,12 +582,7 @@ const questions:Questions = {
   };
 
   return (
-    <section
-      className={`py-6 ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"} rounded-2xl`}
-      aria-labelledby="demo-heading"
-    >
-        
-      <div className="px-4 mx-auto  sm:px-6 lg:px-8">
+    <div className="px-4 mx-auto  sm:px-6 lg:px-8">
         <div className="text-center mb-5">
           
           <p
@@ -774,8 +769,7 @@ const questions:Questions = {
 
         {/* Explore More Button */}
       
-      </div>
-    </section>
+    </div>
   );
 };
 

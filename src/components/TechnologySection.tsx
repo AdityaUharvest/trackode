@@ -164,11 +164,11 @@ export default function TechStackQuizSystem() {
   };
 
   return (
-    <div className={`min-h-screen rounded-3xl ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div className={`min-h-screen rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 py-12">
         {!selectedTech ? (
           <>
-            <div className="max-w-3xl mx-auto text-center mb-16">
+            <div className="max-w-3xl mx-auto text-center mb-5">
               <span className={`inline-block px-4 py-1 rounded-full text-sm font-semibold mb-4 ${theme === "dark" ? "bg-gray-700 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
                 Multiple Technologies
               </span>

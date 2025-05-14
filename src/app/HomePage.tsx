@@ -352,96 +352,95 @@ export default function HomePage() {
   `}</style>
         </section>
         {/* level up coding and stats */}
-        <section 
-  className={`py-2 ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} rounded-2xl`} 
-  aria-labelledby="cta-heading"
-  data-aos="fade-up"
->
-  <div className="px-4 mx-auto  sm:px-6 lg:px-4">
-    <div
-      className="relative overflow-hidden rounded-lg"
-      style={{
-        background: `linear-gradient(135deg, ${
-          theme === "dark" ? "#4f6fdd, #6b21a8" : "#60a5fa, #a5b4fc"
-        })`,
-        boxShadow: theme === "dark" 
-          ? "0 10px 25px -5px rgba(0, 0, 35, 0.4)" 
-          : "0 10px 25px -5px rgba(37, 99, 235, 0.2)"
-      }}
-    >
-      {/* Simplified decorative elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
-        <div className="absolute -bottom-16 -right-8 w-48 h-48 rounded-full bg-white opacity-10"></div>
-        <div className="absolute top-8 left-1/4 text-white text-2xl opacity-10 animate-float">{`{ }`}</div>
-        <div className="absolute bottom-8 right-1/4 text-white text-2xl opacity-10 animate-float-delay">{`</>`}</div>
-      </div>
-
-      <div className="relative px-4 py-6 sm:py-12 sm:px-8 z-10">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="inline-flex items-center justify-center px-3 py-1.5 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
-            <span className="flex items-center">
-              <span className="w-1.5 h-1.5 mr-2 rounded-full bg-green-400 animate-pulse"></span>
-              <span className="text-white text-xs sm:text-sm font-medium tracking-wide">JOIN 1000+ DEVELOPERS</span>
-            </span>
-          </div>
-
-          <h2 id="cta-heading" className="text-2xl sm:text-3xl font-bold text-white leading-tight">
-            Level Up Your Coding Skills <span className="text-blue-200">Today</span>
-          </h2>
-
-          <p className="max-w-xl mx-auto mt-4 text-sm sm:text-base text-blue-100 leading-relaxed">
-            Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
-            <Link
-              href="/programming-quizzes"
-              className="group relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
+        <section
+          className={`py-2 ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} rounded-2xl`}
+          aria-labelledby="cta-heading"
+          data-aos="fade-up"
+        >
+          <div className="px-4 mx-auto  sm:px-6 lg:px-4">
+            <div
+              className="relative overflow-hidden rounded-lg"
+              style={{
+                background: `linear-gradient(135deg, ${theme === "dark" ? "#4f6fdd, #6b21a8" : "#60a5fa, #a5b4fc"
+                  })`,
+                boxShadow: theme === "dark"
+                  ? "0 10px 25px -5px rgba(0, 0, 35, 0.4)"
+                  : "0 10px 25px -5px rgba(37, 99, 235, 0.2)"
+              }}
             >
-              <span className="relative flex items-center">
-                <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
-                  <path d="M8.18 13.426C6.86 14.392 5 13.448 5 11.811V5.439C5 3.802 6.86 2.858 8.18 3.824L12.54 7.01C13.634 7.809 13.634 9.441 12.54 10.24L8.18 13.426Z" strokeWidth="2"/>
-                </svg>
-                <span>Explore Quizzes</span>
-              </span>
-            </Link>
-
-            <Link
-              href="/mocks"
-              className="group relative overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md bg-green-600 hover:bg-green-700 text-white"
-            >
-              <span className="relative flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-                </svg>
-                <span>Free Mock Tests</span>
-              </span>
-            </Link>
-          </div>
-        </div>
-
-        <div className="mt-10 pt-6 border-t border-white border-opacity-20">
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 mx-auto max-w-3xl">
-            {[
-              { value: "20+", label: "Mocks" },
-              { value: "525", label: "Developers" },
-              { value: "120+", label: "Challenges" },
-              { value: "30+", label: "Tech Stacks" },
-              { value: "100+", label: "Live Blogs" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center group transform transition-all duration-300 hover:-translate-y-1">
-                <div className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-200">{stat.value}</div>
-                <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">{stat.label}</div>
+              {/* Simplified decorative elements */}
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-white opacity-10"></div>
+                <div className="absolute -bottom-16 -right-8 w-48 h-48 rounded-full bg-white opacity-10"></div>
+                <div className="absolute top-8 left-1/4 text-white text-2xl opacity-10 animate-float">{`{ }`}</div>
+                <div className="absolute bottom-8 right-1/4 text-white text-2xl opacity-10 animate-float-delay">{`</>`}</div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <style jsx>{`
+              <div className="relative px-4 py-6 sm:py-12 sm:px-8 z-10">
+                <div className="max-w-2xl mx-auto text-center">
+                  <div className="inline-flex items-center justify-center px-3 py-1.5 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
+                    <span className="flex items-center">
+                      <span className="w-1.5 h-1.5 mr-2 rounded-full bg-green-400 animate-pulse"></span>
+                      <span className="text-white text-xs sm:text-sm font-medium tracking-wide">JOIN 1000+ DEVELOPERS</span>
+                    </span>
+                  </div>
+
+                  <h2 id="cta-heading" className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                    Level Up Your Coding Skills <span className="text-blue-200">Today</span>
+                  </h2>
+
+                  <p className="max-w-xl mx-auto mt-4 text-sm sm:text-base text-blue-100 leading-relaxed">
+                    Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
+                    <Link
+                      href="/programming-quizzes"
+                      className="group relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
+                    >
+                      <span className="relative flex items-center">
+                        <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
+                          <path d="M8.18 13.426C6.86 14.392 5 13.448 5 11.811V5.439C5 3.802 6.86 2.858 8.18 3.824L12.54 7.01C13.634 7.809 13.634 9.441 12.54 10.24L8.18 13.426Z" strokeWidth="2" />
+                        </svg>
+                        <span>Explore Quizzes</span>
+                      </span>
+                    </Link>
+
+                    <Link
+                      href="/mocks"
+                      className="group relative overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <span className="relative flex items-center">
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        <span>Free Mock Tests</span>
+                      </span>
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="mt-10 pt-6 border-t border-white border-opacity-20">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 mx-auto max-w-3xl">
+                    {[
+                      { value: "20+", label: "Mocks" },
+                      { value: "525", label: "Developers" },
+                      { value: "120+", label: "Challenges" },
+                      { value: "30+", label: "Tech Stacks" },
+                      { value: "100+", label: "Live Blogs" }
+                    ].map((stat, index) => (
+                      <div key={index} className="text-center group transform transition-all duration-300 hover:-translate-y-1">
+                        <div className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-200">{stat.value}</div>
+                        <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">{stat.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <style jsx>{`
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
@@ -453,79 +452,149 @@ export default function HomePage() {
       animation: float 6s ease-in-out infinite 3s;
     }
   `}</style>
-</section>
-        <section id="technology" className={`py-8 rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
-          <div className="px-4 mx-auto max-w-7xl sm:px-5 lg:px-8">
-             
+        </section>
         
-            <TechStackQuizSystem />
-
-
-
-          </div>
+        
+        <section id="technology" className={` px-4 rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="tech-stack-heading">
+           <TechStackQuizSystem />
+          
 
         </section>
-
-<section
-  className={` ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"} py-7 rounded-lg`}
-  aria-labelledby="demo-heading"
->
-  <div className="text-center ">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            
-            <h2
-              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-              }`}
-            >
-              Try a free
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
-Demo Quiz 
-              </span>
-            </h2>
-           
-            
-            
-            
-          </motion.div>
-        </div>
-       
-      
-  
-  <InteractiveQuiz/>
-</section>
-        <section className={`py-10  feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
-          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="text-center mb-10">
-               <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            
-            <h2
-              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-              }`}
-            >
-              Why Choose 
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
-Trackode
-              </span>
-            </h2>
-           
-            
-            
-            
-          </motion.div>
-        </div>
         
-              
+        <section
+          className={` ${theme === "dark" ? "bg-gray-900" : "bg-gray-150"} py-7 px-10 rounded-lg`}
+          aria-labelledby="demo-heading"
+        >
+          <div className="text-center ">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+
+              <h2
+                className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                  }`}
+              >
+                Try a free
+                <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>
+                  Demo Quiz
+                </span>
+              </h2>
+
+
+
+
+            </motion.div>
+          </div>
+
+
+
+          <InteractiveQuiz />
+        </section>
+        {/* Why Choose Section */}
+        <section className={`py-10  feature ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+          <div className="px-4 mx-auto rounded-lg max-w-7xl sm:px-6 lg:px-8">
+            <div className="text-center mb-10">
+              <div className="text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
+
+                  <h2
+                    className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                      }`}
+                  >
+                    Why 
+                    <span className={`inline-block ml-1 mr-1 rounded-lg font-semibold text-lg  px-4 py-1.5 bg-purple-500  text-white `}>
+                      Choose
+                    </span>
+                    Trackode
+                  </h2>
+
+
+
+
+                </motion.div>
+                <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
+                  <div
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                      }`}
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-green-500" // Reduced size
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                      />
+                    </svg>
+                    <span
+                      className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      100% Secure
+                    </span>
+                  </div>
+                  <div
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                      }`}
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-blue-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                    <span
+                      className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      High Performance
+                    </span>
+                  </div>
+                  <div
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                      }`}
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-purple-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span
+                      className={`text-xs sm:text-sm font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"
+                        }`}
+                    >
+                      Global Support
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+
             </div>
 
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -590,40 +659,40 @@ Trackode
           </div>
         </section>
         {/* How it Works Section with Card Hover Effects */}
-        <section className={`py-15 mb-0 ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`} aria-labelledby="features-heading">
-          <div className="px-4 mx-auto max-w-6xl sm:px-6 lg:px-8">
+        <section className={`py-7  ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="features-heading">
+          <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-5">
 
-  <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            
-            <h2
-              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-              }`}
-            >
-             How Trackode
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
-Works 
-              </span>
-            </h2>
-           
-            
-            
-            
-          </motion.div>
-        </div>
-    
-              
+              <div className="text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                >
 
-             
+
+                  <h2
+                    className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                      }`}
+                  >
+                    How Trackode
+                    <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>
+                      Works
+                    </span>
+                  </h2>
+
+
+
+
+                </motion.div>
+              </div>
+
+
+
+
             </div>
 
-            <div className="grid pb-9 max-w-6xl gap-8 mx-auto sm:grid-cols-3">
+            <div className="grid pb-9  gap-8 mx-auto sm:grid-cols-3">
               {/* Card 1 - with enhanced hover effects */}
               <div
                 className={`relative overflow-hidden rounded-xl transition-all duration-500 group ${theme === "dark" ? "bg-gray-700" : "bg-white"
@@ -638,7 +707,8 @@ Works
 
                 {/* Card content */}
                 <div className="p-8 relative z-10">
-                  <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-blue-500 group-hover:bg-blue-400" : "bg-blue-100 group-hover:bg-blue-200"
+                  
+                  <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-purple-500 group-hover:bg-blue-400" : "bg-blue-100 group-hover:bg-blue-200"
                     }`}>
                     <svg className={`w-7 h-7 transition-transform duration-300 group-hover:scale-110 ${theme === "dark" ? "text-white" : "text-blue-600"
                       }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -739,116 +809,110 @@ Works
 
 
         {/* Technologies Section with Animation */}
-<section
-  className={`py-16 ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} rounded-2xl`}
-  aria-labelledby="testimonials-heading"
->
-  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-    <div className="text-center mb-5">
-      <div className="text-center mb-2">
-            <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            
-            <h2
-              className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-              }`}
-            >
-             What Our
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-blue-500 text-white `}>
-Users says 
-              </span>
-            </h2>
-           
-            
-            
-            
-          </motion.div>
-        </div>
-    
-              
-        </div>
-      
-      <p
-        className={`mt-4 max-w-2xl mx-auto text-lg ${
-          theme === "dark" ? "text-gray-300" : "text-gray-600"
-        }`}
-      >
-        Hear from developers who have leveled up their skills with Trackode.
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-      {[
-        {
-          name: "Rohit Kharwar",
-          role: "Full-Stack Developer",
-          quote:
-            "Trackode's quizzes helped me master JavaScript concepts in a fun and interactive way. The real-time feedback is a game-changer!",
-          image: "/rohitk.png",
-        },
-        {
-          name: "Rohit Kumar",
-          role: "Backend Engineer",
-          quote:
-            "The AI-powered quizzes are spot-on, and the leaderboard keeps me motivated to improve my ranking.",
-          image: "/rohit.png",
-        },
-        {
-          name: "Kajal Kasaudhan",
-          role: "Frontend Developer",
-          quote:
-            "I love the detailed analytics dashboard. It helped me identify my weak areas and focus my learning.",
-          image: "/kaju.png",
-        },
-      ].map((testimonial, index) => (
-        <div
-          key={index}
-          className={`relative p-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 ${
-            theme === "dark" ? "bg-gray-700" : "bg-white"
-          } shadow-md hover:shadow-lg`}
-          data-aos="fade-up"
-          data-aos-delay={index * 100}
+        <section
+          className={`py-10 ${theme === "dark" ? "bg-gray-800" : "bg-gradient-to-b from-white to-blue-50"} rounded-lg`}
+          aria-labelledby="testimonials-heading"
         >
-          <div className="flex items-center mb-4">
-            <img
-              src={testimonial.image}
-              alt={testimonial.name}
-              className="w-12 h-12 rounded-full object-cover mr-4"
-            />
-            <div>
-              <h3
-                className={`text-lg font-medium ${
-                  theme === "dark" ? "text-white" : "text-gray-900"
-                }`}
-              >
-                {testimonial.name}
-              </h3>
+          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="text-center mb-5">
+              <div className="text-center mb-2">
+                <div className="text-center">
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                  >
+
+                    <h2
+                      className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                        }`}
+                    >
+                      What Our
+                      <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>
+                        Users says
+                      </span>
+                    </h2>
+
+
+
+
+                  </motion.div>
+                </div>
+
+
+              </div>
+
               <p
-                className={`text-sm ${
-                  theme === "dark" ? "text-gray-400" : "text-gray-600"
-                }`}
+                className={`mt-4 max-w-2xl mx-auto text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  }`}
               >
-                {testimonial.role}
+                Hear from developers who have leveled up their skills with Trackode.
               </p>
             </div>
+
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  name: "Rohit Kharwar",
+                  role: "Full-Stack Developer",
+                  quote:
+                    "Trackode's quizzes helped me master JavaScript concepts in a fun and interactive way. The real-time feedback is a game-changer!",
+                  image: "/rohitk.png",
+                },
+                {
+                  name: "Rohit Kumar",
+                  role: "Backend Engineer",
+                  quote:
+                    "The AI-powered quizzes are spot-on, and the leaderboard keeps me motivated to improve my ranking.",
+                  image: "/rohit.png",
+                },
+                {
+                  name: "Kajal Kasaudhan",
+                  role: "Frontend Developer",
+                  quote:
+                    "I love the detailed analytics dashboard. It helped me identify my weak areas and focus my learning.",
+                  image: "/kaju.png",
+                },
+              ].map((testimonial, index) => (
+                <div
+                  key={index}
+                  className={`relative p-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 ${theme === "dark" ? "bg-gray-700" : "bg-white"
+                    } shadow-md hover:shadow-lg`}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 100}
+                >
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <h3
+                        className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"
+                          }`}
+                      >
+                        {testimonial.name}
+                      </h3>
+                      <p
+                        className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                          }`}
+                      >
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                  <p
+                    className={`text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                      }`}
+                  >
+                    "{testimonial.quote}"
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
-          <p
-            className={`text-base ${
-              theme === "dark" ? "text-gray-300" : "text-gray-600"
-            }`}
-          >
-            "{testimonial.quote}"
-          </p>
-        </div>
-      ))}
-    </div>
-  </div>
-</section>
+        </section>
 
         {/* Final CTA Section */}
 
