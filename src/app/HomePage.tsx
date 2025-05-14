@@ -243,7 +243,7 @@ export default function HomePage() {
                 {/* Trust badges */}
                 <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
                   <div
-                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
                   >
                     <svg
@@ -267,7 +267,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div
-                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
                   >
                     <svg
@@ -291,7 +291,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div
-                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
                   >
                     <svg
@@ -378,7 +378,7 @@ export default function HomePage() {
 
               <div className="relative px-4 py-6 sm:py-12 sm:px-8 z-10">
                 <div className="max-w-2xl mx-auto text-center">
-                  <div className="inline-flex items-center justify-center px-3 py-1.5 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
+                  <div className="inline-flex items-center justify-center px-3 py-2 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
                     <span className="flex items-center">
                       <span className="w-1.5 h-1.5 mr-2 rounded-full bg-green-400 animate-pulse"></span>
                       <span className="text-white text-xs sm:text-sm font-medium tracking-wide">JOIN 1000+ DEVELOPERS</span>
@@ -462,7 +462,7 @@ export default function HomePage() {
         </section>
         
         <section
-          className={` ${theme === "dark" ? "bg-gray-900" : "bg-gray-150"} py-7 px-10 rounded-lg`}
+          className={` ${theme === "dark" ? "bg-gray-900" : "bg-gray-150"} py-7  rounded-lg`}
           aria-labelledby="demo-heading"
         >
           <div className="text-center ">
@@ -473,11 +473,11 @@ export default function HomePage() {
             >
 
               <h2
-                className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                className={`inline-block  font-semibold text-lg  px-5 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
                   }`}
               >
                 Try a free
-                <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>
+                <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-5 py-2  bg-purple-500 text-white `}>
                   Demo Quiz
                 </span>
               </h2>
@@ -504,11 +504,11 @@ export default function HomePage() {
                 >
 
                   <h2
-                    className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                    className={`inline-block  font-semibold text-lg  px-4 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
                       }`}
                   >
                     Why 
-                    <span className={`inline-block ml-1 mr-1 rounded-lg font-semibold text-lg  px-4 py-1.5 bg-purple-500  text-white `}>
+                    <span className={`inline-block ml-2 mr-2 rounded-lg font-semibold text-lg  px-4 py-2 bg-purple-500  text-white `}>
                       Choose
                     </span>
                     Trackode
@@ -520,7 +520,7 @@ export default function HomePage() {
                 </motion.div>
                 <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
                   <div
-                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
                   >
                     <svg
@@ -544,7 +544,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div
-                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
                   >
                     <svg
@@ -568,7 +568,7 @@ export default function HomePage() {
                     </span>
                   </div>
                   <div
-                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                    className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
                   >
                     <svg
@@ -672,11 +672,11 @@ export default function HomePage() {
 
 
                   <h2
-                    className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                    className={`inline-block  font-semibold text-lg  px-6 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
                       }`}
                   >
                     How Trackode
-                    <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>
+                    <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-5 py-2  bg-purple-500 text-white `}>
                       Works
                     </span>
                   </h2>
@@ -824,11 +824,11 @@ export default function HomePage() {
                   >
 
                     <h2
-                      className={`inline-block  font-semibold text-lg  px-4 py-1.5 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
+                      className={`inline-block  font-semibold text-lg  px-5 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
                         }`}
                     >
                       What Our
-                      <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>
+                      <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-5 py-2  bg-purple-500 text-white `}>
                         Users says
                       </span>
                     </h2>
