@@ -1,17 +1,15 @@
 "use client"
 import React from 'react'
 import { motion, AnimatePresence } from "framer-motion";
-import "flowbite";
 import { useSession } from "next-auth/react";
 import "@/app/globals.css";
 import Faq from "../components/Faq";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import toast, { Toaster } from 'react-hot-toast';;
+
 import { useTheme } from "../components/ThemeContext";
 import SplitText from "../components/SplitText";
-import GradientText from "@/components/GradientText";
-import Head from "next/head";
+
 import { useRouter } from "next/navigation";
 import QuizJoinComponent from '@/components/JoinQuiz';
 import TechStackQuizSystem from '@/components/TechnologySection';
@@ -19,7 +17,17 @@ import InteractiveQuiz from '@/components/DemoQuizzes';
 const handleAnimationComplete = () => {
   console.log('All letters have animated!');
 };
+
 export default function HomePage() {
+const [showBackToTop, setShowBackToTop] = useState(false);
+useEffect(() => {
+  const handleScroll = () => {
+    setShowBackToTop(window.scrollY > 300);
+  };
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
 
   const { data: session, status } = useSession();
   const [isFirstVisit, setIsFirstVisit] = useState(false);
@@ -46,7 +54,16 @@ export default function HomePage() {
   return (
     <>
 
-
+{showBackToTop && (
+  <button
+    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    className="fixed bottom-4 right-4 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700"
+  >
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+)}
       <div className={`overflow-x-hidden  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/*Trackode Hero Section */}
         <section
@@ -154,13 +171,13 @@ export default function HomePage() {
               >
                 <Link
                   href="/dashboard"
-                  className="px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
+                  className="px-6 py-2 sm:py-2 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
                 >
                   Get Started
                 </Link>
                 <Link
                   href="/admin-dashboard"
-                  className={`px-6 py-2 sm:py-3 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${theme === "dark"
+                  className={`px-6 py-2 sm:py-2 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${theme === "dark"
                     ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
                     : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
                     }`}
@@ -467,25 +484,17 @@ export default function HomePage() {
         >
           <div className="text-center ">
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-
-              <h2
-                className={`inline-block  font-semibold text-lg  px-5 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-                  }`}
-              >
-                Try a free
-                <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-5 py-2  bg-purple-500 text-white `}>
-                  Demo Quiz
-                </span>
-              </h2>
-
-
-
-
-            </motion.div>
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
+  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+    Try a free
+    <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+      Demo Quiz
+    </span>
+  </h2>
+</motion.div>
           </div>
 
 
@@ -498,26 +507,18 @@ export default function HomePage() {
             <div className="text-center mb-10">
               <div className="text-center">
                 <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-
-                  <h2
-                    className={`inline-block  font-semibold text-lg  px-4 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-                      }`}
-                  >
-                    Why 
-                    <span className={`inline-block ml-2 mr-2 rounded-lg font-semibold text-lg  px-4 py-2 bg-purple-500  text-white `}>
-                      Choose
-                    </span>
-                    Trackode
-                  </h2>
-
-
-
-
-                </motion.div>
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
+  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+    Why
+    <span className="mx-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+      Choose
+    </span>
+    Trackode
+  </h2>
+</motion.div>
                 <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
                   <div
                     className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
@@ -659,32 +660,25 @@ export default function HomePage() {
           </div>
         </section>
         {/* How it Works Section with Card Hover Effects */}
-        <section className={`py-7  ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="features-heading">
+        <section className={`py-5  ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`} aria-labelledby="features-heading">
           <div className="px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-5">
 
               <div className="text-center">
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                >
-
-
-                  <h2
-                    className={`inline-block  font-semibold text-lg  px-6 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-                      }`}
-                  >
-                    How Trackode
-                    <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-5 py-2  bg-purple-500 text-white `}>
-                      Works
-                    </span>
-                  </h2>
-
-
-
-
-                </motion.div>
+                
+{/* How It Works Section */}
+<motion.div
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
+  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+    How Trackode
+    <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+      Works
+    </span>
+  </h2>
+</motion.div>
               </div>
 
 
@@ -708,7 +702,7 @@ export default function HomePage() {
                 {/* Card content */}
                 <div className="p-8 relative z-10">
                   
-                  <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-purple-500 group-hover:bg-blue-400" : "bg-blue-100 group-hover:bg-blue-200"
+                  <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-blue-500 group-hover:bg-blue-400" : "bg-blue-100 group-hover:bg-blue-200"
                     }`}>
                     <svg className={`w-7 h-7 transition-transform duration-300 group-hover:scale-110 ${theme === "dark" ? "text-white" : "text-blue-600"
                       }`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -810,33 +804,25 @@ export default function HomePage() {
 
         {/* Technologies Section with Animation */}
         <section
-          className={`py-10 ${theme === "dark" ? "bg-gray-800" : "bg-gradient-to-b from-white to-blue-50"} rounded-lg`}
+          className={`py-7 ${theme === "dark" ? "bg-gray-800" : "bg-gradient-to-b from-white to-blue-50"} rounded-lg`}
           aria-labelledby="testimonials-heading"
         >
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="text-center mb-5">
               <div className="text-center mb-2">
                 <div className="text-center">
-                  <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                  >
-
-                    <h2
-                      className={`inline-block  font-semibold text-lg  px-5 py-2 rounded-lg ${theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-                        }`}
-                    >
-                      What Our
-                      <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-5 py-2  bg-purple-500 text-white `}>
-                        Users says
-                      </span>
-                    </h2>
-
-
-
-
-                  </motion.div>
+                 <motion.div
+  initial={{ opacity: 0, y: -20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+>
+  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+    What Our
+    <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+      Users Say
+    </span>
+  </h2>
+</motion.div>
                 </div>
 
 
@@ -906,7 +892,7 @@ export default function HomePage() {
                     className={`text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                       }`}
                   >
-                    "{testimonial.quote}"
+                    {testimonial.quote}
                   </p>
                 </div>
               ))}
@@ -923,6 +909,7 @@ export default function HomePage() {
         {/* Add these keyframe animations to your global styles */}
 
       </div>
+      
     </>
   );
 

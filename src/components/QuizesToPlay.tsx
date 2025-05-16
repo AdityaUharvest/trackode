@@ -752,7 +752,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                                         theme === "dark" ? "text-white" : "text-gray-900"
                                       }`}
                                     >
-                                      {quiz.name}
+                                      {quiz.name.replace("(", "").replace(")", "").trim()}
                                     </h4>
                                     <span
                                       className={`text-xs flex items-center ${

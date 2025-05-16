@@ -112,3 +112,21 @@ body {
 .animation-delay-200 {
   animation-delay: 0.2s;
 }
+.neon-text {
+            text-shadow: 0 0 5px #00b4d8, 0 0 10px #00b4d8, 0 0 20px #00b4d8;
+            animation: flicker 1.5s infinite alternate;
+          }
+          @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+              text-shadow: 0 0 5px #00b4d8, 0 0 10px #00b4d8, 0 0 20px #00b4d8;
+            }
+            20%, 24%, 55% {
+              text-shadow: none;
+            }
+          }
+          .holographic-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }

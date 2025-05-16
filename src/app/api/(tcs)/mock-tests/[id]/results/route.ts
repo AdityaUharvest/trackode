@@ -61,7 +61,7 @@ export async function GET(request: NextRequest, { params }: any) {
       return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
     }
     const section = await Section.find();
-    console.log(section)
+   
     let sections=<any>[]
     for(let i =0;i<section.length;i++){
       sections.push(section[i].value);

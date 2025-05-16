@@ -173,11 +173,11 @@ export default function TechStackQuizSystem() {
                 Multiple Technologies
               </span>
               
-              <h2 id="tech-stack-heading" className={`text-2xl font-bold sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              <h2 id="tech-stack-heading" className={`text-xl font-bold sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 Technologies We Cover
               </h2>
               
-              <p className={`mt-4 text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+              <p className={`mt-4 text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 Practice with quizzes and challenges in all major programming languages and frameworks
               </p>
             </div>

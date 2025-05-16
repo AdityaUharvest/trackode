@@ -83,7 +83,7 @@ const MockTestCreator: React.FC = () => {
     <div >
      
     
-    <div className={`flex justify-center ${containerClasses}`}>
+    <div className={`flex min-h-screen justify-center ${containerClasses}`}>
       
      
       <form onSubmit={handleSubmit} className={formClasses}>

@@ -376,7 +376,7 @@ export default function QuizPage({ params }: any) {
         onPaste={(e) => e.preventDefault()}
       >
         {hasStarted && (
-          <div className={`p-6 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+          <div className={`lg:p-6 p-2 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
             <div className="flex justify-between items-center mb-8">
               {/* Enhanced Timer Display */}
               <div className="flex items-center gap-4">
@@ -400,7 +400,7 @@ export default function QuizPage({ params }: any) {
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
               <div
-                className={`lg:col-span-3 rounded-lg shadow-lg p-8 ${
+                className={`lg:col-span-3 rounded-lg shadow-lg p-4 ${
                   theme === "dark" ? "bg-gray-800" : "bg-white"
                 }`}
               >
@@ -428,11 +428,11 @@ export default function QuizPage({ params }: any) {
                   ))}
                 </div>
 
-                <div className="lg:flex lg:justify-between gap-2 p-2 mt-8">
+                <div className="flex justify-between gap-1  mt-8">
                   <button
                     onClick={() => handleQuestionChange(currentQuestion - 1)}
                     disabled={currentQuestion === 0}
-                    className={`px-6 py-2 mb-2 rounded-lg transition-colors ${
+                    className={`p-2 mb-2 rounded-lg transition-colors ${
                       theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
                     } disabled:opacity-50`}
                   >
@@ -440,7 +440,7 @@ export default function QuizPage({ params }: any) {
                   </button>
                   <button
                     onClick={handleMarkReview}
-                    className={`p-2 mb-2 ml-2 rounded-lg transition-colors ${
+                    className={`p-2 mb-2 ml-1 rounded-lg transition-colors ${
                       theme === "dark" ? "bg-orange-600 hover:bg-orange-700" : "bg-orange-500 hover:bg-orange-600"
                     } text-white`}
                   >
@@ -450,17 +450,17 @@ export default function QuizPage({ params }: any) {
                     <button
                       onClick={() => handleSubmitQuiz()}
                       disabled={submitted || isSubmitting}
-                      className={`p-2 mb-2 ml-2 rounded-lg transition-colors ${
+                      className={`p-3 mb-2 ml-2 rounded-lg transition-colors ${
                         theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"
                       } text-white disabled:opacity-50`}
                     >
-                      {submitted ? "Quiz Submitted" : isSubmitting ? "Submitting..." : "Submit Quiz"}
+                      {submitted ? "Quiz Submitted" : isSubmitting ? "Submitting..." : "Submit"}
                     </button>
                   ) : (
                     <button
                       onClick={() => handleQuestionChange(currentQuestion + 1)}
                       disabled={currentQuestion === quizData.questions.length - 1}
-                      className={`px-6 py-2 mb-2 rounded-lg transition-colors ${
+                      className={`p-3 mb-2 rounded-lg transition-colors ${
                         theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
                       } disabled:opacity-50`}
                     >
@@ -522,24 +522,24 @@ export default function QuizPage({ params }: any) {
       {/* Quiz start screen */}
       {!hasStarted && (
         <div
-          className={`min-h-screen flex items-center justify-center p-4 ${
+          className={`min-h-screen flex items-center justify-center p-2 ${
             theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
           }`}
         >
           <div
-            className={`rounded-xl shadow-2xl p-8 max-w-4xl w-full ${
+            className={`rounded-xl shadow-2xl p-3 max-w-5xl w-full ${
               theme === "dark" ? "bg-gray-800" : "bg-white"
             }`}
           >
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-xl font-semibold">{quizData.name}</h1>
-                <p className="text-sm opacity-80">Please read the instructions carefully before starting</p>
+                <h1 className="text-lg font-semibold">{quizData.name.replace("(","").replace(")", "")}</h1>
+                {/* <p className="text-sm opacity-80">Please read the instructions carefully before starting</p> */}
               </div>
               <button
                 onClick={handleStartQuiz}
                 disabled={!declarationsAgreed || !termsAgreed}
-                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                className={`p-3 rounded-lg font-medium transition-all ${
                   theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
                 } text-white ${
                   !declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
@@ -548,37 +548,10 @@ export default function QuizPage({ params }: any) {
                 Start Quiz
               </button>
             </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+{/* quiz instructions  */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-1">
               <div className="lg:col-span-2 space-y-6">
-                {isMobile && (
-                  <div
-                    className={`p-4 rounded-lg border-l-4 ${
-                      theme === "dark" ? "border-red-500 bg-gray-700" : "border-red-500 bg-red-50"
-                    }`}
-                  >
-                    <div className="font-semibold flex items-center gap-2 mb-2">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      Mobile Restrictions
-                    </div>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
-                      <li>Screen recording/printscreen disabled</li>
-                      <li>Landscape mode locked</li>
-                      <li>App switching limited to 3 times</li>
-                    </ul>
-                  </div>
-                )}
+                
 
                 <div
                   className={`p-4 rounded-lg ${
@@ -644,26 +617,65 @@ export default function QuizPage({ params }: any) {
                           clipRule="evenodd"
                         />
                       </svg>
+                      <span>Quiz will be submitted automatically in case of timeout</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 flex-shrink-0"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                       <span>Calculator available in the tools menu</span>
                     </li>
                   </ul>
                 </div>
 
-                {quizData.instructions && (
-                  <div
-                    className={`p-4 rounded-lg ${
-                      theme === "dark" ? "bg-gray-700" : "bg-gray-50"
-                    }`}
-                  >
-                    <h2 className="text-lg font-semibold mb-3">Additional Instructions</h2>
-                    <div className="prose prose-sm max-w-none" style={{ whiteSpace: "pre-line" }}>
-                      {quizData.instructions}
-                    </div>
-                  </div>
-                )}
+                
               </div>
-
-              <div className="space-y-6">
+ <div
+                  className={`p-4 rounded-lg ${
+                    theme === "dark" ? "bg-gray-700" : "bg-gray-50"
+                  }`}
+                >
+                  <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Quiz Summary
+                  </h2>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>Total Questions:</div>
+                    <div className="font-medium">{quizData.totalQuestions}</div>
+                    <div>Duration:</div>
+                    <div className="font-medium">{quizData.duration * 60} mins</div>
+                    <div>Max Attempts:</div>
+                    <div className="font-medium">{quizData.totalQuestions}</div>
+                    <div>Passing Score:</div>
+                    <div className="font-medium">75%</div>
+                  </div>
+                  
+                </div>
+              
+              
+            </div>
+            {/* Declarations and Terms */}
+            <div className="space-y-6 mt-2">
                 <div
                   className={`p-4 rounded-lg ${
                     theme === "dark" ? "bg-gray-700" : "bg-gray-50"
@@ -729,39 +741,19 @@ export default function QuizPage({ params }: any) {
                     </label>
                   </div>
                 </div>
+                <button
+                onClick={handleStartQuiz}
+                disabled={!declarationsAgreed || !termsAgreed}
+                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                  theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
+                } text-white ${
+                  !declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+                }`}
+              >
+                Start Quiz
+              </button>
 
-                <div
-                  className={`p-4 rounded-lg ${
-                    theme === "dark" ? "bg-gray-700" : "bg-gray-50"
-                  }`}
-                >
-                  <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1zm-5 8.274l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L5 10.274zm10 0l-.818 2.552c.25.112.526.174.818.174.292 0 .569-.062.818-.174L15 10.274z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Quiz Summary
-                  </h2>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>Total Questions:</div>
-                    <div className="font-medium">{quizData.totalQuestions}</div>
-                    <div>Duration:</div>
-                    <div className="font-medium">{quizData.duration * 60} mins</div>
-                    <div>Max Attempts:</div>
-                    <div className="font-medium">{quizData.totalQuestions}</div>
-                    <div>Passing Score:</div>
-                    <div className="font-medium">75%</div>
-                  </div>
-                </div>
-              </div>
+               
             </div>
           </div>
         </div>

@@ -532,7 +532,7 @@ export default function QuizResultsDashboard({ params }: any) {
           </p>
           <span className='text-center text-blue-600 text-sm font-medium'>
             Visit:
-            <Link href='www.trackode.in/'> www.trackode.in</Link>
+            <Link target="blank" href='trackode.in/'> trackode.in</Link>
           </span>
           
           

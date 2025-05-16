@@ -97,28 +97,7 @@ export default function Faq() {
 
   return (
     <div className="py-5">
-  <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            
-            <h2
-              className={`inline-block mb-2 font-semibold text-lg  px-4 py-1.5 rounded-lg ${
-                theme === "dark" ? "bg-blue-900/30 text-white" : "bg-blue-100 text-blue-600"
-              }`}
-            >
-            Trackode Support Center 
-              <span className={`inline-block ml-2 rounded-lg font-semibold text-lg  px-4 py-1.5  bg-purple-500 text-white `}>FAQs 
-              </span>
-            </h2>
-           
-            
-            
-            
-          </motion.div>
-        </div>
+ 
     
               
       <div
@@ -128,6 +107,21 @@ export default function Faq() {
             : "bg-gradient-to-br from-white to-gray-50 border border-gray-100"
         }`}
       >
+         <div className="text-center">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+    >
+      <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+        Trackode Support Center 
+        <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+         FAQs 
+        </span>
+      </h2>
+    </motion.div>
+          
+        </div>
         {/* Header Section */}
         
 

@@ -36,7 +36,6 @@ interface EditingQuestion extends Question {
   index: number;
 }
 
-const API_TIMEOUT = 60000; // 60 seconds timeout
 
 export default function QuestionGenerator({ isPublished, mockTest, shareCode }: QuestionGeneratorProps) {
   //fetching sections from the server
@@ -162,7 +161,6 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       setIsLoading(true);
       const res = await axios.get(`/api/mock-tests/${mockTestId}/questions`, {
         params: { section: selectedSection },
-        timeout: API_TIMEOUT
       });
       setQuestions(res.data);
       setErrorMessage('');
@@ -200,8 +198,6 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
         ]
         The "correctAnswer" field must be the index (0-3) of the correct option. 
         DO NOT include any explanations, markdown formatting, or additional text outside the JSON array. Ensure the JSON is properly formatted and parseable.`
-      }, {
-        timeout: API_TIMEOUT
       });
 
       const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
@@ -237,9 +233,6 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
             correctAnswer: q.correctAnswer
             // Explanation will be generated later
           }))
-        },
-        {
-          timeout: API_TIMEOUT
         }
       );
 
@@ -293,7 +286,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   };
 
   return (
-<div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+<div className=" min-h-screen mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
           {/* Header Section */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
@@ -439,7 +432,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 <button
                   onClick={saveQuestions}
                   disabled={isSubmitting}
-                  className="fixed bottom-6 right-6 flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                  className="fixed bottom-6 text-sm right-6 flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
                 >
                   {isSubmitting && <Loader2 className="animate-spin w-5 h-5" />}
                   {isSubmitting  ? "Saving..." : "Save Questions"}
@@ -448,12 +441,12 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 
                 <button
                 
-                className="fixed bottom-20 right-6 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                className="fixed bottom-20 right-6 flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
                 
                 {questions.length > 24 && (
                   
-                   <Link href="/admin-dashboard" className="text-white text-sm font-semibold">
+                   <Link href="/admin-dashboard" className="text-white text-sm ">
                    Go to Dashboard
                    </Link> 
                  
@@ -462,7 +455,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
               <Button
                 onClick={()=>navigator.share({
                   title: 'Trackode Quiz',
-                  text: `Check out this quiz on Trackode! ${window.location.origin}/playy/${shareCode}`,
+                  text: `Check out this quiz on Trackode!`,
                   url: `${window.location.origin}/playy/${shareCode}`,
 
                 }).then(
@@ -473,17 +466,17 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                     toast.error('Failed to share quiz. Please try again.');
                   }
                 )}
-                className="fixed bottom-32 right-6 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                className="fixed bottom-32 right-6 text-sm flex items-center gap-2 px-10 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
-                Share
+                Share Quiz
                 
                
               </Button>
               <Button
                 onClick={handlePublish}
-                className="fixed bottom-44 right-6 flex items-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                className="fixed bottom-44 right-6 text-sm flex items-center gap-2 px-8 py-2 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
-                {isPublishedd ? 'Unpublish' : 'Publish'}
+                {isPublishedd ? 'Unpublish Quiz' : 'Publish Quiz'}
 
                 
                 
