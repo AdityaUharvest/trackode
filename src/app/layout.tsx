@@ -1,7 +1,4 @@
-// app/layout.tsx - Server Component
-import { ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+
 import StructuredData from "@/components/StructuredData";
 import ClientLayout from "@/app/client-layout/ClientLayout";
 import { SessionProvider } from "next-auth/react";
