@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTheme } from '@/components/ThemeContext';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { 
-  ChevronDown, ChevronUp, AlertCircle, Loader2, Trophy, 
+import Markdown from 'react-markdown';
+import {
+  ChevronDown, ChevronUp, AlertCircle, Loader2, Trophy,
   CheckCircle2, XCircle, Sparkles, Lightbulb, BarChart3,
-  BookOpen, Brain, Calendar, Clock, ArrowRight, GraduationCap
+  BookOpen, Brain, Calendar, Clock, ArrowRight, GraduationCap,
+  Award
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -39,7 +41,19 @@ interface UserResult {
   completedAt: string;
   totalScore: number;
   totalQuestions: number;
+  rank: number;
   sections: SectionResult[];
+  overallFeedback?: string | null;
+  sectionFeedbacks?: Array<{
+    sectionName: string;
+    feedback: string;
+    generatedAt?: Date;
+  }>;
+  questionFeedbacks?: Array<{
+    questionId: string;
+    explanation: string;
+    generatedAt?: Date;
+  }>;
 }
 
 export default function UserQuizResult() {
@@ -73,6 +87,7 @@ export default function UserQuizResult() {
   const neutralOptionBg = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50';
   const feedbackBg = theme === 'dark' ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200';
   const highlightBg = theme === 'dark' ? 'bg-indigo-900/30' : 'bg-indigo-50';
+  const rankBadgeBg = theme === 'dark' ? 'bg-yellow-900/30 border-yellow-600' : 'bg-yellow-50 border-yellow-500';
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -84,13 +99,26 @@ export default function UserQuizResult() {
         }
         const data = await response.json();
         setResult(data);
-        
+
         // Expand all sections by default
         const defaultExpanded = data.sections.reduce((acc: Record<string, boolean>, section: SectionResult) => {
           acc[section.sectionName] = true;
           return acc;
         }, {});
         setExpandedSections(defaultExpanded);
+
+        // Set existing feedback if available
+        if (data.overallFeedback) {
+          setOverallFeedback(data.overallFeedback);
+        }
+
+        // Show toast for certificate
+        if (data.rank) {
+          toast.success(`Certificate earned! Rank ${data.rank} added to your profile.`, {
+            icon: <Award className="h-5 w-5 text-yellow-500" />,
+            duration: 5000,
+          });
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
@@ -102,6 +130,17 @@ export default function UserQuizResult() {
       fetchResult();
     }
   }, [session, quizId]);
+  
+  // Getting the feedback from the result.sectionFeedbacks
+  useEffect(() => {
+    if (result && result.sectionFeedbacks) {
+      const feedbackMap: Record<string, string> = {};
+      result.sectionFeedbacks.forEach((feedback) => {
+        feedbackMap[feedback.sectionName] = feedback.feedback;
+      });
+      setSectionFeedback(feedbackMap);
+    }
+  }, [result]);
 
   const toggleSection = (sectionName: string) => {
     setExpandedSections(prev => ({
@@ -116,7 +155,30 @@ export default function UserQuizResult() {
       [questionId]: !prev[questionId]
     }));
   };
-  
+
+  const saveQuestionFeedback = async (questionId: string, explanation: string) => {
+    try {
+      const response = await fetch(`/api/mock-tests/${quizId}/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionId,
+          content: explanation,
+          type: 'question'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save question feedback');
+      }
+    } catch (error) {
+      console.error('Error saving question feedback:', error);
+      toast.error('Failed to save explanation');
+    }
+  };
+
   const toggleQuestionExplanation = async (
     questionId: string,
     questionText: string,
@@ -124,7 +186,6 @@ export default function UserQuizResult() {
     correctAnswerIndex: number,
     options: string[]
   ) => {
-    // If already expanded, just toggle
     if (expandedExplanations[questionId]) {
       setExpandedExplanations(prev => ({
         ...prev,
@@ -134,17 +195,28 @@ export default function UserQuizResult() {
     }
 
     try {
-      // Set loading state for this question
       setLoadingExplanations(prev => ({ ...prev, [questionId]: true }));
-      
-      // Call the API to get detailed explanation
+
+      if (result?.questionFeedbacks?.some(fb => fb.questionId === questionId)) {
+        const storedFeedback = result.questionFeedbacks.find(fb => fb.questionId === questionId);
+        setDetailedExplanations(prev => ({
+          ...prev,
+          [questionId]: storedFeedback?.explanation || ''
+        }));
+        setExpandedExplanations(prev => ({
+          ...prev,
+          [questionId]: true
+        }));
+        return;
+      }
+
       const response = await fetch('/api/generate-feedback', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prompt: `Analyze this quiz question and provide a detailed explanation:
+          prompt: `Analyze this quiz question and provide a detailed explanation in markdown format:  
           **Question:** ${questionText}
           **User's Answer:** ${options[userAnswerIndex]} 
           ${userAnswerIndex === correctAnswerIndex ? '(Correct)' : '(Incorrect)'}
@@ -162,14 +234,11 @@ export default function UserQuizResult() {
       }
 
       const data = await response.json();
-      
-      // Store the detailed explanation
       setDetailedExplanations(prev => ({
         ...prev,
         [questionId]: data.instructions
       }));
-
-      // Expand the explanation
+      await saveQuestionFeedback(questionId, data.instructions);
       setExpandedExplanations(prev => ({
         ...prev,
         [questionId]: true
@@ -177,11 +246,9 @@ export default function UserQuizResult() {
     } catch (error) {
       console.error('Error generating explanation:', error);
       toast.error('Failed to generate detailed explanation');
-      // Fall back to the original explanation if available
       const question = result?.sections
         .flatMap(s => s.questions)
         .find(q => q._id === questionId);
-      
       setDetailedExplanations(prev => ({
         ...prev,
         [questionId]: question?.explanation || 'Could not generate detailed explanation.'
@@ -191,12 +258,32 @@ export default function UserQuizResult() {
     }
   };
 
-  
+  const saveOverallFeedback = async (feedback: string) => {
+    try {
+      const response = await fetch(`/api/mock-tests/${quizId}/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: feedback,
+          type: 'overall'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save overall feedback');
+      }
+    } catch (error) {
+      console.error('Error saving overall feedback:', error);
+      toast.error('Failed to save feedback');
+    }
+  };
 
   const generateOverallFeedback = async () => {
     try {
       if (!result) return;
-      
+
       setLoadingFeedback(prev => ({ ...prev, overall: true }));
 
       const response = await fetch('/api/generate-feedback', {
@@ -205,13 +292,12 @@ export default function UserQuizResult() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prompt: `Generate detailed overall performance analysis for this quiz attempt:
+          prompt: `Generate detailed overall performance analysis for this quiz attempt, in markdown format, dont include okay ,here is the analysis, or any other similar phrases:
         
           **Overall Score:** ${result.totalScore}/${result.totalQuestions} (${Math.round((result.totalScore / result.totalQuestions) * 100)}%)
         
           **Section Breakdown:**
-          ${
-            result.sections.map(section => (
+          ${result.sections.map(section => (
             `- ${section.sectionName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}: ` +
             `${section.correct}/${section.total} (${Math.round((section.correct / section.total) * 100)}%)`
           )).join('\n')}
@@ -229,7 +315,7 @@ export default function UserQuizResult() {
           - Specific action items for improvement
           - Positive encouragement
         
-          Keep it professional yet encouraging (50-100 words).`
+          Keep it professional yet encouraging (100-150 words).`
         })
       });
 
@@ -239,12 +325,89 @@ export default function UserQuizResult() {
 
       const data = await response.json();
       setOverallFeedback(data.instructions);
+      await saveOverallFeedback(data.instructions);
     } catch (error) {
       console.error('Error generating overall feedback:', error);
       toast.error('Failed to generate overall feedback');
       setOverallFeedback('Could not generate overall feedback.');
     } finally {
       setLoadingFeedback(prev => ({ ...prev, overall: false }));
+    }
+  };
+
+  const saveSectionFeedback = async (sectionName: string, feedback: string) => {
+    try {
+      const response = await fetch(`/api/mock-tests/${quizId}/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sectionName,
+          content: feedback,
+          type: 'section',
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save section feedback');
+      }
+    } catch (error) {
+      console.error('Error saving section feedback:', error);
+      toast.error('Failed to save feedback');
+    }
+  };
+
+  const generateSectionFeedback = async (sectionName: string) => {
+    try {
+      if (!result) return;
+
+      setLoadingFeedback(prev => ({
+        ...prev,
+        sections: { ...prev.sections, [sectionName]: true }
+      }));
+
+      const section = result.sections.find(s => s.sectionName === sectionName);
+      if (!section) return;
+
+      const response = await fetch('/api/generate-feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Generate detailed feedback for the "${sectionName}" section of this quiz attempt:
+          
+          **Section Performance:** ${section.correct}/${section.total} (${Math.round((section.correct / section.total) * 100)}%)
+          
+          Please provide:
+          1. Key strengths in this section
+          2. Main areas needing improvement
+          3. Specific study recommendations for this section
+          4. Estimated time needed to improve
+          
+          Format as concise bullet points (30-50 words total).`
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate section feedback');
+      }
+
+      const data = await response.json();
+      setSectionFeedback(prev => ({
+        ...prev,
+        [sectionName]: data.instructions
+      }));
+      await saveSectionFeedback(sectionName, data.instructions);
+    } catch (error) {
+      console.error('Error generating section feedback:', error);
+      toast.error(`Failed to generate feedback for ${sectionName}`);
+    } finally {
+      setLoadingFeedback(prev => ({
+        ...prev,
+        sections: { ...prev.sections, [sectionName]: false }
+      }));
     }
   };
 
@@ -285,7 +448,7 @@ export default function UserQuizResult() {
             </div>
             <h2 className={`text-sm font-semibold ${textColor}`}>Error Loading Results</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>{error}</p>
-            <Button 
+            <Button
               onClick={() => window.location.reload()}
               className="mt-4"
               variant="outline"
@@ -308,10 +471,10 @@ export default function UserQuizResult() {
             </div>
             <h2 className={`text-sm font-semibold ${textColor}`}>No Results Found</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>You haven't attempted this quiz yet.</p>
-            <Button 
+            <Button
               asChild
               className="mt-4"
-            >
+              >
               <a href={`/mock-tests/${quizId}`}>Take the Quiz</a>
             </Button>
           </div>
@@ -322,16 +485,23 @@ export default function UserQuizResult() {
 
   const overallPercentage = Math.round((result.totalScore / result.totalQuestions) * 100);
   const performanceBadge = getScoreBadge(overallPercentage);
-  
+
   // For the circular progress indicator
   const circumference = 2 * Math.PI * 40; // r = 40
   const strokeDashoffset = circumference - (overallPercentage / 100) * circumference;
+
+  // Format rank with ordinal suffix
+  const getOrdinalSuffix = (n: number) => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
 
   return (
     <div className={`min-h-screen p-2 md:p-6 ${bgColor}`}>
       <div className="max-w-7xl mx-auto">
         {/* Top Summary Card */}
-        <Card className="mb-6 overflow-hidden border shadow-md">
+        <Card className={`mb-6 overflow-hidden border shadow-md ${bgColor}`}>
           <div className={`h-2 w-full ${performanceBadge.color}`}></div>
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2">
             <div>
@@ -354,31 +524,44 @@ export default function UserQuizResult() {
               </CardDescription>
             </div>
             <div className="flex flex-col md:flex-row md:items-center gap-3">
-              <Badge 
+              <Badge
                 className={`px-3 py-1 text-white ${performanceBadge.color}`}
               >
                 {performanceBadge.label}
               </Badge>
+              {result.rank > 0 && (
+                <Badge
+                  className={`px-3 py-1 text-yellow-800 dark:text-yellow-200 ${rankBadgeBg}`}
+                >
+                  <Trophy className="h-4 w-4 mr-1" />
+                  Rank: {getOrdinalSuffix(result.rank)}
+                </Badge>
+              )}
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 mb-6">
-                <TabsTrigger value="overview" className="flex items-center gap-2">
+              <TabsList className="grid grid-cols-3 gap-2 mb-6">
+                <TabsTrigger
+                  value="overview"
+                  className={`flex items-center gap-2 bg-blue-400 text-white hover:bg-blue-500 ${
+                    activeTab === 'overview' ? 'bg-blue-900 text-white' : ''
+                  }`}
+                >
                   <Trophy className="h-4 w-4" />
                   <span className="hidden md:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="sections" className="flex items-center gap-2">
+                <TabsTrigger value="sections" className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden md:inline">Sections</span>
                 </TabsTrigger>
-                <TabsTrigger value="questions" className="flex items-center gap-2">
+                <TabsTrigger value="questions" className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2">
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden md:inline">Questions</span>
                 </TabsTrigger>
               </TabsList>
-              
+
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -404,12 +587,11 @@ export default function UserQuizResult() {
                           strokeDasharray={circumference}
                           strokeDashoffset={strokeDashoffset}
                           transform="rotate(-90 50 50)"
-                          className={`${
-                            overallPercentage >= 80 ? 'stroke-green-500' :
-                            overallPercentage >= 70 ? 'stroke-emerald-500' :
-                            overallPercentage >= 60 ? 'stroke-yellow-500' : 
-                            overallPercentage >= 50 ? 'stroke-orange-500' : 'stroke-red-500'
-                          } transition-all duration-1000 ease-in-out`}
+                          className={`${overallPercentage >= 80 ? 'stroke-green-500' :
+                              overallPercentage >= 70 ? 'stroke-emerald-500' :
+                              overallPercentage >= 60 ? 'stroke-yellow-500' :
+                              overallPercentage >= 50 ? 'stroke-orange-500' : 'stroke-red-500'
+                            } transition-all duration-1000 ease-in-out`}
                         />
                       </svg>
                       <div className="absolute flex flex-col items-center">
@@ -421,8 +603,14 @@ export default function UserQuizResult() {
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
                       <span>{result.totalScore} correct out of {result.totalQuestions}</span>
                     </div>
+                    {result.rank > 0 && (
+                      <div className="mt-2 flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
+                        <Award className="h-4 w-4" />
+                        <span>Certificate Earned: Rank {getOrdinalSuffix(result.rank)}</span>
+                      </div>
+                    )}
                   </div>
-                  
+
                   {/* Section Performance */}
                   <div className={`p-6 rounded-lg ${cardBg} border ${borderColor} col-span-1 md:col-span-2`}>
                     <h3 className="font-medium mb-4 flex items-center gap-2">
@@ -432,39 +620,35 @@ export default function UserQuizResult() {
                     <div className="space-y-2">
                       {result.sections.map((section) => {
                         const sectionPercentage = Math.round((section.correct / section.total) * 100);
-        
                         const sectionBadge = getScoreBadge(sectionPercentage);
-                        
+
                         if (section.total === 0) return null;
-                        
+
                         return (
                           <div key={section.sectionName} className="space-y-2">
                             <div className="flex justify-between items-center">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium">
-                                  {section.sectionName.split('-').map(word => 
+                                  {section.sectionName.split('-').map(word =>
                                     word.charAt(0).toUpperCase() + word.slice(1)
                                   ).join(' ')}
                                 </span>
                                 <Badge variant="outline" className="text-xs">
-                                Attempted: {section.questions.length}/{section.total} 
-                                
+                                  Attempted: {section.questions.length}/{section.total}
                                 </Badge>
                                 <Badge variant="outline" className="text-xs">
-                                Correct: {section.correct}/{section.questions.length}
+                                  Correct: {section.correct}/{section.questions.length}
                                 </Badge>
-                                
                               </div>
-                              <span className={`text-sm font-medium ${
-                                sectionPercentage >= 70 ? 'text-green-500' : 
-                                sectionPercentage >= 60 ? 'text-yellow-500' : 
-                                sectionPercentage >= 50 ? 'text-orange-500' : 'text-red-500'
-                              }`}>
+                              <span className={`text-sm font-medium ${sectionPercentage >= 70 ? 'text-green-500' :
+                                  sectionPercentage >= 60 ? 'text-yellow-500' :
+                                  sectionPercentage >= 50 ? 'text-orange-500' : 'text-red-500'
+                                }`}>
                                 {sectionPercentage}%
                               </span>
                             </div>
-                            <Progress 
-                              value={sectionPercentage} 
+                            <Progress
+                              value={sectionPercentage}
                               className="h-2"
                               style={{
                                 backgroundColor: theme === 'dark' ? 'rgb(63 63 70)' : 'rgb(228 228 231)',
@@ -476,8 +660,8 @@ export default function UserQuizResult() {
                       })}
                     </div>
                     <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-800">
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => setActiveTab('sections')}
                         className="w-full"
                         size="sm"
@@ -488,7 +672,7 @@ export default function UserQuizResult() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* AI Analysis */}
                 <Card className={`${highlightBg} border ${borderColor}`}>
                   <CardHeader className="pb-2">
@@ -503,14 +687,14 @@ export default function UserQuizResult() {
                   <CardContent>
                     {overallFeedback ? (
                       <div className="prose prose-sm dark:prose-invert max-w-none">
-                        <p>{overallFeedback}</p>
+                        <Markdown>{overallFeedback}</Markdown>
                       </div>
                     ) : (
                       <div className="text-center py-6">
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                           Generate an AI-powered analysis of your performance with personalized recommendations
                         </p>
-                        <Button 
+                        <Button
                           onClick={generateOverallFeedback}
                           disabled={loadingFeedback.overall}
                           className="w-full md:w-auto"
@@ -530,55 +714,33 @@ export default function UserQuizResult() {
                       </div>
                     )}
                   </CardContent>
-                  {overallFeedback && (
-                    <CardFooter>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={generateOverallFeedback}
-                        disabled={loadingFeedback.overall}
-                        className="ml-auto"
-                      >
-                        {loadingFeedback.overall ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Refreshing...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="h-4 w-4 mr-2" />
-                            Refresh Analysis
-                          </>
-                        )}
-                      </Button>
-                    </CardFooter>
-                  )}
+                  
                 </Card>
               </TabsContent>
-              
+
               {/* Sections Tab */}
               <TabsContent value="sections" className="space-y-6">
                 {result.sections.map((section) => {
                   const sectionPercentage = Math.round((section.correct / section.total) * 100);
                   const sectionBadge = getScoreBadge(sectionPercentage);
-                  
+
                   if (section.total === 0) return null;
-                  
+
                   return (
                     <Card key={section.sectionName} className="overflow-hidden">
                       <div className={`h-1 w-full ${sectionBadge.color}`}></div>
-                      <CardHeader 
+                      <CardHeader
                         className={`flex flex-row items-center justify-between cursor-pointer ${sectionHeaderBg} hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-colors`}
                         onClick={() => toggleSection(section.sectionName)}
                       >
                         <div>
                           <CardTitle className="text-sm flex items-center gap-2">
-                            {section.sectionName.split('-').map(word => 
+                            {section.sectionName.split('-').map(word =>
                               word.charAt(0).toUpperCase() + word.slice(1)
                             ).join(' ')}
-                            <Badge 
+                            <Badge
                               variant={
-                                sectionPercentage >= 70 ? 'secondary' : 
+                                sectionPercentage >= 70 ? 'secondary' :
                                 sectionPercentage >= 40 ? 'outline' : 'destructive'
                               }
                             >
@@ -586,7 +748,7 @@ export default function UserQuizResult() {
                             </Badge>
                           </CardTitle>
                         </div>
-                        <button 
+                        <button
                           className={`p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors`}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -602,274 +764,314 @@ export default function UserQuizResult() {
                       </CardHeader>
 
                       {expandedSections[section.sectionName] && (
-                        <CardContent className="p-4 space-y-6">
-                        {/* Questions summary for this section */}
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm flex items-center gap-2">
-                            <BookOpen className="h-4 w-4 text-indigo-500" />
-                            Questions Summary
-                          </h4>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                            {section.questions.map((question, idx) => {
-                              const isCorrect = question.userAnswer === question.correctAnswer;
-                              return (
-                                <Card 
-                                  key={question._id}
-                                  className={`border cursor-pointer transition-all ${isCorrect ? 'border-green-500 dark:border-green-700' : 'border-red-500 dark:border-red-700'} hover:shadow-md`}
-                                  onClick={() => {
-                                    toggleQuestion(question._id);
-                                    setActiveTab('questions');
-                                  }}
-                                >
-                                  <CardContent className="p-3 flex flex-col items-center text-center">
-                                    <div className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${isCorrect ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
-                                      {isCorrect ? (
-                                        <CheckCircle2 className="h-2 w-2 text-green-500" />
-                                      ) : (
-                                        <XCircle className="h-2 w-2 text-red-500" />
-                                      )}
-                                    </div>
-                                    <span className="text-xs font-medium">Question {idx + 1}</span>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        
-                        <Button 
-                          variant="outline" 
-                          onClick={() => setActiveTab('questions')}
-                          className="w-full"
-                          size="sm"
-                        >
-                          View All Questions
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </CardContent>
-                    )}
-                  </Card>
-                );
-              })}
-            </TabsContent>
-            
-            {/* Questions Tab */}
-            <TabsContent value="questions" className="space-y-4">
-              {result.sections.map((section) => {
-                if (section.total === 0) return null;
-                
-                return (
-                  <div key={section.sectionName} className="space-y-4">
-                    <h3 className="font-medium text-sm flex items-center gap-2">
-                      <BookOpen className="h-2 w-2 text-indigo-500" />
-                      {section.sectionName.split('-').map(word => 
-                        word.charAt(0).toUpperCase() + word.slice(1)
-                      ).join(' ')}
-                      <Badge variant="outline">
-                        {section.correct}/{section.total}
-                      </Badge>
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {section.questions.map((question, index) => (
-                        <Card key={question._id} className={`border text-xm ${
-                          question.userAnswer === question.correctAnswer ? 
-                          'border-green-500 dark:border-green-700' : 
-                          'border-red-500 dark:border-red-700'
-                        }`}>
-                          <CardHeader 
-                            className="cursor-pointer flex flex-row items-start justify-between"
-                            onClick={() => toggleQuestion(question._id)}
-                          >
-                            <div className="flex gap-3">
-                              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                question.userAnswer === question.correctAnswer ? 
-                                'bg-green-100 dark:bg-green-900/30' : 
-                                'bg-red-100 dark:bg-red-900/30'
-                              }`}>
-                                {question.userAnswer === question.correctAnswer ? (
-                                  <CheckCircle2 className="h-2 w-2 text-green-500" />
-                                ) : (
-                                  <XCircle className="h-2 w-2 text-red-500" />
-                                )}
-                              </div>
-                              <div>
-                                <CardTitle className="text-sm font-medium">Question {index+1}</CardTitle>
-                                <CardDescription className="line-clamp-1">
-                                  {question.text}
-                                </CardDescription>
-                              </div>
-                            </div>
-                            <button 
-                              className="mt-1 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleQuestion(question._id);
-                              }}
-                            >
-                              {expandedQuestions[question._id] ? (
-                                <ChevronUp className="h-2 w-2" />
-                              ) : (
-                                <ChevronDown className="h-2 w-2" />
-                              )}
-                            </button>
-                          </CardHeader>
-
-                          {expandedQuestions[question._id] && (
-                            <CardContent className="space-y-4 pt-0">
-                              <Separator />
-                              
-                              {/* Options list */}
-                              <div className="space-y-2 mt-2">
-                                {question.options.map((option, index) => {
-                                  const isCorrect = index === question.correctAnswer;
-                                  const isUserSelection = index === question.userAnswer;
-                                  
-                                  let optionClass = neutralOptionBg;
-                                  let iconComponent = null;
-                                  
-                                  if (isCorrect) {
-                                    optionClass = correctOptionBg;
-                                    iconComponent = <CheckCircle2 className="h-2 w-2 text-green-500 flex-shrink-0" />;
-                                  } else if (isUserSelection) {
-                                    optionClass = wrongOptionBg;
-                                    iconComponent = <XCircle className="h-2 w-2 text-red-500 flex-shrink-0" />;
-                                  }
-                                  
-                                  return (
-                                    <div
-                                      key={index}
-                                      className={`p-3 text-xs rounded-lg border ${optionClass}`}
-                                    >
-                                      <div className="flex items-start justify-between">
-                                        <div className="flex items-start">
-                                          <span className="mr-2 font-medium">{String.fromCharCode(65 + index)}.</span>
-                                          <p>{option}</p>
-                                        </div>
-                                        {iconComponent}
+                        <CardContent className={`p-4 ${bgColor} space-y-6`}>
+                          {/* Questions summary for this section */}
+                          <div className="space-y-2">
+                            <h4 className="font-medium text-sm flex items-center gap-2">
+                              <BookOpen className="h-4 w-4 text-indigo-500" />
+                              Questions Summary
+                            </h4>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                              {section.questions.map((question, idx) => {
+                                const isCorrect = question.userAnswer === question.correctAnswer;
+                                return (
+                                  <Card
+                                    key={question._id}
+                                    className={`border cursor-pointer transition-all ${isCorrect ? 'border-green-500 dark:border-green-700' : 'border-red-500 dark:border-red-700'} hover:shadow-md`}
+                                    onClick={() => {
+                                      toggleQuestion(question._id);
+                                      setActiveTab('questions');
+                                    }}
+                                  >
+                                    <CardContent className="p-3 flex flex-col items-center text-center">
+                                      <div className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${isCorrect ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                                        {isCorrect ? (
+                                          <CheckCircle2 className="h-2 w-2 text-green-500" />
+                                        ) : (
+                                          <XCircle className="h-2 w-2 text-red-500" />
+                                        )}
                                       </div>
-                                      {isCorrect && (
-                                        <p className="text-xs mt-1 text-green-600 dark:text-green-400 flex items-center gap-1">
-                                          <CheckCircle2 className="h-3 w-3" />
-                                          Correct Answer
-                                        </p>
-                                      )}
-                                      {isUserSelection && !isCorrect && (
-                                        <p className="text-xs mt-1 text-red-600 dark:text-red-400 flex items-center gap-1">
-                                          <XCircle className="h-3 w-3" />
-                                          Your Answer
-                                        </p>
-                                      )}
-                                    </div>
-                                  );
-                                })}
-                              </div>
+                                      <span className="text-xs font-medium">Question {idx + 1}</span>
+                                    </CardContent>
+                                  </Card>
+                                );
+                              })}
+                            </div>
+                          </div>
 
-                              {/* Explanation section */}
-                              <Card className={`${feedbackBg} border-none`}>
-                                <CardHeader className="pb-2">
-                                  <div className="flex justify-between items-center">
-                                    <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                      <Lightbulb className="h-4 w-4 text-blue-500" />
-                                      Explanation
-                                    </CardTitle>
-                                    <Button
-                                      size="sm"
-                                      variant="ghost"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleQuestionExplanation(
-                                          question._id,
-                                          question.text,
-                                          question.userAnswer,
-                                          question.correctAnswer,
-                                          question.options
-                                        );
-                                      }}
-                                      disabled={loadingExplanations[question._id]}
-                                      className="h-8"
-                                    >
-                                      {loadingExplanations[question._id] ? (
-                                        <>
-                                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                          Generating...
-                                        </>
-                                      ) : expandedExplanations[question._id] ? (
-                                        <>
-                                          Hide
-                                          <ChevronUp className="h-4 w-4 ml-1" />
-                                        </>
-                                      ) : (
-                                        <>
-                                          Explain
-                                          <ChevronDown className="h-4 w-4 ml-1" />
-                                        </>
-                                      )}
-                                    </Button>
-                                  </div>
-                                </CardHeader>
-                                
-                                {expandedExplanations[question._id] && (
-                                  <CardContent>
-                                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                                      <p>{detailedExplanations[question._id] || question.explanation || 'No explanation available.'}</p>
-                                    </div>
-                                  </CardContent>
+                          {/* Section Feedback */}
+                          <Card className={`${feedbackBg} border-none`}>
+                            <CardHeader className="pb-2">
+                              <div className="">
+                                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                  <Lightbulb className="h-4 w-4 text-blue-500" />
+                                  Section Feedback
+                                </CardTitle>
+                                {sectionFeedback[section.sectionName] ? (
+                                  <Markdown>{sectionFeedback[section.sectionName]}</Markdown>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => generateSectionFeedback(section.sectionName)}
+                                    disabled={loadingFeedback.sections[section.sectionName]}
+                                    className="h-8"
+                                  >
+                                    {loadingFeedback.sections[section.sectionName] ? (
+                                      <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        Generating...
+                                      </>
+                                    ) : sectionFeedback[section.sectionName] ? (
+                                      <>
+                                        Refresh
+                                        <Sparkles className="h-4 w-4 ml-1" />
+                                      </>
+                                    ) : (
+                                      <>
+                                        Generate
+                                        <Sparkles className="h-4 w-4 ml-1" />
+                                      </>
+                                    )}
+                                  </Button>
                                 )}
-                              </Card>
-                            </CardContent>
-                          )}
-                        </Card>
-                      ))}
+                              </div>
+                            </CardHeader>
+
+                            
+                          </Card>
+
+                          <Button
+                            variant="outline"
+                            onClick={() => setActiveTab('questions')}
+                            className="w-full bg-blue-400 text-white hover:bg-blue-500 hover:text-white"
+                            size="sm"
+                          >
+                            View All Questions
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </CardContent>
+                      )}
+                    </Card>
+                  );
+                })}
+              </TabsContent>
+
+              {/* Questions Tab */}
+              <TabsContent value="questions" className="space-y-4">
+                {result.sections.map((section) => {
+                  if (section.total === 0) return null;
+
+                  return (
+                    <div key={section.sectionName} className="space-y-4">
+                      <h3 className="font-medium text-sm flex items-center gap-2">
+                        <BookOpen className="h-2 w-2 text-indigo-500" />
+                        {section.sectionName.split('-').map(word =>
+                          word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ')}
+                        <Badge variant="outline">
+                          {section.correct}/{section.total}
+                        </Badge>
+                      </h3>
+
+                      <div className="space-y-4">
+                        {section.questions.map((question, index) => (
+                          <Card key={question._id} className={`border text-xm ${question.userAnswer === question.correctAnswer ?
+                              'border-green-500 dark:border-green-700' :
+                              'border-red-500 dark:border-red-700'
+                            }`}>
+                            <CardHeader
+                              className="cursor-pointer flex flex-row items-start justify-between"
+                              onClick={() => toggleQuestion(question._id)}
+                            >
+                              <div className="flex gap-3">
+                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${question.userAnswer === question.correctAnswer ?
+                                    'bg-green-100 dark:bg-green-900/30' :
+                                    'bg-red-100 dark:bg-red-900/30'
+                                  }`}>
+                                  {question.userAnswer === question.correctAnswer ? (
+                                    <CheckCircle2 className="h-2 w-2 text-green-500" />
+                                  ) : (
+                                    <XCircle className="h-2 w-2 text-red-500" />
+                                  )}
+                                </div>
+                                <div>
+                                  <CardTitle className="text-sm font-medium">Question {index + 1}</CardTitle>
+                                  <CardDescription className="line-clamp-1">
+                                    {question.text}
+                                  </CardDescription>
+                                </div>
+                              </div>
+                              <button
+                                className="mt-1 p-1 rounded-full hover:bg-gray-200 bg-green-500 dark:hover:bg-gray-700 transition-colors"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleQuestion(question._id);
+                                }}
+                              >
+                                {expandedQuestions[question._id] ? (
+                                  <ChevronUp className="h-2 w-2" />
+                                ) : (
+                                  <ChevronDown className="h-2 w-2" />
+                                )}
+                              </button>
+                            </CardHeader>
+
+                            {expandedQuestions[question._id] && (
+                              <CardContent className="space-y-4 pt-0">
+                                <Separator />
+
+                                {/* Options list */}
+                                <div className="space-y-2 mt-2">
+                                  {question.options.map((option, index) => {
+                                    const isCorrect = index === question.correctAnswer;
+                                    const isUserSelection = index === question.userAnswer;
+
+                                    let optionClass = neutralOptionBg;
+                                    let iconComponent = null;
+
+                                    if (isCorrect) {
+                                      optionClass = correctOptionBg;
+                                      iconComponent = <CheckCircle2 className="h-2 w-2 text-green-500 flex-shrink-0" />;
+                                    } else if (isUserSelection) {
+                                      optionClass = wrongOptionBg;
+                                      iconComponent = <XCircle className="h-2 w-2 text-red-500 flex-shrink-0" />;
+                                    }
+
+                                    return (
+                                      <div
+                                        key={index}
+                                        className={`p-3 text-xs rounded-lg border ${optionClass}`}
+                                      >
+                                        <div className="flex items-start justify-between">
+                                          <div className="flex items-start">
+                                            <span className="mr-2 font-medium">{String.fromCharCode(65 + index)}.</span>
+                                            <p>{option}</p>
+                                          </div>
+                                          {iconComponent}
+                                        </div>
+                                        {isCorrect && (
+                                          <p className="text-xs mt-1 text-green-600 dark:text-green-400 flex items-center gap-1">
+                                            <CheckCircle2 className="h-3 w-3" />
+                                            Correct Answer
+                                          </p>
+                                        )}
+                                        {isUserSelection && !isCorrect && (
+                                          <p className="text-xs mt-1 text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <XCircle className="h-3 w-3" />
+                                            Your Answer
+                                          </p>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Explanation section */}
+                                <Card className={`${feedbackBg} border-none`}>
+                                  <CardHeader className="pb-2">
+                                    <div className="flex justify-between items-center">
+                                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                        <Lightbulb className="h-4 w-4 text-blue-500" />
+                                        Explanation
+                                      </CardTitle>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleQuestionExplanation(
+                                            question._id,
+                                            question.text,
+                                            question.userAnswer,
+                                            question.correctAnswer,
+                                            question.options
+                                          );
+                                        }}
+                                        disabled={loadingExplanations[question._id]}
+                                        className="h-8"
+                                      >
+                                        {loadingExplanations[question._id] ? (
+                                          <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            Generating...
+                                          </>
+                                        ) : expandedExplanations[question._id] ? (
+                                          <>
+                                            Hide
+                                            <ChevronUp className="h-4 w-4 ml-1" />
+                                          </>
+                                        ) : (
+                                          <>
+                                            Explain
+                                            <ChevronDown className="h-4 w-4 ml-1" />
+                                          </>
+                                        )}
+                                      </Button>
+                                    </div>
+                                  </CardHeader>
+
+                                  {expandedExplanations[question._id] && (
+                                    <CardContent>
+                                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                                        <p>{detailedExplanations[question._id] || question.explanation || 'No explanation available.'}</p>
+                                      </div>
+                                    </CardContent>
+                                  )}
+                                </Card>
+                              </CardContent>
+                            )}
+                          </Card>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-      
-      {/* Actions Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t  pt-12">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <Button 
-            variant="secondary"
-            onClick={() => window.history.back()}
-            size="sm"
-          >
-            Back to Tests
-          </Button>
-          <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
+                  );
+                })}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        {/* Actions Footer */}
+        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-50/90 to-transparent dark:from-gray-950/90 pt-12">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <Button
+              variant="secondary"
+              onClick={() => window.history.back()}
               size="sm"
-              onClick={() => window.print()}
-              className="hidden md:flex"
             >
-              Print Results
+              Back to Tests
             </Button>
-            <Button 
-              size="sm"
-              onClick={() => {
-                setActiveTab('overview');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="hidden md:flex"
-            >
-              Return to Summary
-            </Button>
-            <Button  size="sm"
-            asChild>
-              <a href={`/mocks`}>Explore Mocks</a>
-            </Button>
-            <Button  size="sm" asChild>
-              <a href={`/programming-quizzes`}>More Quizzes</a>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.print()}
+                className="hidden md:flex"
+              >
+                Print Results
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setActiveTab('overview');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="hidden md:flex"
+              >
+                Return to Summary
+              </Button>
+              <Button size="sm" asChild>
+                <a href={`/mocks`}>Explore Mocks</a>
+              </Button>
+              <Button size="sm" asChild>
+                <a href={`/programming-quizzes`}>More Quizzes</a>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+      <Toaster position="bottom-right" />
     </div>
-  </div>
-);
+  );
 }

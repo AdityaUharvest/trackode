@@ -183,7 +183,7 @@ const Navbar: React.FC = () => {
             }`}
           >
             <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
-              <NavItem href="/premium-mock-tests" theme={theme} icon={<BookOpen size={18} />}>
+              <NavItem href="/programming-quizzes" theme={theme} icon={<BookOpen size={18} />}>
                 Mock Test
               </NavItem>
               <NavItem href="/dashboard" theme={theme} icon={<Users size={18} />}>

@@ -1,14 +1,16 @@
 import React from 'react';
 import { useTheme } from './ThemeContext'; // Import the useTheme hook
+import { Card } from './ui/card';
 
 export default function QuizHistory({ results }: any) {
   const { theme } = useTheme(); // Access the current theme
 
   return (
-    <div className={`${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} p-1 rounded-lg shadow-sm`}>
+    <div className={`${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}  rounded-lg shadow-sm`}>
+      <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-5 rounded-lg`}>
       <div className="flex justify-between items-center mb-4">
-        <h2 className={`text-xl font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
-          Recent Attempts
+        <h2 className={`text-sm font-semibold ${theme === 'dark' ? 'text-gray-100' : 'text-gray-800'}`}>
+          Recent Quiz Attempts
         </h2>
         {/* {results.length > 0 && (
           <a
@@ -43,10 +45,10 @@ export default function QuizHistory({ results }: any) {
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className={`font-semibold group-hover:text-blue-600 transition-colors ${
+                  <h3 className={`text-sm group-hover:text-blue-600 transition-colors ${
                     theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
                   }`}>
-                    {result?.title || 'Deleted Quiz'}
+                    {result?.title.replace("(","").replace(")","") || 'Deleted Quiz'}
                   </h3>
                   <p className={`text-sm ${
                     theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
@@ -60,7 +62,7 @@ export default function QuizHistory({ results }: any) {
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className={`font-semibold text-lg ${
+                  <div className={`font-semibold text-sm ${
                     theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
                   }`}>
                     {result.score}/{result.totalQuestions}
@@ -82,6 +84,7 @@ export default function QuizHistory({ results }: any) {
           ))}
         </div>
       )}
+    </Card>
     </div>
   );
 }

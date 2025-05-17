@@ -21,6 +21,7 @@ interface SectionStats {
   correct: number;
   totalQuestions: number;
   accuracy?: number;
+  sectionName?: string;
 }
 
 interface UserAttempt {
@@ -167,7 +168,7 @@ export default function QuizResultsDashboard({ params }: any) {
 
     fetchAttempts();
   }, [quizId]);
-
+  console.log('attempts:', attempts);
   useEffect(() => {
     let results = [...attempts];
 
@@ -716,9 +717,13 @@ export default function QuizResultsDashboard({ params }: any) {
                                   className={`border rounded-lg p-5 ${cardBg} ${borderColor} transform transition-all duration-300 hover:scale-105 hover:shadow-lg`}
                                 >
                                   <h4 className={`font-bold text-lg mb-3 ${textColor}`}>
-                                    {section.split('-').map(word => 
-                                      word.charAt(0).toUpperCase() + word.slice(1)
-                                    ).join(' ')}
+                                    {(stats.sectionName
+                                      ? stats.sectionName.split('-').map(word =>
+                                          word.charAt(0).toUpperCase() + word.slice(1)
+                                        ).join(' ')
+                                      : 'Section')}
+                                    
+                                   
                                   </h4>
                                   
                                   <div className="space-y-4">

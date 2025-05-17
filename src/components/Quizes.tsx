@@ -31,7 +31,7 @@ export default function Quizes({ quizes,setQuizes,getQuizes }: { quizes: Quiz[];
   
    // Adjust the base URL as neede
   return (
-    <div className={`flex flex-col gap-4 p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+    <><div className={`flex flex-col mb-2 gap-4 p-5 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
       <div className="flex justify-between items-center">
         {/* Replace the outer <button> with a <div> */}
         <div className={`flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>
@@ -51,9 +51,11 @@ export default function Quizes({ quizes,setQuizes,getQuizes }: { quizes: Quiz[];
           </Link>
         </div>
       </div>
-      <RunningQuizes quizes={quizes} setQuizes={setQuizes} getQuizes={getQuizes}/>
+      
       
     </div>
+    <RunningQuizes quizes={quizes} setQuizes={setQuizes} getQuizes={getQuizes}/></>
+    
   );
 }
     

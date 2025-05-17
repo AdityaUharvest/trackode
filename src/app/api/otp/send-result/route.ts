@@ -1,29 +1,17 @@
 import { NextResponse, NextRequest } from 'next/server';
 import nodemailer from 'nodemailer';
-import mongoose from 'mongoose';
-import QuizAttempt from '@/app/model/QuizAttempt';
+import mongoose, { Types } from 'mongoose';
 import MockTest from '@/app/model/MoockTest';
-import User from '@/app/model/User';
-import Question from '@/app/model/MockQuestions';
-import Section from '@/app/model/Section';
+import MockResult from '@/app/model/MockResult';
 import connectDB from '@/lib/util';
-
-// Define TypeScript interfaces for your models
-interface IQuestion {
-  _id: mongoose.Types.ObjectId;
-  mockTestId: mongoose.Types.ObjectId;
-  section: string;
-  correctAnswer: number;
+import QuizAttempt from '@/app/model/QuizAttempt';
+// Define TypeScript interfaces
+interface IMockTest {
+  _id: Types.ObjectId;
+  title: string;
 }
-
-interface IUser {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-  email: string;
-}
-
 interface IQuizAttempt {
-  _id: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
   userId: string;
   quizId: string;
   quizTitle: string;
@@ -32,9 +20,47 @@ interface IQuizAttempt {
   completedAt?: Date;
 }
 
-interface IMockTest {
-  _id: mongoose.Types.ObjectId;
+
+interface IStoredQuestionResult {
+  questionId: Types.ObjectId;
+  userAnswer: number;
+  correctAnswer: number;
+  isCorrect: boolean;
+}
+
+interface IStoredSectionResult {
+  sectionName: string;
+  correct: number;
+  total: number;
+  questions: IStoredQuestionResult[];
+}
+
+interface IMockResult {
+  userId: Types.ObjectId;
+  quizId: Types.ObjectId;
+  quizTitle: string;
+  attemptId: Types.ObjectId;
+  totalScore: number;
+  totalQuestions: number;
+  percentage: number;
+  sections: IStoredSectionResult[];
+  completedAt: Date;
+}
+
+interface IPopulatedUserId {
+  name: string;
+  email: string;
+  _id: Types.ObjectId;
+}
+
+interface IPopulatedQuizId {
   title: string;
+  _id: Types.ObjectId;
+}
+
+interface IPopulatedMockResult extends Omit<IMockResult, 'userId' | 'quizId'> {
+  userId: IPopulatedUserId;
+  quizId: IPopulatedQuizId;
 }
 
 // Configure nodemailer transporter
@@ -49,55 +75,224 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Function to generate email HTML for quiz results
+// Function to generate enhanced email HTML for quiz results
 const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: any) => {
+  const timeTaken = attempt.completedAt && attempt.startedAt
+    ? ((new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000).toFixed(2)
+    : '0.00';
+
   const sectionStatsHtml = Object.entries(attempt.sectionStats)
     .map(([section, stats]: [string, any]) => {
       if (stats.answered === 0) return '';
-      return `
-        <div style="margin-bottom: 20px;">
-          <h3 style="color: #333; font-size: 18px;">${section
-            .split('-')
-            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ')}</h3>
-          <p>Answered: ${stats.answered}/${stats.totalQuestions}</p>
-          <p>Correct: ${stats.correct}/${stats.answered}</p>
-          <p>Accuracy: ${Math.round((stats.correct / stats.answered) * 100)}%</p>
+      const accuracy = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
+return `
+<div style="
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+">
+  <h3 style="
+    color: #1a202c;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #edf2f7;
+  ">
+    ${section.split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')}
+  </h3>
+  
+  <div style="
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  ">
+    <!-- Row 1: Answered and Correct -->
+    <div style="
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    ">
+      <div style="
+        flex: 1;
+        min-width: 120px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+      ">
+        <p style="margin: 0 0 4px; font-size: 14px; color: #718096;">Answered</p>
+        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #2d3748;">
+          ${stats.answered}<span style="font-size: 14px; color: #718096;">/${stats.totalQuestions}</span>
+        </p>
+      </div>
+      
+      <div style="
+        flex: 1;
+        min-width: 120px;
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+      ">
+        <p style="margin: 0 0 4px; font-size: 14px; color: #718096;">Correct</p>
+        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #2d3748;">
+          ${stats.correct}<span style="font-size: 14px; color: #718096;">/${stats.answered}</span>
+        </p>
+      </div>
+    </div>
+    
+    <!-- Row 2: Accuracy Bars -->
+    <div style="
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    ">
+      <!-- Section Accuracy -->
+      <div>
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 6px;
+        ">
+          <span style="font-size: 14px; color: #718096;">Section Accuracy</span>
+          <span style="font-size: 14px; font-weight: 600; color: #2d3748;">
+            ${Math.round((stats.correct / Math.max(1, stats.answered)) * 100)}%
+          </span>
         </div>
-      `;
+        <div style="
+          width: 100%;
+          height: 8px;
+          background: #e2e8f0;
+          border-radius: 4px;
+          overflow: hidden;
+        ">
+          <div style="
+            width: ${Math.round((stats.correct / Math.max(1, stats.answered)) * 100)}%;
+            height: 100%;
+            background: #4299e1;
+          "></div>
+        </div>
+      </div>
+      
+      <!-- Overall Accuracy -->
+      <div>
+        <div style="
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 6px;
+        ">
+          <span style="font-size: 14px; color: #718096;">Overall Accuracy</span>
+          <span style="font-size: 14px; font-weight: 600; color: #2d3748;">
+            ${Math.round((stats.correct / Math.max(1, stats.totalQuestions)) * 100)}%
+          </span>
+        </div>
+        <div style="
+          width: 100%;
+          height: 8px;
+          background: #e2e8f0;
+          border-radius: 4px;
+          overflow: hidden;
+        ">
+          <div style="
+            width: ${Math.round((stats.correct / Math.max(1, stats.totalQuestions)) * 100)}%;
+            height: 100%;
+            background: #48bb78;
+          "></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
     })
     .join('');
 
   return `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-      <h2 style="color: #333; text-align: center;">Quiz Results for ${quizTitle}</h2>
-      <p style="color: #555;">Dear ${userName},</p>
-      <p style="color: #555;">Thank you for participating in the quiz. Below are your detailed results:</p>
-      
-      <div style="background-color: #f0f0f0; padding: 15px; border-radius: 5px; margin: 20px 0;">
-        <h3 style="color: #007bff; margin-top: 0;">Overall Performance</h3>
-        <p><strong>Total Answered:</strong> ${attempt.totalAnswered}/${attempt.totalQuestions}</p>
-        <p><strong>Total Correct:</strong> ${attempt.totalCorrect}/${attempt.totalQuestions}</p>
-        <p><strong>Accuracy:</strong> ${attempt.accuracy}%</p>
-        <p><strong>Rank:</strong> ${attempt.rank || 'N/A'}</p>
-        <p><strong>Time Taken:</strong> ${(
-          (new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime()) / 60000
-        ).toFixed(2)} minutes</p>
-      </div>
-      
-      <h3 style="color: #333; font-size: 20px;">Section-wise Performance</h3>
-      ${sectionStatsHtml}
-      
-      <p style="color: #555;">Keep practicing to improve your performance!</p>
-      <p style="color: #555;">Best regards,<br />The Trackode Team</p>
-      <p style="color: #888; font-size: 12px; text-align: center;">
-        Visit: <a href="https://www.trackode.in" style="color: #007bff;">www.trackode.in</a>
-      </p>
-      <p style="color: #888; font-size: 12px; text-align: center;">
-        <a href="https://www.linkedin.com/in/iamadityaupadhyay/" style="color: #007bff;">Best Regards Aditya Upadhyay</a>
-      </p>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Trackode Quiz Results</title>
+    </head>
+    <body style="margin: 0; padding: 0; background: #edf2f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;">
+      <div style="max-width: 640px; margin: 32px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #4299e1 0%, #2b6cb0 100%); padding: 24px; text-align: center;">
+          <h1 style="color: #ffffff; font-size: 24px; font-weight: 700; margin: 0;">Your Quiz Results</h1>
+          <p style="color: #e6f0ff; font-size: 16px; margin: 8px 0 0;">${quizTitle}</p>
+        </div>
 
-    </div>
+        <!-- Content -->
+        <div style="padding: 24px;">
+          <p style="color: #1a202c; font-size: 16px; margin: 0 0 8px;">
+            Hello <strong>${userName}</strong>,
+          </p>
+          <p style="color: #4a5568; font-size: 14px; line-height: 1.5; margin: 0 0 24px;">
+            Congratulations on completing the quiz! Here's a detailed look at your performance to help you shine even brighter next time.
+          </p>
+
+          <!-- Overall Performance -->
+          <div style="background: #f7fafc; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+            <h3 style="color: #1a202c; font-size: 18px; font-weight: 600; margin: 0 0 16px;">Overall Performance</h3>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; font-size: 14px; color: #4a5568;">
+              <div>
+                <p style="margin: 0 0 8px;"><strong>Score:</strong> ${attempt.totalCorrect}/${attempt.totalQuestions}</p>
+                <p style="margin: 0;"><strong>Rank:</strong> ${attempt.rank || 'N/A'}</p>
+              </div>
+              <div>
+                <p style="margin: 0 0 8px;"><strong>Accuracy:</strong> ${attempt.accuracy}%</p>
+                <p style="margin: 0;"><strong>Time Taken:</strong> ${timeTaken} min</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Performance -->
+          <h3 style="color: #1a202c; font-size: 18px; font-weight: 600; margin: 0 0 16px;">Section-wise Performance</h3>
+          <div>
+            ${sectionStatsHtml}
+          </div>
+
+          <!-- Improvement Tips -->
+          <div style="background: #e9f7fe; border-radius: 8px; padding: 16px; margin: 24px 0;">
+            <h3 style="color: #1a202c; font-size: 16px; font-weight: 600; margin: 0 0 12px;">Level Up Your Skills</h3>
+            <ul style="color: #4a5568; font-size: 14px; margin: 0; padding-left: 20px; line-height: 1.5;">
+              <li>Revisit questions you missed to understand key concepts.</li>
+              <li>Take more practice quizzes to build confidence.</li>
+              <li>Use our dashboard to track your progress over time.</li>
+            </ul>
+          </div>
+
+          <!-- Call to Action -->
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="https://trackode.in/programming-quizzes" style="display: inline-block; background: #4299e1; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              Explore More Quizzes
+            </a>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="background: #2d3748; padding: 16px; text-align: center;">
+          <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 8px;">
+            Best regards, <strong>The Trackode Team</strong>
+          </p>
+          <p style="color: #a0aec0; font-size: 12px; margin: 0 0 8px;">
+            <a href="https://trackode.in" style="color: #63b3ed; text-decoration: none;">trackode.in</a>
+          </p>
+          <p style="color: #a0aec0; font-size: 12px; margin: 0;">
+            <a href="https://www.linkedin.com/in/iamadityaupadhyay/" style="color: #63b3ed; text-decoration: none;">Aditya Upadhyay</a> |
+            <a href="https://twitter.com/iamadiupadhyay" style="color: #63b3ed; text-decoration: none;">Twitter</a> |
+            <a href="https://linkedin.com/company/trackode" style="color: #63b3ed; text-decoration: none;">LinkedIn</a>
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
   `;
 };
 
@@ -105,20 +300,17 @@ const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: a
 export async function POST(request: NextRequest) {
   await connectDB();
   try {
-    // Connect to MongoDB
-
-
     const { quizId } = await request.json();
 
     // Validate quizId
-    if (!quizId || !mongoose.Types.ObjectId.isValid(quizId)) {
+    if (!quizId || !Types.ObjectId.isValid(quizId)) {
       return NextResponse.json(
         { success: false, message: 'Invalid quiz ID' },
         { status: 400 }
       );
     }
 
-    // Get the quiz details
+    // Get quiz details
     const quiz = await MockTest.findById(quizId).lean<IMockTest>();
     if (!quiz) {
       return NextResponse.json(
@@ -127,127 +319,71 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch sections
-    const section = await Section.find();
-    let sections: string[] = [];
-    for (let i = 0; i < section.length; i++) {
-      sections.push(section[i].value);
+    // Get all MockResults for the quiz
+    const mockResults = await MockResult.find({ quizId: new Types.ObjectId(quizId) })
+      .populate<{ userId: IPopulatedUserId; quizId: IPopulatedQuizId; }>('userId quizId')
+      .lean() as unknown as IPopulatedMockResult[];
+
+    if (!mockResults.length) {
+      return NextResponse.json(
+        { success: true, message: 'No results found for this quiz' },
+        { status: 200 }
+      );
     }
 
-    // Fetch all questions
-    const allQuestions = await Question.find({ mockTestId: quizId }).lean<IQuestion[]>();
-
-    // Create a map of correct answers
-    const correctAnswersMap = new Map<string, number>();
-    allQuestions.forEach((question) => {
-      correctAnswersMap.set(question._id.toString(), question.correctAnswer);
+    // Get all attempts to retrieve startedAt timestamps
+    const attemptIds = mockResults.map(result => result.attemptId);
+    const attempts = await QuizAttempt.find({ _id: { $in: attemptIds } }).lean<IQuizAttempt[]>();
+    const attemptMap = new Map<string, IQuizAttempt>();
+    attempts.forEach(attempt => {
+      attemptMap.set(attempt._id.toString(), attempt);
     });
 
-    // Get all attempts
-    const attempts = await QuizAttempt.find({ quizId }).lean<IQuizAttempt[]>();
-
-    // Get all unique user IDs from attempts
-    const userIds = [...new Set(attempts.map((attempt) => attempt.userId))];
-
-    // Fetch all users
-    const users = await User.find({
-      _id: { $in: userIds.map((id) => new mongoose.Types.ObjectId(id)) },
-    }).lean<IUser[]>();
-
-    // Create a user map
-    const userMap = new Map<string, { name: string; email: string }>();
-    users.forEach((user) => {
-      userMap.set(user._id.toString(), {
-        name: user.name,
-        email: user.email,
-      });
-    });
-
-    // Process results
-    const results = attempts.map((attempt, index) => {
-      const sectionStats: Record<
-        string,
-        { answered: number; correct: number; totalQuestions: number }
-      > = {};
-
-      // Initialize section stats
-      sections.forEach((section) => {
-        sectionStats[section] = {
-          answered: 0,
-          correct: 0,
-          totalQuestions: allQuestions.filter((q) => q.section === section).length,
-        };
-      });
-
-      let totalAnswered = 0;
-      let totalCorrect = 0;
-      const totalQuestions = allQuestions.length;
-
-      // Process each section's answers
-      sections.forEach((section) => {
-        const sectionAnswers = attempt.answers[section] || {};
-        const answered = Object.keys(sectionAnswers).length;
-        let correct = 0;
-
-        Object.entries(sectionAnswers).forEach(([questionId, userAnswerIndex]) => {
-          const correctAnswerIndex = correctAnswersMap.get(questionId);
-          if (
-            typeof correctAnswerIndex === 'number' &&
-            typeof userAnswerIndex === 'number' &&
-            userAnswerIndex === correctAnswerIndex
-          ) {
-            correct++;
-          }
-        });
-
-        sectionStats[section] = {
-          answered,
-          correct,
-          totalQuestions: sectionStats[section].totalQuestions,
-        };
-
-        totalAnswered += answered;
-        totalCorrect += correct;
-      });
-
-      const userDetails =
-        userMap.get(attempt.userId) || { name: 'Unknown', email: '' };
-
+    // Prepare results
+    const results = mockResults.map((result, index) => {
+      const attempt = attemptMap.get(result.attemptId.toString());
       return {
-        _id: attempt._id.toString(),
-        userId: attempt.userId,
-        userName: userDetails.name,
-        email: userDetails.email,
-        quizTitle: attempt.quizTitle,
-        startedAt: attempt.startedAt,
-        completedAt: attempt.completedAt,
-        totalAnswered,
-        totalCorrect,
-        totalQuestions,
-        accuracy: totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0,
-        sectionStats,
-        rank: index + 1, // Add rank based on sorting
+        _id: result.attemptId.toString(),
+        userId: result.userId._id.toString(),
+        userName: result.userId.name || 'Unknown',
+        email: result.userId.email || '',
+        quizTitle: result.quizTitle,
+        startedAt: attempt?.startedAt || new Date(),
+        completedAt: result.completedAt,
+        totalAnswered: result.sections.reduce((sum, s) => sum + s.questions.length, 0),
+        totalCorrect: result.totalScore,
+        totalQuestions: result.totalQuestions,
+        accuracy: result.percentage,
+        sectionStats: result.sections.reduce((acc, section) => ({
+          ...acc,
+          [section.sectionName]: {
+            answered: section.questions.length,
+            correct: section.correct,
+            totalQuestions: section.total
+          }
+        }), {}),
+        rank: 0 // Will be updated after sorting
       };
     });
 
-    // Sort by accuracy (descending) to assign ranks correctly
+    // Sort by accuracy (descending) and assign ranks
     results.sort((a, b) => b.accuracy - a.accuracy);
+    results.forEach((result, index) => {
+      result.rank = index + 1;
+    });
 
-    // Send emails to each student
-    const emailPromises = results.map(async (attempt, index) => {
+    // Send emails to each participant
+    const emailPromises = results.map(async (attempt) => {
       if (!attempt.email) {
         console.warn(`No email found for user: ${attempt.userName}`);
         return;
       }
 
       const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: `"Trackode Team" <${process.env.OTP_EMAIL_USER}>`,
         to: attempt.email,
-        subject: `Your Quiz Results for ${quiz.title}`,
-        html: generateQuizResultEmail(attempt.userName, quiz.title, {
-          ...attempt,
-          rank: index + 1, // Update rank based on sorted order
-        }),
+        subject: `Your Results for ${quiz.title} - Trackode`,
+        html: generateQuizResultEmail(attempt.userName, quiz.title, attempt),
       };
 
       await transporter.sendMail(mailOptions);

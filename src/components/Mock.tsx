@@ -11,6 +11,7 @@ import { useTheme } from '@/components/ThemeContext';
 import { Button } from '@/components/ui/button';
 import toast, { Toaster } from 'react-hot-toast';
 import { Share } from 'lucide-react';
+import { Card } from './ui/card';
 
 const localizer = momentLocalizer(moment);
 
@@ -110,10 +111,10 @@ export default function Dashboard({
   }
 
   return (
-    <div className={`min-h-screen ${bgColor}`}>
+    <Card className={`min-h-screen ${bgColor}`}>
       {/* Header */}
-      <header className={`${headerBg} shadow-sm`}>
-        <div className="mx-auto p-3 sm:px-3 lg:px-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <header className={`${headerBg} rounded-lg shadow-sm`}>
+        <div className="mx-auto p-4 rounded-lg sm:px-3 lg:px-2 flex flex-col sm:flex-row justify-between items-center gap-3">
           <h1 className={`text-base font-semibold ${textColor}`}>Mock Test Dashboard</h1>
           <Link
             href="/mock-tests"
@@ -125,7 +126,7 @@ export default function Dashboard({
       </header>
 
       {/* Main Content */}
-      <main className={`max-w-7xl mx-auto p-2 sm:px-2 lg:px-2 ${bgColor}`}>
+      <main className={`max-w-7xl mx-auto  sm:px-2 lg:px-2 ${bgColor}`}>
         {/* Tabs - Mobile friendly */}
         <div className={`border-b ${borderColor} mb-6 overflow-x-auto`}>
           <nav className="flex space-x-4 sm:space-x-8">
@@ -188,7 +189,7 @@ export default function Dashboard({
         </div>
       </main>
       <Toaster />
-    </div>
+    </Card>
   );
 }
 
@@ -512,7 +513,7 @@ function MockTestsTab({
                   )}
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-2">
-                      <Button className="bg-blue-500 text-white hover:bg-blue-600">
+                      <Button className="bg-blue-500 text-xs sm:text-sm px-2 py-1 h-auto text-white hover:bg-blue-600">
                         <Link href={`/mock-tests/${mock._id}/results`}>Results</Link>
                       </Button>
                       <Button
@@ -526,12 +527,12 @@ function MockTestsTab({
                       >
                         {mock.isPublished ? 'Unpublish' : 'Publish'}
                       </Button>
-                      <Button className="bg-yellow-500 text-white hover:bg-yellow-600">
+                      <Button className="bg-yellow-500 text-xs sm:text-sm px-2 py-1 h-auto text-white hover:bg-yellow-600">
                         <Link href={`/mock-tests/${mock._id}/questions`}>Questions</Link>
                       </Button>
                       <Button
                         onClick={() => handleShare(mock)}
-                        className={`text-xs sm:text-sm px-2 py-1 rounded ${
+                        className={` h-auto sm:text-sm px-2 py-1 rounded ${
                           theme === 'dark'
                             ? 'bg-blue-700 hover:bg-blue-600'
                             : 'bg-blue-100 hover:bg-blue-200'

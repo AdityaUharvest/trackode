@@ -1,14 +1,16 @@
 import { NextResponse, NextRequest } from 'next/server';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import Question from '@/app/model/MockQuestions';
 import { auth } from '@/auth';
 import Section from '@/app/model/Section';
-// Define TypeScript interfaces for your models
+import MockResult from '@/app/model/MockResult';
+
+// Define TypeScript interfaces
 interface IQuestion {
-  _id: mongoose.Types.ObjectId;
-  mockTestId: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
+  mockTestId: Types.ObjectId;
   section: string;
   text: string;
   options: string[];
@@ -17,7 +19,7 @@ interface IQuestion {
 }
 
 interface IQuizAttempt {
-  _id: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
   userId: string;
   quizId: string;
   quizTitle: string;
@@ -27,7 +29,7 @@ interface IQuizAttempt {
 }
 
 interface IMockTest {
-  _id: mongoose.Types.ObjectId;
+  _id: Types.ObjectId;
   title: string;
 }
 
@@ -47,9 +49,65 @@ interface ISectionResult {
   questions: IQuestionResult[];
 }
 
+interface IStoredQuestionResult {
+  questionId: Types.ObjectId;
+  userAnswer: number;
+  correctAnswer: number;
+  isCorrect: boolean;
+}
+
+interface IStoredSectionResult {
+  sectionName: string;
+  correct: number;
+  total: number;
+  questions: IStoredQuestionResult[];
+}
+
+interface IMockResult {
+  userId: Types.ObjectId;
+  quizId: Types.ObjectId;
+  quizTitle: string;
+  attemptId: Types.ObjectId;
+  totalScore: number;
+  totalQuestions: number;
+  percentage: number;
+  sections: IStoredSectionResult[];
+  completedAt: Date;
+  overallFeedback?: {
+    content: string;
+    generatedAt: Date;
+  };
+  sectionFeedbacks?: Array<{
+    sectionName: string;
+    feedback: string;
+    generatedAt: Date;
+  }>;
+  questionFeedbacks?: Array<{
+    questionId: Types.ObjectId;
+    explanation: string;
+    generatedAt: Date;
+  }>;
+}
+
+// Interfaces for populated documents
+interface IPopulatedUserId {
+  name: string;
+  _id: Types.ObjectId;
+}
+
+interface IPopulatedQuizId {
+  title: string;
+  _id: Types.ObjectId;
+}
+
+interface IPopulatedMockResult extends Omit<IMockResult, 'userId' | 'quizId'> {
+  userId: IPopulatedUserId;
+  quizId: IPopulatedQuizId;
+}
+
 export async function GET(request: NextRequest, { params }: any) {
   try {
-    const { id } = await params;  // Removed await since params is synchronous
+    const { id } = params;
     const attemptId = id;
     
     // Get current session user
@@ -65,12 +123,65 @@ export async function GET(request: NextRequest, { params }: any) {
     }
 
     // Validate attemptId
-    if (!mongoose.Types.ObjectId.isValid(attemptId)) {
+    if (!Types.ObjectId.isValid(attemptId)) {
       return NextResponse.json({ error: 'Invalid attempt ID' }, { status: 400 });
     }
 
-    // Get the attempt with proper typing
-    const attempt = await QuizAttempt.findOne({ _id: attemptId, userId }).lean<IQuizAttempt>();
+    // First check if we already have a stored result
+    const existingResult = await MockResult.findOne({ 
+      attemptId: new Types.ObjectId(attemptId)
+    }).populate<{ userId: IPopulatedUserId, quizId: IPopulatedQuizId }>('userId quizId')
+      .lean() as IPopulatedMockResult | null;
+
+    if (existingResult) {
+      // Get all questions to populate text, options, and explanations
+      const allQuestions = await Question.find({ 
+        mockTestId: existingResult.quizId._id 
+      }).lean<IQuestion[]>();
+
+      // Create a map for quick lookup
+      const questionsMap = new Map<string, IQuestion>();
+      allQuestions.forEach(question => {
+        questionsMap.set(question._id.toString(), question);
+      });
+
+      // Transform the stored result
+      const transformedResult = {
+        userName: existingResult.userId.name || 'User',
+        quizTitle: existingResult.quizTitle,
+        completedAt: existingResult.completedAt,
+        totalScore: existingResult.totalScore,
+        totalQuestions: existingResult.totalQuestions,
+        sections: existingResult.sections.map((section) => ({
+          sectionName: section.sectionName,
+          correct: section.correct,
+          total: section.total,
+          questions: section.questions.map((q) => {
+            const questionData = questionsMap.get(q.questionId.toString());
+            return {
+              _id: q.questionId.toString(),
+              text: questionData?.text || '',
+              options: questionData?.options || [],
+              userAnswer: q.userAnswer,
+              correctAnswer: q.correctAnswer,
+              explanation: questionData?.explanation || ''
+            };
+          })
+        })),
+        overallFeedback: existingResult.overallFeedback?.content || null,
+        sectionFeedbacks: existingResult.sectionFeedbacks || [],
+        questionFeedbacks: existingResult.questionFeedbacks || []
+      };
+
+      return NextResponse.json(transformedResult);
+    }
+
+    // If no existing result, proceed with calculation
+    const attempt = await QuizAttempt.findOne({ 
+      _id: new Types.ObjectId(attemptId), 
+      userId 
+    }).lean<IQuizAttempt>();
+    
     if (!attempt) {
       return NextResponse.json({ error: 'Attempt not found' }, { status: 404 });
     }
@@ -89,16 +200,10 @@ export async function GET(request: NextRequest, { params }: any) {
     });
 
     // Process section-wise results with question details
-    const section = await Section.find();
-    
-    let sections=<any>[]
-    for(let i =0;i<section.length;i++){
-      sections.push(section[i].value);
-    }
-    
+    const sections = await Section.find();
+    const sectionNames = sections.map(section => section.value);
 
-
-    const sectionResults: ISectionResult[] = sections.map((sectionName:any) => {
+    const sectionResults: ISectionResult[] = sectionNames.map((sectionName) => {
       const sectionAnswers = attempt.answers[sectionName] || {};
       const sectionQuestions = allQuestions.filter(q => q.section === sectionName);
       
@@ -132,6 +237,7 @@ export async function GET(request: NextRequest, { params }: any) {
     // Calculate totals
     const totalScore = sectionResults.reduce((sum, section) => sum + section.correct, 0);
     const totalQuestions = allQuestions.length;
+    const percentage = Math.round((totalScore / totalQuestions) * 100);
 
     // Construct the response
     const result = {
@@ -140,8 +246,37 @@ export async function GET(request: NextRequest, { params }: any) {
       completedAt: attempt.completedAt,
       totalScore,
       totalQuestions,
-      sections: sectionResults
+      sections: sectionResults,
+      overallFeedback: null,
+      sectionFeedbacks: [],
+      questionFeedbacks: []
     };
+
+    // Store the result in database for future requests
+    await MockResult.create({
+      userId: new Types.ObjectId(userId),
+      quizId: new Types.ObjectId(quizId),
+      quizTitle: attempt.quizTitle,
+      attemptId: new Types.ObjectId(attemptId),
+      totalScore,
+      totalQuestions,
+      percentage,
+      sections: sectionResults.map((section) => ({
+        sectionName: section.sectionName,
+        correct: section.correct,
+        total: section.total,
+        questions: section.questions.map((q) => ({
+          questionId: new Types.ObjectId(q._id),
+          userAnswer: q.userAnswer,
+          correctAnswer: q.correctAnswer,
+          isCorrect: q.userAnswer === q.correctAnswer
+        }))
+      })),
+      completedAt: attempt.completedAt || new Date(),
+      overallFeedback: undefined,
+      sectionFeedbacks: undefined,
+      questionFeedbacks: undefined
+    } as IMockResult);
 
     return NextResponse.json(result);
 

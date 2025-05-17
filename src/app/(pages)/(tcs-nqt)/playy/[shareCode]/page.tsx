@@ -260,6 +260,11 @@ export default function QuizPlayer() {
 
   const startQuiz = async () => {
     handleUserInteraction();
+    if (document.fullscreenElement) {
+      toast.error('You are already in fullscreen mode.');
+      return;
+    }
+
     try {
      
       setQuizStarted(true);
@@ -311,7 +316,7 @@ export default function QuizPlayer() {
 
     const targetSection = sections.find((s) => s.name === sectionName);
     if (!targetSection?.unlocked || targetSection.submitted) {
-      toast.error('This section is locked or already submitted.');
+      toast.error('Changing sections is not allowed. Service on request, contact your organizer.');
       return;
     }
 
@@ -653,10 +658,11 @@ export default function QuizPlayer() {
                   'Submitted sections are locked permanently',
                   'You cannot return to submitted sections',
                   'Complete all questions before time runs out',
+                  'Contact support for any issues trackode.ai@gmail.com',
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div
-                      className={`mt-1 w-5 h-5 rounded-full flex items-center justify-center ${
+                      className={`mt-1 w-5 h-5 p-2 rounded-full flex items-center justify-center ${
                         theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
                       }`}
                     >
@@ -668,13 +674,36 @@ export default function QuizPlayer() {
               </ul>
             </div>
           </div>
-
+           
           <div className="text-center">
+            {/* adding terms and i am ready for full screen check box */}
+            <div className="flex items-center justify-center mb-4">
+              <input
+              type="checkbox"
+              id="terms"
+              className={`mr-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
+              checked={hideNavAndFooter}
+              onChange={(e) => {setHideNavAndFooter(e.target.checked)
+              setFullscreenPrompt(e.target.checked);
+              }}
+              />
+              <label htmlFor="terms" className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              I agree to the terms and conditions
+              </label>
+            </div>
+
             <button
-              onClick={startQuiz}
+              onClick={()=>{startQuiz() 
+                requestFullscreen()
+              }}
+              disabled={!hideNavAndFooter}
               className={`px-8 py-3 rounded-lg font-medium text-base ${
-                theme === 'dark' ? 'bg-green-700 hover:bg-green-600' : 'bg-green-600 hover:bg-green-700'
-              } text-white shadow-md transition-all`}
+              theme === 'dark'
+                ? 'bg-green-700 hover:bg-green-600'
+                : 'bg-green-600 hover:bg-green-700'
+              } text-white shadow-md transition-all ${
+              !hideNavAndFooter ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               {hasAttemptedQuestions ? 'Continue Attempt' : 'Start Quiz Now'}
             </button>

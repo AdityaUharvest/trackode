@@ -14,6 +14,7 @@ import { useTheme } from '@/components/ThemeContext';
 import SkeletonLoader from '@/components/skeleton/student';
 import { useMediaQuery } from 'react-responsive';
 import { BookOpen, List, Award, Home } from 'lucide-react'; // Import icons
+import MockTestsListClient from './AvailableMocks';
 
 export default function StudentDashboard() {
   // Theme and session management
@@ -129,8 +130,13 @@ export default function StudentDashboard() {
   const tableHeaderBg = theme === 'dark' ? 'bg-gray-700' : 'bg-gray-50';
   const tableRowHover = theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
 
-  if (status === "loading" || loading) {
-    return <SkeletonLoader theme={theme} />;
+  
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   // Tab content components
@@ -145,6 +151,8 @@ export default function StudentDashboard() {
           value={`${averagePercentage}%`} 
           color="blue" 
         />
+        <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="blue" />
+        <StatCard theme={theme} icon="📚" title="Mocks Attempted" value={attempts.length} color="blue" />
         <StatCard 
           theme={theme} 
           icon="🏆" 
@@ -167,47 +175,98 @@ export default function StudentDashboard() {
           color="purple" 
           trend={accuracyTrend} 
         />
+        <StatCard 
+          theme={theme} 
+          icon="📈" 
+          title="Awards Recieved"
+          value="0" 
+          // value={`${averagePercentage}%`} 
+          color="purple" 
+        
+        />
+        
       </div>
-
-      {/* Recent Activity */}
-      <RecentActivity 
-        theme={theme} 
-        quizResults={quizResults} 
-        textColor={textColor} 
-        secondaryText={secondaryText} 
-      />
-
-      {/* Mock Tests Section */}
-      <MockTestsOverview 
+     
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <QuizHistory results={quizResults} theme={theme} />
+         <MockTestsOverview 
         attempts={attempts} 
         theme={theme} 
         cardBg={cardBg} 
         textColor={textColor} 
         secondaryText={secondaryText} 
       />
+       
+
+      {/* Mock Tests Section */}
+     
+      </div>
+      <PerformanceChart chartData={chartData} theme={theme} />
+      {/* Recent Activity */}
+      
     </div>
   );
 
   const QuizzesTab = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <StatCard theme={theme} icon="📚" title="Overall Progress" value={`${averagePercentage}%`} color="blue" />
-        <StatCard theme={theme} icon="🏆" title="Highest Score" value={`${highestPercentage}%`} color="green" />
-        <StatCard theme={theme} icon="⏱" title="Recent Performance" value={`${recentPercentage}%`} color="orange" />
-        <StatCard theme={theme} icon="📈" title="Average Performance" value={`${averagePercentage}%`} color="purple" trend={accuracyTrend} />
-        <StatCard theme={theme} icon="📚" title="Total Quizzes" value={totalQuizzes} color="blue" />
+    <>
+     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* Stats Cards */}
+        <StatCard 
+          theme={theme} 
+          icon="📚" 
+          title="Overall Progress" 
+          value={`${averagePercentage}%`} 
+          color="blue" 
+        />
+        <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="blue" />
+        <StatCard theme={theme} icon="📚" title="Mocks Attempted" value={attempts.length} color="blue" />
+        <StatCard 
+          theme={theme} 
+          icon="🏆" 
+          title="Highest Score" 
+          value={`${highestPercentage}%`} 
+          color="green" 
+        />
+        <StatCard 
+          theme={theme} 
+          icon="⏱" 
+          title="Recent Performance" 
+          value={`${recentPercentage}%`} 
+          color="orange" 
+        />
+        <StatCard 
+          theme={theme} 
+          icon="📈" 
+          title="Average Performance" 
+          value={`${averagePercentage}%`} 
+          color="purple" 
+          trend={accuracyTrend} 
+        />
+        <StatCard 
+          theme={theme} 
+          icon="📈" 
+          title="Awards Recieved"
+          value="0" 
+          // value={`${averagePercentage}%`} 
+          color="purple" 
+        
+        />
+        
       </div>
-
-      <RecentActivity 
-        theme={theme} 
-        quizResults={quizResults} 
-        textColor={textColor} 
-        secondaryText={secondaryText} 
-      />
-
-      <PerformanceChart chartData={chartData} theme={theme} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
       <QuizHistory results={quizResults} theme={theme} />
+      <MockTestsOverview
+        attempts={attempts}
+        theme={theme}
+        cardBg={cardBg}
+        textColor={textColor}
+        secondaryText={secondaryText}
+      />
+      
     </div>
+    </>
+    
   );
 
   return (
@@ -229,8 +288,9 @@ export default function StudentDashboard() {
             <TabsList className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} p-1 rounded-lg`}>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="quizzes">Quiz Histories</TabsTrigger>
-              <TabsTrigger value="available-quizzes">Available Quizzes</TabsTrigger>
               <TabsTrigger value="mocks">Mocks</TabsTrigger>
+              <TabsTrigger value="available-quizzes">Available Quizzes</TabsTrigger>
+              
             </TabsList>
 
             <TabsContent value="overview">
@@ -255,6 +315,8 @@ export default function StudentDashboard() {
                 tableHeaderBg={tableHeaderBg}
                 tableRowHover={tableRowHover}
               />
+              
+              
             </TabsContent>
           </Tabs>
         )}
@@ -378,15 +440,15 @@ const RecentActivity = ({ theme, quizResults, textColor, secondaryText }) => (
 
 // Mock Tests Overview Component
 const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }) => (
-  <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg`}>
-    <h3 className={`text-base font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-      Recent Mock Tests
+  <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-5 rounded-lg`}>
+    <h3 className={`text-sm font-semibold mb-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+      Recent Mock Attempts
     </h3>
     {attempts.length === 0 ? (
       <p className={`text-center py-4 ${secondaryText}`}>No mock tests taken yet</p>
     ) : (
       <div className="space-y-4">
-        {attempts.slice(0, 3).map((attempt, index) => (
+        {attempts.map((attempt, index) => (
           <div key={index} className={`p-4 rounded-lg ${cardBg} border ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
             <div className="flex justify-between items-center">
               <div>
@@ -404,17 +466,7 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
             </div>
           </div>
         ))}
-        {attempts.length > 3 && (
-          <div className="text-center">
-            <Link 
-              href="#" 
-              onClick={() => setActiveTab('mocks')}
-              className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
-            >
-              View all {attempts.length} mock tests
-            </Link>
-          </div>
-        )}
+      
       </div>
     )}
   </Card>

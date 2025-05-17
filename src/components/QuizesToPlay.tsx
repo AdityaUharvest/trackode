@@ -309,7 +309,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
 />
  <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container rounded-lg mx-auto px-3 py-4">
         {/* Stats Section */}
         {userStats.completedQuizzes > 0 && (
           <div className="mb-8">
@@ -857,7 +857,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
                   />
                 </svg>
-                <h2 className="text-xl font-bold text-blue-500">TCS Mock Tests</h2>
+                <h2 className="text-xl font-bold text-blue-500">Free Mock Tests</h2>
               </div>
 
               {filteredMockTests.length === 0 ? (
