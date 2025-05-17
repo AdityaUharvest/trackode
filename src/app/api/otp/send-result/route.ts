@@ -85,7 +85,7 @@ const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: a
     .map(([section, stats]: [string, any]) => {
       if (stats.answered === 0) return '';
       const accuracy = stats.answered > 0 ? Math.round((stats.correct / stats.answered) * 100) : 0;
-return `
+      return `
 <div style="
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -93,121 +93,120 @@ return `
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 ">
   <h3 style="
     color: #1a202c;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    margin: 0 0 16px;
+    margin: 0 0 12px;
     padding-bottom: 8px;
     border-bottom: 1px solid #edf2f7;
   ">
-    ${section.split('-')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    ${section
+      .split('-')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ')}
   </h3>
   
   <div style="
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 12px;
+    font-size: 14px;
+    color: #4a5568;
   ">
-    <!-- Row 1: Answered and Correct -->
+    <!-- Answered/Correct Stats -->
     <div style="
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex: 1;
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 6px;
+      min-width: 0;
     ">
+      <p style="margin: 0 0 8px; font-weight: 500;">Answered: 
+        <strong style="color: #2d3748;">${stats.answered}/${stats.totalQuestions}</strong>
+      </p>
+      <p style="margin: 0; font-weight: 500;">Correct: 
+        <strong style="color: #2d3748;">${stats.correct}/${stats.answered}</strong>
+      </p>
+    </div>
+    
+    <!-- Section Accuracy -->
+    <div style="
+      flex: 1;
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 6px;
+      min-width: 0;
+    ">
+      <p style="margin: 0 0 8px; font-weight: 500;">
+        Section Accuracy: <strong style="color: #2d3748;">${Math.round((stats.correct / stats.answered) * 100)}%</strong>
+      </p>
       <div style="
-        flex: 1;
-        min-width: 120px;
-        padding: 12px;
-        background: #f8fafc;
-        border-radius: 8px;
+        width: 100%;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        margin-top: 8px;
       ">
-        <p style="margin: 0 0 4px; font-size: 14px; color: #718096;">Answered</p>
-        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #2d3748;">
-          ${stats.answered}<span style="font-size: 14px; color: #718096;">/${stats.totalQuestions}</span>
-        </p>
-      </div>
-      
-      <div style="
-        flex: 1;
-        min-width: 120px;
-        padding: 12px;
-        background: #f8fafc;
-        border-radius: 8px;
-      ">
-        <p style="margin: 0 0 4px; font-size: 14px; color: #718096;">Correct</p>
-        <p style="margin: 0; font-size: 20px; font-weight: 600; color: #2d3748;">
-          ${stats.correct}<span style="font-size: 14px; color: #718096;">/${stats.answered}</span>
-        </p>
+        <div style="
+          width: ${Math.round((stats.correct / stats.answered) * 100)}%;
+          height: 100%;
+          background: #4299e1;
+          border-radius: 3px;
+        "></div>
       </div>
     </div>
     
-    <!-- Row 2: Accuracy Bars -->
+    <!-- Overall Accuracy -->
     <div style="
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      flex: 1;
+      padding: 8px;
+      background: #f8fafc;
+      border-radius: 6px;
+      min-width: 0;
     ">
-      <!-- Section Accuracy -->
-      <div>
+      <p style="margin: 0 0 8px; font-weight: 500;">
+        Overall Accuracy: <strong style="color: #2d3748;">${Math.round((stats.correct / stats.totalQuestions) * 100)}%</strong>
+      </p>
+      <div style="
+        width: 100%;
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        margin-top: 8px;
+      ">
         <div style="
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 6px;
-        ">
-          <span style="font-size: 14px; color: #718096;">Section Accuracy</span>
-          <span style="font-size: 14px; font-weight: 600; color: #2d3748;">
-            ${Math.round((stats.correct / Math.max(1, stats.answered)) * 100)}%
-          </span>
-        </div>
-        <div style="
-          width: 100%;
-          height: 8px;
-          background: #e2e8f0;
-          border-radius: 4px;
-          overflow: hidden;
-        ">
-          <div style="
-            width: ${Math.round((stats.correct / Math.max(1, stats.answered)) * 100)}%;
-            height: 100%;
-            background: #4299e1;
-          "></div>
-        </div>
-      </div>
-      
-      <!-- Overall Accuracy -->
-      <div>
-        <div style="
-          display: flex;
-          justify-content: space-between;
-          margin-bottom: 6px;
-        ">
-          <span style="font-size: 14px; color: #718096;">Overall Accuracy</span>
-          <span style="font-size: 14px; font-weight: 600; color: #2d3748;">
-            ${Math.round((stats.correct / Math.max(1, stats.totalQuestions)) * 100)}%
-          </span>
-        </div>
-        <div style="
-          width: 100%;
-          height: 8px;
-          background: #e2e8f0;
-          border-radius: 4px;
-          overflow: hidden;
-        ">
-          <div style="
-            width: ${Math.round((stats.correct / Math.max(1, stats.totalQuestions)) * 100)}%;
-            height: 100%;
-            background: #48bb78;
-          "></div>
-        </div>
+          width: ${Math.round((stats.correct / stats.totalQuestions) * 100)}%;
+          height: 100%;
+          background: #48bb78;
+          border-radius: 3px;
+        "></div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+  @media (max-width: 640px) {
+    div[style*='display: flex; flex-wrap: wrap; gap: 12px;'] > div {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+    div[style*='display: flex; flex-wrap: wrap; gap: 12px;'] {
+      gap: 8px;
+    }
+    h3[style*='font-size: 16px;'] {
+      font-size: 14px;
+    }
+    div[style*='padding: 16px;'] {
+      padding: 12px;
+    }
+    div[style*='font-size: 14px;'] {
+      font-size: 13px;
+    }
+  }
+</style>
 `;
     })
     .join('');
