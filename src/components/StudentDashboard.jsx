@@ -381,7 +381,7 @@ console.log(attempts);
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
-                        href={`mock-tests/${attempt._id}/user-results`}
+                        href={`mock-tests/${attempt.attemptId}/user-results`}
                         className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
                       >
                         View Details
@@ -560,7 +560,7 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
                
                 <p className={`text-xs ${secondaryText}`}>
                  Attempted at: {new Date(attempt.completedAt).toLocaleDateString()}
-                 {new Date(attempt.completedAt).toLocaleTimeString}
+                 
                 </p>
                 
                 <div className="mt-2 flex flex-wrap gap-1">
@@ -579,7 +579,7 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
                 </div>
               </div>
               <Link 
-                href={`/mock-tests/${attempt._id}/user-results`}
+                href={`/mock-tests/${attempt.attemptId}/user-results`}
                 className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
               >
                 View

@@ -118,7 +118,7 @@ export default function DashBoard({ initialTab }) {
     fetchData();
     fetchQuiz();
   }, []);
-
+  
   // Update URL when activeTab changes
   useEffect(() => {
     const currentParams = new URLSearchParams(searchParams.toString());
