@@ -552,8 +552,8 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
             <div className="flex justify-between items-start">
               <div>
                 <div className='flex items-center gap-2'>
-                   <p className={`text-base ${textColor}`}>{attempt.quizTitle} •</p>
-                  <p className={`text-base ${textColor}`}>
+                   <p className={`text-sm ${textColor}`}>{attempt.quizTitle} •</p>
+                  <p className={`text-xs ${textColor}`}>
                   Score: {attempt.totalScore}/{attempt.totalQuestions} ({attempt.percentage}%)
                 </p>
                   </div>
