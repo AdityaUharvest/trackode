@@ -586,7 +586,7 @@ const questions:Questions = {
         <div className="text-center mb-5">
           
           <p
-            className={`mt-4 max-w-2xl mx-auto text-base ${
+            className={`mt-4 max-w-2xl mx-auto lg:text-base text-sm ${
               theme === "dark" ? "text-gray-300" : "text-gray-600"
             }`}
           >
@@ -621,7 +621,7 @@ const questions:Questions = {
           </div>
 
           <h3
-            className={`text-base font-semibold mb-6 ${
+            className={`lg:text-base text-sm font-semibold mb-6 ${
               theme === "dark" ? "text-white" : "text-gray-900"
             }`}
           >
@@ -630,10 +630,10 @@ const questions:Questions = {
 
           {showScore ? (
             <div className="text-center">
-              <h3 className={`text-base font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+              <h3 className={`lg:text-base text-sm  font-bold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 Quiz Completed!
               </h3>
-              <p className={`text-base mb-6 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+              <p className={`lg:text-base text-sm mb-6 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 Your score: {score} out of {questions[currentTopic].reduce((total, q) => total + q.marks, 0)}
               </p>
               <button
@@ -643,7 +643,7 @@ const questions:Questions = {
                   setShowScore(false);
                   setSelectedOption(null);
                 }}
-                className={`px-6 py-2 rounded-md font-medium ${
+                className={`px-6 py-2 text-sm rounded-md font-medium ${
                   theme === "dark"
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-blue-500 hover:bg-blue-600 text-white"
@@ -656,7 +656,7 @@ const questions:Questions = {
             <div className="space-y-6">
               <div>
                 <p
-                  className={`text-base ${
+                  className={`lg:text-base text-sm ${
                     theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
                 >
@@ -672,7 +672,7 @@ const questions:Questions = {
     return (
       <label
         key={index}
-        className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-300 ${
+        className={`flex items-center text-sm p-3 rounded-lg cursor-pointer transition-all duration-300 ${
           theme === "dark"
             ? isSelected
               ? isCorrect
@@ -689,12 +689,12 @@ const questions:Questions = {
         <input
           type="radio"
           name={`${currentTopic}-question`}
-          className="mr-3"
+          className="mr-3 text-sm"
           checked={isSelected}
           onChange={() => setSelectedOption(index)}
           disabled={showFeedback} // Disable further selection after choosing
         />
-        <span className={`text-base ${
+        <span className={`text-sm lg:text-base ${
           theme === "dark" && !isSelected
             ? "text-gray-300"
             : isSelected
@@ -733,7 +733,7 @@ const questions:Questions = {
                         setCurrentQuestion(currentQuestion - 1);
                         setSelectedOption(null);
                       }}
-                      className={`px-4 py-2 rounded-md text-sm font-medium ${
+                      className={`px-4 py-1.5 rounded-md text-sm font-medium ${
                         theme === "dark"
                           ? "bg-gray-600 text-gray-300 hover:bg-gray-500"
                           : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -753,7 +753,7 @@ const questions:Questions = {
                 <div className="flex-1 flex justify-end">
                   <button
                     onClick={handleAnswer}
-                    className={`px-4 py-2 rounded-md text-sm font-medium ${
+                    className={`px-4 py-1.5 rounded-md text-sm font-medium ${
                       theme === "dark"
                         ? "bg-blue-600 text-white hover:bg-blue-500"
                         : "bg-blue-500 text-white hover:bg-blue-600"

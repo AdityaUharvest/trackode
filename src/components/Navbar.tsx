@@ -1,9 +1,9 @@
 'use client';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
-import toast, { Toaster } from 'react-hot-toast';;
+import toast, { Toaster } from 'react-hot-toast';
 import { useTheme } from "./ThemeContext";
 import { Moon, Sun, ChevronDown, Menu, X, User, LogOut, Home, BarChart, Users, MessageSquare, BookOpen } from "lucide-react";
 import GradientText from "@/components/GradientText";
@@ -14,8 +14,9 @@ const Navbar: React.FC = () => {
   const [isNavOpen, setNavOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null); // Ref for mobile menu
 
-  // Add scroll event listener to add shadow when scrolled
+  // Handle scroll for shadow effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
@@ -30,7 +31,7 @@ const Navbar: React.FC = () => {
     await signOut({ callbackUrl: '/' });
     localStorage.setItem("isFirstVisit", "true");
   };
-  
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,44 +43,56 @@ const Navbar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isDropdownOpen]);
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutsideNav = (event: MouseEvent) => {
+      if (
+        isNavOpen &&
+        navRef.current &&
+        !(event.target as Element).closest('.mobile-menu') &&
+        !(event.target as Element).closest('.mobile-menu-toggle')
+      ) {
+        setNavOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutsideNav);
+    return () => document.removeEventListener('mousedown', handleClickOutsideNav);
+  }, [isNavOpen]);
+
   return (
     <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
-    <div className={`${scrolled ? 'shadow-md' : ''}   `}>
-      <Link href="/mocks">
-        <div className={`flex py-2 justify-center ${theme === "light" ? "bg-blue-50" : "bg-blue-900 bg-opacity-30"}`}>
-          <div className="flex items-center gap-2">
-            <div className="relative px-4 py-1 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-teal-400">
-              <GradientText
-                colors={["#ffffff", "#ffffff"]}
-                animationSpeed={50}
-                showBorder={false}
-                className="text-sm font-bold relative z-10"
-              >
-                TCS NQT Mock Test is free 🚀 till 31st July✨
-              </GradientText>
-              <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-blue-600 to-teal-400 opacity-30 animate-pulse"></div>
+      <div className={`${scrolled ? 'shadow-md' : ''}`}>
+        <Link href="/mocks">
+          <div className={`flex py-2 justify-center ${theme === "light" ? "bg-blue-50" : "bg-blue-900 bg-opacity-30"}`}>
+            <div className="flex items-center gap-2">
+              <div className="relative px-4 py-1 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-teal-400">
+                <GradientText
+                  colors={["#ffffff", "#ffffff"]}
+                  animationSpeed={50}
+                  showBorder={false}
+                  className="text-sm font-bold relative z-10"
+                >
+                  TCS NQT Mock Test is free 🚀 till 31st August✨
+                </GradientText>
+                <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-blue-600 to-teal-400 opacity-30 animate-pulse"></div>
+              </div>
             </div>
           </div>
-        </div>
-      </Link>
-      
+        </Link>
 
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
-              src="https://i.ibb.co/jvr3wb6b/trackode.png" 
+              src="https://i.ibb.co/jvr3wb6b/trackode.png"
               className="h-8 rounded-lg"
               alt="Trackode Logo"
             />
-            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 lg:text-2xl text-xl font-bold whitespace-nowrap `}>
+            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 lg:text-2xl text-xl font-bold whitespace-nowrap`}>
               Trackode
             </span>
           </Link>
 
           <div className="flex items-center md:order-2 space-x-4 rtl:space-x-reverse">
-            {/* Theme Toggle Button */}
-            
-
             {/* Profile button */}
             {status === "authenticated" ? (
               <div className="relative user-dropdown">
@@ -164,7 +177,7 @@ const Navbar: React.FC = () => {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setNavOpen(!isNavOpen)}
-              className={`inline-flex items-center p-2 rounded-lg md:hidden focus:outline-none focus:ring-2 transition-colors ${theme === "light" ? "text-gray-700 hover:bg-gray-100 focus:ring-gray-200" : "text-gray-300 hover:bg-gray-700 focus:ring-gray-600"}`}
+              className={`inline-flex items-center p-2 rounded-lg md:hidden focus:outline-none focus:ring-2 transition-colors mobile-menu-toggle ${theme === "light" ? "text-gray-700 hover:bg-gray-100 focus:ring-gray-200" : "text-gray-300 hover:bg-gray-700 focus:ring-gray-600"}`}
               aria-expanded={isNavOpen}
             >
               <span className="sr-only">{isNavOpen ? 'Close menu' : 'Open menu'}</span>
@@ -178,9 +191,8 @@ const Navbar: React.FC = () => {
 
           {/* Navigation links */}
           <div
-            className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 ${
-              isNavOpen ? "block" : "hidden"
-            }`}
+            ref={navRef}
+            className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 mobile-menu ${isNavOpen ? "block" : "hidden"}`}
           >
             <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
               <NavItem href="/programming-quizzes" theme={theme} icon={<BookOpen size={18} />}>
@@ -192,38 +204,65 @@ const Navbar: React.FC = () => {
               <NavItem href="/admin-dashboard" theme={theme} icon={<BarChart size={18} />}>
                 Dashboard
               </NavItem>
-              <NavItem 
-                href={status === "authenticated" ? "/programming-quizzes" : "/signin"} 
-                theme={theme} 
+              <NavItem
+                href={status === "authenticated" ? "/programming-quizzes" : "/signin"}
+                theme={theme}
                 icon={<Home size={18} />}
               >
                 Quiz Tracker
               </NavItem>
-              <button
-              onClick={toggleTheme}
-              className={`flex justify-center p-2 rounded-full transition-all duration-300 hover:scale-20 ${theme === "light" ? "bg-gray-100 hover:bg-gray-200" : "bg-gray-800 hover:bg-gray-700"}`}
-              aria-label="Toggle theme"
-            >
-              {theme === "light" ? <Moon size={22} className="text-gray-700" /> : <Sun size={22} className="text-yellow-300" />}
-            </button>
-              
+              <li className="w-full md:w-auto">
+                <button
+                  onClick={toggleTheme}
+                  className={`relative flex items-center justify-start w-full md:w-auto px-3 py-2 rounded-lg transition-all duration-300 group text-sm font-medium ${
+                    theme === "light"
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700 md:bg-transparent md:hover:bg-blue-50"
+                      : "bg-gray-800 hover:bg-gray-700 text-yellow-300 md:bg-transparent md:hover:bg-gray-800"
+                  }`}
+                  aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+                >
+                  <span className="relative w-6 h-6 flex items-center justify-center mr-2">
+                    <Moon
+                      size={22}
+                      className={`absolute transition-opacity duration-300 ${
+                        theme === "light" ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                    <Sun
+                      size={22}
+                      className={`absolute transition-opacity duration-300 ${
+                        theme === "light" ? "opacity-0" : "opacity-100"
+                      }`}
+                    />
+                  </span>
+                  <span className="block md:hidden">
+                    {theme === "light" ? "Dark Mode" : "Light Mode"}
+                  </span>
+                  <span
+                    className={`absolute top-full mt-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs font-medium rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 md:block hidden ${
+                      theme === "light" ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-900"
+                    }`}
+                  >
+                    {theme === "light" ? "Dark Mode" : "Light Mode"}
+                  </span>
+                </button>
+              </li>
             </ul>
           </div>
         </div>
-        </div>
-      </nav>
-    
+      </div>
+    </nav>
   );
 };
 
 // Helper component for nav items
-const NavItem = ({ href, theme, icon, children }:any) => (
+const NavItem = ({ href, theme, icon, children }: any) => (
   <li>
     <Link
       href={href}
       className={`flex items-center py-2 px-3 md:px-3 rounded-lg font-medium text-sm hover:text-blue-600 transition-colors ${
-        theme === "light" 
-          ? "text-gray-700 hover:bg-blue-50 md:hover:bg-blue-50" 
+        theme === "light"
+          ? "text-gray-700 hover:bg-blue-50 md:hover:bg-blue-50"
           : "text-gray-200 hover:bg-gray-800 md:hover:bg-gray-800"
       }`}
     >

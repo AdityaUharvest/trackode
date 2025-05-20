@@ -8,17 +8,17 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className={`pt-16 ${
+    <footer className={`pt-5 ${
       theme === "dark" 
         ? "bg-gradient-to-b from-gray-900 to-black text-gray-200" 
         : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-700"
     }`}>
       {/* Main Footer Content */}
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        <div className="grid  md:grid-cols-3 lg:grid-cols-3 gap-4">
           {/* Company Info Column */}
           <div className="flex flex-col">
-            <div className="mb-6 flex flex-col items-center md:items-start">
+            <div className=" flex flex-col items-center md:items-start">
               <div className={` rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
                 <img
                   className="h-12 bg-transparent  w-auto"
@@ -29,9 +29,7 @@ export default function Footer() {
                 />
               </div>
               
-              <p className="mt-2 text-sm opacity-75 max-w-xs text-center md:text-left">
-                Enhancing coding skills through interactive challenges, competitions, and personalized learning paths.
-              </p>
+             
             </div>
             <div className="mt-2 flex space-x-4 justify-center md:justify-start">
               <a 
@@ -63,7 +61,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a 
-                href="https://twitter.com/iamadityaupadhyay"
+                href="https://twitter.com/iam_adiupadhyay"
                 target="_blank" 
                 className={`p-2 rounded-full transition-colors duration-300 ${
                   theme === "dark" 

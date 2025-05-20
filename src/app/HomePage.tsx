@@ -488,7 +488,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold lg:text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     Try a free
     <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Demo Quiz
@@ -511,7 +511,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold lg:text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     Why
     <span className="mx-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Choose
@@ -519,7 +519,7 @@ useEffect(() => {
     Trackode
   </h2>
 </motion.div>
-                <div className="flex  mt-3 flex-wrap justify-center  gap-2 sm:gap-3"> {/* Reduced margin */}
+                <div className="flex  mt-3 flex-wrap justify-center  sm:gap-2"> {/* Reduced margin */}
                   <div
                     className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"
                       }`}
@@ -607,8 +607,8 @@ useEffect(() => {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">AI Powered Quiz Generation</h1>
-                <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
+                <h1 className="mt-6 text-base lg:text-lg font-semimedium text-gray-900 dark:text-white">AI Powered Quiz Generation</h1>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Generate quizzes tailored to your learning needs using our AI-driven platform.
                 </p>
               </div>
@@ -621,8 +621,8 @@ useEffect(() => {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">Interactive Challenges</h1>
-                <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
+                <h1 className="mt-6 lg:text-lg font-semimedium text-gray-900 dark:text-white">Interactive Challenges</h1>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Hands-on coding exercises with real-time feedback to improve your skills efficiently.
                 </p>
               </div>
@@ -636,8 +636,8 @@ useEffect(() => {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">Progress Tracking</h1>
-                <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
+                <h1 className="mt-6 lg:text-lg font-medium text-gray-900 dark:text-white">Progress Tracking</h1>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Monitor your growth with detailed analytics and personalized skill assessments.
                 </p>
               </div>
@@ -651,8 +651,8 @@ useEffect(() => {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-lg font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h1>
-                <p className="mt-3 text-base text-gray-600 dark:text-gray-300">
+                <h1 className="mt-6 lg:text-lg font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h1>
+                <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Detailed dashboard for student with leaderboard and result analysis, AI based personlaized feedback.
                 </p>
               </div>
@@ -700,7 +700,7 @@ useEffect(() => {
                 <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-blue-500 transition-colors duration-300"></div>
 
                 {/* Card content */}
-                <div className="p-8 relative z-10">
+                <div className="p-7 relative z-10">
                   
                   <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-blue-500 group-hover:bg-blue-400" : "bg-blue-100 group-hover:bg-blue-200"
                     }`}>
@@ -713,11 +713,11 @@ useEffect(() => {
                   <div className="relative">
                     <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-blue-300" : "text-blue-600"
                       }`}>1</span>
-                    <h3 className={`text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
+                    <h3 className={`lg:text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
                       }`}>Create Your Quiz</h3>
                   </div>
 
-                  <p className={`transition-all duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  <p className={`transition-all text-sm duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                     }`}>
                     Easily prepare your quiz in Trackode with our intuitive interface. Add auto generated questions and answers, and customize settings.
                   </p>
@@ -749,11 +749,11 @@ useEffect(() => {
                   <div className="relative">
                     <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-purple-300" : "text-purple-600"
                       }`}>2</span>
-                    <h3 className={`text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
+                    <h3 className={`lg:text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
                       }`}>Host it Live</h3>
                   </div>
 
-                  <p className={`transition-all duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  <p className={`transition-all text-sm duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                     }`}>
                     Directly publish the quiz and share the link to play , you can Host up to 15 quizzes for free directly on Trackode. Participants join instantly via link or QR code - no downloads needed.
                   </p>
@@ -785,11 +785,11 @@ useEffect(() => {
                   <div className="relative">
                     <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-green-300" : "text-green-600"
                       }`}>3</span>
-                    <h3 className={`text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
+                    <h3 className={`lg:text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"
                       }`}>Real-time Leaderboard</h3>
                   </div>
 
-                  <p className={`transition-all duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  <p className={`transition-all text-sm duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                     }`}>
                     Watch the excitement as participants compete in real-time. Detailed analytics help you track performance and engagement.
                   </p>
@@ -816,7 +816,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold lg:text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     What Our
     <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Users Say
@@ -829,7 +829,7 @@ useEffect(() => {
               </div>
 
               <p
-                className={`mt-4 max-w-2xl mx-auto text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                className={`mt-4 max-w-2xl mx-auto lg:text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                   }`}
               >
                 Hear from developers who have leveled up their skills with Trackode.
@@ -871,17 +871,17 @@ useEffect(() => {
                     <img
                       src={testimonial.image}
                       alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover mr-4"
+                      className="w-10 rounded-full object-cover mr-4"
                     />
                     <div>
                       <h3
-                        className={`text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"
+                        className={`lg:text-lg font-medium ${theme === "dark" ? "text-white" : "text-gray-900"
                           }`}
                       >
                         {testimonial.name}
                       </h3>
                       <p
-                        className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"
+                        className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"
                           }`}
                       >
                         {testimonial.role}
@@ -889,7 +889,7 @@ useEffect(() => {
                     </div>
                   </div>
                   <p
-                    className={`text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                    className={`text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                       }`}
                   >
                     {testimonial.quote}

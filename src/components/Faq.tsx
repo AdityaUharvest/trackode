@@ -113,9 +113,9 @@ export default function Faq() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <h2 className="inline-flex items-center font-semibold text-lg px-6 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+      <h2 className="inline-flex items-center font-semibold lg:text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
         Trackode Support Center 
-        <span className=" px-2 py-2 ml-2 text-sm rounded-md bg-white text-purple-600 font-bold">
+        <span className=" px-2 py-1.5 ml-2 text-sm rounded-md bg-white text-purple-600 font-bold">
          FAQs 
         </span>
       </h2>
@@ -125,7 +125,7 @@ export default function Faq() {
         {/* Header Section */}
         
 
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mt-2 mx-auto">
         
             <ul className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredItems.map((item, index) => (
@@ -145,7 +145,7 @@ export default function Faq() {
                     aria-expanded={openIndex === index ? "true" : "false"}
                     onClick={() => toggleFAQ(index)}
                   >
-                    <span className={`flex-1 font-medium text-base ${
+                    <span className={`flex-1 font-medium lg:text-base text-sm ${
                       openIndex === index 
                         ? theme === "dark" ? "text-blue-400" : "text-blue-600" 
                         : ""
@@ -194,7 +194,7 @@ export default function Faq() {
                             theme === "dark" ? "text-gray-300" : "text-gray-700"
                           }`}
                         >
-                          <div className="space-y-4">
+                          <div className="space-y-4 text-sm">
                             <p>{item.answer}</p>
                             <div className={`text-sm inline-block px-3 py-1 rounded-full capitalize ${
                               theme === "dark" ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-600"
@@ -213,26 +213,26 @@ export default function Faq() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-4 text-center">
+        <div className="mt-4  text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className={`max-w-2xl mx-auto p-3 rounded-xl ${
+            className={`max-w-2xl mx-auto p-5 rounded-xl ${
               theme === "dark" 
                 ? "bg-gray-800/50 border border-gray-700" 
                 : "bg-blue-50 border border-blue-100"
             }`}
           >
             <h3
-              className={`text-base font-bold mb-2 ${
+              className={`lg:text-base text-sm font-semibold mb-2 ${
                 theme === "dark" ? "text-white" : "text-gray-900"
               }`}
             >
               Still have questions?
             </h3>
             <p
-              className={`mb-4  ${
+              className={`mb-4 text-sm  ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
@@ -240,7 +240,7 @@ export default function Faq() {
             </p>
             <Link
               href="/contact"
-              className={`px-5 py-2 rounded-lg font-medium transition-all ${
+              className={`px-5 py-2 rounded-lg text-sm transition-all ${
                 theme === "dark"
                   ? "bg-blue-600 hover:bg-blue-700 text-white"
                   : "bg-blue-600 hover:bg-blue-700 text-white"

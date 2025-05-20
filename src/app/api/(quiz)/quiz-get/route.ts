@@ -26,17 +26,14 @@ export async function GET(req: NextRequest) {
            
             // Find quizzes for this user and return in descending order of createdAt
             const quizzes = await Quiz.find({ createdBy: userId }).populate('questions').sort({ createdAt: -1 });
-            
-            let participants = await Attempted.find({quiz:{$in:quizzes.map(quiz=>quiz._id)}}).sort({attemptedAt:-1}).populate('student').populate('quiz')
-            
-            
-            const recentParticipants = await Attempted.find({quiz:quizzes[quizzes.length-1]._id})
-            if (!quizzes || quizzes.length === 0) {
-                return NextResponse.json({
-                    message: "No quizzes found",
-                    success: false,  
-                });
+            let participants=[]
+            let recentParticipants=[]
+            if(quizzes.length>0){
+participants = await Attempted.find({quiz:{$in:quizzes.map(quiz=>quiz._id)}}).sort({attemptedAt:-1}).populate('student').populate('quiz')
+             recentParticipants = await Attempted.find({quiz:quizzes[quizzes.length-1]._id})
             }
+            
+            
           
            
             return NextResponse.json({

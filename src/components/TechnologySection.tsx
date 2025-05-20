@@ -173,7 +173,7 @@ export default function TechStackQuizSystem() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+        <h2 className="inline-flex items-center font-semibold lg:text-xl  px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
           Technologies We
           <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
           Cover
@@ -183,11 +183,11 @@ export default function TechStackQuizSystem() {
                 </div>
         {!selectedTech ? (
           <>
-            <div className="max-w-3xl mx-auto text-center mb-5">
+            <div className="max-w-3xl mx-auto text-center ">
              
 
               
-              <p className={`mt-4 text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+              <p className={`mt-4 lg:text-base text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 Practice with quizzes and challenges in all major programming languages and frameworks
               </p>
             </div>
