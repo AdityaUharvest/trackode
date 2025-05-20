@@ -316,83 +316,13 @@ console.log(attempts);
             </Link>
           </div>
         ) : (
-        <div className="space-y-8">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className={tableHeaderBg}>
-                <tr>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Test
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Date
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Score
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Sections
-                  </th>
-                  <th className={`px-6 py-3 text-left text-xs font-medium ${secondaryText} uppercase tracking-wider`}>
-                    Details
-                  </th>
-                </tr>
-              </thead>
-              <tbody className={`${cardBg} divide-y ${borderColor}`}>
-                {attempts.map((attempt) => (
-                  <tr key={attempt._id} className={tableRowHover}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm font-medium ${textColor}`}>
-                        {attempt.quizTitle}
-                        {attempt.rank > 0 && (
-                          <span className={`ml-2 text-xs px-2 py-1 rounded-full ${
-                            attempt.rank <= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            Rank: {attempt.rank}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm ${secondaryText}`}>
-                        {new Date(attempt.completedAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className={`text-sm font-medium ${textColor}`}>
-                        {attempt.totalScore}/{attempt.totalQuestions} ({attempt.percentage}%)
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        {attempt.sections?.map((section, i) => (
-                          <>
-                          {section.total > 0 && (
-                            <div key={i} className={`text-xs px-2 py-1 rounded ${
-                            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
-                          }`}>
-                            {section.sectionName}: {section.correct}/{section.total}
-                          </div>)
-                            }
-                          
-                          </>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link
-                        href={`mock-tests/${attempt.attemptId}/user-results`}
-                        className={`${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-                      >
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <MockTestsOverview 
+          attempts={attempts} 
+          theme={theme} 
+          cardBg={cardBg} 
+          textColor={textColor} 
+          secondaryText={secondaryText} 
+        />
       )}
     </div>
   );
@@ -401,7 +331,7 @@ console.log(attempts);
     <div className={`min-h-screen ${bgColor} ${textColor} p-4 ${isMobile ? 'pb-24' : ''}`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className={`text-lg text-purple-500 font-bold flex items-center gap-3`}>
+          <h1 className={`text-base text-purple-500 font-bold flex items-center gap-1`}>
             
             <img 
               className="w-8  rounded-full mr-1"
@@ -409,7 +339,12 @@ console.log(attempts);
               alt="User Avatar">
               
             </img>
-            {`${session?.user?.name || 'Student'}`}
+            Welcome
+            <span className={`text-base  ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+              {session?.user?.name || 'Student'}
+            </span>
+
+            
           </h1>
         </div>
 
@@ -425,16 +360,7 @@ console.log(attempts);
             <TabsContent value="overview">
               <OverviewTab />
             </TabsContent>
-
-            <TabsContent value="quizzes">
-              <QuizzesTab />
-            </TabsContent>
-
-            <TabsContent value="available-quizzes">
-              <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResultss} />
-            </TabsContent>
-
-            <TabsContent value="mocks">
+<TabsContent value="mocks">
               <ResultsTab 
                 attempts={attempts} 
                 cardBg={cardBg}
@@ -445,6 +371,15 @@ console.log(attempts);
                 tableRowHover={tableRowHover}
               />
             </TabsContent>
+            <TabsContent value="quizzes">
+              <QuizzesTab />
+            </TabsContent>
+
+            <TabsContent value="available-quizzes">
+              <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResultss} />
+            </TabsContent>
+
+            
           </Tabs>
         )}
 
@@ -452,9 +387,7 @@ console.log(attempts);
           <div className="space-y-6">
             {activeTab === 'overview' && <OverviewTab />}
             {activeTab === 'quizzes' && <QuizzesTab />}
-            {activeTab === 'available-quizzes' && (
-              <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResultss} />
-            )}
+            
             {activeTab === 'mocks' && (
               <ResultsTab 
                 attempts={attempts} 
@@ -465,6 +398,9 @@ console.log(attempts);
                 tableHeaderBg={tableHeaderBg}
                 tableRowHover={tableRowHover}
               />
+            )}
+            {activeTab === 'available-quizzes' && (
+              <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResultss} />
             )}
           </div>
         )}
