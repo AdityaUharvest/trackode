@@ -422,19 +422,20 @@ console.log(attempts);
               <span className="text-xs mt-1">Quizzes</span>
             </button>
             <button 
-              onClick={() => setActiveTab('available-quizzes')}
-              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'available-quizzes' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
-            >
-              <List className="w-5 h-5" />
-              <span className="text-xs mt-1">Available</span>
-            </button>
-            <button 
               onClick={() => setActiveTab('mocks')}
               className={`flex flex-col items-center justify-center p-2 ${activeTab === 'mocks' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
             >
               <Award className="w-5 h-5" />
               <span className="text-xs mt-1">Mocks</span>
             </button>
+            <button 
+              onClick={() => setActiveTab('available-quizzes')}
+              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'available-quizzes' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
+            >
+              <List className="w-5 h-5" />
+              <span className="text-xs mt-1">Available Quizzes</span>
+            </button>
+            
           </div>
         )}
       </div>
