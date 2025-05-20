@@ -277,11 +277,12 @@ const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: a
 
         <!-- Footer -->
         <div style="background: #2d3748; padding: 16px; text-align: center;">
+          
           <p style="color: #e2e8f0; font-size: 14px; margin: 0 0 8px;">
             Best regards, <strong>The Trackode Team</strong>
           </p>
           <p style="color: #a0aec0; font-size: 12px; margin: 0 0 8px;">
-            <a href="https://trackode.in" style="color: #63b3ed; text-decoration: none;">trackode.in</a>
+            <a href="https://trackode.in" style="color: #63b3ed; text-decoration: none;">Trackode - Every Quiz ups you to success</a>
           </p>
           <p style="color: #a0aec0; font-size: 12px; margin: 0;">
             <a href="https://www.linkedin.com/in/iamadityaupadhyay/" style="color: #63b3ed; text-decoration: none;">Aditya Upadhyay</a> |

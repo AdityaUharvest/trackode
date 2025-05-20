@@ -113,9 +113,9 @@ export default function Faq() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+      <h2 className="inline-flex items-center font-semibold text-lg px-6 py-1 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
         Trackode Support Center 
-        <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+        <span className=" px-2 py-2 ml-2 text-sm rounded-md bg-white text-purple-600 font-bold">
          FAQs 
         </span>
       </h2>

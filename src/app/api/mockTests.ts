@@ -10,6 +10,7 @@ export async function createMockTest(data: {
   durationMinutes: number;
   public: boolean;
   userPlayed?: number;
+  tag: string;
 
 }) {
   await connectDB();
@@ -23,6 +24,7 @@ export async function createMockTest(data: {
     createdAt: new Date(),
     createdBy: session?.user?.id,
     userPlayed:Math.floor(Math.random() * 500) + 203,
+    
   });
   
   

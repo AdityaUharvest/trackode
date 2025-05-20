@@ -20,6 +20,7 @@ interface FormData {
   instructions?: string;
   public: boolean;
   generatedInstructions?: string;
+  tag: string;
 }
 
 const MockTestCreator: React.FC = () => {
@@ -29,19 +30,21 @@ const MockTestCreator: React.FC = () => {
     description: '',
     startTime: '',
     endTime: '',
-    durationMinutes: 180,
+    durationMinutes: 75,
     public: false,
+    tag: 'TCS',
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const [isGenerating, setIsGenerating] = useState(false);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: name === 'durationMinutes' ? parseInt(value) || 0 : value,
+      
     }));
     // Debugging line to check form data
   };
@@ -136,6 +139,17 @@ const MockTestCreator: React.FC = () => {
             className={inputClasses}
             min="30"
             required
+          />
+        </div>
+        <div className="mb-6">
+          <label className={labelClasses}>Tags </label>
+          <input
+            type="text"
+            name="tag"
+            value={formData.tag}
+            onChange={handleChange}
+            className={inputClasses}
+            placeholder="Enter tags separated by commas"
           />
         </div>
         <div className="flex mb-4 items-center gap-3 pt-2">

@@ -23,6 +23,7 @@ const MockTestSchema: Schema = new Schema({
   createdAt: { type: Date, default: Date.now },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   public: { type: Boolean, default: false },
+  tag: { type: String, default: 'TCS' },
 
 });
 

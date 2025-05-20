@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from './ThemeContext'; // Adjust the import path as needed
-
+import { motion } from 'framer-motion';
 interface Quiz {
   _id: string;
   name: string;
@@ -165,17 +165,27 @@ export default function TechStackQuizSystem() {
 
   return (
     <div className={`min-h-screen rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}>
+      
       <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 py-12">
+        <div className="text-center ">
+                  <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+          Technologies We
+          <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
+          Cover
+          </span>
+        </h2>
+      </motion.div>
+                </div>
         {!selectedTech ? (
           <>
             <div className="max-w-3xl mx-auto text-center mb-5">
-              <span className={`inline-block px-4 py-1 rounded-full text-sm font-semibold mb-4 ${theme === "dark" ? "bg-gray-700 text-purple-300" : "bg-purple-100 text-purple-700"}`}>
-                Multiple Technologies
-              </span>
-              
-              <h2 id="tech-stack-heading" className={`text-xl font-bold sm:text-3xl ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                Technologies We Cover
-              </h2>
+             
+
               
               <p className={`mt-4 text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 Practice with quizzes and challenges in all major programming languages and frameworks

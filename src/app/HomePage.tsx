@@ -402,11 +402,11 @@ useEffect(() => {
                     </span>
                   </div>
 
-                  <h2 id="cta-heading" className="text-2xl sm:text-3xl font-bold text-white leading-tight">
+                  <h2 id="cta-heading" className="text-xl sm:text-lg font-bold text-white leading-tight">
                     Level Up Your Coding Skills <span className="text-blue-200">Today</span>
                   </h2>
 
-                  <p className="max-w-xl mx-auto mt-4 text-sm sm:text-base text-blue-100 leading-relaxed">
+                  <p className="max-w-xl mx-auto mt-4 text-sm sm:text-sm text-blue-100 leading-relaxed">
                     Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
                   </p>
 
@@ -447,7 +447,7 @@ useEffect(() => {
                       { value: "100+", label: "Live Blogs" }
                     ].map((stat, index) => (
                       <div key={index} className="text-center group transform transition-all duration-300 hover:-translate-y-1">
-                        <div className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-200">{stat.value}</div>
+                        <div className="text-lg sm:text-lg font-bold text-white group-hover:text-blue-200">{stat.value}</div>
                         <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">{stat.label}</div>
                       </div>
                     ))}
@@ -488,7 +488,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     Try a free
     <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Demo Quiz
@@ -511,7 +511,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     Why
     <span className="mx-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Choose
@@ -672,7 +672,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     How Trackode
     <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Works
@@ -816,7 +816,7 @@ useEffect(() => {
   animate={{ opacity: 1, y: 0 }}
   transition={{ duration: 0.6 }}
 >
-  <h2 className="inline-flex items-center font-semibold text-xl px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
+  <h2 className="inline-flex items-center font-semibold text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
     What Our
     <span className="ml-2 px-3 py-1 rounded-md bg-white text-purple-600 font-bold">
       Users Say

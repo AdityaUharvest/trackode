@@ -14,6 +14,7 @@ interface MockTestType {
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
+  tag:string
 }
 
 // Metadata for SEO

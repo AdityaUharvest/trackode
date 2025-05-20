@@ -24,6 +24,7 @@ interface MockTest {
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
+  tag: string;
 }
 
 interface MockTestsListClientProps {
@@ -204,7 +205,7 @@ export default function MockTestsListClient({
                         : "bg-blue-100 text-blue-800"
                     }`}
                   >
-                    {mock.category || "TCS"}
+                    {mock.tag || "TCS"}
                   </span>
                   {mock.createdAt && (
                     <span className={getThemeClasses("text-muted") + " text-sm"}>

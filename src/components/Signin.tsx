@@ -3,12 +3,12 @@ import { signIn } from 'next-auth/react';
 import { useSession } from "next-auth/react";
 import toast, { Toaster } from 'react-hot-toast';;
 import { useEffect } from "react";
-import { useTheme } from "./ThemeContext";
+
 import { Button } from './ui/button';
 
 const SignInButton = () => {
   const { data: session, status } = useSession();
-  const { theme } = useTheme();
+  
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,14 +29,10 @@ const SignInButton = () => {
     }
   }, [status]);
 
-  const buttonClass = `w-full max-w-xs font-medium shadow-sm rounded-lg py-3 flex items-center justify-center transition-all duration-300 ease-in-out focus:outline-none hover:shadow focus:shadow-sm focus:shadow-outline ${
-    theme === "dark" 
-      ? "bg-gray-900 text-white hover:bg-blue-700 shadow-blue-900" 
-      : "bg-gray-50 text-neutral-900 hover:bg-blue-600 shadow-blue-900"
-  }`;
 
   return (
-    
+    <>
+      <Toaster />
       <Button onClick={handleSignIn} className="flex bg-blue-600 w-full hover:bg-blue-700 hover:text-white text-white items-center gap-5 ">
         <div className=" rounded-full">
           <svg className="w-6" viewBox="0 0 533.5 544.3">
@@ -48,7 +44,7 @@ const SignInButton = () => {
         </div>
         <span className="hover:text-white font-bold text-sm">Login with Google</span>
       </Button>
-   
+   </>
   );
 };
 
