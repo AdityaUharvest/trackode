@@ -10,13 +10,13 @@ import {
   ChevronDown, ChevronUp, AlertCircle, Loader2, Trophy,
   CheckCircle2, XCircle, Sparkles, Lightbulb, BarChart3,
   BookOpen, Brain, Calendar, Clock, ArrowRight, GraduationCap,
-  Award
+  Award, Medal
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import toast, { Toaster } from 'react-hot-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
 interface QuestionResult {
@@ -56,6 +56,22 @@ interface UserResult {
   }>;
 }
 
+interface UserAttempt {
+  _id: string;
+  userId: string;
+  userName: string;
+  email: string;
+  quizTitle: string;
+  startedAt: string;
+  completedAt: string;
+  totalAnswered: number;
+  totalCorrect: number;
+  totalQuestions: number;
+  accuracy: number;
+  sectionStats: Record<string, { answered: number; correct: number; totalQuestions: number; accuracy?: number }>;
+  rank?: number;
+}
+
 export default function UserQuizResult() {
   const { data: session } = useSession();
   const { theme } = useTheme();
@@ -63,6 +79,7 @@ export default function UserQuizResult() {
   const [result, setResult] = useState<UserResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
   const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
@@ -72,9 +89,12 @@ export default function UserQuizResult() {
   const [overallFeedback, setOverallFeedback] = useState<string>('');
   const [loadingFeedback, setLoadingFeedback] = useState({
     overall: false,
-    sections: {} as Record<string, boolean>
+    sections: {} as Record<string, boolean>,
   });
   const [activeTab, setActiveTab] = useState('overview');
+  const [attempts, setAttempts] = useState<UserAttempt[]>([]);
+  const [topPerformers, setTopPerformers] = useState<UserAttempt[]>([]);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
@@ -90,69 +110,97 @@ export default function UserQuizResult() {
   const rankBadgeBg = theme === 'dark' ? 'bg-yellow-900/30 border-yellow-600' : 'bg-yellow-50 border-yellow-500';
 
   useEffect(() => {
-    const fetchResult = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/mock-tests/${quizId}/user-result`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch results');
-        }
-        const data = await response.json();
-        setResult(data);
 
+        // Fetch user's own result
+        const userResponse = await fetch(`/api/mock-tests/${quizId}/user-result`);
+        if (!userResponse.ok) {
+          throw new Error('Failed to fetch user results');
+        }
+        const userData = await userResponse.json();
+        setResult(userData);
+        console.log('User Data:', userData);
         // Expand all sections by default
-        const defaultExpanded = data.sections.reduce((acc: Record<string, boolean>, section: SectionResult) => {
-          acc[section.sectionName] = true;
-          return acc;
-        }, {});
+        const defaultExpanded = userData.sections.reduce(
+          (acc: Record<string, boolean>, section: SectionResult) => {
+            acc[section.sectionName] = true;
+            return acc;
+          },
+          {}
+        );
         setExpandedSections(defaultExpanded);
 
         // Set existing feedback if available
-        if (data.overallFeedback) {
-          setOverallFeedback(data.overallFeedback);
+        if (userData.overallFeedback) {
+          setOverallFeedback(userData.overallFeedback);
+        }
+        if (userData.sectionFeedbacks) {
+          const feedbackMap: Record<string, string> = {};
+          userData.sectionFeedbacks.forEach((feedback: { sectionName: string; feedback: string }) => {
+            feedbackMap[feedback.sectionName] = feedback.feedback;
+          });
+          setSectionFeedback(feedbackMap);
         }
 
         // Show toast for certificate
-        if (data.rank) {
-          toast.success(`Certificate earned! Rank ${data.rank} added to your profile.`, {
+        if (userData.rank) {
+          toast.success(`Certificate earned! Rank ${userData.rank} added to your profile.`, {
             icon: <Award className="h-5 w-5 text-yellow-500" />,
             duration: 5000,
           });
         }
+
+        // Fetch all attempts for leaderboard
+        const attemptsResponse = await fetch(`/api/mock-tests/${userData.quizId}/results`);
+        console.log('Attempts Response:', attemptsResponse);
+        if (!attemptsResponse.ok) {
+          throw new Error('Failed to fetch attempts');
+        }
+        const attemptsData = await attemptsResponse.json();
+
+        // Sort attempts by accuracy and add ranking
+        const sortedAttempts = [...attemptsData.attempts].sort((a, b) => b.accuracy - a.accuracy);
+        const rankedAttempts = sortedAttempts.map((attempt, index) => ({
+          ...attempt,
+          rank: index + 1,
+        }));
+
+        setAttempts(rankedAttempts);
+        setTopPerformers(rankedAttempts.slice(0, 3));
+        
+        // Trigger confetti effect
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 5000);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        // auto refresh the page if error occurs
+        if (err instanceof Error && err.message === 'Failed to fetch user results') {
+          window.location.reload();
+        }
+        
+
       } finally {
         setLoading(false);
       }
     };
 
     if (session && quizId) {
-      fetchResult();
+      fetchData();
     }
   }, [session, quizId]);
-  
-  // Getting the feedback from the result.sectionFeedbacks
-  useEffect(() => {
-    if (result && result.sectionFeedbacks) {
-      const feedbackMap: Record<string, string> = {};
-      result.sectionFeedbacks.forEach((feedback) => {
-        feedbackMap[feedback.sectionName] = feedback.feedback;
-      });
-      setSectionFeedback(feedbackMap);
-    }
-  }, [result]);
-
+console.log('Result:', result);
   const toggleSection = (sectionName: string) => {
-    setExpandedSections(prev => ({
+    setExpandedSections((prev) => ({
       ...prev,
-      [sectionName]: !prev[sectionName]
+      [sectionName]: !prev[sectionName],
     }));
   };
 
   const toggleQuestion = (questionId: string) => {
-    setExpandedQuestions(prev => ({
+    setExpandedQuestions((prev) => ({
       ...prev,
-      [questionId]: !prev[questionId]
+      [questionId]: !prev[questionId],
     }));
   };
 
@@ -166,8 +214,8 @@ export default function UserQuizResult() {
         body: JSON.stringify({
           questionId,
           content: explanation,
-          type: 'question'
-        })
+          type: 'question',
+        }),
       });
 
       if (!response.ok) {
@@ -187,25 +235,25 @@ export default function UserQuizResult() {
     options: string[]
   ) => {
     if (expandedExplanations[questionId]) {
-      setExpandedExplanations(prev => ({
+      setExpandedExplanations((prev) => ({
         ...prev,
-        [questionId]: !prev[questionId]
+        [questionId]: !prev[questionId],
       }));
       return;
     }
 
     try {
-      setLoadingExplanations(prev => ({ ...prev, [questionId]: true }));
+      setLoadingExplanations((prev) => ({ ...prev, [questionId]: true }));
 
-      if (result?.questionFeedbacks?.some(fb => fb.questionId === questionId)) {
-        const storedFeedback = result.questionFeedbacks.find(fb => fb.questionId === questionId);
-        setDetailedExplanations(prev => ({
+      if (result?.questionFeedbacks?.some((fb) => fb.questionId === questionId)) {
+        const storedFeedback = result.questionFeedbacks.find((fb) => fb.questionId === questionId);
+        setDetailedExplanations((prev) => ({
           ...prev,
-          [questionId]: storedFeedback?.explanation || ''
+          [questionId]: storedFeedback?.explanation || '',
         }));
-        setExpandedExplanations(prev => ({
+        setExpandedExplanations((prev) => ({
           ...prev,
-          [questionId]: true
+          [questionId]: true,
         }));
         return;
       }
@@ -225,8 +273,8 @@ export default function UserQuizResult() {
           
           Please provide:
           1. A concise explanation of why the correct answer is right (15-20 words)
-          Format your response in clear paragraphs with no headings.`
-        })
+          Format your response in clear paragraphs with no headings.`,
+        }),
       });
 
       if (!response.ok) {
@@ -234,27 +282,27 @@ export default function UserQuizResult() {
       }
 
       const data = await response.json();
-      setDetailedExplanations(prev => ({
+      setDetailedExplanations((prev) => ({
         ...prev,
-        [questionId]: data.instructions
+        [questionId]: data.instructions,
       }));
       await saveQuestionFeedback(questionId, data.instructions);
-      setExpandedExplanations(prev => ({
+      setExpandedExplanations((prev) => ({
         ...prev,
-        [questionId]: true
+        [questionId]: true,
       }));
     } catch (error) {
       console.error('Error generating explanation:', error);
       toast.error('Failed to generate detailed explanation');
       const question = result?.sections
-        .flatMap(s => s.questions)
-        .find(q => q._id === questionId);
-      setDetailedExplanations(prev => ({
+        .flatMap((s) => s.questions)
+        .find((q) => q._id === questionId);
+      setDetailedExplanations((prev) => ({
         ...prev,
-        [questionId]: question?.explanation || 'Could not generate detailed explanation.'
+        [questionId]: question?.explanation || 'Could not generate detailed explanation.',
       }));
     } finally {
-      setLoadingExplanations(prev => ({ ...prev, [questionId]: false }));
+      setLoadingExplanations((prev) => ({ ...prev, [questionId]: false }));
     }
   };
 
@@ -267,8 +315,8 @@ export default function UserQuizResult() {
         },
         body: JSON.stringify({
           content: feedback,
-          type: 'overall'
-        })
+          type: 'overall',
+        }),
       });
 
       if (!response.ok) {
@@ -284,7 +332,7 @@ export default function UserQuizResult() {
     try {
       if (!result) return;
 
-      setLoadingFeedback(prev => ({ ...prev, overall: true }));
+      setLoadingFeedback((prev) => ({ ...prev, overall: true }));
 
       const response = await fetch('/api/generate-feedback', {
         method: 'POST',
@@ -292,15 +340,23 @@ export default function UserQuizResult() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          prompt: `Generate detailed overall performance analysis for this quiz attempt, in markdown format, dont include okay ,here is the analysis, or any other similar phrases:
+          prompt: `Generate detailed overall performance analysis for this quiz attempt, in markdown format:
         
-          **Overall Score:** ${result.totalScore}/${result.totalQuestions} (${Math.round((result.totalScore / result.totalQuestions) * 100)}%)
+          **Overall Score:** ${result.totalScore}/${result.totalQuestions} (${Math.round(
+            (result.totalScore / result.totalQuestions) * 100
+          )}%)
         
           **Section Breakdown:**
-          ${result.sections.map(section => (
-            `- ${section.sectionName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}: ` +
-            `${section.correct}/${section.total} (${Math.round((section.correct / section.total) * 100)}%)`
-          )).join('\n')}
+          ${result.sections
+            .map(
+              (section) =>
+                `- ${section.sectionName
+                  .split('-')
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')}: ` +
+                `${section.correct}/${section.total} (${Math.round((section.correct / section.total) * 100)}%)`
+            )
+            .join('\n')}
         
           Please provide:
           1. Overall performance assessment (beginner/intermediate/advanced)
@@ -315,8 +371,8 @@ export default function UserQuizResult() {
           - Specific action items for improvement
           - Positive encouragement
         
-          Keep it professional yet encouraging (100-150 words).`
-        })
+          Keep it professional yet encouraging (100-150 words).`,
+        }),
       });
 
       if (!response.ok) {
@@ -331,7 +387,7 @@ export default function UserQuizResult() {
       toast.error('Failed to generate overall feedback');
       setOverallFeedback('Could not generate overall feedback.');
     } finally {
-      setLoadingFeedback(prev => ({ ...prev, overall: false }));
+      setLoadingFeedback((prev) => ({ ...prev, overall: false }));
     }
   };
 
@@ -346,7 +402,7 @@ export default function UserQuizResult() {
           sectionName,
           content: feedback,
           type: 'section',
-        })
+        }),
       });
 
       if (!response.ok) {
@@ -354,7 +410,7 @@ export default function UserQuizResult() {
       }
     } catch (error) {
       console.error('Error saving section feedback:', error);
-      toast.error('Failed to save feedback');
+      toast.error(`Failed to generate feedback for ${sectionName}`);
     }
   };
 
@@ -362,12 +418,12 @@ export default function UserQuizResult() {
     try {
       if (!result) return;
 
-      setLoadingFeedback(prev => ({
+      setLoadingFeedback((prev) => ({
         ...prev,
-        sections: { ...prev.sections, [sectionName]: true }
+        sections: { ...prev.sections, [sectionName]: true },
       }));
 
-      const section = result.sections.find(s => s.sectionName === sectionName);
+      const section = result.sections.find((s) => s.sectionName === sectionName);
       if (!section) return;
 
       const response = await fetch('/api/generate-feedback', {
@@ -378,7 +434,9 @@ export default function UserQuizResult() {
         body: JSON.stringify({
           prompt: `Generate detailed feedback for the "${sectionName}" section of this quiz attempt:
           
-          **Section Performance:** ${section.correct}/${section.total} (${Math.round((section.correct / section.total) * 100)}%)
+          **Section Performance:** ${section.correct}/${section.total} (${Math.round(
+            (section.correct / section.total) * 100
+          )}%)
           
           Please provide:
           1. Key strengths in this section
@@ -386,8 +444,8 @@ export default function UserQuizResult() {
           3. Specific study recommendations for this section
           4. Estimated time needed to improve
           
-          Format as concise bullet points (30-50 words total).`
-        })
+          Format as concise bullet points (30-50 words total).`,
+        }),
       });
 
       if (!response.ok) {
@@ -395,18 +453,18 @@ export default function UserQuizResult() {
       }
 
       const data = await response.json();
-      setSectionFeedback(prev => ({
+      setSectionFeedback((prev) => ({
         ...prev,
-        [sectionName]: data.instructions
+        [sectionName]: data.instructions,
       }));
       await saveSectionFeedback(sectionName, data.instructions);
     } catch (error) {
       console.error('Error generating section feedback:', error);
       toast.error(`Failed to generate feedback for ${sectionName}`);
     } finally {
-      setLoadingFeedback(prev => ({
+      setLoadingFeedback((prev) => ({
         ...prev,
-        sections: { ...prev.sections, [sectionName]: false }
+        sections: { ...prev.sections, [sectionName]: false },
       }));
     }
   };
@@ -417,6 +475,34 @@ export default function UserQuizResult() {
     if (percentage >= 60) return { color: 'bg-yellow-500', label: 'Satisfactory' };
     if (percentage >= 40) return { color: 'bg-orange-500', label: 'Needs Work' };
     return { color: 'bg-red-500', label: 'Critical' };
+  };
+
+  // Medal rendering functions
+  const renderMedal = (rank: number) => {
+    if (rank === 1) return <Trophy className="h-8 w-8 text-yellow-500" />;
+    if (rank === 2) return <Medal className="h-7 w-7 text-gray-400" />;
+    if (rank === 3) return <Medal className="h-6 w-6 text-amber-700" />;
+    return null;
+  };
+
+  const renderRankBadge = (rank: number) => {
+    if (rank > 3) return null;
+
+    const badgeColors = {
+      1: 'bg-yellow-500',
+      2: 'bg-gray-400',
+      3: 'bg-amber-700',
+    };
+
+    return (
+      <span
+        className={`${
+          badgeColors[rank as keyof typeof badgeColors]
+        } text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center`}
+      >
+        {rank}
+      </span>
+    );
   };
 
   if (loading) {
@@ -448,11 +534,7 @@ export default function UserQuizResult() {
             </div>
             <h2 className={`text-sm font-semibold ${textColor}`}>Error Loading Results</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>{error}</p>
-            <Button
-              onClick={() => window.location.reload()}
-              className="mt-4"
-              variant="outline"
-            >
+            <Button onClick={() => window.location.reload()} className="mt-4" variant="outline">
               Try Again
             </Button>
           </div>
@@ -471,10 +553,7 @@ export default function UserQuizResult() {
             </div>
             <h2 className={`text-sm font-semibold ${textColor}`}>No Results Found</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>You haven't attempted this quiz yet.</p>
-            <Button
-              asChild
-              className="mt-4"
-              >
+            <Button asChild className="mt-4">
               <a href={`/mock-tests/${quizId}`}>Take the Quiz</a>
             </Button>
           </div>
@@ -499,6 +578,49 @@ export default function UserQuizResult() {
 
   return (
     <div className={`min-h-screen p-2 md:p-6 ${bgColor}`}>
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50">
+          <div className="confetti-container">
+            {Array.from({ length: 100 }).map((_, i) => {
+              const left = Math.random() * 100;
+              const animationDelay = Math.random() * 2;
+              const size = Math.floor(Math.random() * 8) + 6;
+
+              return (
+                <div
+                  key={i}
+                  className="confetti"
+                  style={{
+                    left: `${left}%`,
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    backgroundColor: [
+                      '#f44336',
+                      '#e91e63',
+                      '#9c27b0',
+                      '#673ab7',
+                      '#3f51b5',
+                      '#2196f3',
+                      '#03a9f4',
+                      '#00bcd4',
+                      '#009688',
+                      '#4CAF50',
+                      '#8BC34A',
+                      '#CDDC39',
+                      '#FFEB3B',
+                      '#FFC107',
+                      '#FF9800',
+                      '#FF5722',
+                    ][Math.floor(Math.random() * 16)],
+                    animationDelay: `${animationDelay}s`,
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto">
         {/* Top Summary Card */}
         <Card className={`mb-6 overflow-hidden border shadow-md ${bgColor}`}>
@@ -524,15 +646,11 @@ export default function UserQuizResult() {
               </CardDescription>
             </div>
             <div className="flex flex-col md:flex-row md:items-center gap-3">
-              <Badge
-                className={`px-3 py-1 text-white ${performanceBadge.color}`}
-              >
+              <Badge className={`px-3 py-1 text-white ${performanceBadge.color}`}>
                 {performanceBadge.label}
               </Badge>
               {result.rank > 0 && (
-                <Badge
-                  className={`px-3 py-1 text-yellow-800 dark:text-yellow-200 ${rankBadgeBg}`}
-                >
+                <Badge className={`px-3 py-1 text-yellow-800 dark:text-yellow-200 ${rankBadgeBg}`}>
                   <Trophy className="h-4 w-4 mr-1" />
                   Rank: {getOrdinalSuffix(result.rank)}
                 </Badge>
@@ -552,11 +670,17 @@ export default function UserQuizResult() {
                   <Trophy className="h-4 w-4" />
                   <span className="hidden md:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="sections" className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2">
+                <TabsTrigger
+                  value="sections"
+                  className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2"
+                >
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden md:inline">Sections</span>
                 </TabsTrigger>
-                <TabsTrigger value="questions" className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2">
+                <TabsTrigger
+                  value="questions"
+                  className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2"
+                >
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden md:inline">Questions</span>
                 </TabsTrigger>
@@ -564,9 +688,14 @@ export default function UserQuizResult() {
 
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-6">
+                {/* Leaderboard Podium */}
+                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Score Circle */}
-                  <div className={`flex flex-col items-center justify-center p-6 rounded-lg ${cardBg} border ${borderColor} relative`}>
+                  <div
+                    className={`flex flex-col items-center justify-center p-6 rounded-lg ${cardBg} border ${borderColor} relative`}
+                  >
                     <div className="relative flex items-center justify-center">
                       <svg width="120" height="120" viewBox="0 0 100 100">
                         <circle
@@ -587,11 +716,17 @@ export default function UserQuizResult() {
                           strokeDasharray={circumference}
                           strokeDashoffset={strokeDashoffset}
                           transform="rotate(-90 50 50)"
-                          className={`${overallPercentage >= 80 ? 'stroke-green-500' :
-                              overallPercentage >= 70 ? 'stroke-emerald-500' :
-                              overallPercentage >= 60 ? 'stroke-yellow-500' :
-                              overallPercentage >= 50 ? 'stroke-orange-500' : 'stroke-red-500'
-                            } transition-all duration-1000 ease-in-out`}
+                          className={`${
+                            overallPercentage >= 80
+                              ? 'stroke-green-500'
+                              : overallPercentage >= 70
+                              ? 'stroke-emerald-500'
+                              : overallPercentage >= 60
+                              ? 'stroke-yellow-500'
+                              : overallPercentage >= 50
+                              ? 'stroke-orange-500'
+                              : 'stroke-red-500'
+                          } transition-all duration-1000 ease-in-out`}
                         />
                       </svg>
                       <div className="absolute flex flex-col items-center">
@@ -601,7 +736,9 @@ export default function UserQuizResult() {
                     </div>
                     <div className="mt-4 flex items-center gap-2 text-sm">
                       <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <span>{result.totalScore} correct out of {result.totalQuestions}</span>
+                      <span>
+                        {result.totalScore} correct out of {result.totalQuestions}
+                      </span>
                     </div>
                     {result.rank > 0 && (
                       <div className="mt-2 flex items-center gap-2 text-sm text-yellow-600 dark:text-yellow-400">
@@ -612,7 +749,9 @@ export default function UserQuizResult() {
                   </div>
 
                   {/* Section Performance */}
-                  <div className={`p-6 rounded-lg ${cardBg} border ${borderColor} col-span-1 md:col-span-2`}>
+                  <div
+                    className={`p-6 rounded-lg ${cardBg} border ${borderColor} col-span-1 md:col-span-2`}
+                  >
                     <h3 className="font-medium mb-4 flex items-center gap-2">
                       <BarChart3 className="h-2 w-2 text-blue-500" />
                       Section Performance
@@ -629,9 +768,10 @@ export default function UserQuizResult() {
                             <div className="flex justify-between items-center">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-medium">
-                                  {section.sectionName.split('-').map(word =>
-                                    word.charAt(0).toUpperCase() + word.slice(1)
-                                  ).join(' ')}
+                                  {section.sectionName
+                                    .split('-')
+                                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .join(' ')}
                                 </span>
                                 <Badge variant="outline" className="text-xs">
                                   Attempted: {section.questions.length}/{section.total}
@@ -640,10 +780,17 @@ export default function UserQuizResult() {
                                   Correct: {section.correct}/{section.questions.length}
                                 </Badge>
                               </div>
-                              <span className={`text-sm font-medium ${sectionPercentage >= 70 ? 'text-green-500' :
-                                  sectionPercentage >= 60 ? 'text-yellow-500' :
-                                  sectionPercentage >= 50 ? 'text-orange-500' : 'text-red-500'
-                                }`}>
+                              <span
+                                className={`text-sm font-medium ${
+                                  sectionPercentage >= 70
+                                    ? 'text-green-500'
+                                    : sectionPercentage >= 60
+                                    ? 'text-yellow-500'
+                                    : sectionPercentage >= 50
+                                    ? 'text-orange-500'
+                                    : 'text-red-500'
+                                }`}
+                              >
                                 {sectionPercentage}%
                               </span>
                             </div>
@@ -714,7 +861,6 @@ export default function UserQuizResult() {
                       </div>
                     )}
                   </CardContent>
-                  
                 </Card>
               </TabsContent>
 
@@ -735,13 +881,17 @@ export default function UserQuizResult() {
                       >
                         <div>
                           <CardTitle className="text-sm flex items-center gap-2">
-                            {section.sectionName.split('-').map(word =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                            ).join(' ')}
+                            {section.sectionName
+                              .split('-')
+                              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                              .join(' ')}
                             <Badge
                               variant={
-                                sectionPercentage >= 70 ? 'secondary' :
-                                sectionPercentage >= 40 ? 'outline' : 'destructive'
+                                sectionPercentage >= 70
+                                  ? 'secondary'
+                                  : sectionPercentage >= 40
+                                  ? 'outline'
+                                  : 'destructive'
                               }
                             >
                               {section.correct}/{section.total} ({sectionPercentage}%)
@@ -777,14 +927,24 @@ export default function UserQuizResult() {
                                 return (
                                   <Card
                                     key={question._id}
-                                    className={`border cursor-pointer transition-all ${isCorrect ? 'border-green-500 dark:border-green-700' : 'border-red-500 dark:border-red-700'} hover:shadow-md`}
+                                    className={`border cursor-pointer transition-all ${
+                                      isCorrect
+                                        ? 'border-green-500 dark:border-green-700'
+                                        : 'border-red-500 dark:border-red-700'
+                                    } hover:shadow-md`}
                                     onClick={() => {
                                       toggleQuestion(question._id);
                                       setActiveTab('questions');
                                     }}
                                   >
                                     <CardContent className="p-3 flex flex-col items-center text-center">
-                                      <div className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${isCorrect ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                                      <div
+                                        className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${
+                                          isCorrect
+                                            ? 'bg-green-100 dark:bg-green-900/30'
+                                            : 'bg-red-100 dark:bg-red-900/30'
+                                        }`}
+                                      >
                                         {isCorrect ? (
                                           <CheckCircle2 className="h-2 w-2 text-green-500" />
                                         ) : (
@@ -837,8 +997,6 @@ export default function UserQuizResult() {
                                 )}
                               </div>
                             </CardHeader>
-
-                            
                           </Card>
 
                           <Button
@@ -866,9 +1024,10 @@ export default function UserQuizResult() {
                     <div key={section.sectionName} className="space-y-4">
                       <h3 className="font-medium text-sm flex items-center gap-2">
                         <BookOpen className="h-2 w-2 text-indigo-500" />
-                        {section.sectionName.split('-').map(word =>
-                          word.charAt(0).toUpperCase() + word.slice(1)
-                        ).join(' ')}
+                        {section.sectionName
+                          .split('-')
+                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(' ')}
                         <Badge variant="outline">
                           {section.correct}/{section.total}
                         </Badge>
@@ -876,19 +1035,26 @@ export default function UserQuizResult() {
 
                       <div className="space-y-4">
                         {section.questions.map((question, index) => (
-                          <Card key={question._id} className={`border text-xm ${question.userAnswer === question.correctAnswer ?
-                              'border-green-500 dark:border-green-700' :
-                              'border-red-500 dark:border-red-700'
-                            }`}>
+                          <Card
+                            key={question._id}
+                            className={`border text-xm ${
+                              question.userAnswer === question.correctAnswer
+                                ? 'border-green-500 dark:border-green-700'
+                                : 'border-red-500 dark:border-red-700'
+                            }`}
+                          >
                             <CardHeader
                               className="cursor-pointer flex flex-row items-start justify-between"
                               onClick={() => toggleQuestion(question._id)}
                             >
                               <div className="flex gap-3">
-                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${question.userAnswer === question.correctAnswer ?
-                                    'bg-green-100 dark:bg-green-900/30' :
-                                    'bg-red-100 dark:bg-red-900/30'
-                                  }`}>
+                                <div
+                                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                    question.userAnswer === question.correctAnswer
+                                      ? 'bg-green-100 dark:bg-green-900/30'
+                                      : 'bg-red-100 dark:bg-red-900/30'
+                                  }`}
+                                >
                                   {question.userAnswer === question.correctAnswer ? (
                                     <CheckCircle2 className="h-2 w-2 text-green-500" />
                                   ) : (
@@ -896,7 +1062,9 @@ export default function UserQuizResult() {
                                   )}
                                 </div>
                                 <div>
-                                  <CardTitle className="text-sm font-medium">Question {index + 1}</CardTitle>
+                                  <CardTitle className="text-sm font-medium">
+                                    Question {index + 1}
+                                  </CardTitle>
                                   <CardDescription className="line-clamp-1">
                                     {question.text}
                                   </CardDescription>
@@ -932,10 +1100,14 @@ export default function UserQuizResult() {
 
                                     if (isCorrect) {
                                       optionClass = correctOptionBg;
-                                      iconComponent = <CheckCircle2 className="h-2 w-2 text-green-500 flex-shrink-0" />;
+                                      iconComponent = (
+                                        <CheckCircle2 className="h-2 w-2 text-green-500 flex-shrink-0" />
+                                      );
                                     } else if (isUserSelection) {
                                       optionClass = wrongOptionBg;
-                                      iconComponent = <XCircle className="h-2 w-2 text-red-500 flex-shrink-0" />;
+                                      iconComponent = (
+                                        <XCircle className="h-2 w-2 text-red-500 flex-shrink-0" />
+                                      );
                                     }
 
                                     return (
@@ -945,7 +1117,9 @@ export default function UserQuizResult() {
                                       >
                                         <div className="flex items-start justify-between">
                                           <div className="flex items-start">
-                                            <span className="mr-2 font-medium">{String.fromCharCode(65 + index)}.</span>
+                                            <span className="mr-2 font-medium">
+                                              {String.fromCharCode(65 + index)}.
+                                            </span>
                                             <p>{option}</p>
                                           </div>
                                           {iconComponent}
@@ -1014,7 +1188,11 @@ export default function UserQuizResult() {
                                   {expandedExplanations[question._id] && (
                                     <CardContent>
                                       <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <p>{detailedExplanations[question._id] || question.explanation || 'No explanation available.'}</p>
+                                        <p>
+                                          {detailedExplanations[question._id] ||
+                                            question.explanation ||
+                                            'No explanation available.'}
+                                        </p>
                                       </div>
                                     </CardContent>
                                   )}
@@ -1029,17 +1207,116 @@ export default function UserQuizResult() {
                 })}
               </TabsContent>
             </Tabs>
+            <div className="mt-6">
+  {topPerformers.length > 0 && (
+    <div className="relative flex flex-col items-center">
+      <h3 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Leaderboard</h3>
+      {/* Top 3 Podium */}
+      <div className="flex items-end justify-center w-full mb-10 space-x-3 md:space-x-6">
+        {/* 2nd Place */}
+        {topPerformers.length >= 2 && (
+          <div className="flex flex-col items-center transform transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-b from-gray-200 to-gray-300 rounded-t-xl w-28 md:w-32 p-5 flex flex-col items-center h-32 shadow-lg">
+              <div className="text-2xl font-extrabold text-gray-700">2</div>
+              <div className="text-sm md:text-base text-center font-semibold text-gray-700 line-clamp-2">
+                {topPerformers[1].userName}
+              </div>
+              <div className="text-sm md:text-base font-bold text-gray-700 mt-2">
+                {topPerformers[1].accuracy}%
+              </div>
+            </div>
+            <div className="bg-gradient-to-b from-gray-400 to-gray-500 h-20 w-28 md:w-32 flex items-center justify-center rounded-b-xl shadow-md">
+              <div className="text-3xl animate-pulse">🥈</div>
+            </div>
+          </div>
+        )}
+
+        {/* 1st Place */}
+        {topPerformers.length >= 1 && (
+          <div className="flex flex-col items-center transform transition-all duration-300 hover:scale-105 relative">
+            <div className="bg-gradient-to-b from-yellow-200 to-yellow-300 rounded-t-xl w-32 md:w-40 p-6 flex flex-col items-center h-40 shadow-xl border-2 border-yellow-400">
+              <div className="text-3xl font-extrabold text-yellow-800">1</div>
+              <div className="text-base md:text-lg text-center font-bold text-yellow-900 line-clamp-2">
+                {topPerformers[0].userName}
+              </div>
+              <div className="text-base md:text-lg font-bold text-yellow-800 mt-3">
+                {topPerformers[0].accuracy}%
+              </div>
+            </div>
+            <div className="bg-gradient-to-b from-yellow-400 to-yellow-600 h-24 w-32 md:w-40 flex items-center justify-center rounded-b-xl shadow-lg relative">
+              <div className="text-4xl animate-bounce">
+                <Trophy className="h-12 w-12 text-yellow-700 drop-shadow-md" />
+              </div>
+              <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
+                <div className="sparkle animate-sparkle"></div>
+                <div className="sparkle animate-sparkle delay-200"></div>
+                <div className="sparkle animate-sparkle delay-400"></div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3rd Place */}
+        {topPerformers.length >= 3 && (
+          <div className="flex flex-col items-center transform transition-all duration-300 hover:scale-105">
+            <div className="bg-gradient-to-b from-orange-200 to-orange-300 rounded-t-xl w-28 md:w-32 p-5 flex flex-col items-center h-32 shadow-lg">
+              <div className="text-2xl font-extrabold text-orange-700">3</div>
+              <div className="text-sm md:text-base text-center font-semibold text-orange-800 line-clamp-2">
+                {topPerformers[2].userName}
+              </div>
+              <div className="text-sm md:text-base font-bold text-orange-700 mt-2">
+                {topPerformers[2].accuracy}%
+              </div>
+            </div>
+            <div className="bg-gradient-to-b from-orange-400 to-orange-500 h-16 w-28 md:w-32 flex items-center justify-center rounded-b-xl shadow-md">
+              <div className="text-3xl animate-pulse">🥉</div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Other rankings */}
+      {topPerformers.length > 3 && (
+        <div className="w-full max-w-2xl mt-6">
+          <h3 className="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-100">
+            Other Top Performers
+          </h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+            {topPerformers.slice(3).map((performer, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center p-4 border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                <div className="flex items-center">
+                  <span className="text-gray-600 dark:text-gray-300 font-bold mr-4">
+                    {index + 4}
+                  </span>
+                  <span className="font-medium text-gray-800 dark:text-gray-100">
+                    {performer.userName}
+                  </span>
+                </div>
+                <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 py-1 px-3 rounded-full text-sm font-semibold">
+                  {performer.accuracy}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* Add CSS for enhanced styling and animations */}
+  
+</div>
+            
           </CardContent>
         </Card>
 
         {/* Actions Footer */}
         <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-50/90 to-transparent dark:from-gray-950/90 pt-12">
           <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <Button
-              variant="secondary"
-              onClick={() => window.history.back()}
-              size="sm"
-            >
+            <Button variant="secondary" onClick={() => window.history.back()} size="sm">
               Back to Tests
             </Button>
             <div className="flex items-center gap-2">
@@ -1061,6 +1338,7 @@ export default function UserQuizResult() {
               >
                 Return to Summary
               </Button>
+              
               <Button size="sm" asChild>
                 <a href={`/mocks`}>Explore Mocks</a>
               </Button>
@@ -1072,6 +1350,36 @@ export default function UserQuizResult() {
         </div>
       </div>
       <Toaster position="bottom-right" />
+
+      {/* Add CSS for confetti animation */}
+      <style jsx global>{`
+        .confetti-container {
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          top: 0;
+          left: 0;
+          pointer-events: none;
+        }
+
+        .confetti {
+          position: absolute;
+          top: -10px;
+          animation: confetti-fall 10s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(105vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 }

@@ -149,6 +149,8 @@ export async function GET(request: NextRequest, { params }: any) {
       const transformedResult = {
         userName: existingResult.userId.name || 'User',
         quizTitle: existingResult.quizTitle,
+        quizId: existingResult.quizId._id.toString(),
+        attemptId: existingResult.attemptId.toString(),
         completedAt: existingResult.completedAt,
         totalScore: existingResult.totalScore,
         totalQuestions: existingResult.totalQuestions,

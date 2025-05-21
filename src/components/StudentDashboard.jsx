@@ -489,10 +489,13 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
             <div className="flex justify-between items-start">
               <div>
                 <div className='flex items-center gap-2'>
-                   <p className={`text-sm ${textColor}`}>{attempt.quizTitle} •</p>
-                  <p className={`text-xs ${textColor}`}>
-                  Score: {attempt.totalScore}/{attempt.totalQuestions} ({attempt.percentage}%)
-                </p>
+                   <p className={`text-sm ${textColor}`}>{attempt.quizTitle}</p>
+                   {attempt.totalScore&&attempt.totalQuestions && (
+                    <p className={`text-xs ${textColor}`}>
+                      • Score: {attempt.totalScore}/{attempt.totalQuestions} ({attempt.percentage}%)
+                    </p>
+                    )}
+                 
                   </div>
                
                 <p className={`text-xs ${secondaryText}`}>
@@ -516,7 +519,7 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
                 </div>
               </div>
               <Link 
-                href={`/mock-tests/${attempt.attemptId}/user-results`}
+                href={`/mock-tests/${attempt.attemptId?attempt.attemptId:attempt._id}/user-results`}
                 className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
               >
                 View

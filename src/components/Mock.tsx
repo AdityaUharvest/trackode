@@ -60,7 +60,6 @@ export default function Dashboard({
   setStats: React.Dispatch<React.SetStateAction<UserStats | null>>;
 }) {
   const { theme } = useTheme();
-  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState('mocks');
   const [isMounted, setIsMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
