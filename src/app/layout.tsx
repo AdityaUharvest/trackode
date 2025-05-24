@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       { url: 'https://trackode.in/favicon.ico' }
     ],
     shortcut: 'https://trackode.in/favicon.ico',
-    apple: '/apple-touch-icon.png',
+    apple: '/trackode.png',
   },
   keywords: ['Trackode', 'Coding', 'Quizzes', 'Mock Tests', 'AI Challenges', 'Programming', 'Contests', 'Knowledge Tracking', 'Skill Improvement', 'Interactive Learning', 'Coding Skills', 'Developer Tools', 'Tech Challenges', 'Online Learning', 'Coding Platform', 'Software Development', 'Programming Contests', 'AI-Generated Challenges'],
   description: 'Trackode helps developers track their knowledge through interactive quizzes, AI-generated challenges. Improve your programming skills effectively.',

@@ -60,36 +60,18 @@ const Navbar: React.FC = () => {
   }, [isNavOpen]);
 
   return (
-    <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
+    <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-950 border-gray-800"} sticky top-0 z-50`}>
       <div className={`${scrolled ? 'shadow-md' : ''}`}>
-        <Link href="/mocks">
-          <div className={`flex py-2 justify-center ${theme === "light" ? "bg-blue-50" : "bg-blue-900 bg-opacity-30"}`}>
-            <div className="flex items-center gap-2">
-              <div className="relative px-4 py-1 rounded-full overflow-hidden bg-gradient-to-r from-blue-600 to-teal-400">
-                <GradientText
-                  colors={["#ffffff", "#ffffff"]}
-                  animationSpeed={50}
-                  showBorder={false}
-                  className="text-sm font-bold relative z-10"
-                >
-                  TCS NQT Mock Test is free 🚀 till 31st August✨
-                </GradientText>
-                <div className="absolute top-0 left-0 right-0 bottom-0 bg-gradient-to-r from-blue-600 to-teal-400 opacity-30 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        </Link>
+        
 
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
-              src="https://i.ibb.co/jvr3wb6b/trackode.png"
-              className="h-8 rounded-lg"
+              src="/logo.png"
+              className="h-16 w-full rounded-lg"
               alt="Trackode Logo"
             />
-            <span className={`self-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600 lg:text-2xl text-xl font-bold whitespace-nowrap`}>
-              Trackode
-            </span>
+            
           </Link>
 
           <div className="flex items-center md:order-2 space-x-4 rtl:space-x-reverse">
@@ -194,7 +176,7 @@ const Navbar: React.FC = () => {
             ref={navRef}
             className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 mobile-menu ${isNavOpen ? "block" : "hidden"}`}
           >
-            <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
+            <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-950 md:bg-gray-950"}`}>
               <NavItem href="/programming-quizzes" theme={theme} icon={<BookOpen size={18} />}>
                 Mock Test
               </NavItem>

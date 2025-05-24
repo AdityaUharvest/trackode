@@ -134,9 +134,9 @@ useEffect(() => {
           >
             <div className="flex mt-12 flex-col items-center justify-start w-full sm:justify-center"> {/* Changed to justify-start on mobile */}
               {/* Hero content */}
-              <div className="text-center max-w-4xl min-w-4xl mb-4 sm:mb-8">
+              <div className="text-center  mb-4 sm:mb-8">
                 <h1
-                  className="text-2xl sm:text-3xl lg:text-5xl font-extrabold tracking-tight" // Reduced font size on mobile
+                  className="text-3xl sm:text-3xl lg:text-5xl font-extrabold " // Reduced font size on mobile
                 >
                   <span
                     className="block mb-1 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" // Reduced margin
@@ -155,7 +155,7 @@ useEffect(() => {
                   </span>
                 </h1>
                 <p
-                  className={`mt-3 sm:mt-6 text-xs sm:text-base max-w-2xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"
+                  className={`mt-3 sm:mt-6 tracking-tight text-xs sm:text-base max-w-2xl ${theme === "dark" ? "text-gray-300" : "text-gray-600"
                     }`} // Reduced margin and font size on mobile
                 >
                   Test, learn, and master programming concepts with AI-powered challenges.
@@ -165,17 +165,17 @@ useEffect(() => {
 
               {/* CTA buttons */}
               <div
-                className="mt-2 flex gap-3 justify-center mb-6 sm:mb-12" // Reduced gaps and margins
+                className="mt-2 flex gap-6 justify-center mb-6 sm:mb-12" // Reduced gaps and margins
               >
                 <Link
                   href="/dashboard"
-                  className="px-6 py-2 sm:py-2 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
+                  className="px-6 py-3 sm:py-3 text-sm sm:text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-blue-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl" // Adjusted padding and font size
                 >
                   Get Started
                 </Link>
                 <Link
                   href="/admin-dashboard"
-                  className={`px-6 py-2 sm:py-2 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${theme === "dark"
+                  className={`px-6 py-3 sm:py-3 text-sm sm:text-lg font-semibold rounded-xl transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg ${theme === "dark"
                     ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-700"
                     : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-200"
                     }`}
@@ -189,7 +189,7 @@ useEffect(() => {
                 <div className="items-center justify-center flex gap-6 sm:gap-24"> {/* Reduced gap */}
                   <div className="flex sm:mb-0">
                     <div className="flex -space-x-2">
-                      {["aditya.png", "rohit.png", "rohitk.png", "kaju.png"].map(
+                      {["aditya.png", "rohit.png", "rohitk.png", "kajal.png"].map(
                         (img, i) => (
                           <div
                             key={i}
@@ -855,7 +855,7 @@ useEffect(() => {
                   role: "Frontend Developer",
                   quote:
                     "I love the detailed analytics dashboard. It helped me identify my weak areas and focus my learning.",
-                  image: "/kaju.png",
+                  image: "/kajal.png",
                 },
               ].map((testimonial, index) => (
                 <div
