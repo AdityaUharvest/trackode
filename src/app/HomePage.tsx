@@ -153,8 +153,7 @@ useEffect(() => {
               <SplitText
                 text=" AI-Powered Quizzes"
                 onLetterAnimationComplete={handleAnimationComplete}
-                className="text-blue-400 font-bold tracking-widest"
-                style={{ fontFamily: "'Orbitron', sans-serif" }}
+                className="text-blue-400 font-bold tracking-widest font-[Orbitron,sans-serif]"
               />
             </span>
           </span>

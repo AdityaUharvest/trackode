@@ -956,7 +956,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     )}`}
                   >
                     <User size={14} className="inline mr-1" />
-                    Contributed By {mock.creator || "Unknown"}
+                     By {mock.creator || "Unknown"}
                   </span>
                   {mock.createdAt && (
                     <span className={getThemeClasses("text-muted") + " text-xs"}>
