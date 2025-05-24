@@ -64,13 +64,30 @@ const Navbar: React.FC = () => {
       <div className={`${scrolled ? 'shadow-md' : ''}`}>
         
 
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4 py-2">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto  px-4 py-2">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
-            <img
-              src="/logo.png"
-              className="h-14 w-full rounded-lg"
-              alt="Trackode Logo"
-            />
+            {theme === "light" ? (
+              <img
+              
+                
+                src="/logo.png"
+                className="h-14 rounded-full"
+              
+                
+                alt="Trackode Logo"
+              />
+            ) : ( 
+              <>
+              <img className="h-14  rounded-full"
+                alt="Trackode Logo Dark" src="/icon-192x192.png">
+              </img>
+              <img
+                src="/brandname.png"
+                className="h-9 mt-2 mr-2 rounded-full"
+                alt="Trackode Logo Dark"
+              />
+              </>
+            )}
             
           </Link>
 
@@ -149,7 +166,7 @@ const Navbar: React.FC = () => {
             ) : (
               <Link
                 href="/signin"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:translate-y-[-2px] ${theme === "light" ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-blue-600 hover:bg-blue-500 text-white"}`}
+                className={`flex items-center lg:px-4 sm:px-2 px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:translate-y-[-2px] ${theme === "light" ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-blue-600 hover:bg-blue-500 text-white"}`}
               >
                 <User size={16} className="mr-1" />
                 Sign in

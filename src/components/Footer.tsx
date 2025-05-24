@@ -19,17 +19,31 @@ export default function Footer() {
           {/* Company Info Column */}
           <div className="flex flex-col">
             <div className=" flex flex-col items-center md:items-start">
-              <div className={` rounded-lg $${
-      theme === "dark" 
-        ? "bg-gradient-to-b from-gray-900 to-black text-gray-200" 
-        : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-700"
-    }`}>
-                <img
-                  className="h-14 mb-4 bg-transparent  w-auto"
-                  src="/logo.png"
-                  alt="Trackode Logo"
-                />
-              </div>
+              <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
+            {theme === "light" ? (
+              <img
+              
+                
+                src="/logo.png"
+                className="h-14 rounded-full"
+              
+                
+                alt="Trackode Logo"
+              />
+            ) : ( 
+              <>
+              <img className="h-14  rounded-full"
+                alt="Trackode Logo Dark" src="/icon-192x192.png">
+              </img>
+              <img
+                src="/brandname.png"
+                className="h-9 mt-2 mr-2 rounded-full"
+                alt="Trackode Logo Dark"
+              />
+              </>
+            )}
+            
+          </Link>
               
              
             </div>
