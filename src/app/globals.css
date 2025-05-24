@@ -190,3 +190,19 @@ body {
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    @keyframes pulseGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+.animate-pulse-gradient {
+  background-size: 200% 200%;
+  animation: pulseGradient 5s ease-in-out infinite;
+}

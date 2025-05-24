@@ -195,7 +195,7 @@ export default function TechStackQuizSystem() {
                         <img
                           src={techImageMap[tech] || "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/codeforces.svg"}
                           alt={`${tech} icon`}
-                          className={`w-10 h-10 ${theme === "dark" ? "invert" : ""}`}
+                          className={`h-8 rounded-full`}
                         />
                       </div>
 
@@ -206,13 +206,13 @@ export default function TechStackQuizSystem() {
 
                       {/* Quiz Count Badge */}
                       <div
-                        className={`absolute top-2 right-2 p-1 rounded-full text-xs ${
+                        className={`absolute top-1 right-2 px-2 rounded-full text-xs ${
                           theme === "dark"
                             ? `bg-${color}-600 text-white`
                             : `bg-${color}-100 text-${color}-800`
                         }`}
                       >
-                        {totalQuizzes} {totalQuizzes === 1 ? "Quiz" : "Quizzes"}
+                        {totalQuizzes} 
                       </div>
 
                       {/* Click Handler */}

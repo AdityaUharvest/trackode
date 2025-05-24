@@ -60,7 +60,7 @@ const Navbar: React.FC = () => {
   }, [isNavOpen]);
 
   return (
-    <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-950 border-gray-800"} sticky top-0 z-50`}>
+    <nav className={`transition-all duration-300 border-b ${theme === "light" ? "bg-white border-gray-100" : "bg-gray-900 border-gray-800"} sticky top-0 z-50`}>
       <div className={`${scrolled ? 'shadow-md' : ''}`}>
         
 
@@ -193,7 +193,7 @@ const Navbar: React.FC = () => {
             ref={navRef}
             className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 mobile-menu ${isNavOpen ? "block" : "hidden"}`}
           >
-            <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-950 md:bg-gray-950"}`}>
+            <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
               <NavItem href="/programming-quizzes" theme={theme} icon={<BookOpen size={18} />}>
                 Mock Test
               </NavItem>
