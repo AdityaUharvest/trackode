@@ -68,7 +68,7 @@ const Navbar: React.FC = () => {
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             <img
               src="/logo.png"
-              className="h-16 w-full rounded-lg"
+              className="h-14 w-full rounded-lg"
               alt="Trackode Logo"
             />
             
