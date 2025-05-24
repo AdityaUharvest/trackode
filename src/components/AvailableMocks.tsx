@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,6 +11,7 @@ import {
   CheckCircle,
   Search,
   Filter,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "./ThemeContext"; // Adjust the import path based on your file structure
@@ -25,6 +27,7 @@ interface MockTest {
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
   tag: string;
+  creator: string; // Added creator to the interface
 }
 
 interface MockTestsListClientProps {
@@ -49,7 +52,9 @@ export default function MockTestsListClient({
         (test) =>
           test.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
           (test.category &&
-            test.category.toLowerCase().includes(searchTerm.toLowerCase()))
+            test.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (test.creator &&
+            test.creator.toLowerCase().includes(searchTerm.toLowerCase())) // Added search by creator
       );
     }
 
@@ -105,6 +110,10 @@ export default function MockTestsListClient({
           : "bg-gray-50 hover:bg-gray-100 text-gray-800 border-gray-200";
       case "text-muted":
         return theme === "dark" ? "text-gray-400" : "text-gray-500";
+      case "creator":
+        return theme === "dark"
+          ? "bg-purple-900 text-purple-300"
+          : "bg-purple-100 text-purple-800";
       default:
         return "";
     }
@@ -135,7 +144,7 @@ export default function MockTestsListClient({
           </div>
           <input
             type="text"
-            placeholder="Search tests..."
+            placeholder="Search tests or creators..."
             className={`pl-10 pr-4 py-2 w-full rounded-lg ${getThemeClasses("input")}`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -197,7 +206,7 @@ export default function MockTestsListClient({
                   </span>
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
                   <span
                     className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
                       theme === "dark"
@@ -207,9 +216,17 @@ export default function MockTestsListClient({
                   >
                     {mock.tag || "TCS"}
                   </span>
+                  <span
+                    className={`inline-block text-xs px-2 py-1 rounded ${getThemeClasses(
+                      "creator"
+                    )}`}
+                  >
+                    <User size={14} className="inline mr-1" />
+                    Contributed By {mock.creator || "Unknown"}
+                  </span>
                   {mock.createdAt && (
-                    <span className={getThemeClasses("text-muted") + " text-sm"}>
-                      {new Date(mock.createdAt).toLocaleDateString()}
+                    <span className={getThemeClasses("text-muted") + " text-xs"}>
+                      Conducted On : {new Date(mock.createdAt).toLocaleDateString()}
                     </span>
                   )}
                 </div>

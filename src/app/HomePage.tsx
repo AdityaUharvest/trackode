@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import "@/app/globals.css";
 import Faq from "../components/Faq";
@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { useTheme } from "../components/ThemeContext";
 import SplitText from "../components/SplitText";
 
-import { useRouter } from "next/navigation";
 import QuizJoinComponent from '@/components/JoinQuiz';
 import TechStackQuizSystem from '@/components/TechnologySection';
 import InteractiveQuiz from '@/components/DemoQuizzes';
@@ -49,8 +48,7 @@ useEffect(() => {
       setIsFirstVisit(false);
     }
   }, [status]);
-  const router = useRouter();
-  const [quizCode, setQuizCode] = useState("");
+  
   return (
     <>
 

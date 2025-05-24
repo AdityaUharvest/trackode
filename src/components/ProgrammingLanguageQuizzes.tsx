@@ -29,6 +29,8 @@ interface MockTest {
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
+  tag: string;
+  creator: string;
 }
 
 interface QuizResult {

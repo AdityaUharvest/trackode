@@ -10,6 +10,9 @@ interface IMockTest extends Document {
   isPublished: boolean;
   shareCode: string;
   createdAt: Date;
+  userPlayed: number;
+  creator: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
 }
 
 const MockTestSchema: Schema = new Schema({
@@ -24,7 +27,9 @@ const MockTestSchema: Schema = new Schema({
   createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
   public: { type: Boolean, default: false },
   tag: { type: String, default: 'TCS' },
-
+  userPlayed: { type: Number, default: 0 },
+  difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' },
+  creator: { type: String, default: 'Anonymous' },
 });
 
 const MockTest= mongoose.models.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);

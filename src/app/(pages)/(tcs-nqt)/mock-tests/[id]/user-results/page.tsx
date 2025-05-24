@@ -176,7 +176,11 @@ export default function UserQuizResult() {
       } catch (err) {
         // auto refresh the page if error occurs
         if (err instanceof Error && err.message === 'Failed to fetch user results') {
-          window.location.reload();
+          setTimeout(() => {
+            window.location.reload();
+          }
+          , 10000);
+          
         }
         
 
@@ -554,7 +558,7 @@ console.log('Result:', result);
             <h2 className={`text-sm font-semibold ${textColor}`}>No Results Found</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>You haven't attempted this quiz yet.</p>
             <Button asChild className="mt-4">
-              <a href={`/mock-tests/${quizId}`}>Take the Quiz</a>
+              <a href={`/playy/${quizId}`}>Take the Quiz</a>
             </Button>
           </div>
         </div>

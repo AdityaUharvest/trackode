@@ -15,6 +15,7 @@ interface MockTestType {
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
   tag:string
+  creator:string
 }
 
 // Metadata for SEO
@@ -43,12 +44,28 @@ export const metadata: Metadata = {
     images: ["https://trackode.in/og-image.jpg"],
   },
 };
+// ...existing code...
+
+function serializeId(id: any) {
+  return id?.toString ? id.toString() : id;
+}
+
+function serializeAttempt(attempt: any) {
+  return {
+    ...attempt.toObject(),
+    _id: serializeId(attempt._id),
+    quizId: serializeId(attempt.quizId),
+    userId: serializeId(attempt.userId),
+    // Add more fields if needed
+  };
+}
 
 async function fetchMockTests(): Promise<MockTestType[]> {
   await connectDB();
-
   const mocks = await MockTest.find({ public: true, isPublished: true }).sort({ createdAt: -1 });
 
+  // Update userPlayed in the database for each mock
+  
   const mockIds = mocks.map((mock) => mock._id);
 
   const quizAttempts = await QuizAttempt.find({ quizId: { $in: mockIds } });
@@ -58,17 +75,21 @@ async function fetchMockTests(): Promise<MockTestType[]> {
     if (!acc[key]) {
       acc[key] = [];
     }
-    acc[key].push(attempt);
+    acc[key].push(serializeAttempt(attempt));
     return acc;
   }, {} as Record<string, any[]>);
 
-  return mocks.map((mock) => ({
-    ...mock.toObject(),
-    quizAttempts: quizAttemptMap[mock._id.toString()] || [],
-    userPlayed: mock.userPlayed || Math.floor(Math.random() * 500) + 50,
-    category: mock.category || "TCS",
-    difficulty: mock.difficulty || (["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)] as "Easy" | "Medium" | "Hard"),
-  }));
+  return mocks.map((mock) => {
+    const obj = mock.toObject();
+    return {
+      ...obj,
+      _id: serializeId(obj._id),
+      quizAttempts: quizAttemptMap[obj._id.toString()] || [],
+      userPlayed: obj.userPlayed || Math.floor(Math.random() * 500) + 50,
+      category: obj.category || "TCS",
+      difficulty: obj.difficulty || (["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)] as "Easy" | "Medium" | "Hard"),
+    };
+  });
 }
 
 export default async function MockTestsPage() {
@@ -78,7 +99,7 @@ export default async function MockTestsPage() {
     <div className="container  dark:bg-gray-900 mx-auto p-4 max-w-7xl">
       <div className="mb-8 text-center">
         <h1 className="text-xl md:text-2xl font-bold mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          TCS Mock Tests
+          Free Mock Tests
         </h1>
         <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Practice with our collection of mock tests and improve your skills

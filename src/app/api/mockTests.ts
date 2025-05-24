@@ -11,19 +11,24 @@ export async function createMockTest(data: {
   public: boolean;
   userPlayed?: number;
   tag: string;
+  creator: string;
 
 }) {
   await connectDB();
   const session = await auth();
   const shareCode = generateShareCode();
-  
+  const userPlayed = Math.floor(Math.random() * 1001) + 500; 
+  const difficulty = Math.random() < 0.33 ? 'Easy' : Math.random() < 0.66 ? 'Medium' : 'Hard';
+  const user = session?.user?.name // Fallback if session is not available
   const mockTest =  MockTest.create({
     ...data,
     isPublished: false,
     shareCode,
     createdAt: new Date(),
     createdBy: session?.user?.id,
-    userPlayed:Math.floor(Math.random() * 500) + 203,
+    userPlayed: userPlayed,
+    difficulty: difficulty,
+    creator: user || 'Anonymous',
     
   });
   

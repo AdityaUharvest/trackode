@@ -1,11 +1,22 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import PerformanceChart from "./PerformanceChart";
-import { Search, Filter } from "lucide-react";
 
+import Link from "next/link";
+
+
+
+import {
+  Clock,
+  Play,
+  Award,
+  BarChart,
+  Users,
+  CheckCircle,
+  Search,
+  Filter,
+  User,
+} from "lucide-react";
 interface Quiz {
   _id: string;
   name: string;
@@ -31,7 +42,9 @@ interface MockTest {
   userPlayed?: number;
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
-  createdAt?: string;
+  createdAt?: string
+  tag: string;
+  creator: string;
 }
 
 interface QuizResult {
@@ -115,6 +128,36 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
       secondary: "text-gray-300",
       muted: "text-gray-500",
     },
+  };
+    const getThemeClasses = (type: string) => {
+    switch (type) {
+      case "card":
+        return theme === "dark"
+          ? "bg-gray-800 border-gray-700 text-gray-200"
+          : "bg-white border-gray-200 text-gray-800";
+      case "card-hover":
+        return theme === "dark" ? "hover:shadow-gray-900" : "hover:shadow-gray-300";
+      case "input":
+        return theme === "dark"
+          ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-400 focus:border-blue-400"
+          : "bg-white border-gray-300 text-gray-800 focus:ring-blue-500 focus:border-blue-500";
+      case "button-primary":
+        return theme === "dark"
+          ? "bg-blue-600 hover:bg-blue-700 text-white"
+          : "bg-blue-500 hover:bg-blue-600 text-white";
+      case "button-secondary":
+        return theme === "dark"
+          ? "bg-gray-700 hover:bg-gray-600 text-gray-200 border-gray-600"
+          : "bg-gray-50 hover:bg-gray-100 text-gray-800 border-gray-200";
+      case "text-muted":
+        return theme === "dark" ? "text-gray-400" : "text-gray-500";
+      case "creator":
+        return theme === "dark"
+          ? "bg-purple-900 text-purple-300"
+          : "bg-purple-100 text-purple-800";
+      default:
+        return "";
+    }
   };
 
   // Organize quizzes by section and level
@@ -875,178 +918,105 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                  {filteredMockTests.map((mock) => (
-                    <div
-                      key={mock._id}
-                      className={`rounded-xl shadow-lg overflow-hidden border transition-all duration-200 hover:shadow-xl ${
-                        theme === "dark" ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"
-                      }`}
-                    >
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <h2 className={`text-sm font-semibold ${textStyles[theme].primary}`}>
-                            {mock.title}
-                          </h2>
-                          <span
-                            className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(
-                              mock.difficulty || ""
-                            )}`}
-                          >
-                            {mock.difficulty}
-                          </span>
-                        </div>
-
-                        <div className="mb-4">
-                          <span
-                            className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
-                              theme === "dark" ? "bg-blue-700 text-blue-200" : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {mock.category || "TCS"}
-                          </span>
-                          {mock.createdAt && (
-                            <span className={`text-sm ${textStyles[theme].muted}`}>
-                              {new Date(mock.createdAt).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-4 mb-6">
-                          <div className={`flex items-center text-sm ${textStyles[theme].secondary}`}>
-                            <svg
-                              className="w-4 h-4 mr-2 text-blue-500"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            {mock.durationMinutes || 60} mins
-                          </div>
-                          <div className={`flex items-center text-sm ${textStyles[theme].secondary}`}>
-                            <svg
-                              className="w-4 h-4 mr-2 text-green-500"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            75 questions
-                          </div>
-                          <div className={`flex items-center text-sm ${textStyles[theme].secondary}`}>
-                            <svg
-                              className="w-4 h-4 mr-2 text-purple-500"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                              />
-                            </svg>
-                            {(mock.quizAttempts?.length || 0) + (mock.userPlayed?mock.userPlayed:0)} students
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                          <Link
-                            href={`/playy/${mock.shareCode}`}
-                            className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg ${
-                              theme === "dark"
-                                ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
-                                : "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white"
-                            }`}
-                          >
-                            <svg
-                              className="w-4 h-4 mr-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                              />
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            Play Now
-                          </Link>
-
-                          <div className="flex gap-3">
-                            <Link
-                              href={`/mock-tests/${mock._id}/user-results`}
-                              className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${
-                                theme === "dark"
-                                  ? "bg-gray-700 hover:bg-gray-600 text-gray-300 border-gray-600"
-                                  : "bg-gray-50 hover:bg-gray-100 text-gray-800 border-gray-200"
-                              }`}
-                            >
-                              <svg
-                                className="w-4 h-4 mr-2 text-blue-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                                />
-                              </svg>
-                              Results
-                            </Link>
-                            <Link
-                              href={`/mock-tests/${mock._id}/results`}
-                              className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${
-                                theme === "dark"
-                                  ? "bg-gray-700 hover:bg-gray-600 text-gray-300 border-gray-600"
-                                  : "bg-gray-50 hover:bg-gray-100 text-gray-800 border-gray-200"
-                              }`}
-                            >
-                              <svg
-                                className="w-4 h-4 mr-2 text-yellow-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 9.143m-3.143 7.714L20 21m-2-2h-4m-5 0H5m4-6l-2.286-6.857L3 9.143"
-                                />
-                              </svg>
-                              Leaderboard
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredMockTests.map((mock) => (
+            <div
+              key={mock._id}
+              className={`rounded-xl shadow-lg overflow-hidden border ${getThemeClasses(
+                "card"
+              )} ${getThemeClasses("card-hover")} transition-shadow duration-300`}
+            >
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <h2 className="text-sm font-semibold">
+                    {mock.title}
+                  </h2>
+                  <span
+                    className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(
+                      mock.difficulty || ""
+                    )}`}
+                  >
+                    {mock.difficulty}
+                  </span>
                 </div>
+
+                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                  <span
+                    className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
+                      theme === "dark"
+                        ? "bg-blue-900 text-blue-300"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {mock.tag || "TCS"}
+                  </span>
+                  <span
+                    className={`inline-block text-xs px-2 py-1 rounded ${getThemeClasses(
+                      "creator"
+                    )}`}
+                  >
+                    <User size={14} className="inline mr-1" />
+                    Contributed By {mock.creator || "Unknown"}
+                  </span>
+                  {mock.createdAt && (
+                    <span className={getThemeClasses("text-muted") + " text-xs"}>
+                      Conducted On : {new Date(mock.createdAt).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-4 mb-6">
+                  <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
+                    <Clock size={16} className="mr-2 text-blue-500" />
+                    {mock.durationMinutes || 60} mins
+                  </div>
+                  <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
+                    <CheckCircle size={16} className="mr-2 text-green-500" />
+                    75 questions
+                  </div>
+                  <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
+                    <Users size={16} className="mr-2 text-purple-500" />
+                    {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)}{" "}
+                    students
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href={`/playy/${mock.shareCode}`}
+                    className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg ${getThemeClasses(
+                      "button-primary"
+                    )}`}
+                  >
+                    <Play size={18} className="mr-2" />
+                    Play Now
+                  </Link>
+
+                  <div className="flex gap-3">
+                    <Link
+                      href={`/mock-tests/${mock._id}/user-results`}
+                      className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${getThemeClasses(
+                        "button-secondary"
+                      )}`}
+                    >
+                      <BarChart size={16} className="mr-2 text-blue-500" />
+                      Results
+                    </Link>
+                    <Link
+                      href={`/mock-tests/${mock._id}/results`}
+                      className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${getThemeClasses(
+                        "button-secondary"
+                      )}`}
+                    >
+                      <Award size={16} className="mr-2 text-yellow-500" />
+                      Leaderboard
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
               )}
               <div className="mt-8 text-center text-gray-500">
                 Showing {filteredMockTests.length} of {mockTests.length} mock tests
