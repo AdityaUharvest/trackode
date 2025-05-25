@@ -64,21 +64,21 @@ const Navbar: React.FC = () => {
       <div className={`${scrolled ? 'shadow-md' : ''}`}>
         
 
-        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto  px-4 py-2">
+        <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto  px-4 py-4">
           <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
             {theme === "light" ? (
               <img
               
                 
                 src="/logo.png"
-                className="h-14 rounded-full"
+                className="h-12 rounded-full"
               
                 
                 alt="Trackode Logo"
               />
             ) : ( 
               <>
-              <img className="h-14  rounded-full"
+              <img className="h-12  rounded-full"
                 alt="Trackode Logo Dark" src="/icon-192x192.png">
               </img>
               <img
@@ -193,7 +193,7 @@ const Navbar: React.FC = () => {
             ref={navRef}
             className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 mobile-menu ${isNavOpen ? "block" : "hidden"}`}
           >
-            <ul className={`flex flex-col font-medium p-6 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
+            <ul className={`flex flex-col font-medium p-2 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
               <NavItem href="/programming-quizzes" theme={theme} icon={<BookOpen size={18} />}>
                 Mock Test
               </NavItem>
@@ -201,14 +201,14 @@ const Navbar: React.FC = () => {
                 Student Section
               </NavItem>
               <NavItem href="/admin-dashboard" theme={theme} icon={<BarChart size={18} />}>
-                Dashboard
+                Creator Dashboard
               </NavItem>
               <NavItem
                 href={status === "authenticated" ? "/programming-quizzes" : "/signin"}
                 theme={theme}
                 icon={<Home size={18} />}
               >
-                Quiz Tracker
+                Quiz
               </NavItem>
               <li className="w-full md:w-auto">
                 <button

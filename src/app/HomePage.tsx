@@ -109,7 +109,7 @@ useEffect(() => {
     className="absolute hidden lg:block left-6 lg:left-12 top-24 lg:top-48 opacity-25 dark:opacity-15 animate-float-slow hover:animate-pulse"
   >
     <div className="text-cyan-400 dark:text-cyan-300 font-mono text-sm lg:text-base transition-all duration-300">
-      {"async function code() {"}<br />
+      {"async trackode code() {"}<br />
       {"  await masterSkills();"}<br />
       {"}"}
     </div>
@@ -119,8 +119,11 @@ useEffect(() => {
   >
     <div className="text-cyan-400 dark:text-cyan-300 font-mono text-sm lg:text-base transition-all duration-300">
       {"const dev = {"}<br />
+      {"  name: 'Trackode',"}<br />
+      {"  expertise: 'AI Quizzes',"}<br />
       {"  skills: 'elite',"}<br />
       {"  passion: true"}<br />
+
       {"}"}
     </div>
   </div>
@@ -169,7 +172,7 @@ useEffect(() => {
 
       {/* CTA buttons */}
       <div
-        className="mt-12 lg:mt-0 flex gap-6 justify-center mb-10"
+        className="mt-12 lg:mt-0 flex gap-2 justify-center mb-10"
       >
         <Link
           href="/programming-quizzes"
@@ -179,7 +182,7 @@ useEffect(() => {
           Start Learning Now
         </Link>
         <Link
-          href="/admin-dashboard"
+          href="/dashboard"
           className={`px-7 py-3 sm:py-4 text-base sm:text-base font-semibold rounded-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-lg hover:shadow-xl relative overflow-hidden group ${theme === "dark" ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-600" : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-300"}`}
         >
           <span className="absolute inset-0 bg-gradient-to-r from-transparent to-white opacity-0 group-hover:opacity-20 transition-opacity duration-500"></span>
