@@ -2,13 +2,15 @@
 import { ReactNode, useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { usePWAInstall } from "@/hooks/usePWAInstall"
+
 // import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@/components/ThemeContext"; // Import ThemeProvider
 import toast, { Toaster } from 'react-hot-toast';
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
-  
+  const { isInstallable } = usePWAInstall();
   useEffect(() => {
     const hasVisited = localStorage.getItem("hasVisited");
     

@@ -4,6 +4,12 @@
   ],
   "hints": {
     "axe/aria": "off",
-    "apple-touch-icons": "off"
+    "apple-touch-icons": "off",
+    "axe/name-role-value": [
+      "default",
+      {
+        "button-name": "off"
+      }
+    ]
   }
 }
