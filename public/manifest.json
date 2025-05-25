@@ -15,10 +15,8 @@
       "type": "image/png"
     }
   ],
-  "orientation": "natural",
+"start_url": "/",
   "display": "standalone",
-  "dir": "auto",
-  "lang": "en-IN",
   "name": "Trackode - Quizzes and Mocks",
   "short_name": "Trackode"
 }
