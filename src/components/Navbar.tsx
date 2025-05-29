@@ -166,10 +166,17 @@ const Navbar: React.FC = () => {
             ) : (
               <Link
                 href="/signin"
-                className={`flex items-center lg:px-4 sm:px-2 px-2 py-2 text-sm font-medium rounded-lg transition-all duration-300 hover:translate-y-[-2px] ${theme === "light" ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-blue-600 hover:bg-blue-500 text-white"}`}
+                className={`flex items-center lg:px-4 sm:px-2 px-2 py-2 text-base font-medium rounded-lg transition-all duration-300 relative overflow-hidden group ${theme === "light" ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-blue-600 hover:bg-blue-700 text-white"}`}
               >
                 <User size={16} className="mr-1" />
-                Sign in
+                <span className="block relative">
+                  <span className="block transition-transform duration-300 group-hover:-translate-y-8">{/* current text slides up */}
+                    Sign in
+                  </span>
+                  <span className="block absolute left-0 top-8 w-full transition-transform duration-300 group-hover:-translate-y-8">
+                    Sign in
+                  </span>
+                </span>
               </Link>
             )}
 
@@ -194,8 +201,15 @@ const Navbar: React.FC = () => {
             className={`items-center justify-between w-full md:flex md:w-auto md:order-1 transition-all duration-300 mobile-menu ${isNavOpen ? "block" : "hidden"}`}
           >
             <ul className={`flex flex-col font-medium p-2 md:p-0 mt-4 rounded-lg md:flex-row md:space-x-1 md:mt-0 md:border-0 ${theme === "light" ? "bg-white md:bg-white" : "bg-gray-900 md:bg-gray-900"}`}>
-              <NavItem href="/programming-quizzes" theme={theme} icon={<BookOpen size={18} />}>
-                Mock Test
+              <NavItem
+                href={status === "authenticated" ? "/programming-quizzes" : "/signin"}
+                theme={theme}
+                icon={<Home size={18} />}
+              >
+               Explore Quizzes
+              </NavItem>
+              <NavItem href="/mocks" theme={theme} icon={<BookOpen size={18} />}>
+                Mock Tests
               </NavItem>
               <NavItem href="/dashboard" theme={theme} icon={<Users size={18} />}>
                 Student Section
@@ -203,13 +217,7 @@ const Navbar: React.FC = () => {
               <NavItem href="/admin-dashboard" theme={theme} icon={<BarChart size={18} />}>
                 Creator Dashboard
               </NavItem>
-              <NavItem
-                href={status === "authenticated" ? "/programming-quizzes" : "/signin"}
-                theme={theme}
-                icon={<Home size={18} />}
-              >
-                Quiz
-              </NavItem>
+              
               <li className="w-full md:w-auto">
                 <button
                   onClick={toggleTheme}
