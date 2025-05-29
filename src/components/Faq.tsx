@@ -9,78 +9,78 @@ export default function Faq() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [filteredItems, setFilteredItems] = useState<any[]>([]);
   const { theme } = useTheme();
-  
+
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
   const faqItems = [
     {
-      question: "What is Trackode?",
+      question: "How does Trackode generate personalized quizzes?",
       answer:
-        "Trackode is a comprehensive platform designed for developers to enhance their coding skills through interactive challenges, quizzes, and contests. Our mission is to provide a supportive environment where programmers of all levels can track their progress, identify areas for improvement, and grow their technical abilities in a structured way.",
-      category: "general"
+        "Trackode uses AI to analyze your skill level, past performance, and learning goals to create tailored quizzes. After completing an initial assessment, our system curates questions that match your current abilities and areas for improvement, ensuring a focused learning experience.",
+      category: "features",
     },
     {
-      question: "How can I get started with Trackode?",
+      question: "Can I create and share my own quizzes?",
       answer:
-        "Getting started is easy! Simply create an account using your email or social login, complete your developer profile, and you'll be guided through an onboarding process to assess your current skill level. Based on this assessment, we'll recommend a personalized learning path with appropriate challenges and resources tailored to your needs.",
-      category: "account"
+        "Yes! Trackode allows you to design custom quizzes with your own questions or use our AI to generate them. You can share quizzes with others via a unique link or QR code, perfect for educators, team leads, or study groups.",
+      category: "features",
     },
     {
-      question: "What features does Trackode offer?",
+      question: "What kind of progress tracking does Trackode offer?",
       answer:
-        "Trackode offers a wide range of features including: interactive coding challenges across multiple languages and difficulty levels, timed coding competitions, specialized quizzes to test theoretical knowledge, personalized progress tracking and analytics, skill badges and certifications, community forums and discussion boards, comprehensive learning resources and tutorials, integration with GitHub to showcase your progress, and mock technical interviews for job preparation.",
-      category: "features"
+        "Trackode provides detailed analytics, including performance trends, topic-specific strengths and weaknesses, and completion rates. You can view your progress on a personalized dashboard and earn badges for milestones, helping you stay motivated.",
+      category: "features",
     },
     {
-      question: "Is Trackode suitable for beginners?",
+      question: "How do I join or create a coding community on Trackode?",
       answer:
-        "Absolutely! Trackode caters to developers at all skill levels. For beginners, we offer foundational challenges and guided learning paths that introduce programming concepts step by step. Our beginner-friendly interface and comprehensive resources make it easy to start your coding journey with confidence, even if you're just writing your first lines of code.",
-      category: "general"
+        "You can join existing communities or create your own in the 'Community' section. Communities allow you to collaborate on challenges, share resources, and compete in group contests. Invite friends or colleagues to join your group for collaborative learning.",
+      category: "community",
     },
     {
-      question: "What programming languages are supported?",
+      question: "Are Trackode quizzes suitable for job interview prep?",
       answer:
-        "Trackode currently supports challenges and quizzes in JavaScript, Python, Java, C++, TypeScript, Rust, Go, Ruby, PHP, C#, and Swift. We're constantly expanding our language support based on community demand. Each language includes beginner to advanced level challenges, with specialized tracks for web development, data structures, algorithms, and more.",
-      category: "technical"
+        "Absolutely! Trackode offers mock interview challenges based on real questions from top tech companies. Our premium plan includes company-specific tracks and detailed feedback on your solutions to help you ace technical interviews.",
+      category: "career",
     },
     {
-      question: "How does the ranking system work?",
+      question: "Which programming languages can I practice on Trackode?",
       answer:
-        "Our ranking system is based on a combination of factors including challenge completion, accuracy, efficiency of solutions, participation in contests, consistency, and helping other community members. As you accumulate points, you'll progress through different tiers from Bronze to Diamond, with special recognition for top performers. Your ranking is visible on your public profile and can be shared with potential employers.",
-      category: "features"
+        "Trackode supports a wide range of languages, including Python, JavaScript, Java, C++, TypeScript, Go, and more. Each language offers challenges across beginner, intermediate, and advanced levels, covering algorithms, data structures, and real-world scenarios.",
+      category: "technical",
     },
     {
-      question: "Are there any team features for collaborative learning?",
+      question: "How does Trackode ensure quiz quality and accuracy?",
       answer:
-        "Yes! Trackode offers team capabilities where you can create or join coding groups for collaborative learning. Teams can participate in special team challenges, track collective progress, create private contests, and engage in friendly competition with other teams. This feature is particularly popular for study groups, bootcamp cohorts, and corporate training programs.",
-      category: "features"
+        "Our quizzes are created and reviewed by experienced developers and AI algorithms to ensure accuracy and relevance. Questions are regularly updated based on user feedback and industry trends to maintain high quality.",
+      category: "technical",
     },
     {
-      question: "Is there a mobile app available?",
+      question: "Can I access Trackode on mobile devices?",
       answer:
-        "Currently, Trackode is optimized as a responsive web application that works well on mobile browsers. Our dedicated mobile apps for iOS and Android are in development and scheduled for release next quarter. The mobile apps will include offline challenge modes and push notifications for contests and learning reminders.",
-      category: "technical"
+        "Yes, Trackode is fully responsive and works seamlessly on mobile browsers. Dedicated iOS and Android apps are in development, with features like offline mode and push notifications, expected to launch soon.",
+      category: "technical",
     },
     {
-      question: "How can Trackode help with job preparation?",
+      question: "What are the benefits of a premium subscription?",
       answer:
-        "Trackode prepares you for technical interviews through industry-relevant challenges, algorithm practice, and mock interview simulations. Our challenges are designed based on real interview questions from top tech companies. Premium members get access to company-specific interview preparation tracks and personalized feedback on their solutions from experienced developers.",
-      category: "career"
+        "The premium subscription unlocks advanced challenges, in-depth analytics, exclusive interview prep tracks, and priority support. It also includes access to premium community features like private contests and custom leaderboards.",
+      category: "pricing",
     },
     {
-      question: "What are the subscription options?",
+      question: "How can I get help if I encounter issues?",
       answer:
-        "Trackode offers a free tier with access to basic challenges and community features. Our Premium subscription unlocks advanced challenges, detailed analytics, interview preparation resources, and priority support. For organizations, we offer Team and Enterprise plans with custom challenge creation, private leaderboards, and detailed team performance analytics. Educational institutions receive special discounted rates.",
-      category: "pricing"
-    }
+        "Our support team is available 24/7 via the 'Contact Support' page. You can also browse our help center for guides or ask questions in our community forums for quick peer support.",
+      category: "support",
+    },
   ];
 
   // Filter FAQ items based on search term
   useEffect(() => {
     const filtered = faqItems.filter(
-      item =>
+      (item) =>
         item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.answer.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -92,135 +92,117 @@ export default function Faq() {
     setFilteredItems(faqItems);
   }, []);
 
-  // Group FAQ items by category
-  const categories = Array.from(new Set(faqItems.map(item => item.category)));
-
   return (
     <div className="py-5">
- 
-    
-              
       <div
-        className={`rounded-lg px-5 py-8 max-w-6xl mx-auto shadow-xl ${
-          theme === "dark" 
-            ? "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700" 
+        className={`rounded-xl px-5 py-8 max-w-6xl mx-auto shadow-xl ${
+          theme === "dark"
+            ? "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700"
             : "bg-gradient-to-br from-white to-gray-50 border border-gray-100"
         }`}
       >
-         <div className="text-center">
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <h2 className="inline-flex items-center font-semibold lg:text-lg px-6 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md">
-        Trackode Support Center 
-        <span className=" px-2 py-1.5 ml-2 text-sm rounded-md bg-white text-purple-600 font-bold">
-         FAQs 
-        </span>
-      </h2>
-    </motion.div>
-          
-        </div>
-        {/* Header Section */}
-        
-
-        <div className="max-w-4xl mt-2 mx-auto">
-        
-            <ul className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredItems.map((item, index) => (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className={`${
-                    theme === "dark" ? "hover:bg-gray-800/50" : "hover:bg-gray-50/80"
-                  } rounded-lg transition-colors`}
+        <div className="max-w-7xl mt-2 mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredItems.map((item, index) => (
+              <motion.li
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.05 }}
+                className={`${
+                  theme === "dark" ? "hover:bg-gray-800/50" : "hover:bg-gray-50/80"
+                } rounded-lg transition-colors list-none`}
+              >
+                <button
+                  className={`relative flex items-center w-full p-3 text-left ${
+                    theme === "dark" ? "text-white" : "text-black"
+                  }`}
+                  aria-expanded={openIndex === index ? "true" : "false"}
+                  onClick={() => toggleFAQ(index)}
                 >
-                  <button
-                    className={`relative flex items-center w-full p-3 text-left ${
-                      theme === "dark" ? "text-white" : "text-black"
-                    }`}
-                    aria-expanded={openIndex === index ? "true" : "false"}
-                    onClick={() => toggleFAQ(index)}
-                  >
-                    <span className={`flex-1 font-medium lg:text-base text-sm ${
-                      openIndex === index 
-                        ? theme === "dark" ? "text-blue-400" : "text-blue-600" 
+                  <span
+                    className={`flex-1 font-medium lg:text-base text-sm ${
+                      openIndex === index
+                        ? theme === "dark"
+                          ? "text-blue-400"
+                          : "text-blue-600"
                         : ""
-                    }`}>
-                      {item.question}
-                    </span>
-                    <span
-                      className={`ml-4 flex-shrink-0 p-2 rounded-full transition-colors ${
-                        openIndex === index
-                          ? theme === "dark"
-                            ? "bg-blue-900/50 text-blue-400"
-                            : "bg-blue-100 text-blue-600"
-                          : theme === "dark"
-                          ? "bg-gray-800 text-gray-400"
-                          : "bg-gray-100 text-gray-500"
+                    }`}
+                  >
+                    {item.question}
+                  </span>
+                  <span
+                    className={`ml-4 flex-shrink-0 p-2 rounded-full transition-colors ${
+                      openIndex === index
+                        ? theme === "dark"
+                          ? "bg-blue-900/50 text-blue-400"
+                          : "bg-blue-100 text-blue-600"
+                        : theme === "dark"
+                        ? "bg-gray-800 text-gray-400"
+                        : "bg-gray-100 text-gray-500"
+                    }`}
+                  >
+                    <svg
+                      className={`w-5 h-5 transform transition-transform duration-200 ${
+                        openIndex === index ? "rotate-180" : ""
                       }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      <svg
-                        className={`w-5 h-5 transform transition-transform duration-200 ${
-                          openIndex === index ? "rotate-180" : ""
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      ></path>
+                    </svg>
+                  </span>
+                </button>
+                <AnimatePresence>
+                  {openIndex === index && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div
+                        className={`p-3 leading-relaxed ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
                         }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        ></path>
-                      </svg>
-                    </span>
-                  </button>
-                  <AnimatePresence>
-                    {openIndex === index && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="overflow-hidden"
-                      >
-                        <div
-                          className={`p-3 leading-relaxed ${
-                            theme === "dark" ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          <div className="space-y-4 text-sm">
-                            <p>{item.answer}</p>
-                            <div className={`text-sm inline-block px-3 py-1 rounded-full capitalize ${
-                              theme === "dark" ? "bg-gray-800 text-gray-400" : "bg-gray-100 text-gray-600"
-                            }`}>
-                              {item.category}
-                            </div>
+                        <div className="space-y-4 text-sm">
+                          <p>{item.answer}</p>
+                          <div
+                            className={`text-sm inline-block px-3 py-1 rounded-full capitalize ${
+                              theme === "dark"
+                                ? "bg-gray-800 text-gray-400"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {item.category}
                           </div>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.li>
-              ))}
-            </ul>
-        
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.li>
+            ))}
+          </div>
         </div>
 
         {/* Contact Section */}
-        <div className="mt-4  text-center">
+        <div className="mt-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.6 }}
             className={`max-w-2xl mx-auto p-5 rounded-xl ${
-              theme === "dark" 
-                ? "bg-gray-800/50 border border-gray-700" 
+              theme === "dark"
+                ? "bg-gray-800/50 border border-gray-700"
                 : "bg-blue-50 border border-blue-100"
             }`}
           >
@@ -232,7 +214,7 @@ export default function Faq() {
               Still have questions?
             </h3>
             <p
-              className={`mb-4 text-sm  ${
+              className={`mb-4 text-sm ${
                 theme === "dark" ? "text-gray-300" : "text-gray-600"
               }`}
             >
