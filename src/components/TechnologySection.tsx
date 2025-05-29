@@ -128,12 +128,12 @@ export default function TechStackQuizSystem() {
   };
 
   return (
-    <div className={`px-6 py-8 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-900" : "bg-gray-100"}`}>
+    <div className={` p-5 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-900" : "bg-gray-100"}`}>
       <div className="">
 
         {!selectedTech ? (
           <>
-            <div className="grid grid-cols-2 gap-6 sm:gap-8 mt-12 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-6 sm:gap-8  sm:grid-cols-3 lg:grid-cols-5">
               {Object.keys(organizedQuizzes)
                 .filter((section) => section !== "Uncategorized")
                 .map((tech, index) => {

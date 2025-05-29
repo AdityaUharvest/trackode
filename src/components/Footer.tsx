@@ -8,7 +8,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className={`pt-5 ${
+    <footer className={`pt-10 ${
       theme === "dark" 
         ? "bg-gradient-to-b from-gray-900 to-black text-gray-200" 
         : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-700"

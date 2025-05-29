@@ -381,13 +381,13 @@ export default function HomePage() {
 
         {/* Level Up Coding and Stats */}
         <section
-          className={`py-16 ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-b from-white to-blue-50"} rounded-2xl`}
+          className={`pb-16 pt-2 ${theme === "dark" ? "bg-gray-800" : "bg-gradient-to-b from-white to-blue-50"} `}
           aria-labelledby="cta-heading"
           data-aos="fade-up"
         >
           <div className="px-2 mx-auto">
             <div
-              className="relative overflow-hidden rounded-lg"
+              className="relative py-5 overflow-hidden rounded-lg"
               style={{
                 background: `linear-gradient(135deg, ${theme === "dark" ? "#60a5fa, #a5b4fc" : "#60a5fa, #a5b4fc"})`,
                 boxShadow: theme === "dark" ? "0 10px 25px -5px rgba(0, 0, 35, 0.4)" : "0 10px 25px -5px rgba(37, 99, 235, 0.2)"
@@ -402,16 +402,24 @@ export default function HomePage() {
 
               <div className="relative px-4 py-6 sm:py-12 sm:px-8 z-10">
                 <div className="max-w-2xl mx-auto text-center">
-                  <div className="inline-flex items-center justify-center px-3 py-2 mb-4 rounded-full bg-white bg-opacity-20 backdrop-blur-sm">
-                    <span className="flex items-center">
-                      <span className="w-1.5 h-1.5 mr-2 rounded-full bg-green-400 animate-pulse"></span>
-                      <span className="text-white text-xs sm:text-sm font-medium tracking-wide">JOIN 1000+ DEVELOPERS</span>
-                    </span>
-                  </div>
+                  
 
-                  <h2 id="cta-heading" className="text-xl sm:text-lg font-bold text-white leading-tight">
-                    Level Up Your Coding Skills <span className="text-blue-200">Today</span>
-                  </h2>
+                  <div className="text-center ">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="relative inline-block"
+            >
+              <h2
+                className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-white"}`}
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Level Up Your Coding Skills
+              </h2>
+              <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            </motion.div>
+          </div>
 
                   <p className="max-w-xl mx-auto mt-4 text-sm sm:text-sm text-blue-100 leading-relaxed">
                     Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
@@ -481,7 +489,7 @@ export default function HomePage() {
         {/* Technology Section */}
         <section
           id="technology"
-          className={`py-16 px-2 max-w-7xl rounded-lg ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}
+          className={`pb-16 pt-5 px-2 max-w-7xl rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
           aria-labelledby="tech-stack-hading"
         >
           <div className="text-center mb-10">
@@ -503,7 +511,7 @@ export default function HomePage() {
           <TechStackQuizSystem />
         </section>
 <section
-          className={`py-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
+          className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
         >
           <div className="px-4 mx-auto rounded-lg max-w-7xl sm:px-6 lg:px-8">
             <div className="text-center mb-10">
@@ -650,7 +658,7 @@ export default function HomePage() {
 
         {/* How it Works Section */}
         <section
-          className={`py-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-50"}`}
+          className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
           aria-labelledby="features-heading"
         >
           <div className="px-4  mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -748,10 +756,10 @@ export default function HomePage() {
         </section>
         {/* Demo Quiz Section */}
         <section
-          className={`py-16  ${theme === "dark" ? "bg-gray-800" : "bg-gray-150"}`}
+          className={`pb-16  ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
           aria-labelledby="demo-heading"
         >
-          <div className="text-center mb-10">
+          <div className="text-center ">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -775,7 +783,7 @@ export default function HomePage() {
 
         {/* Testimonials Section */}
         <section
-          className={`py-16 ${theme === "dark" ? "bg-gray-800" : "bg-gradient-to-b from-white to-blue-50"} rounded-lg`}
+          className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"} rounded-lg`}
           aria-labelledby="testimonials-heading"
         >
           <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
@@ -865,7 +873,7 @@ export default function HomePage() {
         {/* FAQ Section */}
         <section
           id="faq"
-          className={`py-16 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}
+          className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
         >
           <div className="text-center mb-10">
             <motion.div
