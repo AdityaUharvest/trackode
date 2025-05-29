@@ -30,9 +30,9 @@ interface SectionLevels {
   };
 }
 
-// Map technologies to image URLs (use your own image assets or external CDN)
+// Map technologies to image URLs
 const techImageMap: Record<string, string> = {
-  "C": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+  "C": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg",
   JavaScript: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
   Python: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
   Java: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
@@ -44,9 +44,88 @@ const techImageMap: Record<string, string> = {
   "HTML/CSS": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
   Git: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
   Docker: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
-  AWS:  "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/codeforces.svg",
+  AWS: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/codeforces.svg",
   DSA: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/codepen/codepen-original.svg",
   DBMS: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+};
+
+// Map technologies to color classes and inline gradient styles
+const colorMap: Record<string, { borderGradient: string; badgeGradient: string; textClass: string }> = {
+  "C": {
+    borderGradient: "linear-gradient(to right, #FFD700, #DAA520)",
+    badgeGradient: "linear-gradient(to right, #FFD700, #DAA520)",
+    textClass: "group-hover:text-yellow-500",
+  },
+  JavaScript: {
+    borderGradient: "linear-gradient(to right, #F59E0B, #D97706)",
+    badgeGradient: "linear-gradient(to right, #F59E0B, #D97706)",
+    textClass: "group-hover:text-amber-500",
+  },
+  Python: {
+    borderGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
+    badgeGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
+    textClass: "group-hover:text-sky-500",
+  },
+  Java: {
+    borderGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
+    badgeGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
+    textClass: "group-hover:text-rose-500",
+  },
+  "CPP": {
+    borderGradient: "linear-gradient(to right, #FFD700, #DAA520)",
+    badgeGradient: "linear-gradient(to right, #FFD700, #DAA520)",
+    textClass: "group-hover:text-yellow-500",
+  },
+  "React.js": {
+    borderGradient: "linear-gradient(to right, #8B5CF6, #7C3AED)",
+    badgeGradient: "linear-gradient(to right, #8B5CF6, #7C3AED)",
+    textClass: "group-hover:text-violet-500",
+  },
+  "Node.js": {
+    borderGradient: "linear-gradient(to right, #10B981, #059669)",
+    badgeGradient: "linear-gradient(to right, #10B981, #059669)",
+    textClass: "group-hover:text-emerald-500",
+  },
+  TypeScript: {
+    borderGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
+    badgeGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
+    textClass: "group-hover:text-sky-500",
+  },
+  SQL: {
+    borderGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
+    badgeGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
+    textClass: "group-hover:text-rose-500",
+  },
+  "HTML/CSS": {
+    borderGradient: "linear-gradient(to right, #EF4444, #DC2626)",
+    badgeGradient: "linear-gradient(to right, #EF4444, #DC2626)",
+    textClass: "group-hover:text-red-500",
+  },
+  Git: {
+    borderGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
+    badgeGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
+    textClass: "group-hover:text-rose-500",
+  },
+  Docker: {
+    borderGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
+    badgeGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
+    textClass: "group-hover:text-sky-500",
+  },
+  AWS: {
+    borderGradient: "linear-gradient(to right, #10B981, #059669)",
+    badgeGradient: "linear-gradient(to right, #10B981, #059669)",
+    textClass: "group-hover:text-emerald-500",
+  },
+  DSA: {
+    borderGradient: "linear-gradient(to right, #8B5CF6, #7C3AED)",
+    badgeGradient: "linear-gradient(to right, #8B5CF6, #7C3AED)",
+    textClass: "group-hover:text-violet-500",
+  },
+  DBMS: {
+    borderGradient: "linear-gradient(to right, #10B981, #059669)",
+    badgeGradient: "linear-gradient(to right, #10B981, #059669)",
+    textClass: "group-hover:text-emerald-500",
+  },
 };
 
 export default function TechStackQuizSystem() {
@@ -128,12 +207,11 @@ export default function TechStackQuizSystem() {
   };
 
   return (
-    <div className={` p-5 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-900" : "bg-gray-100"}`}>
-      <div className="">
-
+    <div className={`px-6 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+      <div>
         {!selectedTech ? (
           <>
-            <div className="grid grid-cols-2 gap-6 sm:gap-8  sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-6 sm:gap-8 mt-12 sm:grid-cols-3 lg:grid-cols-5">
               {Object.keys(organizedQuizzes)
                 .filter((section) => section !== "Uncategorized")
                 .map((tech, index) => {
@@ -143,25 +221,11 @@ export default function TechStackQuizSystem() {
                     (organizedQuizzes[tech].Hard?.length || 0) +
                     (organizedQuizzes[tech].Other?.length || 0);
 
-                  const colorMap: Record<string, string> = {
-                    "C": "gold",
-                    JavaScript: "amber",
-                    Python: "sky",
-                    Java: "rose",
-                    "CPP": "gold",
-                    "React.js": "violet",
-                    "Node.js": "emerald",
-                    TypeScript: "sky",
-                    SQL: "rose",
-                    "HTML/CSS": "red",
-                    Git: "rose",
-                    Docker: "sky",
-                    AWS: "emerald",
-                    DSA: "violet",
-                    DBMS: "emerald",
+                  const colors = colorMap[tech] || {
+                    borderGradient: "linear-gradient(to right, #10B981, #059669)",
+                    badgeGradient: "linear-gradient(to right, #10B981, #059669)",
+                    textClass: "group-hover:text-emerald-500",
                   };
-
-                  const color = colorMap[tech] || "emerald";
 
                   return (
                     <motion.div
@@ -169,50 +233,54 @@ export default function TechStackQuizSystem() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: index * 0.1 }}
-                      whileHover={{ 
-                        scale: 1.05, 
-                        boxShadow: theme === "dark" 
-                          ? "0 15px 30px rgba(255, 255, 255, 0.1)" 
+                      whileHover={{
+                        scale: 1.05,
+                        boxShadow: theme === "dark"
+                          ? "0 15px 30px rgba(255, 255, 255, 0.1)"
                           : "0 15px 30px rgba(0, 0, 0, 0.15)",
-                        transition: { duration: 0.3 }
+                        transition: { duration: 0.3 },
                       }}
                       whileTap={{ scale: 0.95 }}
                       className={`relative flex flex-col items-center p-6 rounded-2xl cursor-pointer backdrop-blur-md transition-all duration-300 
                         ${theme === "dark" 
-                          ? "bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50" 
+                          ? "bg-gray-700/50 border border-gray-700/50 hover:bg-gray-700/50" 
                           : "bg-white/50 border border-gray-200/50 hover:bg-gray-100/50"} 
                         shadow-xl group
                       `}
                     >
                       {/* Gradient Border Overlay */}
-                      <div 
-                        className={`absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-gradient-to-r group-hover:from-${color}-400 group-hover:to-${color}-600 transition-all duration-500 opacity-0 group-hover:opacity-100`}
+                      <div
+                        className="absolute inset-0 rounded-2xl border-2 border-transparent transition-all duration-500 opacity-0 group-hover:opacity-100"
+                        style={{ backgroundSize: "200% 200%", animation: "gradientFlow 3s ease infinite" }}
                       ></div>
 
                       {/* Tech Icon with Gradient Background */}
-                      <div className={`relative mb-4 p-3 rounded-full bg-gradient-to-br from-${color}-200 to-${color}-400 group-hover:from-${color}-300 group-hover:to-${color}-500 transition-all duration-300`}>
+                      <div
+                        className="relative  p-3 rounded-full transition-all duration-300"
+                        
+                      >
                         <img
                           src={techImageMap[tech] || "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/codeforces.svg"}
                           alt={`${tech} icon`}
-                          className="lg:h-16 lg:w-16 h-12 w-12  rounded-xl group-hover:rotate-12 transition-transform duration-300"
+                          className="lg:h-14 lg:w-14 h-12 w-12 rounded-lg group-hover:rotate-12 transition-transform duration-300"
                         />
                       </div>
 
                       {/* Tech Name */}
-                      <span 
-                        className={`text-base font-serif tracking-wide ${theme === "dark" ? "text-gray-100" : "text-gray-900"} group-hover:text-${color}-500 transition-colors duration-300`} 
+                      <span
+                        className={`text-base font-serif tracking-wide ${theme === "dark" ? "text-gray-100" : "text-gray-900"} ${colors.textClass} transition-colors duration-300`}
                         style={{ fontFamily: "'Playfair Display', serif" }}
                       >
                         {tech}
                       </span>
-                       <span 
-                        className={`text-base px-2 py-1 absolute top-2 rounded-full border-2 right-2 font-serif tracking-wide ${theme === "dark" ? "text-gray-100" : "text-gray-900"} group-hover:text-${color}-500 text-${color}-500 transition-colors duration-300`} 
-                        style={{ fontFamily: "'Playfair Display', serif" }}
+
+                      {/* Quiz Count Badge */}
+                      <div
+                        className={`absolute top-2 right-2 px-2 py-1 rounded-lg text-xs font-medium text-white shadow-md transform group-hover:scale-110 group-hover:bg-${colors.badgeGradient} transition-all duration-300`}
+                        style={{ background: colors.badgeGradient }}
                       >
                         {totalQuizzes}
-                      </span>
-                      {/* Quiz Count Badge */}
-                      
+                      </div>
 
                       {/* Click Handler */}
                       <button
@@ -237,11 +305,6 @@ export default function TechStackQuizSystem() {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
-        }
-        .border-gradient-to-r {
-          background: linear-gradient(to right, var(--tw-gradient-stops));
-          background-size: 200% 200%;
-          animation: gradientFlow 3s ease infinite;
         }
       `}</style>
     </div>
