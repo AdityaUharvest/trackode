@@ -14,9 +14,9 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
     description: `Explore free ${techName} quizzes for all skill levels. Practice and test your ${techName} knowledge with our interactive quizzes.`,
     keywords: [`${techName} quizzes`, `${techName} tests`, `free ${techName} questions`, `learn ${techName}`],
     openGraph: {
-      title: `${techName} Quizzes | QuizApp`,
+      title: `${techName} Quizzes | Trackode`,
       description: `Practice ${techName} with our free interactive quizzes`,
-      url: `https://trackode.in/programming-quizzes/${techName}`,
+      url: `https://trackode.in/free-quizzes/${techName}`,
       type: 'website',
     },
   };

@@ -558,7 +558,8 @@ console.log('Result:', result);
             <h2 className={`text-sm font-semibold ${textColor}`}>No Results Found</h2>
             <p className={`text-gray-500 dark:text-gray-400`}>You haven't attempted this quiz yet.</p>
             <Button asChild className="mt-4">
-              <a href={`/playy/${quizId}`}>Take the Quiz</a>
+              
+              <a href="/mocks">Explore Mocks</a>
             </Button>
           </div>
         </div>

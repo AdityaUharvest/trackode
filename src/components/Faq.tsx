@@ -93,7 +93,7 @@ export default function Faq() {
   }, []);
 
   return (
-    <div className="">
+    <div className="px-3">
       <div
         className={`rounded-xl px-5 py-8 max-w-6xl mx-auto shadow-xl ${
           theme === "dark"

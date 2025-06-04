@@ -42,7 +42,7 @@ export default function FreeTechQuizClient({ params }: any) {
   const [organizedQuizzes, setOrganizedQuizzes] = useState<SectionLevels>({});
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
-  const { data: session } = useSession();
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -210,7 +210,7 @@ export default function FreeTechQuizClient({ params }: any) {
                         >
                           <div className='flex justify-between items-center'>
                             <h4 className={`font-semibold text-sm ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-                              {quiz.name}
+                              {quiz.name.replace("(", "").replace(")", "")}
                             </h4>
                             <span className={`text-xs flex items-center ${
                                 theme === "dark" ? "text-gray-400" : "text-gray-500"

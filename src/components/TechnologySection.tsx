@@ -203,11 +203,11 @@ export default function TechStackQuizSystem() {
   };
 
   const handleTechClick = (tech: string) => {
-    router.push(`/free-tech-quiz/${encodeURIComponent(tech)}`);
+    router.push(`/free-quizzes/${encodeURIComponent(tech)}`);
   };
 
   return (
-    <div className={`px-6 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+    <div className={`px-2 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
       <div>
         {!selectedTech ? (
           <>

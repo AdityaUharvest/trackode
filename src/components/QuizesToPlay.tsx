@@ -1,11 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
-
 import Link from "next/link";
-
-
-
 import {
   Clock,
   Play,
@@ -16,7 +12,11 @@ import {
   Search,
   Filter,
   User,
+  X
 } from "lucide-react";
+
+
+
 interface Quiz {
   _id: string;
   name: string;
@@ -42,7 +42,7 @@ interface MockTest {
   userPlayed?: number;
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
-  createdAt?: string
+  createdAt?: string;
   tag: string;
   creator: string;
 }
@@ -82,6 +82,51 @@ interface Props {
   quizResults: QuizResult[];
 }
 
+// Language logo mapping
+
+const languageLogos: Record<string, string> = {
+  C: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg",
+  JavaScript: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+  Python: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
+  Java: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
+  CPP: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
+ "React.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  "Node.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+  TypeScript: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
+  SQL: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
+  "HTML/CSS": "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/html5/html5-original.svg",
+  Git: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg",
+  Docker: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg",
+  AWS: "https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/amazonaws.svg",
+  DSA: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/codepen/codepen-original.svg",
+  DBMS: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg",
+};
+
+const getLanguageLogo = (section: string) => {
+  if (!section) return null;
+  const normalizedSection = section.trim().toLowerCase();
+  const languageMap: Record<string, string> = {
+    java: languageLogos["Java"],
+    javascript: languageLogos["JavaScript"],
+    python: languageLogos["Python"],
+    c: languageLogos["C"],
+    cpp: languageLogos["CPP"],
+    "c++": languageLogos["CPP"],
+    "react.js": languageLogos["React.js"],
+    "node.js": languageLogos["Node.js"],
+    typescript: languageLogos["TypeScript"],
+    sql: languageLogos["SQL"],
+    html: languageLogos["HTML/CSS"],
+    css: languageLogos["HTML/CSS"],
+    git: languageLogos["Git"],
+    docker: languageLogos["Docker"],
+    aws: languageLogos["AWS"],
+    dsa: languageLogos["DSA"],
+    dbms: languageLogos["DBMS"],
+  };
+  return languageMap[normalizedSection] || null;
+};
+
 const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
   const { theme } = useTheme();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -94,7 +139,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
   const [mockFilter, setMockFilter] = useState<"all" | "Easy" | "Medium" | "Hard">("all");
   const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
   const [showStats, setShowStats] = useState(false);
-  const [showPerformanceChart, setShowPerformanceChart] = useState(false);
+  
   const [userStats, setUserStats] = useState<UserStats>({
     totalQuizzes: 0,
     completedQuizzes: 0,
@@ -129,7 +174,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
       muted: "text-gray-500",
     },
   };
-    const getThemeClasses = (type: string) => {
+
+  const getThemeClasses = (type: string) => {
     switch (type) {
       case "card":
         return theme === "dark"
@@ -168,6 +214,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
       if (match) {
         const section = match[1].trim();
         const level = match[2].trim();
+       
         if (!organized[section]) {
           organized[section] = { Easy: [], Medium: [], Hard: [], Other: [] };
         }
@@ -181,6 +228,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
           organized[section].Other.push({ ...quiz, section, level: "Other" });
         }
       } else {
+        console.log(`No match for quiz: ${quiz.name}`);
         const section = "Uncategorized";
         if (!organized[section]) {
           organized[section] = { Easy: [], Medium: [], Hard: [], Other: [] };
@@ -323,525 +371,552 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  const getSectionColor = (section: string) => {
+    const lowerSection = section.toLowerCase();
+    if (lowerSection.includes("java")) return "bg-orange-100 text-orange-800";
+    if (lowerSection.includes("python")) return "bg-blue-100 text-blue-800";
+    if (lowerSection.includes("c++") || lowerSection.includes("cpp")) return "bg-indigo-100 text-indigo-800";
+    if (lowerSection.includes("javascript")) return "bg-yellow-100 text-yellow-800";
+    if (lowerSection.includes("sql")) return "bg-purple-100 text-purple-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
   const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "itemListElement": quizzes.map((quiz, index) => ({
-    "@type": "ListItem",
-    "position": index + 1,
-    "item": {
-      "@type": "Quiz",
-      "name": quiz.name,
-      "description": quiz.description,
-      "educationalLevel": quiz.level || "Beginner",
-      "numberOfQuestions": quiz.maxScore || 10,
-      "dateCreated": quiz.startDate,
-      "creator": {
-        "@type": "Organization",
-        "name": "Your Quiz Platform"
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": quizzes.map((quiz, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Quiz",
+        "name": quiz.name,
+        "description": quiz.description,
+        "educationalLevel": quiz.level || "Beginner",
+        "numberOfQuestions": quiz.maxScore || 10,
+        "dateCreated": quiz.startDate,
+        "creator": {
+          "@type": "Organization",
+          "name": "Your Quiz Platform"
+        }
       }
-    }
-  }))
-};
+    }))
+  };
 
   return (
-  <main>
-<script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-/>
- <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
-
-      <div className="container rounded-lg mx-auto px-3 py-4">
-        {/* Stats Section */}
-        {userStats.completedQuizzes > 0 && (
-          <div className="mb-8">
-            <button
-              onClick={() => setShowStats(!showStats)}
-              className={`flex w-full justify-between items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
-                theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
-              } transition-colors`}
-            >
-              <span className="font-medium">{showStats ? "Hide Stats" : "Show Stats"}</span>
-              <svg
-                className={`w-4 h-4 transition-transform ${showStats ? "rotate-180" : ""}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            {showStats && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                {/* Completion Rate */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                >
-                  <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
-                    Completion
-                  </h3>
-                  <div className="relative h-40">
-                    <svg className="w-full h-full" viewBox="0 0 100 100">
-                      <circle
-                        className={theme === "dark" ? "text-gray-700" : "text-gray-200"}
-                        strokeWidth="8"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="40"
-                        cx="50"
-                        cy="50"
-                      />
-                      <circle
-                        className="text-blue-500"
-                        strokeWidth="8"
-                        strokeDasharray={`${(userStats.completedQuizzes / userStats.totalQuizzes) * 251} 251`}
-                        strokeLinecap="round"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="40"
-                        cx="50"
-                        cy="50"
-                        transform="rotate(-90 50 50)"
-                      />
-                    </svg>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                      <span className={`text-2xl font-bold block ${textStyles[theme].primary}`}>
-                        {userStats.totalQuizzes > 0
-                          ? Math.round((userStats.completedQuizzes / userStats.totalQuizzes) * 100)
-                          : 0}
-                        %
-                      </span>
-                      <span className={`text-xs block ${textStyles[theme].muted}`}>
-                        {userStats.completedQuizzes} / {userStats.totalQuizzes}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Average Score */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Average Score
-                  </h3>
-                  <div className="flex items-end mb-2">
-                    <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                      {userStats.averageScore}
-                    </p>
-                    <span className={textStyles[theme].muted}>%</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className={`text-sm mr-2 ${textStyles[theme].muted}`}>Trend:</span>
-                    {getTrendIcon(userStats.accuracyTrend)}
-                    <span
-                      className={`text-sm ml-1 capitalize ${
-                        userStats.accuracyTrend === "improving"
-                          ? "text-green-500"
-                          : userStats.accuracyTrend === "declining"
-                          ? "text-red-500"
-                          : textStyles[theme].secondary
-                      }`}
-                    >
-                      {userStats.accuracyTrend}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Achievement */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Achievement
-                  </h3>
-                  <div className="flex items-center">
-                    <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                      {getAchievementLevel()}
-                    </p>
-                    <span className="text-xl">✨</span>
-                  </div>
-                </div>
-
-                {/* Highest Score */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Highest Score
-                  </h3>
-                  <div className="flex items-end mb-2">
-                    <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                      {userStats.highestScore}
-                    </p>
-                    <span className={textStyles[theme].muted}>%</span>
-                  </div>
-                  <div>
-                    <span className={`text-sm ${textStyles[theme].muted}`}>Your personal best</span>
-                  </div>
-                </div>
-
-                {/* Recent Performance */}
-                <div
-                  className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                >
-                  <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                    Recent Score
-                  </h3>
-                  <div className="flex items-end mb-2">
-                    <p
-                      className={`text-3xl font-bold mr-2 ${
-                        userStats.recentScore >= 80
-                          ? "text-green-500"
-                          : userStats.recentScore >= 50
-                          ? "text-yellow-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {userStats.recentScore}
-                    </p>
-                    <span className={textStyles[theme].muted}>%</span>
-                  </div>
-                  <div>
-                    <span className={`text-sm ${textStyles[theme].muted}`}>Latest attempt</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            
-          </div>
-        )}
-
-        {/* Quizzes and Mock Tests Section */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          
-
-          {/* Quizzes and Mock Tests Content */}
-          <div className="flex-1">
-            {/* Quizzes Section */}
-           {/* Compact Filtering Section */}
-<div className="mb-6">
-  <div className="flex flex-col md:flex-row md:items-center gap-4">
-    {/* Search Input - Always visible */}
-    <div className="relative flex-1">
-      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Search className="text-gray-400" size={16} />
-      </div>
-      <input
-        type="text"
-        placeholder="Search quizzes or mock tests..."
-        className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-          theme === "dark"
-            ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-            : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-        }`}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+    <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-    </div>
-
-    {/* Mobile Filter Toggle */}
-<div className="md:hidden">
-  <button
-    onClick={() => setShowMobileFilters(!showMobileFilters)}
-    className={`flex items-center gap-2 px-4 py-2 rounded-lg w-full justify-center ${
-      theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
-    }`}
-  >
-    <Filter size={16} />
-    <span>Filters</span>
-  </button>
-</div>
-
-    
-
-    {/* Desktop Filters - Always visible */}
-    <div className="hidden md:flex gap-2">
-      {/* Quiz Status Filter Dropdown */}
-      <div className="relative">
-        <select
-          value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-          className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
-            theme === "dark"
-              ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-              : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-          }`}
-        >
-          <option value="all">All Quizzes</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="ended">Ended</option>
-        </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-
-      {/* Difficulty Filter Dropdown */}
-      <div className="relative">
-        <select
-          value={difficultyFilter}
-          onChange={(e) => {
-            setDifficultyFilter(e.target.value);
-            setMockFilter(e.target.value as any);
-          }}
-          className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
-            theme === "dark"
-              ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-              : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-          }`}
-        >
-          <option value="all">All Levels</option>
-          <option value="Easy">Easy</option>
-          <option value="Medium">Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-    </div>
-{/* Mobile Filters - Expandable */}
-{showMobileFilters && (
-  <div className="md:hidden space-y-2">
-    <div className="grid grid-cols-2 gap-2">
-      {/* Quiz Status Filter */}
-      <div>
-        <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
-          Quiz Status
-        </label>
-        <select
-          value={activeFilter}
-          onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-          className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
-            theme === "dark"
-              ? "bg-gray-700 border-gray-600 text-white"
-              : "bg-white border-gray-300 text-gray-800"
-          }`}
-        >
-          <option value="all">All</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="ended">Ended</option>
-        </select>
-      </div>
-
-      {/* Difficulty Filter */}
-      <div>
-        <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
-          Difficulty
-        </label>
-        <select
-          value={difficultyFilter}
-          onChange={(e) => {
-            setDifficultyFilter(e.target.value);
-            setMockFilter(e.target.value as any);
-          }}
-          className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
-            theme === "dark"
-              ? "bg-gray-700 border-gray-600 text-white"
-              : "bg-white border-gray-300 text-gray-800"
-          }`}
-        >
-          <option value="all">All</option>
-          <option value="Easy">Easy</option>
-          <option value="Medium">Medium</option>
-          <option value="Hard">Hard</option>
-        </select>
-      </div>
-    </div>
-  </div>
-)}
-    {/* Mobile Filters - Expandable */}
-    {showStats && (
-      <div className="md:hidden space-y-2">
-        <div className="grid grid-cols-2 gap-2">
-          {/* Quiz Status Filter */}
-          <div>
-            <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
-              Quiz Status
-            </label>
-            <select
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-              className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
-                theme === "dark"
-                  ? "bg-gray-700 border-gray-600 text-white"
-                  : "bg-white border-gray-300 text-gray-800"
-              }`}
-            >
-              <option value="all">All</option>
-              <option value="active">Active</option>
-              <option value="completed">Completed</option>
-              <option value="ended">Ended</option>
-            </select>
-          </div>
-
-          {/* Difficulty Filter */}
-          <div>
-            <label className={`block text-xs font-medium mb-1 ${textStyles[theme].secondary}`}>
-              Difficulty
-            </label>
-            <select
-              value={difficultyFilter}
-              onChange={(e) => {
-                setDifficultyFilter(e.target.value);
-                setMockFilter(e.target.value as any);
-              }}
-              className={`w-full pl-2 pr-6 py-1.5 rounded text-xs border ${
-                theme === "dark"
-                  ? "bg-gray-700 border-gray-600 text-white"
-                  : "bg-white border-gray-300 text-gray-800"
-              }`}
-            >
-              <option value="all">All</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    )}
-  </div>
-</div>
-
-            <div className="space-y-2 ">
-              {Object.keys(organizedQuizzes).map((section) => (
-                <div
-                  key={section}
-                  className={`rounded-xl shadow-sm border overflow-hidden transition-all duration-200 ${cardStyles[theme]}`}
+      <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
+        <div className="container rounded-lg mx-auto px-3 py-4">
+          {/* Stats Section */}
+          {userStats.completedQuizzes > 0 && (
+            <div className="mb-8">
+              <button
+                onClick={() => setShowStats(!showStats)}
+                className={`flex w-full justify-between items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
+                  theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
+                } transition-colors`}
+              >
+                <span className="font-medium">{showStats ? "Hide Stats" : "Show Stats"}</span>
+                <svg
+                  className={`w-4 h-4 transition-transform ${showStats ? "rotate-180" : ""}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showStats && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                  {/* Completion Rate */}
                   <div
-                    className={`flex p-5 justify-between items-center cursor-pointer transition-all duration-200 ${
-                      theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"
-                    }`}
-                    onClick={() => toggleSection(section)}
+                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
                   >
-                    <div className="flex items-center">
-                      <div
-                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 ${
-                          theme === "dark" ? "bg-gray-600" : "bg-gray-200"
-                        }`}
-                      >
-                        <span
-                          className={`text-lg font-bold ${
-                            theme === "dark" ? "text-gray-200" : "text-gray-800"
-                          }`}
-                        >
-                          {section.charAt(0).toUpperCase()}
+                    <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
+                      Completion
+                    </h3>
+                    <div className="relative h-40">
+                      <svg className="w-full h-full" viewBox="0 0 100 100">
+                        <circle
+                          className={theme === "dark" ? "text-gray-700" : "text-gray-200"}
+                          strokeWidth="8"
+                          stroke="currentColor"
+                          fill="transparent"
+                          r="40"
+                          cx="50"
+                          cy="50"
+                        />
+                        <circle
+                          className="text-blue-500"
+                          strokeWidth="8"
+                          strokeDasharray={`${(userStats.completedQuizzes / userStats.totalQuizzes) * 251} 251`}
+                          strokeLinecap="round"
+                          stroke="currentColor"
+                          fill="transparent"
+                          r="40"
+                          cx="50"
+                          cy="50"
+                          transform="rotate(-90 50 50)"
+                        />
+                      </svg>
+                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                        <span className={`text-2xl font-bold block ${textStyles[theme].primary}`}>
+                          {userStats.totalQuizzes > 0
+                            ? Math.round((userStats.completedQuizzes / userStats.totalQuizzes) * 100)
+                            : 0}
+                          %
+                        </span>
+                        <span className={`text-xs block ${textStyles[theme].muted}`}>
+                          {userStats.completedQuizzes} / {userStats.totalQuizzes}
                         </span>
                       </div>
-                      <h3 className="text-base text-blue-600 font-semibold">{section}</h3>
-                      <span
-                        className={`ml-2 text-xs px-2 py-1 rounded-full transition-all ${
-                          theme === "dark" ? "bg-gray-600 text-gray-200" : "bg-gray-200 text-gray-700"
-                        }`}
-                      >
-                        {Object.values(organizedQuizzes[section]).reduce(
-                          (acc, levelQuizzes) => acc + levelQuizzes.length,
-                          0
-                        )}{" "}
-                        quizzes
-                      </span>
                     </div>
-                    <svg
-                      className={`w-5 h-5 transition-transform duration-200 ${
-                        expandedSections[section] ? "rotate-180" : ""
-                      } ${textStyles[theme].secondary}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
                   </div>
 
-                  {expandedSections[section] && (
-                    <div className="divide-y divide-gray-200 animate-fadeIn">
-                      {(["Easy", "Medium", "Hard", "Other"] as const).map((level) => {
-                        if (
-                          organizedQuizzes[section][level].length === 0 ||
-                          (difficultyFilter !== "all" && difficultyFilter !== level.toLowerCase())
-                        )
-                          return null;
+                  {/* Average Score */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                  >
+                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                      Average Score
+                    </h3>
+                    <div className="flex items-end mb-2">
+                      <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                        {userStats.averageScore.toFixed(1)}
+                      </p>
+                      <span className={textStyles[theme].muted}>%</span>
+                    </div>
+                    <div>
+                      <span className={`text-sm ${textStyles[theme].muted}`}>Across all quizzes</span>
+                    </div>
+                    <div className="flex items-center">
+                      <span className={`text-sm mr-2 ${textStyles[theme].muted}`}>Trend:</span>
+                      {getTrendIcon(userStats.accuracyTrend)}
+                      <span
+                        className={`text-sm ml-1 capitalize ${
+                          userStats.accuracyTrend === "improving"
+                            ? "text-green-500"
+                            : userStats.accuracyTrend === "declining"
+                            ? "text-red-500"
+                            : textStyles[theme].secondary
+                        }`}
+                      >
+                        {userStats.accuracyTrend}
+                      </span>
+                    </div>
+                  </div>
 
-                        return (
-                          <div key={`${section}-${level}`} className="p-2">
-                            <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
-                              {organizedQuizzes[section][level].map((quiz) => (
+                  {/* Achievement */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                  >
+                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                      Achievement
+                    </h3>
+                    <div className="flex items-center">
+                      <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                        {getAchievementLevel()}
+                      </p>
+                      <span className="text-xl">✨</span>
+                    </div>
+                  </div>
+
+                  {/* Highest Score */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                  >
+                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                      Highest Score
+                    </h3>
+                    <div className="flex items-end mb-2">
+                      <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
+                        {userStats.highestScore}
+                      </p>
+                      <span className={textStyles[theme].muted}>%</span>
+                    </div>
+                    <div>
+                      <span className={`text-sm ${textStyles[theme].muted}`}>Your personal best</span>
+                    </div>
+                  </div>
+
+                  {/* Recent Performance */}
+                  <div
+                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                  >
+                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
+                      Recent Score
+                    </h3>
+                    <div className="flex items-end mb-2">
+                      <p
+                        className={`text-3xl font-bold mr-2 ${
+                          userStats.recentScore >= 80
+                            ? "text-green-500"
+                            : userStats.recentScore >= 50
+                            ? "text-yellow-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {userStats.recentScore}
+                      </p>
+                      <span className={textStyles[theme].muted}>%</span>
+                    </div>
+                    <div>
+                      <span className={`text-sm ${textStyles[theme].muted}`}>Latest attempt</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Quizzes and Mock Tests Section */}
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Main Content Area */}
+            <div className="flex-1">
+              {/* Compact Filtering Section */}
+              <div className="mb-6">
+                <div className="flex flex-col md:flex-row md:items-center gap-4">
+                  {/* Search Input */}
+                  <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search className="text-gray-400" size={16} />
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Search quizzes or mock tests..."
+                      className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
+                        theme === "dark"
+                          ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
+                          : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
+                      }`}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Mobile Filter Toggle */}
+                  <div className="md:hidden">
+                    <button
+                      onClick={() => setShowMobileFilters(!showMobileFilters)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg w-full justify-center ${
+                        theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
+                      }`}
+                    >
+                      <Filter size={16} />
+                      <span>Filters</span>
+                    </button>
+                  </div>
+
+                  {/* Desktop Filters */}
+                  <div className="hidden md:flex gap-2">
+                    {/* Quiz Status Filter Dropdown */}
+                    <div className="relative">
+                      <select
+                        value={activeFilter}
+                        onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
+                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
+                            : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
+                        }`}
+                      >
+                        <option value="all">All Quizzes</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="ended">Ended</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Difficulty Filter Dropdown */}
+                    <div className="relative">
+                      <select
+                        value={difficultyFilter}
+                        onChange={(e) => {
+                          setDifficultyFilter(e.target.value);
+                          setMockFilter(e.target.value as any);
+                        }}
+                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
+                          theme === "dark"
+                            ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
+                            : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
+                        }`}
+                      >
+                        <option value="all">All Levels</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile Filters - Expandable */}
+                {showMobileFilters && (
+                  <div className="md:hidden space-y-2 mt-4">
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Quiz Status Filter */}
+                      <div>
+                        <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
+                          Quiz Status
+                        </label>
+                        <select
+                          value={activeFilter}
+                          onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
+                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${
+                            theme === "dark"
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "bg-white border-gray-300 text-gray-800"
+                          }`}
+                        >
+                          <option value="all">All</option>
+                          <option value="active">Active</option>
+                          <option value="completed">Completed</option>
+                          <option value="ended">Ended</option>
+                        </select>
+                      </div>
+
+                      {/* Difficulty Filter */}
+                      <div>
+                        <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
+                          Difficulty
+                        </label>
+                        <select
+                          value={difficultyFilter}
+                          onChange={(e) => {
+                            setDifficultyFilter(e.target.value);
+                            setMockFilter(e.target.value as any);
+                          }}
+                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${
+                            theme === "dark"
+                              ? "bg-gray-700 border-gray-600 text-white"
+                              : "bg-white border-gray-300 text-gray-800"
+                          }`}
+                        >
+                          <option value="all">All</option>
+                          <option value="Easy">Easy</option>
+                          <option value="Medium">Medium</option>
+                          <option value="Hard">Hard</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Quizzes Section */}
+              <div className="mb-16 mt-10">
+                <div className=" items-center mb-10">
+                  <h2  className={`text-2xl text-center font-bold ${
+                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
+                                    }`}>Programming Quizzes</h2>
+                  <p className={`text-center text-sm ${textStyles[theme].secondary}`}>
+                    Explore quizzes across various programming languages and levels
+                  </p>
+                </div>
+
+                {Object.keys(organizedQuizzes).length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-gray-500 text-sm mb-4">No quizzes found matching your criteria</div>
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setActiveFilter("all");
+                        setDifficultyFilter("all");
+                      }}
+                      className={`px-6 py-2 rounded-lg transition ${
+                        theme === "dark" ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-500 hover:bg-blue-600"
+                      } text-white`}
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6 ">
+                    {Object.keys(organizedQuizzes).map((section) => {
+                      const sectionLogo = getLanguageLogo(section);
+                      
+                      return (
+                        <div
+                          key={section}
+                          className={`rounded-xl  shadow-sm border overflow-hidden transition-all duration-200 ${cardStyles[theme]}`}
+                        >
+                          <div
+                            className={`flex p-7 justify-between items-center cursor-pointer transition-all duration-200 ${
+                              theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                            }`}
+                            onClick={() => toggleSection(section)}
+                          >
+                            <div className="flex items-center">
+                              {sectionLogo ? (
+                                <div className=" flex items-center justify-center rounded-lg mr-3 overflow-hidden">
+                                  <img
+                                    src={sectionLogo}
+                                    alt={`${section} logo`}
+                                    className="w-12 h-12 "
+                                    onError={() => console.error(`Failed to load logo for ${section}: ${sectionLogo}`)}
+                                  />
+                                </div>
+                              ) : (
                                 <div
-                                  key={quiz._id}
-                                  className={`p-5 border-s-4 border-green-500 rounded-lg shadow-md ${
-                                    theme === "dark" ? "bg-gray-700 hover:bg-gray-650" : "bg-gray-50 hover:bg-white"
-                                  } transition-all duration-200 hover:shadow-lg`}
+                                  className={`w-8 h-8  flex items-center justify-center rounded-full mr-3 ${
+                                    theme === "dark" ? "bg-gray-600" : "bg-gray-200"
+                                  }`}
                                 >
-                                  <div className="flex justify-between items-center">
-                                    <h4
-                                      className={`font-semibold text-sm ${
-                                        theme === "dark" ? "text-white" : "text-gray-900"
-                                      }`}
-                                    >
-                                      {quiz.name.replace("(", "").replace(")", "").trim()}
-                                    </h4>
-                                    <span
-                                      className={`text-xs flex items-center ${
-                                        theme === "dark" ? "text-gray-400" : "text-gray-500"
-                                      }`}
-                                    >
-                                      <svg
-                                        className="w-3.5 h-3.5 mr-1"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth="2"
-                                          d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                                        ></path>
-                                      </svg>
-                                      {quiz.totalRegistrations} players
-                                    </span>
-                                  </div>
-                                  <p
-                                    className={`text-sm mt-2 font-sans font-medium text-green-600 dark:text-green-400`}
+                                  <span
+                                    className={`text-lg font-bold ${
+                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
+                                    }`}
                                   >
-                                    {quiz.userPlayed ? `Your Score: ${quiz.userScore}/${quiz.maxScore}` : ""}
-                                  </p>
-                                  
-                                  <div className="mt-4 flex justify-between items-center">
-  {quiz.userPlayed ? (
-    <>
-      <span className={`text-xs font-semibold flex items-center ${
-        theme === "dark" ? "text-green-400" : "text-green-600"
-      }`}>
-        <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Completed
-      </span>
-      <div className="flex gap-3">
-        <Link href={`/quiz-result/${quiz._id}`} className="text-xs p-2 text-white bg-green-400 rounded-lg ${
-      
-        ">
-          Leaderboard
-        </Link>
+                                    {section.charAt(0).toUpperCase()}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="flex ml-2 flex-col">
+                                <h3 className={`text-lg font-bold ${
+                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
+                                    }`}>{section}</h3>
+                                <div className="flex gap-2 mt-1">
+                                  <span
+                                    className={`text-xs px-2 py-1 rounded-full ${getSectionColor(section)}`}
+                                  >
+                                    {Object.values(organizedQuizzes[section]).reduce(
+                                      (acc, levelQuizzes) => acc + levelQuizzes.length,
+                                      0
+                                    )}{" "}
+                                    quizzes
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            <svg
+                              className={`w-5 h-5 transition-transform duration-200 ${
+                                expandedSections[section] ? "rotate-180" : ""
+                              } ${textStyles[theme].secondary}`}
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M19 9l-7 7-7-7"
+                              />
+                            </svg>
+                          </div>
+
+                          {expandedSections[section] && (
+                            <div className="divide-y divide-gray-200 animate-fadeIn">
+                              {(["Easy", "Medium", "Hard", "Other"] as const).map((level) => {
+                                if (
+                                  organizedQuizzes[section][level].length === 0 ||
+                                  (difficultyFilter !== "all" && difficultyFilter !== level.toLowerCase())
+                                )
+                                  return null;
+
+                                return (
+                                  <div key={`${section}-${level}`} className="p-4">
+                                    <div className="flex items-center mb-3">
+                                      <span
+                                        className={`text-xs font-medium px-2 py-1 rounded-full ${getDifficultyColor(
+                                          level
+                                        )}`}
+                                      >
+                                        {level}
+                                      </span>
+                                      <span className={`text-xs ml-2 ${textStyles[theme].muted}`}>
+                                        {organizedQuizzes[section][level].length} quizzes
+                                      </span>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
+                                      {organizedQuizzes[section][level].map((quiz) => (
+                                        <div
+                                          key={quiz._id}
+                                          className={`p-5 border-l-4 ${
+                                            level === "Easy"
+                                              ? "border-green-500"
+                                              : level === "Medium"
+                                              ? "border-yellow-500"
+                                              : level === "Hard"
+                                              ? "border-red-500"
+                                              : "border-gray-500"
+                                          } rounded-lg shadow-md ${
+                                            theme === "dark" ? "bg-gray-700 hover:bg-gray-650" : "bg-gray-50 hover:bg-white"
+                                          } transition-all duration-200 hover:shadow-lg`}
+                                        >
+                                          <div className="flex justify-between items-start">
+                                            <h4
+                                              className={`font-semibold text-sm ${
+                                                theme === "dark" ? "text-white" : "text-gray-900"
+                                              }`}
+                                            >
+                                              {quiz.name.replace("(", "").replace(")", "").trim()}
+                                            </h4>
+                                            <span
+                                              className={`text-xs flex items-center ${
+                                                theme === "dark" ? "text-gray-400" : "text-gray-500"
+                                              }`}
+                                            >
+                                              <Users size={14} className="mr-1" />
+                                              {quiz.totalRegistrations} players
+                                            </span>
+                                          </div>
+                                          {quiz.userPlayed && (
+                                            <p className={`text-sm mt-2 font-medium ${
+                                              level === "Easy"
+                                                ? "text-green-600 dark:text-green-400"
+                                                : level === "Medium"
+                                                ? "text-yellow-600 dark:text-yellow-400"
+                                                : level === "Hard"
+                                                ? "text-red-600 dark:text-red-400"
+                                                : "text-gray-600 dark:text-gray-400"
+                                            }`}>
+                                              Your Score: {quiz.userScore}/{quiz.maxScore}
+                                            </p>
+                                          )}
+                                          
+                                          <div className="mt-4 flex justify-between items-center">
+                                            {quiz.userPlayed ? (
+                                              <>
+                                                <span className={`text-xs font-semibold flex items-center ${
+                                                  level === "Easy"
+                                                    ? "text-green-600 dark:text-green-400"
+                                                    : level === "Medium"
+                                                    ? "text-yellow-600 dark:text-yellow-400"
+                                                    : level === "Hard"
+                                                    ? "text-red-600 dark:text-red-400"
+                                                    : "text-gray-600 dark:text-gray-400"
+                                                }`}>
+                                                  <CheckCircle size={14} className="mr-1" />
+                                                  Completed
+                                                </span>
+                                                <div className="flex gap-2">
+                                                  <Link
+                                                    href={`/quiz-result/${quiz._id}`}
+                                                    className={`text-xs px-3 py-1.5 rounded-lg ${
+                                                      theme === "dark"
+                                                        ? "bg-gray-600 hover:bg-gray-500 text-white"
+                                                        : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                                                    } transition-colors`}
+                                                  >
+                                                    Leaderboard
+                                                  </Link>
+                                                  
         <Link href={`/dashboard/result/${quiz._id}`} className={`px-4 py-1.5 text-xs font-medium rounded-lg ${
           theme === "dark" ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"
         } transition-colors shadow-sm hover:shadow flex items-center`}>
@@ -857,7 +932,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
     <Link
       href={`/quiz-play/${quiz._id}`}
       aria-label={`Start ${quiz.name} quiz`}
-      className={`w-full text-center px-4 py-2 text-sm font-medium rounded-lg ${
+      className={` mt-5 text-center px-4 py-2 text-sm font-medium rounded-lg ${
         theme === "dark" 
           ? "bg-green-600 hover:bg-green-500 text-white" 
           : "bg-green-600 hover:bg-green-700 text-white"
@@ -880,27 +955,24 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     </div>
                   )}
                 </div>
-              ))}
+              )}
+            )
+            }
             </div>
+                )}
 
+
+            {/* Sidebar Section */}
             {/* Mock Tests Section */}
-            <div className="mt-12">
-              <div className="flex gap-2 ml-2 items-center mb-6">
-                <svg
-                  className={`w-7 h-7 ${theme === "dark" ? "text-white" : "text-blue-600"}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                  />
-                </svg>
-                <h2 className="text-xl font-bold text-blue-500">Free Mock Tests</h2>
+            <div className="mt-16">
+              <div className=" items-center mb-6">
+                <h1 className={`text-2xl text-center font-bold ${
+                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
+                                    }`}>Free Mock Tests</h1>
+                <p className={`text-sm text-center ${textStyles[theme].muted}`}>
+                  Explore our collection of free mock tests to prepare for your next coding interview or exam.
+                </p>
+                
               </div>
 
               {filteredMockTests.length === 0 ? (
@@ -1023,10 +1095,10 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
               </div>
             </div>
 
-            <div className="flex justify-between mt-6">
+            <div className=" lg:flex lg:justify-between mt-6">
               <Link href="/contact">
                 <button
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`px-4 w-full mb-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     theme === "dark" ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-blue-500 text-white hover:bg-blue-600"
                   }`}
                 >
@@ -1035,7 +1107,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
               </Link>
               <Link href="/quiz-setup">
                 <button
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`px-4 py-2 w-full rounded-lg text-sm font-medium transition-all duration-200 ${
                     theme === "dark" ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-blue-100 text-blue-700 hover:bg-blue-200"
                   }`}
                 >
@@ -1046,6 +1118,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   </main>
    
