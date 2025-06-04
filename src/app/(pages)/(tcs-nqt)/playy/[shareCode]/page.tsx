@@ -89,20 +89,26 @@ export default function QuizPlayer() {
 
         // Fetch and normalize sections
         const res = await axios.get('/api/fetchSection');
-        const normalizedSections = res.data.sections.map((s: any) => ({
-          name: s.value,
-          label: s.label,
-          timeLimit: 25 * 60,
-          questionCount: 0,
-          submitted: false,
-          unlocked: false,
-        }));
+        // Count questions for each section
+        const questionCountMap: Record<string, number> = {};
+        response.data.questions.forEach((q: Question) => {
+          questionCountMap[q.section] = (questionCountMap[q.section] || 0) + 1;
+        });
+
+        const normalizedSections = res.data.sections.map((s: any) => {
+          const questionCount = questionCountMap[s.value] || 0;
+          return {
+            name: s.value,
+            label: s.label,
+            timeLimit: questionCount * 60, // 60 seconds per question
+            questionCount,
+            submitted: false,
+            unlocked: false,
+          };
+        });
 
         // Count questions in each section
-        response.data.questions.forEach((q: Question) => {
-          const section = normalizedSections.find((s: any) => s.name === q.section);
-          if (section) section.questionCount++;
-        });
+       
 
         // Filter out sections with 0 questions
         const filteredSections = normalizedSections.filter((s: any) => s.questionCount > 0);

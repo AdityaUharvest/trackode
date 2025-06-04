@@ -134,7 +134,7 @@ export default function HomePage() {
           <div
             className="relative px-4 py-8 mx-auto max-w-7xl mt-10 sm:px-8 lg:px-12 z-10 flex-1 flex flex-col min-h-[auto] sm:min-h-[calc(100vh-96px)]"
           >
-            <div className="flex lg:mt-6 mt-6 flex-col items-center justify-start w-full sm:justify-center">
+            <div className="flex lg:mt-2 mt-6 flex-col items-center justify-start w-full sm:justify-center">
               <div className="text-center mb-6 sm:mb-10">
                 <h1
                   className="text-3xl sm:text-3xl lg:text-5xl font-extrabold leading-tight tracking-wide"
@@ -489,7 +489,7 @@ export default function HomePage() {
         {/* Technology Section */}
         <section
           id="technology"
-          className={`pb-16 pt-5 px-2 max-w-7xl rounded-lg ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
+          className={`pb-16 pt-5 px-2 max-w-7xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
           aria-labelledby="tech-stack-hading"
         >
           <div className="text-center mb-10">
@@ -513,7 +513,7 @@ export default function HomePage() {
 <section
           className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
         >
-          <div className="px-4 mx-auto rounded-lg max-w-7xl sm:px-6 lg:px-8">
+          <div className="px-4 mx-auto  max-w-7xl sm:px-6 lg:px-8">
             <div className="text-center mb-10">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}

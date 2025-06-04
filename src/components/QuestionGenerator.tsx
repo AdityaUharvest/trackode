@@ -9,7 +9,6 @@ import { useTheme } from './ThemeContext';
 import { Loader2, ChevronDown } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
-import { to } from '@react-spring/web';
 
 interface Question {
   text: string;
@@ -50,6 +49,9 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [quickFilter, setQuickFilter] = useState('');
+  const [customSection, setCustomSection] = useState('');
+  const [questionCount, setQuestionCount] = useState<number>(25);
+  const [isAddingCustomSection, setIsAddingCustomSection] = useState(false);
 
   const { theme } = useTheme();
   const params = useParams();
@@ -67,221 +69,221 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [copied, setCopied] = useState(false);
 
   // Define categories structure
- const predefinedCategories: Category[] = [
-  {
-    name: 'Verbal Ability',
-    subcategories: [
-      {
-        name: 'English Language',
-        sections: [
-          'verbal-ability', 'reading-comprehension', 'para-jumbles',
-          'sentence-correction', 'fill-in-the-blanks', 'synonyms',
-          'antonyms', 'one-word-substitution', 'idioms-phrases',
-          'cloze-test', 'grammar', 'active-passive', 'direct-indirect',
-          'error-spotting', 'spellings'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Reasoning',
-    subcategories: [
-      {
-        name: 'Logical Reasoning',
-        sections: [
-          'reasoning-ability', 'logical-reasoning', 'analytical-reasoning',
-          'blood-relations', 'coding-decoding', 'number-series',
-          'letter-series', 'direction-sense', 'statement-conclusion',
-          'statement-assumption', 'syllogism', 'data-sufficiency',
-          'puzzles', 'odd-one-out', 'venn-diagram', 'calendar', 'clock'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Quantitative Aptitude',
-    subcategories: [
-      {
-        name: 'Mathematics',
-        sections: [
-          'numerical-ability', 'advanced-quantitative', 'percentage',
-          'profit-loss', 'simple-interest', 'compound-interest',
-          'ratio-proportion', 'average', 'time-speed-distance',
-          'time-work', 'mixtures-alligation', 'problems-on-ages',
-          'partnership', 'number-system', 'lcm-hcf', 'algebra',
-          'geometry', 'mensuration', 'trigonometry', 'statistics',
-          'data-interpretation', 'probability', 'permutation-combination',
-          'quadratic-equations', 'linear-equations', 'surds-indices',
-          'logarithm', 'mathematics', 'statistics-advanced'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Programming',
-    subcategories: [
-      { 
-        name: 'C Programming',
-        sections: [
-          'c-basics', 'c-arrays', 'c-strings', 'c-pointers',
-          'c-structures', 'c-functions', 'c-loops',
-          'c-conditional-statements', 'c-storage-classes',
-          'c-recursion', 'c-malloc', 'c-file-handling',
-          'c-bitwise', 'c-preprocessor', 'c-linked-list',
-          'c-data-structures', 'c-mcq', 'c-debugging'
-        ]
-      },
-      {
-        name: 'Python',
-        sections: [
-          'python-basics', 'python-functions', 'python-data-structures',
-          'python-oop', 'python-file-handling', 'python-libraries'
-        ]
-      },
-      {
-        name: 'Java',
-        sections: [
-          'java-basics', 'java-oop', 'java-collections', 'java-multithreading'
-        ]
-      },
-      {
-        name: 'JavaScript',
-        sections: [
-          'javascript-basics', 'javascript-dom', 'javascript-es6'
-        ]
-      },
-      {
-        name: 'C++',
-        sections: [
-          'cpp-oop', 'cpp-templates', 'cpp-stl'
-        ]
-      },
-      {
-        name: 'SQL',
-        sections: [
-          'sql-basics', 'sql-joins', 'sql-aggregation'
-        ]
-      },
-      {
-        name: 'Web Technologies',
-        sections: [
-          'html-basics', 'css-basics'
-        ]
-      },
-      {
-        name: 'Other Languages',
-        sections: [
-          'ruby-basics', 'ruby-rails', 'php-basics', 'go-basics',
-          'go-concurrency', 'rust-basics', 'rust-ownership',
-          'kotlin-basics', 'swift-basics', 'r-basics', 'r-data-analysis',
-          'scala-basics', 'haskell-basics'
-        ]
-      },
-      {
-        name: 'Computer Science Fundamentals',
-        sections: [
-          'data-structures', 'algorithms', 'operating-systems',
-          'computer-networks', 'database-systems', 'software-engineering'
-        ]
-      },
-      {
-        name: 'Advanced Technologies',
-        sections: [
-          'web-development', 'mobile-development', 'cloud-computing',
-          'machine-learning', 'artificial-intelligence', 'data-science',
-          'cybersecurity', 'blockchain', 'iot'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'General Knowledge',
-    subcategories: [
-      {
-        name: 'History',
-        sections: [
-          'indian-history', 'modern-history', 'medieval-history',
-          'ancient-history', 'indian-freedom-struggle', 'world-history'
-        ]
-      },
-      {
-        name: 'Polity & Economy',
-        sections: [
-          'indian-polity', 'indian-economy', 'constitution',
-          'governance', 'economics', 'public-administration',
-          'panchayati-raj', 'governance-reforms'
-        ]
-      },
-      {
-        name: 'Geography',
-        sections: [
-          'geography', 'indian-geography', 'world-geography'
-        ]
-      },
-      {
-        name: 'Science',
-        sections: [
-          'general-science', 'physics', 'chemistry', 'biology',
-          'environment', 'science-technology', 'computer-awareness',
-          'computers-basics', 'ms-office', 'internet-awareness',
-          'space-technology', 'defence-technology', 'nuclear-technology',
-          'agriculture', 'science-in-everyday-life', 'astronomy',
-          'astrophysics', 'quantum-physics', 'environmental-science'
-        ]
-      },
-      {
-        name: 'Current Affairs',
-        sections: [
-          'current-affairs', 'general-knowledge', 'banking-awareness',
-          'financial-awareness', 'budget', 'sports', 'art-culture',
-          'awards-honours', 'books-authors', 'important-days',
-          'national-international-events', 'government-schemes',
-          'social-issues', 'population-demographics',
-          'international-relations', 'world-organizations',
-          'disaster-management', 'infrastructure', 'international-politics'
-        ]
-      }
-    ]
-  },
-  {
-    name: 'Other Disciplines',
-    subcategories: [
-      {
-        name: 'Social Sciences',
-        sections: [
-          'philosophy', 'political-science', 'anthropology',
-          'linguistics', 'psychology-advanced', 'sociology-advanced'
-        ]
-      },
-      {
-        name: 'Humanities',
-        sections: [
-          'literature', 'history-of-constitution'
-        ]
-      },
-      {
-        name: 'Business & Management',
-        sections: [
-          'business-management', 'finance', 'marketing'
-        ]
-      },
-      {
-        name: 'Soft Skills',
-        sections: [
-          'aptitude', 'logical-thinking', 'decision-making',
-          'personality-development', 'psychology', 'sociology',
-          'ethics-integrity', 'ethics'
-        ]
-      },
-      {
-        name: 'Development',
-        sections: [
-          'urban-rural-development'
-        ]
-      }
-    ]
-  }
-];
+  const predefinedCategories: Category[] = [
+    {
+      name: 'Verbal Ability',
+      subcategories: [
+        {
+          name: 'English Language',
+          sections: [
+            'verbal-ability', 'reading-comprehension', 'para-jumbles',
+            'sentence-correction', 'fill-in-the-blanks', 'synonyms',
+            'antonyms', 'one-word-substitution', 'idioms-phrases',
+            'cloze-test', 'grammar', 'active-passive', 'direct-indirect',
+            'error-spotting', 'spellings'
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Reasoning',
+      subcategories: [
+        {
+          name: 'Logical Reasoning',
+          sections: [
+            'reasoning-ability', 'logical-reasoning', 'analytical-reasoning',
+            'blood-relations', 'coding-decoding', 'number-series',
+            'letter-series', 'direction-sense', 'statement-conclusion',
+            'statement-assumption', 'syllogism', 'data-sufficiency',
+            'puzzles', 'odd-one-out', 'venn-diagram', 'calendar', 'clock'
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Quantitative Aptitude',
+      subcategories: [
+        {
+          name: 'Mathematics',
+          sections: [
+            'numerical-ability', 'advanced-quantitative', 'percentage',
+            'profit-loss', 'simple-interest', 'compound-interest',
+            'ratio-proportion', 'average', 'time-speed-distance',
+            'time-work', 'mixtures-alligation', 'problems-on-ages',
+            'partnership', 'number-system', 'lcm-hcf', 'algebra',
+            'geometry', 'mensuration', 'trigonometry', 'statistics',
+            'data-interpretation', 'probability', 'permutation-combination',
+            'quadratic-equations', 'linear-equations', 'surds-indices',
+            'logarithm', 'mathematics', 'statistics-advanced'
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Programming',
+      subcategories: [
+        { 
+          name: 'C Programming',
+          sections: [
+            'c-basics', 'c-arrays', 'c-strings', 'c-pointers',
+            'c-structures', 'c-functions', 'c-loops',
+            'c-conditional-statements', 'c-storage-classes',
+            'c-recursion', 'c-malloc', 'c-file-handling',
+            'c-bitwise', 'c-preprocessor', 'c-linked-list',
+            'c-data-structures', 'c-mcq', 'c-debugging'
+          ]
+        },
+        {
+          name: 'Python',
+          sections: [
+            'python-basics', 'python-functions', 'python-data-structures',
+            'python-oop', 'python-file-handling', 'python-libraries'
+          ]
+        },
+        {
+          name: 'Java',
+          sections: [
+            'java-basics', 'java-oop', 'java-collections', 'java-multithreading'
+          ]
+        },
+        {
+          name: 'JavaScript',
+          sections: [
+            'javascript-basics', 'javascript-dom', 'javascript-es6'
+          ]
+        },
+        {
+          name: 'C++',
+          sections: [
+            'cpp-oop', 'cpp-templates', 'cpp-stl'
+          ]
+        },
+        {
+          name: 'SQL',
+          sections: [
+            'sql-basics', 'sql-joins', 'sql-aggregation'
+          ]
+        },
+        {
+          name: 'Web Technologies',
+          sections: [
+            'html-basics', 'css-basics'
+          ]
+        },
+        {
+          name: 'Other Languages',
+          sections: [
+            'ruby-basics', 'ruby-rails', 'php-basics', 'go-basics',
+            'go-concurrency', 'rust-basics', 'rust-ownership',
+            'kotlin-basics', 'swift-basics', 'r-basics', 'r-data-analysis',
+            'scala-basics', 'haskell-basics'
+          ]
+        },
+        {
+          name: 'Computer Science Fundamentals',
+          sections: [
+            'data-structures', 'algorithms', 'operating-systems',
+            'computer-networks', 'database-systems', 'software-engineering'
+          ]
+        },
+        {
+          name: 'Advanced Technologies',
+          sections: [
+            'web-development', 'mobile-development', 'cloud-computing',
+            'machine-learning', 'artificial-intelligence', 'data-science',
+            'cybersecurity', 'blockchain', 'iot'
+          ]
+        }
+      ]
+    },
+    {
+      name: 'General Knowledge',
+      subcategories: [
+        {
+          name: 'History',
+          sections: [
+            'indian-history', 'modern-history', 'medieval-history',
+            'ancient-history', 'indian-freedom-struggle', 'world-history'
+          ]
+        },
+        {
+          name: 'Polity & Economy',
+          sections: [
+            'indian-polity', 'indian-economy', 'constitution',
+            'governance', 'economics', 'public-administration',
+            'panchayati-raj', 'governance-reforms'
+          ]
+        },
+        {
+          name: 'Geography',
+          sections: [
+            'geography', 'indian-geography', 'world-geography'
+          ]
+        },
+        {
+          name: 'Science',
+          sections: [
+            'general-science', 'physics', 'chemistry', 'biology',
+            'environment', 'science-technology', 'computer-awareness',
+            'computers-basics', 'ms-office', 'internet-awareness',
+            'space-technology', 'defence-technology', 'nuclear-technology',
+            'agriculture', 'science-in-everyday-life', 'astronomy',
+            'astrophysics', 'quantum-physics', 'environmental-science'
+          ]
+        },
+        {
+          name: 'Current Affairs',
+          sections: [
+            'current-affairs', 'general-knowledge', 'banking-awareness',
+            'financial-awareness', 'budget', 'sports', 'art-culture',
+            'awards-honours', 'books-authors', 'important-days',
+            'national-international-events', 'government-schemes',
+            'social-issues', 'population-demographics',
+            'international-relations', 'world-organizations',
+            'disaster-management', 'infrastructure', 'international-politics'
+          ]
+        }
+      ]
+    },
+    {
+      name: 'Other Disciplines',
+      subcategories: [
+        {
+          name: 'Social Sciences',
+          sections: [
+            'philosophy', 'political-science', 'anthropology',
+            'linguistics', 'psychology-advanced', 'sociology-advanced'
+          ]
+        },
+        {
+          name: 'Humanities',
+          sections: [
+            'literature', 'history-of-constitution'
+          ]
+        },
+        {
+          name: 'Business & Management',
+          sections: [
+            'business-management', 'finance', 'marketing'
+          ]
+        },
+        {
+          name: 'Soft Skills',
+          sections: [
+            'aptitude', 'logical-thinking', 'decision-making',
+            'personality-development', 'psychology', 'sociology',
+            'ethics-integrity', 'ethics'
+          ]
+        },
+        {
+          name: 'Development',
+          sections: [
+            'urban-rural-development'
+          ]
+        }
+      ]
+    }
+  ];
 
   // Fetch sections and categorize them
   useEffect(() => {
@@ -305,8 +307,24 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
           }))
           .filter(category => category.subcategories.length > 0);
 
+        // Add a "Custom" category for user-defined sections
+        const customSections = res.data.sections.filter(
+          (section: Section) => !predefinedCategories.some(category =>
+            category.subcategories.some(sub => sub.sections.includes(section.value))
+          )
+        );
+
+        if (customSections.length > 0) {
+          availableCategories.push({
+            name: 'Custom',
+            subcategories: [{
+              name: 'User-Defined',
+              sections: customSections.map((s: Section) => s.value),
+            }],
+          });
+        }
+
         setCategories(availableCategories);
-        // Set initial active tab
         if (availableCategories.length > 0) {
           setActiveTab(availableCategories[0].name);
         }
@@ -339,7 +357,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
     }
   };
 
-  const parseGeneratedQuestions = (generatedQuestions: any): Question[] => {
+ const parseGeneratedQuestions = (generatedQuestions: any): Question[] => {
     if (typeof generatedQuestions === 'string') {
       try {
         const cleaned = generatedQuestions.replace(/```(json)?\s*|\s*```/g, '');
@@ -389,15 +407,20 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   };
 
   const generateQuestions = async () => {
+    if (questionCount < 1 || questionCount > 100) {
+      setErrorMessage('Please enter a number of questions between 1 and 100.');
+      return;
+    }
+
     try {
       setIsGenerating(true);
       setErrorMessage('');
 
       const res = await axios.post('/api/chat-gpt', {
-        prompt: `Generate exactly 25 medium, hard and challenging level ${selectedSection} questions.Each question must:
-        - Have exactly 4 options, accurate dont do any error (labeled options 0-3)
+        prompt: `Generate exactly ${questionCount} medium, hard, and challenging level ${selectedSection} questions. Each question must:
+        - Have exactly 4 options (labeled options 0-3)
         - Have a single correct answer
-        - Return a valid JSON array with 25 objects following this exact format:
+        - Return a valid JSON array with ${questionCount} objects following this exact format:
         [
           {
           "text": "Question text here",
@@ -413,7 +436,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       const parsedQuestions = parseGeneratedQuestions(res.data.instructions);
 
       if (parsedQuestions.length > 0) {
-        setQuestions(parsedQuestions.slice(0, 25));
+        setQuestions(parsedQuestions.slice(0, questionCount));
         setSuccessMessage(`Successfully generated ${parsedQuestions.length} questions!`);
         toast.success(`Successfully generated ${parsedQuestions.length} questions!`);
         setTimeout(() => setSuccessMessage(''), 2000);
@@ -425,6 +448,60 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       setErrorMessage('Failed to generate questions. Please try again.');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const addCustomSection = async () => {
+    if (!customSection.trim()) {
+      setErrorMessage('Please enter a valid section name.');
+      return;
+    }
+
+    const sectionValue = customSection
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    if (!sectionValue) {
+      setErrorMessage('Invalid section name. Use alphanumeric characters.');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const res = await axios.post('/api/fetchSection', {
+        value: sectionValue,
+        label: customSection.trim(),
+        category: 'Custom',
+      });
+
+      const newSection = res.data.section;
+      setSections([...sections, newSection]);
+
+      // Update categories to include the new custom section
+      const updatedCategories = [...categories];
+      const customCategory = updatedCategories.find(c => c.name === 'Custom');
+      if (customCategory) {
+        customCategory.subcategories[0].sections.push(newSection.value);
+      } else {
+        updatedCategories.push({
+          name: 'Custom',
+          subcategories: [{ name: 'User-Defined', sections: [newSection.value] }],
+        });
+      }
+      setCategories(updatedCategories);
+      setSelectedSection(newSection.value);
+      setCustomSection('');
+      setIsAddingCustomSection(false);
+      setSuccessMessage('Custom section added successfully!');
+      toast.success('Custom section added successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Failed to add custom section', error);
+      setErrorMessage('Failed to add custom section. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -556,6 +633,55 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       {/* Controls Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div className="space-y-4 w-full">
+          {/* Question Count Input */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="questionCount" className="text-sm font-medium">
+              Number of Questions:
+            </label>
+            <input
+              id="questionCount"
+              type="number"
+              min="1"
+              max="100"
+              value={questionCount}
+              onChange={(e) => setQuestionCount(Number(e.target.value))}
+              className="w-20 p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={isGenerating || isSubmitting}
+              aria-label="Number of questions to generate"
+            />
+          </div>
+
+          {/* Custom Section Input */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsAddingCustomSection(!isAddingCustomSection)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+            >
+              <ChevronDown className={`w-5 h-5 ${isAddingCustomSection ? 'rotate-180' : ''}`} />
+              Add Custom Topic
+            </button>
+          </div>
+          {isAddingCustomSection && (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                placeholder="Enter custom topic (e.g., Machine Learning Basics)"
+                className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={customSection}
+                onChange={(e) => setCustomSection(e.target.value)}
+                disabled={isGenerating || isSubmitting}
+                aria-label="Custom section name"
+              />
+              <button
+                onClick={addCustomSection}
+                disabled={isGenerating || isSubmitting}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add
+              </button>
+            </div>
+          )}
+
           {/* Category Tabs */}
           <div className="flex overflow-x-auto pb-2 space-x-1">
             {categories.map((category) => (
@@ -569,7 +695,6 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 onClick={() => {
                   setActiveTab(category.name);
                   setQuickFilter('');
-                  // Set the first available section in the category
                   const firstSection = category.subcategories[0]?.sections[0];
                   if (firstSection) {
                     setSelectedSection(firstSection);
@@ -646,7 +771,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGenerating && <Loader2 className="animate-spin w-5 h-5" />}
-            {isGenerating ? 'Generating✨' : 'Generate'}
+            {isGenerating ? 'Generating✨' : `Generate ${questionCount} Questions`}
           </button>
         </div>
       </div>
@@ -741,7 +866,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
               <button
                 className="fixed bottom-20 right-6 flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
-                {questions.length > 24 && (
+                {questions.length > 0 && (
                   <Link href="/admin-dashboard" className="text-white text-sm">
                     Go to Dashboard
                   </Link>
