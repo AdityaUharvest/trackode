@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useTheme } from "./ThemeContext"; // Adjust the import path as needed
 import { motion } from "framer-motion";
-
+import Image from "next/image";
 interface Quiz {
   _id: string;
   name: string;
@@ -207,8 +207,10 @@ export default function TechStackQuizSystem() {
   };
 
   return (
-    <div className={`px-2 rounded-xl max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+    <div className={`px-2 rounded-xl  mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+      
       <div>
+
         {!selectedTech ? (
           <>
             <div className="grid grid-cols-2 gap-6 sm:gap-8 mt-12 sm:grid-cols-3 lg:grid-cols-5">

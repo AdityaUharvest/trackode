@@ -6,7 +6,7 @@ import QuestionEditor from './(tcs)/QuestionEditor';
 import axios from 'axios';
 import { Button } from './ui/button';
 import { useTheme } from './ThemeContext';
-import { Loader2, ChevronDown } from 'lucide-react';
+import { Loader2, ChevronDown, BookOpen, EyeOff, Eye, ArrowLeft, Pencil, Save, Share2, Trash2 } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -470,7 +470,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
 
     try {
       setIsSubmitting(true);
-      const res = await axios.post('/api/fetchSection', {
+      const res = await axios.post('/api/mock-tests/addSection', {
         value: sectionValue,
         label: customSection.trim(),
         category: 'Custom',
@@ -592,316 +592,418 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   };
 
   return (
-    <div className="min-h-screen mx-auto p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-      {/* Header Section */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          {isPublished && (
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                copied
-                  ? 'bg-green-500 text-white'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
-              onClick={handleShareLink}
-              disabled={isGenerating || isSubmitting || copied}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-5 h-5"
-                viewBox="0 0 48 48"
-                fill="currentColor"
-              >
-                <path d="M38.1,31.2L19.4,24l18.7-7.2c1.5-0.6,2.3-2.3,1.7-3.9c-0.6-1.5-2.3-2.3-3.9-1.7l-26,10C8.8,21.6,8,22.8,8,24s0.8,2.4,1.9,2.8l26,10c0.4,0.1,0.7,0.2,1.1,0.2c1.2,0,2.3-0.7,2.8-1.9C40.4,33.5,39.6,31.8,38.1,31.2z"></path>
-                <path d="M11 17A7 7 0 1 0 11 31 7 7 0 1 0 11 17zM37 7A7 7 0 1 0 37 21 7 7 0 1 0 37 7zM37 27A7 7 0 1 0 37 41 7 7 0 1 0 37 27z"></path>
-              </svg>
-              {copied ? 'Copied!' : 'Share'}
-            </button>
-          )}
-          <span
-            className={`px-3 py-1 rounded-full text-sm font-medium ${
-              isPublished
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-            }`}
-          >
-            {isPublished ? 'Published' : 'Unpublished'}
-          </span>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
+  <div className="max-w-7xl mx-auto">
+    {/* Header Section */}
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
+          Question Adder
+        </h1>
+        <span
+          className={`px-3 py-1 rounded-lg text-xs font-semibold shadow-sm ${
+            isPublished
+              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200'
+              : 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200'
+          }`}
+        >
+          {isPublished ? 'Published' : 'Draft'}
+        </span>
       </div>
+      
+      <div className="flex flex-wrap gap-3">
+        {isPublished && (
+          <button
+            onClick={handleShareLink}
+            disabled={isGenerating || isSubmitting || copied}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-[1.02] ${
+              copied
+                ? 'bg-emerald-500 text-white shadow-emerald-200 dark:shadow-emerald-900'
+                : 'bg-blue-600 text-white shadow-blue-200 dark:shadow-blue-900 hover:bg-blue-700'
+            } shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M18 16c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m-8 4c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2M6 8c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2m12 4c0-.3 0-.7.1-1H14v2h4.1c-.1-.3-.1-.7-.1-1m-6-2h5.9c-.1-.3-.1-.7-.1-1 0-.3 0-.7.1-1H12v2m-2 0v2H5.9c.1-.3.1-.7.1-1s0-.7-.1-1H10m0-2v2H6.8C7.4 8.3 8.5 8 10 8m0 4H6.8c-.6.7-1.7 1-3.3 1v2c2.1 0 3.8-.4 5.2-1.2l.9 1.8c-1.8 1-4 1.4-6.1 1.4v-2c1.3 0 2.5-.1 3.5-.4-1.6 1.3-3.5 1.4-3.5 1.4v2s2.2-.2 4.1-1.4c1.4 1.3 3.4 1.4 3.9 1.4v-2c-.6 0-2.1-.1-3.5-1.1l.8-1.8c1.1.5 2.7.9 4.7.9v-2c-1.4 0-2.6-.3-3.2-1H10z"/>
+            </svg>
+            {copied ? 'Link Copied!' : 'Share Quiz'}
+          </button>
+        )}
+      </div>
+    </div>
 
-      {/* Controls Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div className="space-y-4 w-full">
-          {/* Question Count Input */}
-          <div className="flex items-center gap-2">
-            <label htmlFor="questionCount" className="text-sm font-medium">
-              Number of Questions:
+    {/* Main Content Grid */}
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Left Panel - Controls */}
+      <div className="lg:col-span-1 space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+            Quiz Settings
+          </h2>
+          
+          {/* Question Count */}
+          <div className="mb-6">
+            <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Number of Questions
             </label>
-            <input
-              id="questionCount"
-              type="number"
-              min="1"
-              max="100"
-              value={questionCount}
-              onChange={(e) => setQuestionCount(Number(e.target.value))}
-              className="w-20 p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isGenerating || isSubmitting}
-              aria-label="Number of questions to generate"
-            />
+            <div className="relative">
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={questionCount}
+                onChange={(e) => setQuestionCount(Math.min(50, Math.max(1, Number(e.target.value))))}
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                disabled={isGenerating || isSubmitting}
+              />
+              <div className="absolute right-3 top-2 text-xs text-gray-500 dark:text-gray-400">
+                Max: 50
+              </div>
+            </div>
           </div>
 
-          {/* Custom Section Input */}
-          <div className="flex items-center gap-2">
+          {/* Custom Topic */}
+          <div className="mb-6">
             <button
               onClick={() => setIsAddingCustomSection(!isAddingCustomSection)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600"
+              className="flex items-center justify-between w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
             >
-              <ChevronDown className={`w-5 h-5 ${isAddingCustomSection ? 'rotate-180' : ''}`} />
-              Add Custom Topic
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                Add Custom Topic
+              </span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${isAddingCustomSection ? 'rotate-180' : ''}`} />
             </button>
-          </div>
-          {isAddingCustomSection && (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                placeholder="Enter custom topic (e.g., Machine Learning Basics)"
-                className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={customSection}
-                onChange={(e) => setCustomSection(e.target.value)}
-                disabled={isGenerating || isSubmitting}
-                aria-label="Custom section name"
-              />
-              <button
-                onClick={addCustomSection}
-                disabled={isGenerating || isSubmitting}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add
-              </button>
-            </div>
-          )}
-
-          {/* Category Tabs */}
-          <div className="flex overflow-x-auto pb-2 space-x-1">
-            {categories.map((category) => (
-              <button
-                key={category.name}
-                className={`px-4 py-2 rounded-t-lg whitespace-nowrap ${
-                  activeTab === category.name
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-                }`}
-                onClick={() => {
-                  setActiveTab(category.name);
-                  setQuickFilter('');
-                  const firstSection = category.subcategories[0]?.sections[0];
-                  if (firstSection) {
-                    setSelectedSection(firstSection);
-                  }
-                }}
-                aria-selected={activeTab === category.name}
-                role="tab"
-              >
-                {category.name}
-              </button>
-            ))}
+            
+            {isAddingCustomSection && (
+              <div className="mt-4 space-y-3 animate-fadeIn">
+                <input
+                  type="text"
+                  placeholder="e.g., Advanced Machine Learning"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={customSection}
+                  onChange={(e) => setCustomSection(e.target.value)}
+                />
+                <button
+                  onClick={addCustomSection}
+                  disabled={!customSection.trim() || isGenerating || isSubmitting}
+                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add Topic
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Quick Filter */}
-          {activeTab && (
-            <div className="px-2">
-              <input
-                type="text"
-                placeholder={`Filter ${activeTab} sections...`}
-                className="w-full p-2 border rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={quickFilter}
-                onChange={(e) => setQuickFilter(e.target.value)}
-                disabled={isGenerating || isSubmitting}
-                aria-label={`Filter sections in ${activeTab}`}
-              />
+          {/* Category Selection */}
+          <div className="mb-6">
+            <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Select Category
+            </label>
+            <div className=" pb-2 space-2 flex flex-wrap gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category.name}
+                  className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
+                    activeTab === category.name
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                  onClick={() => {
+                    setActiveTab(category.name);
+                    setQuickFilter('');
+                    const firstSection = category.subcategories[0]?.sections[0];
+                    if (firstSection) {
+                      setSelectedSection(firstSection);
+                    }
+                  }}
+                >
+                  {category.name}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
 
-          {/* Subcategory Sections */}
+          {/* Section Selection */}
           {activeTab && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-b-lg rounded-tr-lg p-4">
-              {categories
-                .find((c) => c.name === activeTab)
-                ?.subcategories.map((subcategory) => {
-                  const filteredSections = subcategory.sections
-                    .map((value) => sections.find((s) => s.value === value))
-                    .filter(
-                      (section) =>
-                        section &&
-                        section.label.toLowerCase().includes(quickFilter.toLowerCase())
-                    );
+            <div className="space-y-4">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder={`Search ${activeTab} topics...`}
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg  placeholder:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  value={quickFilter}
+                  onChange={(e) => setQuickFilter(e.target.value)}
+                />
+                <svg
+                  className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
 
-                  if (filteredSections.length === 0) return null;
+              <div className="max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                {categories
+                  .find((c) => c.name === activeTab)
+                  ?.subcategories.map((subcategory) => {
+                    const filteredSections = subcategory.sections
+                      .map((value) => sections.find((s) => s.value === value))
+                      .filter(
+                        (section) =>
+                          section &&
+                          section.label.toLowerCase().includes(quickFilter.toLowerCase())
+                      );
 
-                  return (
-                    <div key={subcategory.name} className="mb-6">
-                      <h3 className="font-medium text-lg mb-3">{subcategory.name}</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                        {filteredSections.map((section) => (
-                          <button
-                            key={section!.value}
-                            className={`p-2 rounded text-sm text-left ${
-                              selectedSection === section!.value
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-                            }`}
-                            onClick={() => setSelectedSection(section!.value)}
-                            disabled={isGenerating || isSubmitting}
-                            aria-pressed={selectedSection === section!.value}
-                          >
-                            {section!.label}
-                          </button>
-                        ))}
+                    if (filteredSections.length === 0) return null;
+
+                    return (
+                      <div key={subcategory.name} className="mb-6">
+                        <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">
+                          {subcategory.name}
+                        </h3>
+                        <div className="grid grid-cols-1 gap-2">
+                          {filteredSections.map((section) => (
+                            <button
+                              key={section!.value}
+                              className={`p-3 rounded-lg text-left text-sm transition-all ${
+                                selectedSection === section!.value
+                                  ? 'bg-blue-600 text-white shadow-md'
+                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                              }`}
+                              onClick={() => setSelectedSection(section!.value)}
+                            >
+                              {section!.label}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
             </div>
           )}
 
           <button
             onClick={generateQuestions}
-            disabled={isGenerating || isSubmitting}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isGenerating || isSubmitting || !selectedSection}
+            className={`w-full mt-5 py-3 px-4 rounded-lg font-medium text-white transition-all transform hover:scale-[1.02] ${
+              isGenerating
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 shadow-lg'
+            } flex items-center justify-center gap-2`}
           >
-            {isGenerating && <Loader2 className="animate-spin w-5 h-5" />}
-            {isGenerating ? 'Generating✨' : `Generate ${questionCount} Questions`}
+            {isGenerating ? (
+              <>
+                <Loader2 className="animate-spin w-5 h-5" />
+                <span>Generating Questions...</span>
+              </>
+            ) : (
+              `Generate ${questionCount} Questions`
+            )}
           </button>
         </div>
       </div>
 
-      {/* Notifications */}
-      {errorMessage && (
-        <div className="mb-4 p-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg">
-          {errorMessage}
-        </div>
-      )}
-      {successMessage && (
-        <div className="mb-4 p-4 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-lg">
-          {successMessage}
-        </div>
-      )}
+      {/* Right Panel - Questions */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Status Messages */}
+        {errorMessage && (
+          <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded-lg animate-fadeIn">
+            <div className="flex items-center">
+              <svg className="h-5 w-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <p className="text-red-700 dark:text-red-300">{errorMessage}</p>
+            </div>
+          </div>
+        )}
+        
+        {successMessage && (
+          <div className="bg-green-50 dark:bg-green-900/30 border-l-4 border-green-500 p-4 rounded-lg animate-fadeIn">
+            <div className="flex items-center">
+              <svg className="h-5 w-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <p className="text-green-700 dark:text-green-300">{successMessage}</p>
+            </div>
+          </div>
+        )}
 
-      {/* Main Content */}
-      {isLoading ? (
-        <div className="text-center py-12">
-          <Loader2 className="animate-spin mx-auto w-8 h-8 text-blue-600 dark:text-blue-400" />
-          <p className="mt-3 text-gray-600 dark:text-gray-300">Loading questions...</p>
-        </div>
-      ) : editingQuestion ? (
-        <QuestionEditor
-          question={editingQuestion}
-          onSave={(updatedQuestion) =>
-            handleUpdateQuestion(updatedQuestion, editingQuestion.index)
-          }
-          onCancel={() => setEditingQuestion(null)}
-        />
-      ) : (
-        <>
-          <div className="space-y-6">
-            {questions.length === 0 ? (
-              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                No questions yet. Click "Generate Questions" to get started.
-              </div>
-            ) : (
-              questions.map((q, index) => (
+        {/* Questions List */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          {isLoading ? (
+            <div className="p-12 text-center">
+              <Loader2 className="animate-spin mx-auto w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <p className="mt-4 text-gray-500 dark:text-gray-400">
+                Generating your questions...
+              </p>
+            </div>
+          ) : editingQuestion ? (
+            <QuestionEditor
+              question={editingQuestion}
+              onSave={(updatedQuestion) =>
+                handleUpdateQuestion(updatedQuestion, editingQuestion.index)
+              }
+              onCancel={() => setEditingQuestion(null)}
+            />
+          ) : questions.length > 0 ? (
+            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+              {questions.map((q, index) => (
                 <div
                   key={index}
-                  className="p-6 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                      Question {index + 1}
-                    </h3>
-                    <div className="flex gap-3">
+                  <div className=" ">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-medium text-gray-800 dark:text-gray-100 mb-3">
+                        <span className="text-blue-600 dark:text-blue-400 mr-2">
+                          Q{index + 1}.
+                        </span>
+                        {q.text}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {q.options.map((opt, i) => (
+                          <div
+                            key={i}
+                            className={`p-3 rounded-lg border transition-colors ${
+                              q.correctAnswer === i
+                                ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-800'
+                                : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600'
+                            }`}
+                          >
+                            <span
+                              className={`inline-block w-6 h-6 rounded-full mr-2 text-center leading-6 text-sm font-medium ${
+                                q.correctAnswer === i
+                                  ? 'bg-emerald-500 text-white'
+                                  : 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+                              }`}
+                            >
+                              {String.fromCharCode(65 + i)}
+                            </span>
+                            <span className="text-gray-700 dark:text-gray-300">{opt}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
                       <button
                         onClick={() => handleEdit(index)}
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
+                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full"
+                        title="Edit question"
                       >
-                        Edit
+                        <Pencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(index)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm"
+                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full"
+                        title="Delete question"
                       >
-                        Delete
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                  <p className="mb-4 text-gray-700 dark:text-gray-200">{q.text}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {q.options.map((opt, i) => (
-                      <div
-                        key={i}
-                        className={`p-3 rounded-lg text-sm ${
-                          q.correctAnswer === i
-                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                            : 'bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-200'
-                        }`}
-                      >
-                        {String.fromCharCode(65 + i)}. {opt}
-                      </div>
-                    ))}
-                  </div>
                 </div>
-              ))
-            )}
-          </div>
-          {questions.length > 0 && (
-            <>
+              ))}
+            </div>
+          ) : (
+            <div className="p-12 text-center">
+              <div className="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                <BookOpen className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
+                No questions yet
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                Select a topic and generate questions to get started. Your quiz will appear here.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons (when questions exist) */}
+        {questions.length > 0 && (
+          <div className="sticky bottom-2 bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 flex flex-wrap gap-3 justify-between">
+            <div className="flex gap-3">
+              <button
+                onClick={handlePublish}
+                disabled={isSubmitting}
+                className={`px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-colors ${
+                  isPublished
+                    ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
+              >
+                {isPublished ? (
+                  <>
+                    <EyeOff className="w-4 h-4" />
+                    Unpublish
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4" />
+                    Publish Quiz
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={() =>
+                  navigator.clipboard.writeText(`${window.location.origin}/playy/${shareCode}`)
+                    .then(() => toast.success('Quiz link copied to clipboard!'))
+                    .catch(() => toast.error('Failed to copy link'))
+                }
+                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
+            </div>
+            
+            <div className="flex gap-3">
+              <Link
+                href="/admin-dashboard"
+                className="px-5 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium flex items-center gap-2 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Dashboard
+              </Link>
+              
               <button
                 onClick={saveQuestions}
                 disabled={isSubmitting}
-                className="fixed bottom-6 text-sm right-6 flex items-center gap-2 px-6 py-2 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting && <Loader2 className="animate-spin w-5 h-5" />}
-                {isSubmitting ? 'Saving...' : 'Save Questions'}
-              </button>
-              <button
-                className="fixed bottom-20 right-6 flex items-center gap-2 px-5 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-              >
-                {questions.length > 0 && (
-                  <Link href="/admin-dashboard" className="text-white text-sm">
-                    Go to Dashboard
-                  </Link>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="animate-spin w-4 h-4" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save Questions
+                  </>
                 )}
               </button>
-              <Button
-                onClick={() =>
-                  navigator.share({
-                    title: 'Trackode Quiz',
-                    text: `Check out this quiz on Trackode!`,
-                    url: `${window.location.origin}/playy/${shareCode}`,
-                  }).then(
-                    () => {
-                      toast.success('Link Copied!');
-                    },
-                    (error) => {
-                      toast.error('Failed to share quiz. Please try again.');
-                    }
-                  )
-                }
-                className="fixed bottom-32 right-6 text-sm flex items-center gap-2 px-10 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-              >
-                Share Quiz
-              </Button>
-              <Button
-                onClick={handlePublish}
-                className="fixed bottom-44 right-6 text-sm flex items-center gap-2 px-8 py-2 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-              >
-                {isPublishedd ? 'Unpublish Quiz' : 'Publish Quiz'}
-              </Button>
-            </>
-          )}
-        </>
-      )}
-      <Toaster />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
+  </div>
+  
+  <Toaster position="bottom-right" />
+</div>
   );
 }

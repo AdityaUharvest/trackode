@@ -1,4 +1,5 @@
 "use client";
+import Carousel from "./Crousel";
 import { useTheme } from "./ThemeContext";
 import Link from "next/link";
 
@@ -13,6 +14,7 @@ export default function Footer() {
         ? "bg-gradient-to-b from-gray-900 to-black text-gray-200" 
         : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-700"
     }`}>
+      <Carousel/>
       {/* Main Footer Content */}
       <div className="container mx-auto px-6">
         <div className="grid  md:grid-cols-3 lg:grid-cols-3 gap-4">
@@ -204,6 +206,15 @@ export default function Footer() {
             }`}>Resources</h3>
             <ul className="space-y-3">
               <li>
+                <Link 
+                  href="https://www.devblogger.in" 
+                  className="text-sm hover:underline transition-all flex items-center"
+                >
+                  <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
+                  </svg>
+                  Roadmaps
+                </Link>
                 <Link 
                   href="https://www.devblogger.in" 
                   className="text-sm hover:underline transition-all flex items-center"

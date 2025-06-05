@@ -206,3 +206,12 @@ body {
   background-size: 200% 200%;
   animation: pulseGradient 5s ease-in-out infinite;
 }
+
+ @keyframes marquee {
+        0% {
+          transform: translateX(0%);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+          }

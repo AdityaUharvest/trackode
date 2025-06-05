@@ -13,6 +13,13 @@ import SplitText from "../components/SplitText";
 import QuizJoinComponent from '@/components/JoinQuiz';
 import TechStackQuizSystem from '@/components/TechnologySection';
 import InteractiveQuiz from '@/components/DemoQuizzes';
+import CountUp from 'react-countup';
+
+import ProgrammingLanguageQuizzes from '@/components/ProgrammingLanguageQuizzes';
+
+import TCSNQTRoadmap from '@/components/RoadMapComponent';
+import RoadmapComponent from '@/components/RoadMapComponent';
+
 
 const handleAnimationComplete = () => {
   console.log('All letters have animated!');
@@ -424,11 +431,10 @@ export default function HomePage() {
                   <p className="max-w-xl mx-auto mt-4 text-sm sm:text-sm text-blue-100 leading-relaxed">
                     Join a community of passionate developers who use Trackode's interactive quizzes to master programming concepts.
                   </p>
-
                   <div className="flex flex-wrap items-center justify-center gap-3 mt-6">
                     <Link
                       href="/programming-quizzes"
-                      className="group relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
+                      className="group relative  bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center  px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
                     >
                       <span className="relative flex items-center">
                         <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
@@ -440,7 +446,7 @@ export default function HomePage() {
 
                     <Link
                       href="/mocks"
-                      className="group relative overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md bg-green-600 hover:bg-green-700 text-white"
+                      className="group relative overflow-hidden inline-flex items-center justify-center  px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md bg-green-600 hover:bg-green-700 text-white"
                     >
                       <span className="relative flex items-center">
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -449,23 +455,43 @@ export default function HomePage() {
                         <span>Free Mock Tests</span>
                       </span>
                     </Link>
+                     <Link
+                      href="/programming-quizzes"
+                      className="group   relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
+                    >
+                      <span className="relative flex items-center">
+                        <svg className="w-4 h-4 mr-2" viewBox="0 0 18 18" fill="none" stroke="currentColor">
+                          <path d="M8.18 13.426C6.86 14.392 5 13.448 5 11.811V5.439C5 3.802 6.86 2.858 8.18 3.824L12.54 7.01C13.634 7.809 13.634 9.441 12.54 10.24L8.18 13.426Z" strokeWidth="2" />
+                        </svg>
+                        <span>Free Roadmaps</span>
+                      </span>
+                    </Link>
+</div>
                   </div>
-                </div>
+
 
                 <div className="mt-10 pt-6 border-t border-white border-opacity-20">
                   <div className="grid grid-cols-3 sm:grid-cols-5 gap-4 mx-auto max-w-3xl">
                     {[
-                      { value: "20+", label: "Mocks" },
-                      { value: "525", label: "Developers" },
-                      { value: "120+", label: "Challenges" },
-                      { value: "30+", label: "Tech Stacks" },
-                      { value: "100+", label: "Live Blogs" }
+                      { value: 50, label: "Mocks" },
+                      
+                      { value: 150, label: "Challenges" },
+                      { value: 30, label: "Tech Stacks" },
+                      { value: 100, label: "Live Quizzes" }
                     ].map((stat, index) => (
                       <div key={index} className="text-center group transform transition-all duration-300 hover:-translate-y-1">
-                        <div className="text-lg sm:text-lg font-bold text-white group-hover:text-blue-200">{stat.value}</div>
+                        <div className="text-3xl font-bold text-white">
+                          <CountUp end={stat.value} duration={3} separator="," />
+                        </div>
                         <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">{stat.label}</div>
                       </div>
                     ))}
+                    <div className="text-center group transform transition-all duration-300 hover:-translate-y-1">
+                      <div className="text-3xl font-bold text-white">
+                        <CountUp end={1254} duration={3} separator="," />
+                      </div>
+                      <div className="mt-0.5 text-blue-200 text-xs sm:text-sm uppercase tracking-wider">Active Learners</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -489,7 +515,7 @@ export default function HomePage() {
         {/* Technology Section */}
         <section
           id="technology"
-          className={`pb-16 pt-5 px-2 max-w-7xl ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
+          className={`pb-16 pt-5 px-2  ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
           aria-labelledby="tech-stack-hading"
         >
           <div className="text-center mb-10">
@@ -508,12 +534,26 @@ export default function HomePage() {
               <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </motion.div>
           </div>
+          
           <TechStackQuizSystem />
+         
+          
         </section>
-<section
+        {/* road map */}
+        <section
+
           className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
         >
-          <div className="px-4 mx-auto  max-w-7xl sm:px-6 lg:px-8">
+          
+          <RoadmapComponent/>
+        </section>
+        
+<section
+
+          className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
+        >
+          
+          <div className="px-4 mx-auto   sm:px-6 ">
             <div className="text-center mb-10">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -661,7 +701,7 @@ export default function HomePage() {
           className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
           aria-labelledby="features-heading"
         >
-          <div className="px-4  mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="px-4  mx-auto sm:px-6 ">
             <div className="max-w-3xl mx-auto text-center mb-10">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -786,7 +826,7 @@ export default function HomePage() {
           className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"} rounded-lg`}
           aria-labelledby="testimonials-heading"
         >
-          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="px-4 mx-auto  sm:px-6 ">
             <div className="text-center mb-10">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -893,6 +933,8 @@ export default function HomePage() {
           </div>
           <Faq />
         </section>
+        
+      
       </div>
     </>
   );

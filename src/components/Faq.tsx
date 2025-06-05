@@ -95,13 +95,13 @@ export default function Faq() {
   return (
     <div className="px-3">
       <div
-        className={`rounded-xl px-5 py-8 max-w-6xl mx-auto shadow-xl ${
+        className={`rounded-xl px-5 py-8  mx-auto shadow-xl ${
           theme === "dark"
             ? "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700"
             : "bg-gradient-to-br from-white to-gray-50 border border-gray-100"
         }`}
       >
-        <div className="max-w-7xl mt-2 mx-auto">
+        <div className="mt-2 mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {filteredItems.map((item, index) => (
               <motion.li

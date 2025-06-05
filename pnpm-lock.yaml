@@ -143,6 +143,9 @@ importers:
       react-confetti:
         specifier: ^6.4.0
         version: 6.4.0(react@18.3.1)
+      react-countup:
+        specifier: ^6.5.3
+        version: 6.5.3(react@18.3.1)
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -201,6 +204,9 @@ importers:
       '@types/react-big-calendar':
         specifier: ^1.16.1
         version: 1.16.1
+      '@types/react-countup':
+        specifier: ^4.3.1
+        version: 4.3.1(react@18.3.1)
       '@types/react-dom':
         specifier: ^19
         version: 19.0.4(@types/react@19.0.12)
@@ -2679,6 +2685,10 @@ packages:
   '@types/react-big-calendar@1.16.1':
     resolution: {integrity: sha512-pDHFcVWx+BvZbX6U39R4l8c9930vKnfx+09lf4W8r8HuxBDLzGk7Q63ncBmqqnQImEFNDKfwa6MDyu90cfzJ2A==}
 
+  '@types/react-countup@4.3.1':
+    resolution: {integrity: sha512-8KwOdVVKhMOdtXJoOg3YXZwWxnFnZtPojNs/DZRlhHTpOYIb1If+9+rVPnwnXDhNhphj5diUCds9E26VtVK8IA==}
+    deprecated: This is a stub types definition. react-countup provides its own type definitions, so you do not need this installed.
+
   '@types/react-dom@19.0.4':
     resolution: {integrity: sha512-4fSQ8vWFkg+TGhePfUzVmat3eC14TXYSsiiDSLI0dVLsrm9gZFABjPy/Qu6TKgl1tq1Bu1yDsuQgY3A3DOjCcg==}
     peerDependencies:
@@ -4061,6 +4071,9 @@ packages:
   cosmiconfig@7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
     engines: {node: '>=10'}
+
+  countup.js@2.9.0:
+    resolution: {integrity: sha512-llqrvyXztRFPp6+i8jx25phHWcVWhrHO4Nlt0uAOSKHB8778zzQswa4MU3qKBvkXfJKftRYFJuVHez67lyKdHg==}
 
   create-ecdh@4.0.4:
     resolution: {integrity: sha512-mf+TCx8wWc9VpuxfP2ht0iSISLZnt0JgWlrOKZiNqyUZWnjIaCIVNQArMHnCZKfEYRg6IM7A+NeJoN8gf/Ws0A==}
@@ -8112,6 +8125,11 @@ packages:
     engines: {node: '>=16'}
     peerDependencies:
       react: ^16.3.0 || ^17.0.1 || ^18.0.0 || ^19.0.0
+
+  react-countup@6.5.3:
+    resolution: {integrity: sha512-udnqVQitxC7QWADSPDOxVWULkLvKUWrDapn5i53HE4DPRVgs+Y5rr4bo25qEl8jSh+0l2cToJgGMx+clxPM3+w==}
+    peerDependencies:
+      react: '>= 16.3.0'
 
   react-dev-utils@11.0.4:
     resolution: {integrity: sha512-dx0LvIGHcOPtKbeiSUM4jqpBl3TcY7CDjZdfOIcKeznE7BWr9dg0iPG90G5yfVQ+p/rGNMXdbfStvzQZEVEi4A==}
@@ -12502,11 +12520,7 @@ snapshots:
       jest-runner: 26.6.3
       jest-runtime: 26.6.3
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/transform@26.6.2':
     dependencies:
@@ -13737,6 +13751,12 @@ snapshots:
       '@types/date-arithmetic': 4.1.4
       '@types/prop-types': 15.7.14
       '@types/react': 19.0.12
+
+  '@types/react-countup@4.3.1(react@18.3.1)':
+    dependencies:
+      react-countup: 6.5.3(react@18.3.1)
+    transitivePeerDependencies:
+      - react
 
   '@types/react-dom@19.0.4(@types/react@19.0.12)':
     dependencies:
@@ -15435,6 +15455,8 @@ snapshots:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+
+  countup.js@2.9.0: {}
 
   create-ecdh@4.0.4:
     dependencies:
@@ -17941,11 +17963,7 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-cli@26.6.3:
     dependencies:
@@ -20554,6 +20572,11 @@ snapshots:
     dependencies:
       react: 18.3.1
       tween-functions: 1.2.0
+
+  react-countup@6.5.3(react@18.3.1):
+    dependencies:
+      countup.js: 2.9.0
+      react: 18.3.1
 
   react-dev-utils@11.0.4(eslint@9.23.0(jiti@1.21.7))(typescript@5.8.2)(webpack@4.44.2):
     dependencies:
