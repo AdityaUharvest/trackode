@@ -456,7 +456,7 @@ export default function HomePage() {
                       </span>
                     </Link>
                      <Link
-                      href="/programming-quizzes"
+                      href="/roadmap"
                       className="group   relative bg-blue-500 hover:bg-blue-700 text-white overflow-hidden inline-flex items-center justify-center px-6 py-3 text-sm font-bold transition-all duration-300 rounded-lg shadow-md"
                     >
                       <span className="relative flex items-center">

@@ -207,7 +207,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link 
-                  href="https://www.devblogger.in" 
+                  href="/roadmap" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -215,7 +215,7 @@ export default function Footer() {
                   </svg>
                   Roadmaps
                 </Link>
-                <Link 
+                {/* <Link 
                   href="https://www.devblogger.in" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
@@ -223,7 +223,7 @@ export default function Footer() {
                     <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
                   </svg>
                   Blog
-                </Link>
+                </Link> */}
               </li>
               <li>
                 <Link 
