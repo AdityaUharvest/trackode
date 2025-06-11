@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
 const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
@@ -9,6 +8,9 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   env: {
     MONGODB_URI: process.env.MONGODB_URI,
+  },
+  images: {
+    domains: ['img.icons8.com','/'], // Add your image domains here
   },
   async headers() {
     return [

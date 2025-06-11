@@ -1,227 +1,10 @@
 "use client"
 import React, { useState } from 'react';
-import { useTheme } from './ThemeContext';
+import { useTheme } from '../ThemeContext';
 
-    const colorMap = {
-        "C": {
-            borderGradient: "linear-gradient(to right, #FFD700, #DAA520)",
-            badgeGradient: "linear-gradient(to right, #FFD700, #DAA520)",
-            textClass: "text-yellow-500",
-        },
-        "C++": {
-            borderGradient: "linear-gradient(to right, #FFD700, #DAA520)",
-            badgeGradient: "linear-gradient(to right, #FFD700, #DAA520)",
-            textClass: "text-yellow-500",
-        },
-        "Java": {
-            borderGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
-            badgeGradient: "linear-gradient(to right, #F43F5E, #E11D48)",
-            textClass: "text-rose-500",
-        },
-        "Python": {
-            borderGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
-            badgeGradient: "linear-gradient(to right, #0EA5E9, #0284C7)",
-            textClass: "text-sky-500",
-        },
-        "TCS NQT": {
-            borderGradient: "linear-gradient(to right, #10B981, #059669)",
-            badgeGradient: "linear-gradient(to right, #10B981, #059669)",
-            textClass: "text-emerald-500",
-        },
-    };
+   
 
-    const programmingRoadmapData = {
-      C: [
-        {
-          milestone: "Milestone 1: Basics and Syntax",
-          topics: [
-            "Introduction to C: History, setup (GCC), basic program structure",
-            "Data Types: int, float, char, double, ranges",
-            "Variables and Constants: Declaration, initialization, scope",
-            "Operators: Arithmetic, relational, logical, bitwise",
-            "Input/Output: printf, scanf, getchar, putchar",
-            "Control Structures: if, if-else, switch-case",
-          ],
-        },
-        {
-          milestone: "Milestone 2: Loops and Arrays",
-          topics: [
-            "Loops: for, while, do-while, nested loops",
-            "Arrays: 1D arrays, declaration, initialization",
-            "Multi-dimensional Arrays: 2D arrays for matrices",
-            "String Handling: Character arrays, strlen, strcpy, strcmp",
-          ],
-        },
-        {
-          milestone: "Milestone 3: Functions and Pointers",
-          topics: [
-            "Functions: Declaration, definition, calling",
-            "Parameter Passing: Call by value, recursion basics",
-            "Pointers: Concept, declaration, pointer arithmetic",
-            "Pointers with Arrays: Accessing elements via pointers",
-          ],
-        },
-        {
-          milestone: "Milestone 4: Advanced Concepts",
-          topics: [
-            "Structures and Unions: Definition, accessing members",
-            "Dynamic Memory: malloc, calloc, free",
-            "File Handling: Reading and writing files",
-            "Data Structures: Linked lists, stacks, queues",
-          ],
-        },
-        {
-          milestone: "Milestone 5: Real-world Applications",
-          topics: [
-            "Building small projects: Contact management system",
-            "Algorithm implementation: Sorting, searching",
-            "Memory management techniques",
-            "Performance optimization basics",
-          ],
-        },
-      ],
-      "C++": [
-        {
-          milestone: "Milestone 1: C++ Fundamentals",
-          topics: [
-            "Introduction: Setup (g++), differences from C",
-            "Data Types: int, float, char, string class",
-            "Operators: Arithmetic, logical, relational, bitwise",
-            "Input/Output: cin, cout, string streams",
-          ],
-        },
-        {
-          milestone: "Milestone 2: STL and Modern C++",
-          topics: [
-            "Standard Template Library: Containers, algorithms",
-            "Vectors, lists, maps: Declaration and usage",
-            "Range-based loops, auto keyword",
-            "Smart pointers: unique_ptr, shared_ptr",
-          ],
-        },
-        {
-          milestone: "Milestone 3: OOP Concepts",
-          topics: [
-            "Classes and Objects: Constructors, destructors",
-            "Inheritance: Single, multiple, hierarchical",
-            "Polymorphism: Virtual functions, abstract classes",
-            "Operator overloading",
-          ],
-        },
-        {
-          milestone: "Milestone 4: Advanced Features",
-          topics: [
-            "Templates: Function and class templates",
-            "Exception handling: try, catch, throw",
-            "Multithreading basics",
-            "File I/O operations",
-          ],
-        },
-        {
-          milestone: "Milestone 5: Project Development",
-          topics: [
-            "Design patterns in C++",
-            "Building small games or utilities",
-            "Performance measurement and optimization",
-            "Cross-platform development basics",
-          ],
-        },
-      ],
-      Java: [
-        {
-          milestone: "Milestone 1: Core Java",
-          topics: [
-            "Introduction: JVM, JRE, JDK setup",
-            "Data Types: Primitive and object types",
-            "Control Statements: if-else, switch, loops",
-            "Arrays and Strings: Manipulation techniques",
-          ],
-        },
-        {
-          milestone: "Milestone 2: OOP Principles",
-          topics: [
-            "Classes and Objects: Constructors, methods",
-            "Inheritance and Polymorphism",
-            "Encapsulation and Abstraction",
-            "Interfaces and Abstract classes",
-          ],
-        },
-        {
-          milestone: "Milestone 3: Java Collections",
-          topics: [
-            "List implementations: ArrayList, LinkedList",
-            "Set and Map interfaces",
-            "Iterators and Comparators",
-            "Stream API and Lambda expressions",
-          ],
-        },
-        {
-          milestone: "Milestone 4: Advanced Java",
-          topics: [
-            "Exception Handling: Checked and unchecked",
-            "Multithreading: Thread class, Runnable",
-            "File Handling: Readers, Writers",
-            "Networking basics",
-          ],
-        },
-        {
-          milestone: "Milestone 5: Application Development",
-          topics: [
-            "Building console applications",
-            "JDBC and database connectivity",
-            "Unit testing with JUnit",
-            "Introduction to Spring Framework",
-          ],
-        },
-      ],
-      Python: [
-        {
-          milestone: "Milestone 1: Python Basics",
-          topics: [
-            "Introduction: Setup, interpreters, IDEs",
-            "Data Types: int, float, str, list, tuple, dict",
-            "Control Structures: if-elif-else, loops",
-            "Functions: Defining, lambda, recursion",
-          ],
-        },
-        {
-          milestone: "Milestone 2: Data Structures",
-          topics: [
-            "Lists: Slicing, list comprehension",
-            "Tuples, Sets, Dictionaries: Operations",
-            "String manipulation techniques",
-            "Generators and Iterators",
-          ],
-        },
-        {
-          milestone: "Milestone 3: OOP in Python",
-          topics: [
-            "Classes and Objects: init, self",
-            "Inheritance and Polymorphism",
-            "Magic methods",
-            "Decorators and Properties",
-          ],
-        },
-        {
-          milestone: "Milestone 4: Advanced Concepts",
-          topics: [
-            "File Handling: Reading/writing files",
-            "Exception Handling: try-except-else-finally",
-            "Modules and Packages",
-            "Working with APIs (requests library)",
-          ],
-        },
-        {
-          milestone: "Milestone 5: Real-world Projects",
-          topics: [
-            "Web scraping with BeautifulSoup",
-            "Data analysis with Pandas",
-            "Building small web applications",
-            "Automation scripts",
-          ],
-        },
-      ],
-    };
+    
 
     const tcsNqtRoadmap = {
       sections: [
@@ -598,9 +381,9 @@ import { useTheme } from './ThemeContext';
       ],
     };
 
-const RoadmapComponent = () => {
-  const [selectedTab, setSelectedTab] = useState('programming');
-  const [selectedLanguage, setSelectedLanguage] = useState('C');
+const TCS = () => {
+  
+  
   const { theme, toggleTheme } = useTheme(); // Use the theme context
 
   return (
@@ -618,134 +401,13 @@ const RoadmapComponent = () => {
             theme === 'light' ? 'text-gray-800' : 'text-gray-100'
           }`}
         >
-          Personalized Roadmaps
+          TCS NQT Roadmaps
         </h2>
 
         {/* Tab Selection */}
-        <div className="flex justify-center mb-8">
-          <button
-            onClick={() => setSelectedTab('tcs')}
-            className={`px-6 py-2 rounded-l-lg text-sm font-semibold transition-colors ${
-              selectedTab === 'tcs'
-                ? theme === 'light'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-green-500 text-white'
-                : theme === 'light'
-                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-            }`}
-          >
-            TCS NQT Preparation
-          </button>
-          <button
-            onClick={() => setSelectedTab('programming')}
-            className={`px-6 py-2 rounded-r-lg text-sm font-semibold transition-colors ${
-              selectedTab === 'programming'
-                ? theme === 'light'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-blue-500 text-white'
-                : theme === 'light'
-                ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-            }`}
-          >
-            Programming Languages
-          </button>
-          
-        </div>
+        
 
-        {selectedTab === 'programming' ? (
-          <>
-            <div className="flex justify-center mb-8">
-              {Object.keys(programmingRoadmapData).map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => setSelectedLanguage(lang)}
-                  className={`mx-2 px-4 py-2 rounded-lg font-semibold transition-colors `}
-                  style={{
-                    background:
-                      selectedLanguage === lang
-                        ? colorMap[lang].badgeGradient
-                        : theme === 'light'
-                        ? '#e5e7eb'
-                        : '#374151',
-                  }}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative">
-              {programmingRoadmapData[selectedLanguage].map((milestone, index) => (
-                <div
-                  key={index}
-                  className={`relative mb-5 ${index % 2 === 0 ? 'pl-12' : 'pr-12'}`}
-                >
-                  {/* Timeline dot */}
-                  <div
-                    className={`absolute top-0 w-6 h-6 rounded-full ${colorMap[selectedLanguage].textClass} border-4`}
-                    style={{
-                      borderImage: colorMap[selectedLanguage].borderGradient,
-                      borderImageSlice: 1,
-                      left: index % 2 === 0 ? '0' : 'auto',
-                      right: index % 2 === 0 ? 'auto' : '0',
-                    }}
-                  ></div>
-
-                  {/* Milestone Content */}
-                  <div
-                    className={`p-6 rounded-lg shadow-md mb-4 ${
-                      index % 2 === 0 ? 'ml-6' : 'mr-6'
-                    } ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`}
-                    style={{
-                      borderLeft:
-                        index % 2 === 0
-                          ? `4px solid ${colorMap[selectedLanguage].borderGradient}`
-                          : 'none',
-                      borderRight:
-                        index % 2 === 0
-                          ? 'none'
-                          : `4px solid ${colorMap[selectedLanguage].borderGradient}`,
-                    }}
-                  >
-                    <h3
-                      className={`text-xl font-semibold mb-4 ${colorMap[selectedLanguage].textClass}`}
-                    >
-                      {milestone.milestone}
-                    </h3>
-                    <ul
-                      className={`list-disc pl-5 ${
-                        theme === 'light' ? 'text-gray-700' : 'text-gray-200'
-                      }`}
-                    >
-                      {milestone.topics.map((topic, idx) => (
-                        <li key={idx} className="mb-2">{topic}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Timeline connector */}
-{/* Timeline connector */}
-{/* Timeline connector */}
-{/* Timeline connector */}
-{/* Timeline connector */}
-{/* Timeline connector */}
-{index < programmingRoadmapData[selectedLanguage].length - 1 && (
-  <div
-    className={`absolute top-6 h-[calc(100%+48px)] w-1 ${
-      index % 2 === 0 ? 'left-3' : 'right-3'
-    }`}
-    style={{
-      background: colorMap[selectedLanguage].borderGradient,
-    }}
-  ></div>
-)}
-                </div>
-              ))}
-            </div>
-          </>
-        ) : (
+        
           <div
             className={`rounded-lg shadow-lg p-6 ${
               theme === 'light' ? 'bg-white' : 'bg-gray-900'
@@ -1051,10 +713,10 @@ const RoadmapComponent = () => {
               </ul>
             </div>
           </div>
-        )}
+        
       </div>
     </section>
   );
 };
 
-export default RoadmapComponent;
+export default TCS;

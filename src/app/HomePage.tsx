@@ -19,6 +19,7 @@ import ProgrammingLanguageQuizzes from '@/components/ProgrammingLanguageQuizzes'
 
 import TCSNQTRoadmap from '@/components/RoadMapComponent';
 import RoadmapComponent from '@/components/RoadMapComponent';
+import RoadMap from '@/components/roadmaps/Main';
 
 
 const handleAnimationComplete = () => {
@@ -545,7 +546,7 @@ export default function HomePage() {
           className={`pb-16 ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}
         >
           
-          <RoadmapComponent/>
+          <RoadMap/>
         </section>
         
 <section
