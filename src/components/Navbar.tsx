@@ -154,7 +154,7 @@ const Navbar: React.FC = () => {
         ${themeStyles.navbar}
         ${scrolled ? 'shadow-lg backdrop-blur-xl' : 'backdrop-blur-md'}
       `}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
             {/* Logo Section */}
@@ -168,19 +168,19 @@ const Navbar: React.FC = () => {
                   {theme === "light" ? (
                     <img
                       src="/logo.png"
-                      className="h-12 w-full  transition-shadow"
+                      className="h-11 w-full  transition-shadow"
                       alt="Trackode"
                     />
                   ) : (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center ">
                       <img 
-                        className="h-12 rounded-xl shadow-sm group-hover:shadow-md transition-shadow"
+                        className="h-10  rounded-xl shadow-sm group-hover:shadow-md transition-shadow"
                         alt="Trackode" 
                         src="/icon-192x192.png"
                       />
                       <img
                         src="/brandname.png"
-                        className="h-8 rounded-lg"
+                        className="h-8 mt-2 rounded-lg"
                         alt="Trackode"
                       />
                     </div>
@@ -207,7 +207,7 @@ const Navbar: React.FC = () => {
             </div>
 
             {/* Right Section */}
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1">
               
               {/* Theme Toggle */}
               <button
@@ -360,7 +360,7 @@ const Navbar: React.FC = () => {
                 <Link
                   href="/signin"
                   className={`
-                    flex items-center px-4 py-2 text-sm font-medium rounded-xl
+                    flex items-center px-2 py-2 text-sm font-medium rounded-xl
                     transition-all duration-300 hover:scale-105 group
                     bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
                     text-white shadow-md hover:shadow-lg
