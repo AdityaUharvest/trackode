@@ -20,8 +20,37 @@ import {
   ChevronDown,
   AudioWaveform,
   Notebook
-  
 } from "lucide-react";
+
+// Custom hook extracted outside the component
+const useOutsideClick = <T extends HTMLElement>(
+  ref: React.RefObject<T>,
+  callback: () => void,
+  isOpen: boolean
+) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleClick = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        callback();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        callback();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [ref, callback, isOpen]);
+};
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
@@ -72,44 +101,15 @@ const Navbar: React.FC = () => {
     }
   };
 
-  // Enhanced outside click handler
-  const useOutsideClick = <T extends HTMLElement>(
-    ref: React.RefObject<T>,
-    callback: () => void,
-    isOpen: boolean
-  ) => {
-    useEffect(() => {
-      if (!isOpen) return;
-      
-      const handleClick = (event: MouseEvent) => {
-        if (ref.current && !ref.current.contains(event.target as Node)) {
-          callback();
-        }
-      };
-
-      const handleEscape = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-          callback();
-        }
-      };
-
-      document.addEventListener('mousedown', handleClick);
-      document.addEventListener('keydown', handleEscape);
-      return () => {
-        document.removeEventListener('mousedown', handleClick);
-        document.removeEventListener('keydown', handleEscape);
-      };
-    }, [ref, callback, isOpen]);
-  };
-
-  useOutsideClick(dropdownRef, () => setDropdownOpen(false), isDropdownOpen);
-  useOutsideClick(navRef, () => setNavOpen(false), isNavOpen);
-  useOutsideClick(notificationRef, () => setNotificationOpen(false), isNotificationOpen);
+  // Use the custom hook for outside clicks
+  useOutsideClick(dropdownRef as React.RefObject<HTMLElement>, useCallback(() => setDropdownOpen(false), []), isDropdownOpen);
+  useOutsideClick(navRef as React.RefObject<HTMLElement>, useCallback(() => setNavOpen(false), []), isNavOpen);
+  useOutsideClick(notificationRef as React.RefObject<HTMLElement>, useCallback(() => setNotificationOpen(false), []), isNotificationOpen);
 
   // Navigation items configuration
   const navigationItems = useMemo(() => [
     {
-      href: status === "authenticated" ? "/programming-quizzes" : "/signin",
+      href: "/programming-quizzes",
       icon:<Notebook size={18} /> ,
       label: "Explore Quizzes",
       requiresAuth: false
@@ -128,12 +128,10 @@ const Navbar: React.FC = () => {
     },
     {
       href: "/dashboard",
-
       icon: <BarChart size={18} />,
       label: "Dashboard",
       requiresAuth: true
     },
-    
   ], [status]);
 
   // Theme-based styles
@@ -200,8 +198,7 @@ const Navbar: React.FC = () => {
                     href={item.href}
                     icon={item.icon}
                     theme={theme}
-                    requiresAuth={item.requiresAuth}
-                    isAuthenticated={status === "authenticated"}
+                    
                   >
                     {item.label}
                   </NavItem>
@@ -212,18 +209,6 @@ const Navbar: React.FC = () => {
             {/* Right Section */}
             <div className="flex items-center space-x-3">
               
-              {/* Search Button (Desktop) */}
-              {/* <button
-                className={`
-                  hidden md:flex items-center justify-center w-10 h-10 rounded-xl
-                  transition-all duration-200 hover:scale-105
-                  ${themeStyles.hover} ${themeStyles.textSecondary}
-                `}
-                aria-label="Search"
-              >
-                <Search size={18} />
-              </button> */}
-
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}
@@ -263,9 +248,6 @@ const Navbar: React.FC = () => {
                   {theme === "light" ? "Dark Mode" : "Light Mode"}
                 </div>
               </button>
-
-              {/* Notifications (for authenticated users) */}
-              
 
               {/* User Section */}
               {status === "authenticated" ? (
