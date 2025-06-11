@@ -115,7 +115,7 @@ export default function HomePage() {
             className="absolute hidden lg:block left-6 lg:left-12 top-24 lg:top-48 opacity-25 dark:opacity-15 animate-float-slow hover:animate-pulse"
           >
             <div className="text-cyan-400 dark:text-cyan-300 font-mono text-sm lg:text-base transition-all duration-300">
-              {"async trackode code() {"}<br />
+              {"async trackode() {"}<br />
               {"  await masterSkills();"}<br />
               {"}"}
             </div>

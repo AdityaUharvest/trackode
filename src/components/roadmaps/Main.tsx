@@ -25,7 +25,7 @@ const RoadmapList = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4">
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2  md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {roadmapItems.map((item, index) => (
           <div
             key={item.slug}
@@ -37,7 +37,7 @@ const RoadmapList = () => {
           >
             <Link
               href={`/roadmap/${item.slug}`}
-              className="block p-6 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 
+              className="block p-4 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 
                          rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 
                          border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600
                          transform hover:-translate-y-2 hover:scale-105"
@@ -147,26 +147,23 @@ export const metadata = {
 function RoadMap() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-blue-100 
-                    dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-16 px-4">
+                    dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-10 ">
       {/* Header Section */}
       <div className="max-w-4xl mx-auto text-center mb-10">
         <div className="relative">
           <h1 className="text-3xl md:text-4xl font-bold  
-                          mb-6 leading-tight">
+                          mb-2 leading-tight">
             Trackode Roadmap
           </h1>
           <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500 rounded-full animate-pulse opacity-60"></div>
-          <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-500 rounded-full animate-ping opacity-40"></div>
+          <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-500 rounded-full  opacity-40"></div>
         </div>
         
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-          Master programming languages and ace competitive exams with our comprehensive learning paths
-        </p>
         
         {/* Stats or decorative elements */}
-        <div className="flex justify-center items-center space-x-8 text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex justify-center items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 text-sm bg-green-500 rounded-full animate-pulse"></div>
             <span>17+ Roadmaps</span>
           </div>
           <div className="flex items-center space-x-2">
