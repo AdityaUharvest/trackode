@@ -74,6 +74,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const theme = "dark"; // Replace with your theme logic or context
   return (
     <html lang="en">
       <head>
@@ -82,7 +83,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <SessionProvider>
           <ClientLayout>
-            {children}
+            
+            <div style={{
+            backgroundImage: theme === "dark"
+              ? "url('/image.png')"
+              : "url('/your-light-bg-image.jpg')",
+            
+            
+          }} >
+{children}
+            </div>
+            
             <StructuredData />
           </ClientLayout>
         </SessionProvider>

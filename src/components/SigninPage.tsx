@@ -74,8 +74,8 @@ export default function Signin() {
     <>
       <Toaster />
       <main>
-        <div className={`min-h-screen flex items-center justify-center ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
-          <div className={`w-full max-w-md mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-lg`}>
+        <div className={`min-h-screen flex items-center justify-center `}>
+          <div className={`w-full max-w-md mt-2 mb-2 p-8 space-y-8 rounded-xl ${theme === "dark" ? "bg-gray-700/50" : "bg-white"} shadow-lg`}>
             <div className="text-center">
               <h1 className={`text-lg font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                 Welcome back

@@ -28,7 +28,7 @@ const techList = [
 ];
 
 const Carousel: React.FC = () => (
-  <div className="pb-10 max-w-6xl overflow-hidden">
+  <div className="pb-10  overflow-hidden">
     <div
       className="flex  w-max"
       style={{

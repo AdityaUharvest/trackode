@@ -595,9 +595,9 @@ const questions:Questions = {
         </div>
 
         <div
-          className={`p-5 rounded-xl shadow-lg ${
-            theme === "dark" ? "bg-gray-700" : "bg-white"
-          } max-w-3xl mx-auto`}
+          className={`lg:p-10 p-5 rounded-xl shadow-lg ${
+            theme === "dark" ? "bg-gray-700/50" : "bg-white"
+          } max-w-5xl mx-auto`}
         >
           {/* Topic Selection */}
           <div className="flex space-x-2 mb-6 overflow-x-auto pb-2">

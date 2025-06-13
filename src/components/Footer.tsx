@@ -13,7 +13,15 @@ export default function Footer() {
       theme === "dark" 
         ? "bg-gradient-to-b from-gray-900 to-black text-gray-200" 
         : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-700"
-    }`}>
+    }`}
+    style={{
+            backgroundImage: theme === "dark"
+              ? "url('/image.png')"
+              : "url('/your-light-bg-image.jpg')",
+            
+            
+          }}
+>
       <Carousel/>
       {/* Main Footer Content */}
       <div className="container mx-auto px-6">
@@ -26,7 +34,7 @@ export default function Footer() {
               <img
               
                 
-                src="/logo.png"
+                src="/brand.png"
                 className="h-14 rounded-full"
               
                 
@@ -35,13 +43,9 @@ export default function Footer() {
             ) : ( 
               <>
               <img className="h-14  rounded-full"
-                alt="Trackode Logo Dark" src="/icon-192x192.png">
+                alt="Trackode Logo Dark" src="/brand-dark.png">
               </img>
-              <img
-                src="/brandname.png"
-                className="h-9 mt-2 mr-2 rounded-full"
-                alt="Trackode Logo Dark"
-              />
+              
               </>
             )}
             
@@ -278,7 +282,7 @@ export default function Footer() {
         </div>
         
         {/* Secondary Footer */}
-        <div className={`mt-5 pt-2 border-t ${
+        <div className={`mt-5 pb-5 pt-2 border-t ${
           theme === "dark" ? "border-gray-800" : "border-gray-200"
         }`}>
           <div className="flex flex-col md:flex-row justify-between items-center">
@@ -334,18 +338,7 @@ export default function Footer() {
       </div>
       
       {/* Bottom Bar */}
-      <div className={`mt-4 py-4 ${
-        theme === "dark" ? "bg-black" : "bg-gray-100"
-      }`}>
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-xs opacity-75 mb-2 md:mb-0">
-              Using this site means you consent to our use of cookies.
-            </p>
-            
-          </div>
-        </div>
-      </div>
+      
     </footer>
   );
 }

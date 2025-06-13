@@ -1,6 +1,8 @@
+"use client"
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTheme } from '@/components/ThemeContext';
 // A new component to render the roadmap items with links and images
 const RoadmapList = () => {
   const roadmapItems = [
@@ -27,6 +29,7 @@ const RoadmapList = () => {
     <div className="max-w-7xl mx-auto px-4">
       <div className="grid grid-cols-2  md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         {roadmapItems.map((item, index) => (
+      
           <div
             key={item.slug}
             className="group relative overflow-hidden"
@@ -37,7 +40,7 @@ const RoadmapList = () => {
           >
             <Link
               href={`/roadmap/${item.slug}`}
-              className="block p-4 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 
+              className="block p-4 bg-gray-50 dark:bg-gray-700/50
                          rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 
                          border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600
                          transform hover:-translate-y-2 hover:scale-105"
@@ -54,7 +57,7 @@ const RoadmapList = () => {
                   <Image
                     src={item.icon}
                     alt={`${item.name} icon`}
-                    className="w-10 h-10 object-contain filter group-hover:brightness-110"
+                    className=" h-10 rounded-full   group-hover:brightness-110"
                     width={40}
                     height={40}
                   />
@@ -145,12 +148,22 @@ export const metadata = {
 };
 
 function RoadMap() {
+  const { theme } = useTheme();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-blue-100 
+    <div 
+    style={{
+            backgroundImage: theme === "dark"
+              ? "url('/image.png')"
+              : "url('/your-light-bg-image.jpg')",
+            
+            
+          }}
+ className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-blue-100 
                     dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-10 ">
+
       {/* Header Section */}
-      <div className="max-w-4xl mx-auto text-center mb-10">
-        <div className="relative">
+      <div  className="max-w-4xl mx-auto text-center mb-10">
+        <div  className="relative">
           <h1 className="text-3xl md:text-4xl font-bold  
                           mb-2 leading-tight">
             Trackode Roadmap

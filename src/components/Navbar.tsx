@@ -21,6 +21,7 @@ import {
   AudioWaveform,
   Notebook
 } from "lucide-react";
+import Image from "next/image";
 
 // Custom hook extracted outside the component
 const useOutsideClick = <T extends HTMLElement>(
@@ -133,12 +134,25 @@ const Navbar: React.FC = () => {
       requiresAuth: true
     },
   ], [status]);
-
+const themeClasses = {
+        background: theme === 'dark' 
+            ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900' 
+            : 'bg-gradient-to-br from-slate-50 via-white to-blue-50',
+        text: theme === 'dark' ? 'text-white' : 'text-gray-900',
+        textSecondary: theme === 'dark' ? 'text-gray-300' : 'text-gray-600',
+        cardBg: theme === 'dark' ? 'bg-gray-800' : 'bg-white',
+        cardBorder: theme === 'dark' ? 'border-gray-700' : 'border-gray-100',
+        tagBg: {
+            blue: theme === 'dark' ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-700',
+            purple: theme === 'dark' ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-700',
+            green: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-700'
+        }
+    };
   // Theme-based styles
   const themeStyles = useMemo(() => ({
     navbar: theme === "light" 
       ? "bg-white/95 backdrop-blur-md border-gray-200/50" 
-      : "bg-gray-900/95 backdrop-blur-md border-gray-700/50",
+      : "bg-gray-800/50 backdrop-blur-2xl border-gray-700/50",
     text: theme === "light" ? "text-gray-900" : "text-white",
     textSecondary: theme === "light" ? "text-gray-600" : "text-gray-300",
     hover: theme === "light" ? "hover:bg-gray-50" : "hover:bg-gray-800/50",
@@ -152,7 +166,7 @@ const Navbar: React.FC = () => {
       <nav className={`
         fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b
         ${themeStyles.navbar}
-        ${scrolled ? 'shadow-lg backdrop-blur-xl' : 'backdrop-blur-md'}
+        ${scrolled ? 'shadow-lg backdrop-blur-2xl' : 'bg-gray-900/50 backdrop-blur-2xl'}
       `}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -161,30 +175,19 @@ const Navbar: React.FC = () => {
             <div className="flex items-center">
               <Link 
                 href="/" 
-                className="flex items-center space-x-3 group transition-transform hover:scale-105"
+                className="flex items-center  group transition-transform hover:scale-105"
                 aria-label="Trackode Home"
               >
                 <div className="relative">
-                  {theme === "light" ? (
-                    <img
-                      src="/logo.png"
-                      className="h-11 w-full  transition-shadow"
-                      alt="Trackode"
-                    />
-                  ) : (
-                    <div className="flex items-center ">
-                      <img 
-                        className="h-10  rounded-xl shadow-sm group-hover:shadow-md transition-shadow"
-                        alt="Trackode" 
-                        src="/icon-192x192.png"
-                      />
-                      <img
-                        src="/brandname.png"
-                        className="h-8 mt-2 rounded-lg"
-                        alt="Trackode"
-                      />
-                    </div>
-                  )}
+                  
+                  <Image
+                    priority
+                    width={140}
+                    height={10}
+                    src={theme === 'dark' ? '/brand-dark.png' : '/brand.png'}
+                    alt="Trackode Logo"
+                    className="mt-2"
+                  />
                 </div>
               </Link>
             </div>
@@ -211,43 +214,20 @@ const Navbar: React.FC = () => {
               
               {/* Theme Toggle */}
               <button
-                onClick={toggleTheme}
-                className={`
-                  relative flex items-center justify-center w-10 h-10 rounded-xl
-                  transition-all duration-300 hover:scale-105 group
-                  ${themeStyles.hover}
-                `}
-                aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-              >
-                <div className="relative w-5 h-5">
-                  <Moon
-                    size={18}
-                    className={`
-                      absolute inset-0 transition-all duration-300 
-                      ${theme === "light" ? "opacity-100 rotate-0" : "opacity-0 rotate-180"}
-                      ${themeStyles.textSecondary}
-                    `}
-                  />
-                  <Sun
-                    size={18}
-                    className={`
-                      absolute inset-0 transition-all duration-300 text-amber-500
-                      ${theme === "light" ? "opacity-0 -rotate-180" : "opacity-100 rotate-0"}
-                    `}
-                  />
-                </div>
-                
-                {/* Tooltip */}
-                <div className={`
-                  absolute -bottom-10 left-1/2 transform -translate-x-1/2
-                  px-2 py-1 text-xs font-medium rounded-md whitespace-nowrap
-                  opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                  pointer-events-none z-50
-                  ${theme === "light" ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-900"}
-                `}>
-                  {theme === "light" ? "Dark Mode" : "Light Mode"}
-                </div>
-              </button>
+            onClick={toggleTheme}
+            className={`p-2 rounded-full ${themeClasses.cardBg} ${themeClasses.cardBorder} border shadow-lg hover:shadow-xl transition-all duration-300`}
+            aria-label="Toggle theme"
+            >
+            {theme === 'dark' ? (
+            <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+            </svg>
+            ) : (
+            <svg className="w-5 h-5 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+            </svg>
+            )}
+            </button>
 
               {/* User Section */}
               {status === "authenticated" ? (
@@ -360,9 +340,9 @@ const Navbar: React.FC = () => {
                 <Link
                   href="/signin"
                   className={`
-                    flex items-center px-2 py-2 text-sm font-medium rounded-xl
+                    flex items-center px-3 py-2 text-sm font-medium rounded-md
                     transition-all duration-300 hover:scale-105 group
-                    bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800
+                    bg-gradient-to-r from-blue-600 to-violet-700 hover:from-blue-700 hover:to-violet-800
                     text-white shadow-md hover:shadow-lg
                   `}
                 >

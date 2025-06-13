@@ -32,7 +32,6 @@ const sectionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-sectionSchema.index({ value: 1 });
 
 const Section = mongoose.models.Section || mongoose.model("Section", sectionSchema);
 export default Section;

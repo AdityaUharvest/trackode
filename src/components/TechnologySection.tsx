@@ -207,7 +207,14 @@ export default function TechStackQuizSystem() {
   };
 
   return (
-    <div className={`px-2 rounded-xl  mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+    <div style={{
+            backgroundImage: theme === "dark"
+              ? "url('/image.png')"
+              : "url('/your-light-bg-image.jpg')",
+            
+            
+          }}
+  className={`px-2 rounded-xl  mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
       
       <div>
 

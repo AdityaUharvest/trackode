@@ -97,7 +97,7 @@ export default function Faq() {
       <div
         className={`rounded-xl px-5 py-8  mx-auto shadow-xl ${
           theme === "dark"
-            ? "bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700"
+            ? "bg-gray-700/50 border-gray-700"
             : "bg-gradient-to-br from-white to-gray-50 border border-gray-100"
         }`}
       >
@@ -110,7 +110,7 @@ export default function Faq() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.05 }}
                 className={`${
-                  theme === "dark" ? "hover:bg-gray-800/50" : "hover:bg-gray-50/80"
+                  theme === "dark" ? "hover:bg-gray-700/50" : "hover:bg-gray-50/80"
                 } rounded-lg transition-colors list-none`}
               >
                 <button
@@ -222,11 +222,9 @@ export default function Faq() {
             </p>
             <Link
               href="/contact"
-              className={`px-5 py-2 rounded-lg text-sm transition-all ${
-                theme === "dark"
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
-              }`}
+              className={`px-5 py-3 bg-gradient-to-r from-blue-600 to-violet-500 rounded-lg text-base  text-white transition-all 
+                
+              `}
             >
               Contact Support
             </Link>
