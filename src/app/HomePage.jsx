@@ -62,10 +62,10 @@ export default function HomePage() {
           </svg>
         </button>
       )}
-      <div className={`overflow-x-hidden ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
+      <div  className={`overflow-x-hidden ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
         {/* Trackode Hero Section */}
         <section
-          className={`relative justify-center animate-slide-up flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-br from-purple-50 via-white to-blue-100"} overflow-hidden min-h-[auto] sm:min-h-screen transition-all duration-500`}
+          className={`relative rounded-br-3xl justify-center animate-slide-up flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-gradient-to-br from-purple-50 via-white to-blue-100"} overflow-hidden min-h-[auto] sm:min-h-screen transition-all duration-500`}
           style={{
             backgroundImage: theme === "dark"
               ? "url('/image.png')"
@@ -153,7 +153,7 @@ export default function HomePage() {
             </span>
             <span className="block text-gray-800 dark:text-white text-center">
               <span className="inline-flex items-center ">
-                <span className="text-violet-500 dark:text-violet-300 font-extrabold">
+              <span className="text-violet-500 dark:text-violet-300 font-extrabold">
             AI-Based
                 </span>
                 <RotatingText
@@ -200,7 +200,7 @@ export default function HomePage() {
               </div>
 
               <div className="w-full mt-12 mb-20 max-w-4xl">
-          <div className="items-center justify-center flex gap-8 sm:gap-28">
+          <div className="items-center justify-center flex gap-4 ">
             <div className="flex sm:mb-0">
               <div className="flex -space-x-3">
                 {["aditya.png", "rohit.png", "rohitk.png", "kajal.png"].map(
@@ -266,74 +266,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-          <div className="flex mt-6 flex-wrap justify-center gap-2">
-            <div
-              className={`flex items-center px-2 py-1.5 sm:px-4 sm:py-2 rounded-xl ${theme === "dark" ? "bg-gray-700/50/50 hover:bg-gray-700/50" : "bg-gray-100 hover:bg-gray-200"} transition-all duration-300 transform hover:-translate-y-1`}
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 text-green-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                />
-              </svg>
-              <span
-                className={`text-sm sm:text-sm font-medium ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}
-              >
-                100% Secure
-              </span>
-            </div>
-            <div
-              className={`flex items-center px-2 py-1.5 sm:px-4 sm:py-2 rounded-xl ${theme === "dark" ? "bg-gray-700/50/50 hover:bg-gray-700/50" : "bg-gray-100 hover:bg-gray-200"} transition-all duration-300 transform hover:-translate-y-1`}
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 text-blue-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
-              <span
-                className={`text-sm sm:text-base font-medium ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}
-              >
-                High Performance
-              </span>
-            </div>
-            <div
-              className={`flex items-center px-2 py-1.5 sm:px-4 sm:py-2 rounded-xl ${theme === "dark" ? "bg-gray-700/50/50 hover:bg-gray-700/50" : "bg-gray-100 hover:bg-gray-200"} transition-all duration-300 transform hover:-translate-y-1`}
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5 text-purple-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span
-                className={`text-sm sm:text-base font-medium ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}
-              >
-                Global Support
-              </span>
-            </div>
-          </div>
+          
               </div>
             </div>
 

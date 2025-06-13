@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
+import Link from 'next/link';
 // Theme Context (your existing theme provider)
 export type Theme = "light" | "dark";
 
@@ -40,20 +41,17 @@ const AlternatingSections = () => {
             {/* Theme Toggle Button */}
             
 
-            <div className="max-w-6xl mx-auto px-4 md:px-8">
+            <div className=" mx-auto px-4 md:px-8">
                 <div className="text-center mb-12 md:mb-20">
                     <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4 md:mb-6 shadow-lg">
                         <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    <h2 className={`text-3xl md:text-5xl font-bold bg-gradient-to-r from-gray-200 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-4 md:mb-6 ${theme === 'dark' ? 'from-gray-100 via-blue-400 to-purple-400' : ''}`}>
-                        Level Up Your Coding Skills
+                    <h2 className={`text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-200 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-4 md:mb-6 ${theme === 'dark' ? 'from-gray-100 via-blue-400 to-purple-400' : ''}`}>
+                        Level Up Your Skills with Interactive Learning
                     </h2>
-                    <p className={`text-base md:text-xl ${themeClasses.textSecondary} max-w-3xl mx-auto leading-relaxed`}>
-                        Join thousands of developers mastering programming through interactive learning experiences
-                        designed by industry experts
-                    </p>
+                    
                 </div>
 
                 <div className="space-y-16 md:space-y-32">
@@ -67,7 +65,9 @@ const AlternatingSections = () => {
                                 Interactive Learning
                             </div>
                             <h3 className={`text-2xl md:text-4xl font-bold ${themeClasses.text} mb-4 md:mb-6 leading-tight`}>
-                                Interactive Programming Quizzes
+                               <Link href="/programming-quizzes" className="hover:underline">
+                               Interactive Programming Quizzes
+                               </Link> 
                             </h3>
                             <p className={`text-sm md:text-lg ${themeClasses.textSecondary} mb-6 md:mb-8 leading-relaxed`}>
                                 Master programming concepts with our comprehensive quiz collection. Test your
@@ -84,7 +84,7 @@ const AlternatingSections = () => {
                                     <span className={`text-sm md:text-base ${themeClasses.text}`}>500+ Practice Questions</span>
                                 </div>
                             </div>
-                            <a
+                            <Link
                                 href="/programming-quizzes"
                                 className="group inline-flex items-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-sm md:text-base"
                             >
@@ -103,7 +103,7 @@ const AlternatingSections = () => {
                                 <svg className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                 </svg>
-                            </a>
+                            </Link>
                         </div>
                         <div className="flex-1">
                             <div  className="relative group">
@@ -118,7 +118,7 @@ const AlternatingSections = () => {
                                     <img
                                         src="https://plus.unsplash.com/premium_photo-1690303193720-38d825579eef?q=80&w=1467&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         alt="Interactive Programming Quizzes"
-                                        className="w-72  md:w-72 lg:w-full  h-40 md:h-64 object-cover rounded-lg md:rounded-xl mb-4 md:mb-6"
+                                        className="w-96  lg:w-full  h-40 md:h-64 object-cover rounded-lg md:rounded-xl mb-4 md:mb-6"
                                     />
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-3 md:space-x-4">
@@ -150,7 +150,13 @@ const AlternatingSections = () => {
                                 </svg>
                                 Mock Assessments
                             </div>
-                            <h3 className={`text-2xl md:text-4xl font-bold ${themeClasses.text} mb-4 md:mb-6 leading-tight`}>Free Mock Tests</h3>
+                            <h3 className={`text-2xl md:text-4xl font-bold ${themeClasses.text} mb-4 md:mb-6 leading-tight`}>
+                              <Link
+                                href="/mocks"
+                                className="hover:underline"
+                            >Free Mock Tests</Link>  
+
+                                </h3>
                             <p className={`text-sm md:text-lg ${themeClasses.textSecondary} mb-6 md:mb-8 leading-relaxed`}>
                                 Practice with realistic mock tests designed to simulate real interview scenarios.
                                 Get detailed feedback, performance analytics, and personalized improvement
@@ -158,17 +164,17 @@ const AlternatingSections = () => {
                             </p>
                             <div className="grid grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
                                 <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-blue-900 to-blue-800' : 'bg-gradient-to-br from-blue-50 to-blue-100'} p-3 md:p-4 rounded-xl`}>
-                                    <div className="text-lg md:text-2xl font-bold text-blue-600 mb-1">250+</div>
-                                    <div className="text-xs md:text-sm text-blue-700">Mock Tests</div>
+                                    <div className="text-lg md:text-2xl font-bold text-white-600 mb-1">250+</div>
+                                    <div className="text-xs md:text-sm text-white-700">Mock Tests</div>
                                 </div>
                                 <div className={`${theme === 'dark' ? 'bg-gradient-to-br from-green-900 to-green-800' : 'bg-gradient-to-br from-green-50 to-green-100'} p-3 md:p-4 rounded-xl`}>
-                                    <div className="text-lg md:text-2xl font-bold text-green-600 mb-1">20+</div>
-                                    <div className="text-xs md:text-sm text-green-700">Exams</div>
+                                    <div className="text-lg md:text-2xl font-bold text-white mb-1">20+</div>
+                                    <div className="text-xs md:text-sm text-white">Exams</div>
                                 </div>
                             </div>
-                            <a
+                            <Link
                                 href="/mocks"
-                                className="group inline-flex items-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-sm md:text-base"
+                                className="group inline-flex items-center px-6 py-3 md:px-8 md:py-4 bg-gradient-to-r from-violet-500 to-blue-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 text-sm md:text-base"
                             >
                                 <svg
                                     className="w-4 h-4 md:w-5 md:h-5 mr-2 md:mr-3 group-hover:scale-110 transition-transform duration-300"
@@ -187,7 +193,7 @@ const AlternatingSections = () => {
                                 <svg className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                                 </svg>
-                            </a>
+                            </Link>
                         </div>
                         <div className="flex-1">
                             <div className="relative group">
@@ -196,7 +202,7 @@ const AlternatingSections = () => {
                                     <img
                                         src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&h=300&fit=crop&auto=format"
                                         alt="Free Mock Tests"
-                                        className="w-72  md:w-72 lg:w-full h-40 md:h-64 object-cover rounded-lg md:rounded-xl mb-4 md:mb-6"
+                                        className="w-96  md:w-72 lg:w-full h-40 md:h-64 object-cover rounded-lg md:rounded-xl mb-4 md:mb-6"
                                     />
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between">
@@ -231,7 +237,9 @@ const AlternatingSections = () => {
                                 Learning Paths
                             </div>
                             <h3 className={`text-2xl md:text-4xl font-bold ${themeClasses.text} mb-4 md:mb-6 leading-tight`}>
-                                Free Learning Roadmaps
+                             <Link href="/roadmap" className="hover:underline">
+                             Free Learning Roadmaps
+                             </Link>   
                             </h3>
                             <p className={`text-sm md:text-lg ${themeClasses.textSecondary} mb-6 md:mb-8 leading-relaxed`}>
                                 Follow structured learning paths designed by industry experts. Get step-by-step
@@ -294,7 +302,7 @@ const AlternatingSections = () => {
                                     <img
                                         src="https://plus.unsplash.com/premium_photo-1661311950994-d263ea9681a1?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                                         alt="Free Learning Roadmaps"
-                                        className="w-72  md:w-72 lg:w-full h-44 md:h-64 object-cover rounded-lg md:rounded-xl mb-4 md:mb-6"
+                                        className="w-96 md:w-72 lg:w-full h-44 md:h-64 object-cover rounded-lg md:rounded-xl mb-4 md:mb-6"
                                     />
                                     <div className="space-y-3 md:space-y-4">
                                         <div className="flex items-center justify-between">
