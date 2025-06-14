@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTheme } from "../components/ThemeContext";
 
-
 import QuizJoinComponent from '@/components/JoinQuiz';
 import TechStackQuizSystem from '@/components/TechnologySection';
 import InteractiveQuiz from '@/components/DemoQuizzes';
@@ -18,7 +17,7 @@ import RoadMap from '@/components/roadmaps/Main';
 import RotatingText from '@/components/RotatingText';
 import AlternatingSections from '@/components/Links';
 
-
+import MockExamCard from '@/components/MockExamCard';
 export default function HomePage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
   useEffect(() => {
@@ -55,7 +54,7 @@ export default function HomePage() {
       {showBackToTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-4 right-4 p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700"
+          className="fixed bottom-4 right-4 p-3 rounded-full bg-violet-600 text-white shadow-lg hover:bg-violet-700"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -396,7 +395,92 @@ style={{
           
           <RoadMap/>
         </section>
-        
+        <section 
+  className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+  style={{
+    backgroundImage: theme === "dark"
+      ? "url('/image.png')"
+      : "url('/your-light-bg-image.jpg')",
+  }}
+>
+  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="text-center mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative inline-block"
+      >
+        <h2 className={`text-3xl lg:text-4xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+          Featured Mock Tests
+        </h2>
+        <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+          Prepare for your dream job with our industry-standard mock tests
+        </p>
+      </motion.div>
+    </div>
+
+    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+      {[
+        {
+          id: 'tcs',
+          name: 'TCS Mock Tests',
+          image: '/tcs.png',
+          description: 'TCS NQT and Ninja preparation'
+        },
+        {
+          id: 'ssc',
+          name: 'SSC Mock Tests',
+          image: '/ssc.png',
+          description: 'SSC CGL, CHSL, and other exams'
+        },
+        {
+          id: 'gate',
+          name: 'GATE Mock Tests',
+          image: '/gate.png',
+          description: 'GATE Computer Science and IT'
+        },
+        {
+          id: 'cat',
+          name: 'CAT Mock Tests',
+          image: '/cat.png',
+          description: 'Common Admission Test preparation'
+        },
+        {
+          id: 'upsc',
+          name: 'UPSC Mock Tests',
+          image: '/upsc.png',
+          description: 'Civil Services preliminary exams'
+        },
+        {
+          id: 'banking',
+          name: 'Banking Mocks',
+          image: '/banking.png',
+          description: 'IBPS, SBI PO and Clerk exams'
+        },
+        {
+          id: 'jee',
+          name: 'JEE Mocks',
+          image: '/jee.png',
+          description: 'Joint Entrance Examination'
+        },
+        {
+          id: 'programming',
+          name: 'Programming Tests',
+          image: '/programming.png',
+          description: 'DSA and coding challenges'
+        }
+      ].map((exam) => (
+        <MockExamCard 
+          key={exam.id}
+          exam={exam}
+          theme={theme}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
 <section
 
           className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}

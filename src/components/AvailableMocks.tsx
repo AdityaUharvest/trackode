@@ -121,19 +121,23 @@ export default function MockTestsListClient({
 
   if (mockTests.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className={`text-sm font-medium ${theme === "dark" ? "text-red-400" : "text-red-600"}`}>
-          No mock tests available
-          <button
-            onClick={() => window.location.reload()}
-            className={`ml-4 px-4 py-2 ${getThemeClasses("button-primary")} rounded transition`}
-          >
-            Retry
-          </button>
-        </div>
+      <div className="flex flex-col items-center justify-center h-64">
+      <div className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-red-300" : "text-red-700"}`}>
+        <Award className="inline mr-2 mb-1 text-yellow-400" size={22} />
+        No mock tests available for this category
+      </div>
+      <div className={`text-sm mb-4 ${getThemeClasses("text-muted")}`}>
+        Please check back later or try refreshing the page.
+      </div>
+      <Link
+        href="/mocks"
+        className={`px-6 py-2 ${getThemeClasses("button-primary")} rounded-lg transition`}
+      >
+        Explore More Free
+      </Link>
       </div>
     );
-  }
+    }
 
   return (
     <>

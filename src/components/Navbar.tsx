@@ -420,8 +420,8 @@ const NavItem: React.FC<{
         flex items-center px-3 py-2 rounded-xl text-sm font-medium
         transition-all duration-200 hover:scale-105 group
         ${theme === "light" 
-          ? "text-gray-700 hover:bg-gray-100 hover:text-blue-600" 
-          : "text-gray-300 hover:bg-gray-800/50 hover:text-blue-400"
+          ? "text-gray-700 hover:bg-gray-100 hover:text-violet-600" 
+          : "text-gray-300 hover:bg-gray-800/50 hover:text-violet-400"
         }
       `}
     >
