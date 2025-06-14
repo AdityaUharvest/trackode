@@ -41,12 +41,7 @@ export const metadata = {
         title: 'Trackode SSC chsl Mock Test',
         statusBarStyle: 'default',
     },
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
-    },
+    
     alternates: {
         canonical: 'https://trackode.in/roadmap/ssc-chsl',
         languages: {

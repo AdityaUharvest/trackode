@@ -624,9 +624,9 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
      
   };
   return (
-    <Card className={`w-full mx-auto ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-black"}`}>
-      <TooltipProvider> 
-        <CardContent className="p-2 sm:p-4">
+    <Card className={`w-full border-none  ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-black"}`}>
+      <TooltipProvider > 
+        <CardContent className="p-0  ">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"}`}></div>
@@ -636,7 +636,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
               No quizzes available. Create one to get started!
             </div>
           ) : (
-            <Accordion type="single" className="w-full space-y-3" collapsible>
+            <Accordion type="single" className="w-full  space-y-3" collapsible>
               {quizes.map((quiz, index) => (
                 <AccordionItem 
                   key={index} 
@@ -665,7 +665,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                         >
                           {quiz.active ? "Active" : "Inactive"}
                         </Badge>
-                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+                       
                       </div>
                     </div>
                   </AccordionTrigger>
@@ -714,7 +714,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                             <Button 
                               asChild
                               variant="outline"
-                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "border-gray-700 text-gray-400" : "border-gray-300 text-gray-700"}`}
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "bg-gray-700 text-white-400" : "border-gray-300 text-gray-700"}`}
                             >
                               <Link href={`admin-dashboard/quiz-settings/${quiz._id}`}>
                                 <Pencil size={14} className="mr-1 sm:mr-2" />
@@ -752,7 +752,11 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                               />
                               <Button 
                                 variant="outline" 
-                                onClick={() => handleShareQuiz(quiz.shareCode)}
+                                onClick={() => (
+                                  navigator.clipboard.writeText(`${quiz.shareCode}`) 
+                                    .then(() => toast.success("Quiz code copied to clipboard!"))
+                                    .catch(() => toast.error("Failed to copy quiz code"))
+                                )}
                                 className="h-8 px-2"
                               >
                                 <Copy size={14} className="mr-1 sm:mr-2" />

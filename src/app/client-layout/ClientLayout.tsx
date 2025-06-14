@@ -21,7 +21,7 @@ function ClientLayoutContent({ children }: { children: ReactNode }) {
   return (
     <>
       <Navbar />
-      <div className={`min-h-screen ${theme === 'dark' ? 'bg-[url("/image.png")]' : 'bg-white'}`}>
+      <div className={`min-h-screen pt-5 ${theme === 'dark' ? 'bg-[url("/image.png")]' : 'bg-white'}`}>
         {children}
       </div>
       <Footer />

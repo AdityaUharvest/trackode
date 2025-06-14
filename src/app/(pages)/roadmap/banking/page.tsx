@@ -34,18 +34,8 @@ export const metadata = {
         follow: true,
         nocache: true,
     },
-    themeColor: '#ffffff',
-    appleWebApp: {
-        capable: true,
-        title: 'Trackode Banking Roadmap',
-        statusBarStyle: 'default',
-    },
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
-    },
+    
+    
     alternates: {
         canonical: 'https://trackode.in/roadmap/banking',
         languages: {

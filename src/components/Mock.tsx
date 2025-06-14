@@ -110,14 +110,14 @@ export default function Dashboard({
   }
 
   return (
-    <Card className={`min-h-screen ${bgColor}`}>
+    <Card className={`min-h-screen border-none ${bgColor}`}>
       {/* Header */}
-      <header className={`${headerBg} rounded-lg shadow-sm`}>
-        <div className="mx-auto p-4 rounded-lg sm:px-3 lg:px-2 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <header className={`${headerBg} rounded-lg `}>
+        <div className="mx-auto p-4 rounded-lg  flex flex-col sm:flex-row justify-between items-center gap-3">
           <h1 className={`text-base font-semibold ${textColor}`}>Mock Test Dashboard</h1>
           <Link
             href="/mock-tests"
-            className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+            className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2  text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
           >
             New Mock Test
           </Link>
@@ -127,7 +127,7 @@ export default function Dashboard({
       {/* Main Content */}
       <main className={`max-w-7xl mx-auto  sm:px-2 lg:px-2 ${bgColor}`}>
         {/* Tabs - Mobile friendly */}
-        <div className={`border-b ${borderColor} mb-6 overflow-x-auto`}>
+        <div className={`${borderColor} mb-6 overflow-x-auto`}>
           <nav className="flex space-x-4 sm:space-x-8">
             {(['overview', 'mocks', 'results'] as const).map((tab) => (
               <button

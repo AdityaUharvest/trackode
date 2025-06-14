@@ -42,12 +42,7 @@ export const metadata = {
         title: 'Trackode CAT Exam Roadmap',
         statusBarStyle: 'default',
     },
-    viewport: {
-        width: 'device-width',
-        initialScale: 1,
-        maximumScale: 1,
-        userScalable: false,
-    },
+    
     alternates: {
         canonical: 'https://trackode.in/roadmap/cat',
         languages: {

@@ -35,7 +35,7 @@ export default function Quizes({ quizes,setQuizes,getQuizes }: { quizes: Quiz[];
       <div className="flex justify-between items-center">
         {/* Replace the outer <button> with a <div> */}
         <div className={`flex items-center gap-2 ${theme === "dark" ? "text-white" : "text-gray-800"}`}>
-          <span className="text-sm font-semibold">My Quiz</span>
+          <span className="text-base font-semibold">My Quiz</span>
         </div>
         <div className="flex flex-row lg:gap-2 sm:gap-1">
           <Link href="/quiz-setup">

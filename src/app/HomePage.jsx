@@ -411,9 +411,12 @@ style={{
         transition={{ duration: 0.6 }}
         className="relative inline-block"
       >
-        <h2 className={`text-3xl lg:text-4xl font-bold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
-          Featured Mock Tests
-        </h2>
+        <h2
+                className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Featured Mock Exams
+              </h2>
         <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
           Prepare for your dream job with our industry-standard mock tests
         </p>
@@ -480,7 +483,148 @@ style={{
     </div>
   </div>
 </section>
+<section 
+  className={`pb-16 ${theme === "dark" ? "bg-gray-700/50" : "bg-gray-100"}`}
+  style={{
+    backgroundImage: theme === "dark"
+      ? "url('/image.png')"
+      : "url('/your-light-bg-image.jpg')",
+  }}
+>
+  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <div className="text-center mb-12">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative inline-block"
+      >
+        <h2
+                className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Why Trackode Outperforms Other Platforms
+              </h2>
+        
+        <p className={`mt-4 max-w-2xl mx-auto text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+          We're not just another quiz platform - we're a complete learning ecosystem
+        </p>
+      </motion.div>
+    </div>
 
+    <div className="">
+      {/* Feature Comparison Table */}
+      <div className={`rounded-2xl overflow-hidden shadow-xl ${theme === "dark" ? "bg-gray-700/50" : "bg-white"}`}>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className={`border-b ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`}>
+                <th className={`py-4 px-6 text-left ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>Feature</th>
+                <th className={`py-4 px-6 text-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>Trackode</th>
+                <th className={`py-4 px-6 text-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>Other Platforms</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                {
+                  feature: "AI-Powered Quiz Generation",
+                  trackode: true,
+                  others: false
+                },
+                {
+                  feature: "Personalized Learning Roadmaps",
+                  trackode: true,
+                  others: false
+                },
+                {
+                  feature: "Real-time Analytics Dashboard",
+                  trackode: true,
+                  others: "Limited"
+                },
+                {
+                  feature: "Exam-Specific Mock Tests",
+                  trackode: true,
+                  others: "Basic"
+                },
+                {
+                  feature: "AI Feedback & Recommendations",
+                  trackode: true,
+                  others: false
+                },
+                {
+                  feature: "Interactive Coding Challenges",
+                  trackode: true,
+                  others: true
+                },
+                {
+                  feature: "Progress Tracking Across Skills",
+                  trackode: true,
+                  others: "Partial"
+                },
+                {
+                  feature: "Free Quiz Hosting",
+                  trackode: "15 quizzes/month",
+                  others: "1-5 quizzes/month"
+                }
+              ].map((item, index) => (
+                <tr 
+                  key={index} 
+                  className={`border-b ${theme === "dark" ? "border-gray-700 hover:bg-gray-750" : "border-gray-200 hover:bg-blue-50"}`}
+                >
+                  <td className={`py-4 px-6 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{item.feature}</td>
+                  <td className="py-4 px-6 text-center">
+                    {item.trackode === true ? (
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    ) : item.trackode === false ? (
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
+                        <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${theme === "dark" ? "bg-blue-900 text-blue-200" : "bg-blue-100 text-blue-800"}`}>
+                        {item.trackode}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-4 px-6 text-center">
+                    {item.others === true ? (
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
+                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    ) : item.others === false ? (
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
+                        <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </div>
+                    ) : (
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${theme === "dark" ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-800"}`}>
+                        {item.others}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Key Advantages */}
+     
+    </div>
+
+    
+  </div>
+</section>
 <section
 
           className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -12,9 +11,12 @@ import {
   Search,
   Filter,
   User,
+  X,
 } from "lucide-react";
 import Link from "next/link";
-import { useTheme } from "./ThemeContext"; // Adjust the import path based on your file structure
+import { useTheme } from "./ThemeContext";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 interface MockTest {
   _id: string;
@@ -27,7 +29,7 @@ interface MockTest {
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
   tag: string;
-  creator: string; // Added creator to the interface
+  creator: string;
 }
 
 interface MockTestsListClientProps {
@@ -37,16 +39,17 @@ interface MockTestsListClientProps {
 export default function MockTestsListClient({
   initialTests,
 }: MockTestsListClientProps) {
-  const { theme } = useTheme(); // Access the current theme
+  const { theme } = useTheme();
   const [mockTests] = useState<MockTest[]>(initialTests);
   const [filteredTests, setFilteredTests] = useState<MockTest[]>(initialTests);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"all" | "Easy" | "Medium" | "Hard">("all");
+  const [showContactForm, setShowContactForm] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     let results = mockTests;
 
-    // Apply search filter
     if (searchTerm) {
       results = results.filter(
         (test) =>
@@ -54,11 +57,10 @@ export default function MockTestsListClient({
           (test.category &&
             test.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (test.creator &&
-            test.creator.toLowerCase().includes(searchTerm.toLowerCase())) // Added search by creator
+            test.creator.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
-    // Apply difficulty filter
     if (filter !== "all") {
       results = results.filter((test) => test.difficulty === filter);
     }
@@ -87,7 +89,6 @@ export default function MockTestsListClient({
     }
   };
 
-  // Helper function to get theme-based classes
   const getThemeClasses = (type: string) => {
     switch (type) {
       case "card":
@@ -112,8 +113,8 @@ export default function MockTestsListClient({
         return theme === "dark" ? "text-gray-400" : "text-gray-500";
       case "creator":
         return theme === "dark"
-          ? "bg-purple-900 text-purple-300"
-          : "bg-purple-100 text-purple-800";
+          ? "bg-violet-900 text-violet-300"
+          : "bg-violet-100 text-violet-800";
       default:
         return "";
     }
@@ -121,23 +122,137 @@ export default function MockTestsListClient({
 
   if (mockTests.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-      <div className={`text-lg font-semibold mb-2 ${theme === "dark" ? "text-red-300" : "text-red-700"}`}>
-        <Award className="inline mr-2 mb-1 text-yellow-400" size={22} />
-        No mock tests available for this category
-      </div>
-      <div className={`text-sm mb-4 ${getThemeClasses("text-muted")}`}>
-        Please check back later or try refreshing the page.
-      </div>
-      <Link
-        href="/mocks"
-        className={`px-6 py-2 ${getThemeClasses("button-primary")} rounded-lg transition`}
-      >
-        Explore More Free
-      </Link>
+      <div className="flex flex-col items-center justify-center py-12">
+        {showContactForm ? (
+          <div className="w-full max-w-md">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                Request More Tests
+              </h2>
+              <button 
+                onClick={() => setShowContactForm(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-md">
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const data = {
+                  name: formData.get('name') as string,
+                  email: formData.get('email') as string,
+                  message: formData.get('message') as string,
+                  subject: "Mock Test Request"
+                };
+
+                try {
+                  const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                  });
+
+                  if (response.ok) {
+                    toast.success('Request sent successfully!');
+                    setShowContactForm(false);
+                  } else {
+                    toast.error('Failed to send request. Please try again.');
+                  }
+                } catch (error) {
+                  toast.error('An error occurred. Please try again.');
+                }
+              }}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    defaultValue={session?.user?.name || ''}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    defaultValue={session?.user?.email || ''}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    What tests would you like to see?
+                  </label>
+                  <textarea
+                    name="message"
+                    defaultValue="I'd like to request mock tests for: [Specify category/exam]"
+                    required
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  onClick={() => toast.loading('Sending request...')}
+                  className={`w-full py-2 px-4 ${
+                    theme === "dark" 
+                      ? "bg-violet-600 hover:bg-violet-700" 
+                      : "bg-violet-500 hover:bg-violet-600"
+                  } text-white font-medium rounded-lg transition`}
+                >
+                  Submit Request
+                </button>
+              </form>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="text-center mb-8">
+              <Award className="inline-block mb-4 text-yellow-400" size={36} />
+              <h3 className={`text-xl font-bold mb-2 ${theme === "dark" ? "text-gray-200" : "text-gray-800"}`}>
+                No mock tests available yet
+              </h3>
+              <p className={`max-w-md mx-auto ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                We're working hard to add more tests for this category. 
+                Request specific tests and we'll prioritize creating them!
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/mocks"
+                className={`px-6 py-2 ${getThemeClasses("button-primary")} rounded-lg transition`}
+              >
+                Explore Available Tests
+              </Link>
+              
+              <button
+                onClick={() => setShowContactForm(true)}
+                className={`px-6 py-2 ${theme === "dark" 
+                  ? "bg-gray-700 hover:bg-gray-600 text-white" 
+                  : "bg-gray-200 hover:bg-gray-300 text-gray-800"} rounded-lg transition`}
+              >
+                Request Specific Tests
+              </button>
+            </div>
+          </>
+        )}
       </div>
     );
-    }
+  }
 
   return (
     <>
@@ -175,7 +290,7 @@ export default function MockTestsListClient({
       {filteredTests.length === 0 ? (
         <div className="text-center py-12">
           <div className={`text-sm mb-4 ${getThemeClasses("text-muted")}`}>
-            No mock tests found
+            No mock tests found matching your criteria
           </div>
           <button
             onClick={() => {
@@ -245,7 +360,7 @@ export default function MockTestsListClient({
                     75 questions
                   </div>
                   <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                    <Users size={16} className="mr-2 text-purple-500" />
+                    <Users size={16} className="mr-2 text-violet-500" />
                     {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)}{" "}
                     students
                   </div>
@@ -261,8 +376,6 @@ export default function MockTestsListClient({
                     <Play size={18} className="mr-2" />
                     Play Now
                   </Link>
-
-                  
                 </div>
               </div>
             </div>
