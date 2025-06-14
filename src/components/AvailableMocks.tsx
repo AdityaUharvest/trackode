@@ -222,7 +222,7 @@ export default function MockTestsListClient({
                     )}`}
                   >
                     <User size={14} className="inline mr-1" />
-                     By {mock.creator || "Unknown"}
+                     By {mock.creator.split(" ")[0] || "Unknown"}
                   </span>
                   {mock.createdAt && (
                     <span className={getThemeClasses("text-muted") + " text-xs"}>
@@ -258,26 +258,7 @@ export default function MockTestsListClient({
                     Play Now
                   </Link>
 
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/mock-tests/${mock._id}/user-results`}
-                      className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${getThemeClasses(
-                        "button-secondary"
-                      )}`}
-                    >
-                      <BarChart size={16} className="mr-2 text-blue-500" />
-                      Results
-                    </Link>
-                    <Link
-                      href={`/mock-tests/${mock._id}/results`}
-                      className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${getThemeClasses(
-                        "button-secondary"
-                      )}`}
-                    >
-                      <Award size={16} className="mr-2 text-yellow-500" />
-                      Leaderboard
-                    </Link>
-                  </div>
+                  
                 </div>
               </div>
             </div>

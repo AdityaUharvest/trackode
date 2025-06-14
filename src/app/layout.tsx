@@ -7,6 +7,7 @@ import { Inter } from "next/font/google";
 const inter = Inter({ subsets: ["latin"] });
 
 import "./globals.css";
+import { useTheme } from "@/components/ThemeContext";
 
 export const metadata: Metadata = {
   title: {
@@ -73,8 +74,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const theme = "dark"; // Replace with your theme logic or context
+export default function RootLayout({ children }: { children: React.ReactNode }) {// Replace with your theme logic or context
   return (
     <html lang="en">
       <head>
@@ -84,15 +84,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
           <ClientLayout>
             
-            <div style={{
-            backgroundImage: theme === "dark"
-              ? "url('/image.png')"
-              : "url('/your-light-bg-image.jpg')",
+           
+              {children}
             
-            
-          }} >
-{children}
-            </div>
             
             <StructuredData />
           </ClientLayout>
