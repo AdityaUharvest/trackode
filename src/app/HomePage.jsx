@@ -491,7 +491,7 @@ style={{
       : "url('/your-light-bg-image.jpg')",
   }}
 >
-  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+  <div className=" mx-auto  sm:px-4 lg:px-4">
     <div className="text-center mb-12">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -503,10 +503,10 @@ style={{
                 className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                Why Trackode Outperforms Other Platforms
+          Why Trackode is Different
               </h2>
         
-        <p className={`mt-4 max-w-2xl mx-auto text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+        <p className={`mt-4 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
           We're not just another quiz platform - we're a complete learning ecosystem
         </p>
       </motion.div>
