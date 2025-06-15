@@ -139,18 +139,18 @@ export default function HomePage() {
           </div>
 
           <div
-            className="relative px-4 py-8 mx-auto max-w-7xl mt-10 sm:px-8 lg:px-12 z-10 flex-1 flex flex-col min-h-[auto] sm:min-h-[calc(100vh-96px)]"
+            className="relative px-4 py-8 mx-auto    z-10 flex-1 flex flex-col  "
           >
-            <div className="flex lg:mt-2 mt-6 flex-col items-center justify-start w-full sm:justify-center">
-              <div className="text-center mb-6 sm:mb-10 flex flex-col items-center justify-center">
+            <div className="flex  mt-3 flex-col">
+              <div className=" mb-6 flex flex-col items-center lg:justify-center">
           <h1
-            className="text-3xl  sm:text-3xl lg:text-5xl font-extrabold leading-tight tracking-normal text-center"
+            className=" text-4xl lg:text-5xl font-extrabold text-center"
             style={{ fontFamily: "'Exo 2', sans-serif" }}
           >
-            <span className="block mb-2 text-gray-700 dark:text-gray-200 text-center">
-              Personalized Quizzes, Mocks & <span className="text-violet-500 dark:text-violet-400"> Roadmaps</span>
+            <span className="block mb-2 text-gray-700 dark:text-gray-200 text-left ">
+              Personalized Quizzes, Mocks and <span className="text-violet-500 dark:text-violet-400"> Roadmaps</span>
             </span>
-            <span className="block text-gray-800 dark:text-white text-center">
+            <span className="block text-gray-800 dark:text-white text-left md:text-center lg:text-center">
               <span className="inline-flex items-center ">
               <span className="text-violet-500 dark:text-violet-300 font-extrabold">
             AI-Based
@@ -174,32 +174,32 @@ export default function HomePage() {
             </span>
            
           </h1>
-            <p
-            className={`text-center sm:mt-4 text-sm sm:text-base max-w-lg animate-fade-in-up ${theme === "dark" ? "text-gray-400" : "text-gray-800"}`}
+          <p
+            className={`sm:text-center text-lg text-left sm:mt-4  max-w-xl animate-fade-in-up ${theme === "dark" ? "text-gray-400" : "text-gray-800"}`}
             >
             Master your journey with personalized roadmaps, mocks, and quizzes. Track your progress, & accelerate your learning with AI Based guidance.
-            </p>
+          </p>
               </div>
 
-              <div className="mt-12 lg:mt-0 flex gap-2 justify-center mb-10">
+              <div className=" lg:mt-0 flex gap-2 sm:justify-center mb-5">
           <Link
             href="/programming-quizzes"
-            className="px-4 py-3 sm:py-4 text-base sm:text-base font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-cyan-400 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-xl hover:shadow-2xl relative overflow-hidden group"
+            className="px-4 py-3 sm:py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-cyan-400 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-xl hover:shadow-2xl relative overflow-hidden group"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent to-white opacity-0 group-hover:opacity-20 transition-opacity duration-500"></span>
             Start Learning Now
           </Link>
           <Link
             href="/dashboard"
-            className={`px-7 py-3 sm:py-4 text-base sm:text-base font-semibold rounded-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-lg hover:shadow-xl relative overflow-hidden group ${theme === "dark" ? "text-white bg-gray-700/50/50 hover:bg-gray-700/50 border border-gray-600" : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-300"}`}
+            className={`px-7 py-3 sm:py-4 text-base  font-semibold rounded-lg transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-lg hover:shadow-xl relative overflow-hidden group ${theme === "dark" ? "text-white bg-gray-700/50/50 hover:bg-gray-700/50 border border-gray-600" : "text-gray-800 bg-white hover:bg-gray-50 border border-gray-300"}`}
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent to-white opacity-0 group-hover:opacity-20 transition-opacity duration-500"></span>
-            Dashboard
+          View Dashboard
           </Link>
               </div>
 
-              <div className="w-full mt-12 mb-20 max-w-4xl">
-          <div className="items-center justify-center flex gap-4 ">
+              <div className="w-full mt-8 mb-10 ">
+          <div className="items-center sm:justify-center flex gap-16 md:gap-5 ">
             <div className="flex sm:mb-0">
               <div className="flex -space-x-3">
                 {["aditya.png", "rohit.png", "rohitk.png", "kajal.png"].map(
