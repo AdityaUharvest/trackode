@@ -383,8 +383,8 @@ const themeClasses = {
                   icon={item.icon}
                   theme={theme}
                   onClick={() => setNavOpen(false)}
-                  requiresAuth={item.requiresAuth}
-                  isAuthenticated={status === "authenticated"}
+                  // requiresAuth={item.requiresAuth}
+                  // isAuthenticated={status === "authenticated"}
                 >
                   {item.label}
                 </MobileNavItem>
