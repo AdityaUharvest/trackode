@@ -147,10 +147,10 @@ export default function HomePage() {
             className=" text-3xl md:text-4xl lg:text-5xl font-extrabold text-center"
             style={{ fontFamily: "'Exo 2', sans-serif" }}
           >
-            <span className="block mb-2 text-gray-700 dark:text-gray-200 text-left ">
+            <span className="block mb-2 text-gray-700 dark:text-gray-200 sm:text-left md:text-center lg:text-center ">
               Personalized Quizzes, Mocks and <span className="text-violet-500 dark:text-violet-400"> Roadmaps</span>
             </span>
-            <span className="block text-gray-800 dark:text-white text-left md:text-center lg:text-center">
+            <span className="block text-gray-800 dark:text-white sm:text-left md:text-center lg:text-center">
               <span className="inline-flex items-center ">
               <span className="text-violet-500 dark:text-violet-300 font-extrabold">
             AI-Based
@@ -175,13 +175,13 @@ export default function HomePage() {
            
           </h1>
           <p
-            className={`sm:text-center text-lg text-left sm:mt-4  max-w-xl animate-fade-in-up ${theme === "dark" ? "text-gray-400" : "text-gray-800"}`}
+            className={`text-center text-lg   sm:mt-4  max-w-xl animate-fade-in-up ${theme === "dark" ? "text-gray-400" : "text-gray-800"}`}
             >
             Master your journey with personalized roadmaps, mocks, and quizzes. Track your progress, & accelerate your learning with AI Based guidance.
           </p>
               </div>
 
-              <div className=" lg:mt-0 flex lg:gap-5 gap-2 sm:justify-center mb-5">
+              <div className=" lg:mt-0 flex lg:gap-5 gap-2 justify-center mb-5">
           <Link
             href="/programming-quizzes"
             className="px-4 py-3 sm:py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-cyan-400 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-xl hover:shadow-2xl relative overflow-hidden group"
@@ -199,7 +199,7 @@ export default function HomePage() {
               </div>
 
               <div className="w-full mt-4 mb-10 ">
-          <div className="items-center sm:justify-center flex gap-16 md:gap-5 ">
+          <div className="items-center justify-center flex gap-16 md:gap-5 ">
             <div className="flex sm:mb-0">
               <div className="flex -space-x-3">
                 {["aditya.png", "rohit.png", "rohitk.png", "kajal.png"].map(
@@ -484,148 +484,7 @@ style={{
           <RoadMap/>
         </section>
        
-<section 
-  className={`pb-16 ${theme === "dark" ? "bg-gray-700/50" : "bg-gray-100"}`}
-  style={{
-    backgroundImage: theme === "dark"
-      ? "url('/image.png')"
-      : "url('/your-light-bg-image.jpg')",
-  }}
->
-  <div className=" mx-auto  sm:px-4 lg:px-4">
-    <div className="text-center mb-12">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative inline-block"
-      >
-        <h2
-                className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                style={{ fontFamily: "'Inter', sans-serif" }}
-              >
-          Why Trackode is Different
-              </h2>
-        
-        <p className={`mt-4 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-          We're not just another quiz platform - we're a complete learning ecosystem
-        </p>
-      </motion.div>
-    </div>
 
-    <div className="">
-      {/* Feature Comparison Table */}
-      <div className={`rounded-2xl overflow-hidden shadow-xl ${theme === "dark" ? "bg-gray-700/50" : "bg-white"}`}>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className={`border-b ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`}>
-                <th className={`py-4 px-6 text-left ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>Feature</th>
-                <th className={`py-4 px-6 text-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>Trackode</th>
-                <th className={`py-4 px-6 text-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>Other Platforms</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                {
-                  feature: "AI-Powered Quiz Generation",
-                  trackode: true,
-                  others: false
-                },
-                {
-                  feature: "Personalized Learning Roadmaps",
-                  trackode: true,
-                  others: false
-                },
-                {
-                  feature: "Real-time Analytics Dashboard",
-                  trackode: true,
-                  others: "Limited"
-                },
-                {
-                  feature: "Exam-Specific Mock Tests",
-                  trackode: true,
-                  others: "Basic"
-                },
-                {
-                  feature: "AI Feedback & Recommendations",
-                  trackode: true,
-                  others: false
-                },
-                {
-                  feature: "Interactive Coding Challenges",
-                  trackode: true,
-                  others: true
-                },
-                {
-                  feature: "Progress Tracking Across Skills",
-                  trackode: true,
-                  others: "Partial"
-                },
-                {
-                  feature: "Free Quiz Hosting",
-                  trackode: "15 quizzes/month",
-                  others: "1-5 quizzes/month"
-                }
-              ].map((item, index) => (
-                <tr 
-                  key={index} 
-                  className={`border-b ${theme === "dark" ? "border-gray-700 hover:bg-gray-750" : "border-gray-200 hover:bg-blue-50"}`}
-                >
-                  <td className={`py-4 px-6 ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{item.feature}</td>
-                  <td className="py-4 px-6 text-center">
-                    {item.trackode === true ? (
-                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                    ) : item.trackode === false ? (
-                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
-                        <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    ) : (
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${theme === "dark" ? "bg-blue-900 text-blue-200" : "bg-blue-100 text-blue-800"}`}>
-                        {item.trackode}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-4 px-6 text-center">
-                    {item.others === true ? (
-                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                        </svg>
-                      </div>
-                    ) : item.others === false ? (
-                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
-                        <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </div>
-                    ) : (
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${theme === "dark" ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-800"}`}>
-                        {item.others}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Key Advantages */}
-     
-    </div>
-
-    
-  </div>
-</section>
 <section
 
           className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
