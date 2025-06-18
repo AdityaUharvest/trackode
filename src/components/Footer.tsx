@@ -2,7 +2,7 @@
 import Carousel from "./Crousel";
 import { useTheme } from "./ThemeContext";
 import Link from "next/link";
-
+import Image from "next/image";
 export default function Footer() {
   const { theme } = useTheme();
   
@@ -29,27 +29,31 @@ export default function Footer() {
           {/* Company Info Column */}
           <div className="flex flex-col">
             <div className=" flex flex-col items-center md:items-start">
-              <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
-            {theme === "light" ? (
-              <img
-              
+              <Link
+              href="/"
+              className="flex items-center gap-3 group transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-1 py-1"
+              aria-label="Trackode Home"
+              >
+              <div className="flex items-center">
+                <Image
+                priority
+                width={40}
+                height={40}
                 
-                src="/brand.png"
-                className="h-14 rounded-full"
-              
-                
+                src="/brand-dark.png"
                 alt="Trackode Logo"
-              />
-            ) : ( 
-              <>
-              <img className="h-14  rounded-full"
-                alt="Trackode Logo Dark" src="/brand-dark.png">
-              </img>
-              
-              </>
-            )}
-            
-          </Link>
+                className="transition-transform duration-300 bg-gradient-to-r from-white via-violet-200  to-violet-300 p-1 group-hover:scale-110 rounded-lg shadow-sm"
+                />
+                <div className="ml-2 flex flex-col justify-center">
+                <span className={`text-xl font-extrabold tracking-tight text-gray-700 dark:text-gray-100 leading-tight`}>
+                  Trackode
+                </span>
+                <span className={`text-xs font-medium  leading-tight`}>
+                  Quizzes & Mocks
+                </span>
+                </div>
+              </div>
+              </Link>
               
              
             </div>

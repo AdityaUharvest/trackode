@@ -144,7 +144,7 @@ export default function HomePage() {
             <div className="flex  mt-3 flex-col">
               <div className=" mb-6 flex flex-col items-center lg:justify-center">
           <h1
-            className=" text-4xl lg:text-5xl font-extrabold text-center"
+            className=" text-3xl md:text-4xl lg:text-5xl font-extrabold text-center"
             style={{ fontFamily: "'Exo 2', sans-serif" }}
           >
             <span className="block mb-2 text-gray-700 dark:text-gray-200 text-left ">
@@ -181,7 +181,7 @@ export default function HomePage() {
           </p>
               </div>
 
-              <div className=" lg:mt-0 flex gap-2 sm:justify-center mb-5">
+              <div className=" lg:mt-0 flex lg:gap-5 gap-2 sm:justify-center mb-5">
           <Link
             href="/programming-quizzes"
             className="px-4 py-3 sm:py-4 text-base font-semibold text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-cyan-400 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 shadow-xl hover:shadow-2xl relative overflow-hidden group"
@@ -198,7 +198,7 @@ export default function HomePage() {
           </Link>
               </div>
 
-              <div className="w-full mt-8 mb-10 ">
+              <div className="w-full mt-4 mb-10 ">
           <div className="items-center sm:justify-center flex gap-16 md:gap-5 ">
             <div className="flex sm:mb-0">
               <div className="flex -space-x-3">
@@ -379,23 +379,7 @@ export default function HomePage() {
          
           
         </section>
-        {/* road map */}
-        <section
-style={{
-            backgroundImage: theme === "dark"
-              ? "url('/image.png')"
-              : "url('/your-light-bg-image.jpg')",
-            
-            
-          }}
-          className={`
-  pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
-
-        >
-          
-          <RoadMap/>
-        </section>
-        <section 
+         <section 
   className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
   style={{
     backgroundImage: theme === "dark"
@@ -403,7 +387,7 @@ style={{
       : "url('/your-light-bg-image.jpg')",
   }}
 >
-  <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+  <div className="px-3 mx-auto max-w-7xl sm:px-4 lg:px-4">
     <div className="text-center mb-8">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -423,7 +407,7 @@ style={{
       </motion.div>
     </div>
 
-    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-5">
       {[
         {
           id: 'tcs',
@@ -483,6 +467,23 @@ style={{
     </div>
   </div>
 </section>
+        {/* road map */}
+        <section
+style={{
+            backgroundImage: theme === "dark"
+              ? "url('/image.png')"
+              : "url('/your-light-bg-image.jpg')",
+            
+            
+          }}
+          className={`
+  pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+
+        >
+          
+          <RoadMap/>
+        </section>
+       
 <section 
   className={`pb-16 ${theme === "dark" ? "bg-gray-700/50" : "bg-gray-100"}`}
   style={{
