@@ -6,10 +6,10 @@ const AlternatingSections = () => {
     const { theme } = useTheme();
     
     const isDark = theme === 'dark';
-    const bg = isDark ? 'bg-gradient-to-r from-gray-950 via-gray-900 bg-gray-900' : 'bg-indigo-50';
+    const bg = isDark ? 'bg-gradient-to-r from-gray-950 via-gray-900 bg-gray-950' : 'bg-indigo-50';
     const text = isDark ? 'text-white' : 'text-gray-900';
     const textSecondary = isDark ? 'text-indigo-200' : 'text-gray-600';
-    const cardBg = isDark ? 'bg-gray-700' : 'bg-white';
+    const cardBg = isDark ? 'bg-gray-800' : 'bg-white';
 
     const sections = [
         {
