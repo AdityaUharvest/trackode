@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react';
 
 import axios from 'axios';
 import Link from 'next/link';
-import QuizDashboard from './QuizesToPlay';
+import QuizDashboard from './QuizDashboard';
 import { useTheme } from '@/components/ThemeContext';
 
 import { useMediaQuery } from 'react-responsive';

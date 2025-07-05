@@ -51,11 +51,11 @@ export default function ContactForm() {
     <>
     
 
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 min-h-screen sm:flex sm:items-center justify-center p-4">
+    <div className=" min-h-screen flex items-center justify-center p-4">
   <div className="w-full max-w-md">
     <form 
       onSubmit={handleSubmit}
-      className="bg-white dark:bg-gray-700 rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-600"
+      className="bg-white dark:bg-gray-700/50 rounded-2xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-600"
     >
       <div className="p-8">
         <h2 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-6">Contact Us</h2>
@@ -77,7 +77,7 @@ export default function ContactForm() {
               required
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
                 bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 placeholder-gray-400
-                focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 
+                focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 
                 focus:border-transparent transition-all duration-200 pl-10"
               placeholder="John Doe"
             />
@@ -106,7 +106,7 @@ export default function ContactForm() {
               required
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
                 bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 placeholder-gray-400
-                focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 
+                focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 
                 focus:border-transparent transition-all duration-200 pl-10"
               placeholder="you@example.com"
             />
@@ -135,7 +135,7 @@ export default function ContactForm() {
             rows={4}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
               bg-white dark:bg-gray-600 text-gray-800 dark:text-gray-100 placeholder-gray-400
-              focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 
+              focus:outline-none focus:ring-2 focus:ring-violet-500 dark:focus:ring-violet-400 
               focus:border-transparent transition-all duration-200 resize-none"
             placeholder="How can we help you?"
           />
@@ -143,9 +143,9 @@ export default function ContactForm() {
 
         <button
           type="submit"
-          className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700
+          className="w-full py-3 px-4 bg-gradient-to-r from-violet-500 to-violet-800 hover:from-violet-600 hover:to-violet-700
             text-white font-semibold rounded-lg shadow-md transition-all duration-200
-            focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2
+            focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-2
             flex items-center justify-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">

@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
         instructions,
         startDate,
         endDate,
-        
         totalMarks,
         totalQuestions,
         shuffleOptions,

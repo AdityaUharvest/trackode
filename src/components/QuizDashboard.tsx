@@ -15,8 +15,6 @@ import {
   X
 } from "lucide-react";
 
-
-
 interface Quiz {
   _id: string;
   name: string;
@@ -82,15 +80,13 @@ interface Props {
   quizResults: QuizResult[];
 }
 
-// Language logo mapping
-
 const languageLogos: Record<string, string> = {
   C: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/c/c-original.svg",
   JavaScript: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
   Python: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg",
   Java: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
   CPP: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/cplusplus/cplusplus-original.svg",
- "React.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  "React.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
   "Node.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
   TypeScript: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg",
   SQL: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg",
@@ -137,9 +133,10 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
   const [difficultyFilter, setDifficultyFilter] = useState("all");
   const [activeFilter, setActiveFilter] = useState<QuizFilter>("all");
   const [mockFilter, setMockFilter] = useState<"all" | "Easy" | "Medium" | "Hard">("all");
-  const [expandedSections, setExpandedSections] = useState<{ [key: string]: boolean }>({});
   const [showStats, setShowStats] = useState(false);
-  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+
   const [userStats, setUserStats] = useState<UserStats>({
     totalQuizzes: 0,
     completedQuizzes: 0,
@@ -151,7 +148,6 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
     accuracyTrend: "stable",
   });
 
-  // Theme-based styles
   const containerStyles = {
     light: "bg-gray-50 text-gray-800",
     dark: "bg-gray-900 text-gray-100",
@@ -189,8 +185,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
           : "bg-white border-gray-300 text-gray-800 focus:ring-blue-500 focus:border-blue-500";
       case "button-primary":
         return theme === "dark"
-          ? "bg-blue-600 hover:bg-blue-700 text-white"
-          : "bg-blue-500 hover:bg-blue-600 text-white";
+          ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+          : "bg-indigo-500 hover:bg-indigo-600 text-white";
       case "button-secondary":
         return theme === "dark"
           ? "bg-gray-700 hover:bg-gray-600 text-gray-200 border-gray-600"
@@ -201,12 +197,15 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
         return theme === "dark"
           ? "bg-purple-900 text-purple-300"
           : "bg-purple-100 text-purple-800";
+      case "modal":
+        return theme === "dark"
+          ? "bg-gray-800 text-gray-100"
+          : "bg-white text-gray-800";
       default:
         return "";
     }
   };
 
-  // Organize quizzes by section and level
   const organizeQuizzesBySectionAndLevel = (quizList: Quiz[]) => {
     const organized: SectionLevels = {};
     quizList.forEach((quiz) => {
@@ -214,7 +213,6 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
       if (match) {
         const section = match[1].trim();
         const level = match[2].trim();
-       
         if (!organized[section]) {
           organized[section] = { Easy: [], Medium: [], Hard: [], Other: [] };
         }
@@ -239,19 +237,10 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
     return organized;
   };
 
-  // Calculate user stats and organize quizzes on mount
   useEffect(() => {
     const organized = organizeQuizzesBySectionAndLevel(quizzes);
     setOrganizedQuizzes(organized);
 
-    // Initialize expanded sections
-    const expanded: { [key: string]: boolean } = {};
-    Object.keys(organized).forEach((section) => {
-      expanded[section] = false;
-    });
-    setExpandedSections(expanded);
-
-    // Calculate stats
     const totalQuizzes = quizzes.length;
     const percentages = quizResults.map((result) =>
       Number(((result.score / result.totalQuestions) * 100).toFixed(1))
@@ -280,7 +269,6 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
     setFilteredMockTests(mockTests);
   }, [quizzes, quizResults, mockTests]);
 
-  // Filter quizzes and mock tests based on search and filters
   useEffect(() => {
     let filtered = quizzes;
     if (searchTerm) {
@@ -352,11 +340,14 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
     return "Newbie";
   };
 
-  const toggleSection = (section: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
+  const openModal = (section: string) => {
+    setSelectedSection(section);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setSelectedSection(null);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -374,9 +365,9 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
 
   const getSectionColor = (section: string) => {
     const lowerSection = section.toLowerCase();
-    if (lowerSection.includes("java")) return "bg-orange-100 text-orange-800";
+    if (lowerSection.includes("java")) return "bg-indigo-100 text-indigo-800";
     if (lowerSection.includes("python")) return "bg-blue-100 text-blue-800";
-    if (lowerSection.includes("c++") || lowerSection.includes("cpp")) return "bg-indigo-100 text-indigo-800";
+    if (lowerSection.includes("c++") || lowerSection.includes("cpp")) return "bg-indigo-200 text-indigo-900";
     if (lowerSection.includes("javascript")) return "bg-yellow-100 text-yellow-800";
     if (lowerSection.includes("sql")) return "bg-purple-100 text-purple-800";
     return "bg-gray-100 text-gray-800";
@@ -411,7 +402,6 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
       />
       <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
         <div className="container rounded-lg mx-auto px-3 py-4">
-          {/* Stats Section */}
           {userStats.completedQuizzes > 0 && (
             <div className="mb-8">
               <button
@@ -433,9 +423,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
 
               {showStats && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                  {/* Completion Rate */}
                   <div
-                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
                   >
                     <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
                       Completion
@@ -478,9 +467,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     </div>
                   </div>
 
-                  {/* Average Score */}
                   <div
-                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
                   >
                     <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
                       Average Score
@@ -511,9 +499,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     </div>
                   </div>
 
-                  {/* Achievement */}
                   <div
-                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
                   >
                     <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
                       Achievement
@@ -526,9 +513,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     </div>
                   </div>
 
-                  {/* Highest Score */}
                   <div
-                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
                   >
                     <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
                       Highest Score
@@ -544,9 +530,8 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     </div>
                   </div>
 
-                  {/* Recent Performance */}
                   <div
-                    className={`p-4 rounded-xl border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
+                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
                   >
                     <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
                       Recent Score
@@ -574,14 +559,10 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
             </div>
           )}
 
-          {/* Quizzes and Mock Tests Section */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Main Content Area */}
+          <div className=" gap-6">
             <div className="flex-1">
-              {/* Compact Filtering Section */}
               <div className="mb-6">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  {/* Search Input */}
                   <div className="relative flex-1">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Search className="text-gray-400" size={16} />
@@ -589,17 +570,12 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     <input
                       type="text"
                       placeholder="Search quizzes or mock tests..."
-                      className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${
-                        theme === "dark"
-                          ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-                          : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-                      }`}
+                      className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${getThemeClasses("input")}`}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
 
-                  {/* Mobile Filter Toggle */}
                   <div className="md:hidden">
                     <button
                       onClick={() => setShowMobileFilters(!showMobileFilters)}
@@ -612,18 +588,12 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                     </button>
                   </div>
 
-                  {/* Desktop Filters */}
                   <div className="hidden md:flex gap-2">
-                    {/* Quiz Status Filter Dropdown */}
                     <div className="relative">
                       <select
                         value={activeFilter}
                         onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
-                          theme === "dark"
-                            ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-                            : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-                        }`}
+                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${getThemeClasses("input")}`}
                       >
                         <option value="all">All Quizzes</option>
                         <option value="active">Active</option>
@@ -637,7 +607,6 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                       </div>
                     </div>
 
-                    {/* Difficulty Filter Dropdown */}
                     <div className="relative">
                       <select
                         value={difficultyFilter}
@@ -645,11 +614,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                           setDifficultyFilter(e.target.value);
                           setMockFilter(e.target.value as any);
                         }}
-                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${
-                          theme === "dark"
-                            ? "bg-gray-700 border-gray-600 focus:ring-blue-500 text-white"
-                            : "bg-white border-gray-300 focus:ring-blue-400 text-gray-800"
-                        }`}
+                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${getThemeClasses("input")}`}
                       >
                         <option value="all">All Levels</option>
                         <option value="Easy">Easy</option>
@@ -665,11 +630,9 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                   </div>
                 </div>
 
-                {/* Mobile Filters - Expandable */}
                 {showMobileFilters && (
                   <div className="md:hidden space-y-2 mt-4">
                     <div className="grid grid-cols-2 gap-2">
-                      {/* Quiz Status Filter */}
                       <div>
                         <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
                           Quiz Status
@@ -677,11 +640,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                         <select
                           value={activeFilter}
                           onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${
-                            theme === "dark"
-                              ? "bg-gray-700 border-gray-600 text-white"
-                              : "bg-white border-gray-300 text-gray-800"
-                          }`}
+                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${getThemeClasses("input")}`}
                         >
                           <option value="all">All</option>
                           <option value="active">Active</option>
@@ -690,7 +649,6 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                         </select>
                       </div>
 
-                      {/* Difficulty Filter */}
                       <div>
                         <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
                           Difficulty
@@ -701,11 +659,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                             setDifficultyFilter(e.target.value);
                             setMockFilter(e.target.value as any);
                           }}
-                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${
-                            theme === "dark"
-                              ? "bg-gray-700 border-gray-600 text-white"
-                              : "bg-white border-gray-300 text-gray-800"
-                          }`}
+                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${getThemeClasses("input")}`}
                         >
                           <option value="all">All</option>
                           <option value="Easy">Easy</option>
@@ -718,12 +672,11 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                 )}
               </div>
 
-              {/* Quizzes Section */}
               <div className="mb-16 mt-10">
-                <div className=" items-center mb-10">
-                  <h2  className={`text-2xl text-center font-bold ${
-                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
-                                    }`}>Programming Quizzes</h2>
+                <div className="items-center mb-10">
+                  <h2 className={`text-2xl text-center font-bold ${textStyles[theme].primary}`}>
+                    Programming Quizzes
+                  </h2>
                   <p className={`text-center text-sm ${textStyles[theme].secondary}`}>
                     Explore quizzes across various programming languages and levels
                   </p>
@@ -738,61 +691,56 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                         setActiveFilter("all");
                         setDifficultyFilter("all");
                       }}
-                      className={`px-6 py-2 rounded-lg transition ${
-                        theme === "dark" ? "bg-blue-600 hover:bg-blue-500" : "bg-blue-500 hover:bg-blue-600"
-                      } text-white`}
+                      className={`px-6 py-2 rounded-lg transition ${getThemeClasses("button-primary")}`}
                     >
                       Clear filters
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-6 ">
+                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {Object.keys(organizedQuizzes).map((section) => {
                       const sectionLogo = getLanguageLogo(section);
-                      
                       return (
                         <div
                           key={section}
-                          className={`rounded-xl  shadow-sm border overflow-hidden transition-all duration-200 ${cardStyles[theme]}`}
+                          className={`rounded-lg shadow-sm border overflow-hidden transition-all duration-200 cursor-pointer ${cardStyles[theme]}`}
+                          onClick={() => openModal(section)}
                         >
                           <div
-                            className={`flex p-7 justify-between items-center cursor-pointer transition-all duration-200 ${
+                            className={`flex p-7 items-center transition-all duration-200 ${
                               theme === "dark" ? "hover:bg-gray-700" : "hover:bg-gray-50"
                             }`}
-                            onClick={() => toggleSection(section)}
                           >
-                            <div className="flex items-center">
+                            <div className="flex items-center w-full">
                               {sectionLogo ? (
-                                <div className=" flex items-center justify-center rounded-lg mr-3 overflow-hidden">
+                                <div className="flex items-center justify-center rounded-lg mr-3 overflow-hidden">
                                   <img
                                     src={sectionLogo}
                                     alt={`${section} logo`}
-                                    className="w-12 h-12 "
+                                    className="w-12 h-12"
                                     onError={() => console.error(`Failed to load logo for ${section}: ${sectionLogo}`)}
                                   />
                                 </div>
                               ) : (
                                 <div
-                                  className={`w-8 h-8  flex items-center justify-center rounded-full mr-3 ${
+                                  className={`w-8 h-8 flex items-center justify-center rounded-lg mr-3 ${
                                     theme === "dark" ? "bg-gray-600" : "bg-gray-200"
                                   }`}
                                 >
                                   <span
-                                    className={`text-lg font-bold ${
-                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
-                                    }`}
+                                    className={`text-lg font-bold ${textStyles[theme].primary}`}
                                   >
                                     {section.charAt(0).toUpperCase()}
                                   </span>
                                 </div>
                               )}
-                              <div className="flex ml-2 flex-col">
-                                <h3 className={`text-lg font-bold ${
-                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
-                                    }`}>{section}</h3>
+                              <div className="flex flex-col flex-1">
+                                <h3 className={`text-lg font-bold ${textStyles[theme].primary}`}>
+                                  {section}
+                                </h3>
                                 <div className="flex gap-2 mt-1">
                                   <span
-                                    className={`text-xs px-2 py-1 rounded-full ${getSectionColor(section)}`}
+                                    className={`text-xs px-2 py-1 rounded-lg ${getSectionColor(section)}`}
                                   >
                                     {Object.values(organizedQuizzes[section]).reduce(
                                       (acc, levelQuizzes) => acc + levelQuizzes.length,
@@ -803,149 +751,178 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                                 </div>
                               </div>
                             </div>
-                            <svg
-                              className={`w-5 h-5 transition-transform duration-200 ${
-                                expandedSections[section] ? "rotate-180" : ""
-                              } ${textStyles[theme].secondary}`}
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 9l-7 7-7-7"
-                              />
-                            </svg>
                           </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
 
-                          {expandedSections[section] && (
-                            <div className="divide-y divide-gray-200 animate-fadeIn">
-                              {(["Easy", "Medium", "Hard", "Other"] as const).map((level) => {
-                                if (
-                                  organizedQuizzes[section][level].length === 0 ||
-                                  (difficultyFilter !== "all" && difficultyFilter !== level.toLowerCase())
-                                )
-                                  return null;
+              {modalOpen && selectedSection && (
+                <div className="fixed inset-0 px-2 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div
+                    className={`rounded-sm   w-full max-w-3xl max-h-[70vh] overflow-y-auto ${getThemeClasses("modal")} shadow-2xl border border-indigo-200`}
+                  >
+                    <div className="p-3 sticky bg-indigo-100  top-0 z-10 border-b border-indigo-200">
+                      <div className="flex justify-between items-center">
+                        <h2 className={`text-lg font-bold  ${textStyles[theme].primary} dark:text-neutral-600`}>
+                          {selectedSection} Quizzes
+                        </h2>
+                        <button
+                          onClick={closeModal}
+                          className="p-2 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900 transition"
+                        >
+                          <X size={24} className="text-indigo-600 dark:text-indigo-400" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="p-3">
+                      {(["Easy", "Medium", "Hard", "Other"] as const).map((level) => {
+                        if (
+                          organizedQuizzes[selectedSection][level].length === 0 ||
+                          (difficultyFilter !== "all" && difficultyFilter !== level.toLowerCase())
+                        )
+                          return null;
 
-                                return (
-                                  <div key={`${section}-${level}`} className="p-4">
-                                    <div className="flex items-center mb-3">
-                                      <span
-                                        className={`text-xs font-medium px-2 py-1 rounded-full ${getDifficultyColor(
-                                          level
-                                        )}`}
-                                      >
-                                        {level}
-                                      </span>
-                                      <span className={`text-xs ml-2 ${textStyles[theme].muted}`}>
-                                        {organizedQuizzes[section][level].length} quizzes
-                                      </span>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-4">
-                                      {organizedQuizzes[section][level].map((quiz) => (
-                                        <div
-                                          key={quiz._id}
-                                          className={`p-5 border-l-4 ${
+                        return (
+                          <div key={`${selectedSection}-${level}`} className="mb-6">
+                            <div className="flex items-center mb-3">
+                              <span
+                                className={`text-xs font-medium px-2 py-1 rounded-lg ${getDifficultyColor(level)}`}
+                              >
+                                {level}
+                              </span>
+                              <span className={`text-xs ml-2 ${textStyles[theme].muted}`}>
+                                {organizedQuizzes[selectedSection][level].length} quizzes
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                              {organizedQuizzes[selectedSection][level].map((quiz) => (
+                                <div
+                                  key={quiz._id}
+                                  className={`p-5 border-l-4 ${
+                                    level === "Easy"
+                                      ? "border-green-500"
+                                      : level === "Medium"
+                                      ? "border-yellow-500"
+                                      : level === "Hard"
+                                      ? "border-red-500"
+                                      : "border-gray-500"
+                                  } rounded-lg shadow-md ${
+                                    theme === "dark" ? "bg-gray-700 hover:bg-gray-650" : "bg-gray-50 hover:bg-white"
+                                  } transition-all duration-200 hover:shadow-lg`}
+                                >
+                                  <div className="flex justify-between items-start">
+                                    <h4
+                                      className={`font-semibold text-sm ${textStyles[theme].primary}`}
+                                    >
+                                      {quiz.name.replace("(", "").replace(")", "").trim()}
+                                    </h4>
+                                    <span
+                                      className={`text-xs flex items-center ${textStyles[theme].muted}`}
+                                    >
+                                      <Users size={14} className="mr-1" />
+                                      {quiz.totalRegistrations} players
+                                    </span>
+                                  </div>
+                                  {quiz.userPlayed && (
+                                    <p
+                                      className={`text-sm mt-2 font-medium ${
+                                        level === "Easy"
+                                          ? "text-green-600 dark:text-green-400"
+                                          : level === "Medium"
+                                          ? "text-yellow-600 dark:text-yellow-400"
+                                          : level === "Hard"
+                                          ? "text-red-600 dark:text-red-400"
+                                          : "text-gray-600 dark:text-gray-400"
+                                      }`}
+                                    >
+                                      Your Score: {quiz.userScore}/{quiz.maxScore}
+                                    </p>
+                                  )}
+                                  <div className="mt-4 flex justify-between items-center">
+                                    {quiz.userPlayed ? (
+                                      <>
+                                        <span
+                                          className={`text-xs font-semibold flex items-center ${
                                             level === "Easy"
-                                              ? "border-green-500"
+                                              ? "text-green-600 dark:text-green-400"
                                               : level === "Medium"
-                                              ? "border-yellow-500"
+                                              ? "text-yellow-600 dark:text-yellow-400"
                                               : level === "Hard"
-                                              ? "border-red-500"
-                                              : "border-gray-500"
-                                          } rounded-lg shadow-md ${
-                                            theme === "dark" ? "bg-gray-700 hover:bg-gray-650" : "bg-gray-50 hover:bg-white"
-                                          } transition-all duration-200 hover:shadow-lg`}
+                                              ? "text-red-600 dark:text-red-400"
+                                              : "text-gray-600 dark:text-gray-400"
+                                          }`}
                                         >
-                                          <div className="flex justify-between items-start">
-                                            <h4
-                                              className={`font-semibold text-sm ${
-                                                theme === "dark" ? "text-white" : "text-gray-900"
-                                              }`}
+                                          <CheckCircle size={14} className="mr-1" />
+                                          Completed
+                                        </span>
+                                        <div className="flex gap-2">
+                                          <Link
+                                            href={`/quiz-result/${quiz._id}`}
+                                            className={`text-xs px-3 py-1.5 rounded-lg ${getThemeClasses("button-secondary")}`}
+                                          >
+                                            Leaderboard
+                                          </Link>
+                                          <Link
+                                            href={`/dashboard/result/${quiz._id}`}
+                                            className={`px-4 py-1.5 text-xs font-medium rounded-lg ${getThemeClasses("button-primary")} flex items-center`}
+                                          >
+                                            <svg
+                                              className="w-3.5 h-3.5 mr-1"
+                                              fill="none"
+                                              stroke="currentColor"
+                                              viewBox="0 0 24 24"
                                             >
-                                              {quiz.name.replace("(", "").replace(")", "").trim()}
-                                            </h4>
-                                            <span
-                                              className={`text-xs flex items-center ${
-                                                theme === "dark" ? "text-gray-400" : "text-gray-500"
-                                              }`}
-                                            >
-                                              <Users size={14} className="mr-1" />
-                                              {quiz.totalRegistrations} players
-                                            </span>
-                                          </div>
-                                          {quiz.userPlayed && (
-                                            <p className={`text-sm mt-2 font-medium ${
-                                              level === "Easy"
-                                                ? "text-green-600 dark:text-green-400"
-                                                : level === "Medium"
-                                                ? "text-yellow-600 dark:text-yellow-400"
-                                                : level === "Hard"
-                                                ? "text-red-600 dark:text-red-400"
-                                                : "text-gray-600 dark:text-gray-400"
-                                            }`}>
-                                              Your Score: {quiz.userScore}/{quiz.maxScore}
-                                            </p>
-                                          )}
-                                          
-                                          <div className="mt-4 flex justify-between items-center">
-                                            {quiz.userPlayed ? (
-                                              <>
-                                                <span className={`text-xs font-semibold flex items-center ${
-                                                  level === "Easy"
-                                                    ? "text-green-600 dark:text-green-400"
-                                                    : level === "Medium"
-                                                    ? "text-yellow-600 dark:text-yellow-400"
-                                                    : level === "Hard"
-                                                    ? "text-red-600 dark:text-red-400"
-                                                    : "text-gray-600 dark:text-gray-400"
-                                                }`}>
-                                                  <CheckCircle size={14} className="mr-1" />
-                                                  Completed
-                                                </span>
-                                                <div className="flex gap-2">
-                                                  <Link
-                                                    href={`/quiz-result/${quiz._id}`}
-                                                    className={`text-xs px-3 py-1.5 rounded-lg ${
-                                                      theme === "dark"
-                                                        ? "bg-gray-600 hover:bg-gray-500 text-white"
-                                                        : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-                                                    } transition-colors`}
-                                                  >
-                                                    Leaderboard
-                                                  </Link>
-                                                  
-        <Link href={`/dashboard/result/${quiz._id}`} className={`px-4 py-1.5 text-xs font-medium rounded-lg ${
-          theme === "dark" ? "bg-purple-600 hover:bg-purple-500 text-white" : "bg-purple-600 hover:bg-purple-700 text-white"
-        } transition-colors shadow-sm hover:shadow flex items-center`}>
-          <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Result
-        </Link>
-      </div>
-    </>
-  ) : (
-    <Link
-      href={`/quiz-play/${quiz._id}`}
-      aria-label={`Start ${quiz.name} quiz`}
-      className={` mt-5 text-center px-4 py-2 text-sm font-medium rounded-lg ${
-        theme === "dark" 
-          ? "bg-green-600 hover:bg-green-500 text-white" 
-          : "bg-green-600 hover:bg-green-700 text-white"
-      } transition-colors shadow-sm hover:shadow flex items-center justify-center`}
-    >
-      <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      Start Quiz
-    </Link>
-  )}
-</div>
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                                              />
+                                              <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                              />
+                                            </svg>
+                                            Result
+                                          </Link>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <Link
+                                        href={`/quiz-play/${quiz._id}`}
+                                        aria-label={`Start ${quiz.name} quiz`}
+                                        className={`mt-5 text-center px-4 py-2 text-sm font-medium rounded-lg ${getThemeClasses(
+                                          "button-primary"
+                                        )} flex items-center justify-center`}
+                                      >
+                                        <svg
+                                          className="w-3.5 h-3.5 mr-1"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                                          />
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                          />
+                                        </svg>
+                                        Start Quiz
+                                      </Link>
+                                    )}
+                                  </div>
                                 </div>
                               ))}
                             </div>
@@ -953,26 +930,19 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                         );
                       })}
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
-            )
-            }
             </div>
-                )}
 
-
-            {/* Sidebar Section */}
-            {/* Mock Tests Section */}
             <div className="mt-16">
-              <div className=" items-center mb-6">
-                <h1 className={`text-2xl text-center font-bold ${
-                                      theme === "dark" ? "text-gray-200" : "text-gray-800"
-                                    }`}>Free Mock Tests</h1>
+              <div className="items-center mb-6">
+                <h1 className={`text-2xl text-center font-bold ${textStyles[theme].primary}`}>
+                  Free Mock Tests
+                </h1>
                 <p className={`text-sm text-center ${textStyles[theme].muted}`}>
                   Explore our collection of free mock tests to prepare for your next coding interview or exam.
                 </p>
-                
               </div>
 
               {filteredMockTests.length === 0 ? (
@@ -984,123 +954,84 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                       setMockFilter("all");
                       setDifficultyFilter("all");
                     }}
-                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                    className={`px-6 py-2 rounded-lg ${getThemeClasses("button-primary")}`}
                   >
                     Clear filters
                   </button>
                 </div>
               ) : (
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredMockTests.map((mock) => (
-            <div
-              key={mock._id}
-              className={`rounded-xl shadow-lg overflow-hidden border ${getThemeClasses(
-                "card"
-              )} ${getThemeClasses("card-hover")} transition-shadow duration-300`}
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-sm font-semibold">
-                    {mock.title}
-                  </h2>
-                  <span
-                    className={`px-3 py-1 text-xs font-medium rounded-full ${getDifficultyColor(
-                      mock.difficulty || ""
-                    )}`}
-                  >
-                    {mock.difficulty}
-                  </span>
-                </div>
-
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
-                  <span
-                    className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
-                      theme === "dark"
-                        ? "bg-blue-900 text-blue-300"
-                        : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {mock.tag || "TCS"}
-                  </span>
-                  <span
-                    className={`inline-block text-xs px-2 py-1 rounded ${getThemeClasses(
-                      "creator"
-                    )}`}
-                  >
-                    <User size={14} className="inline mr-1" />
-                     By {mock.creator || "Unknown"}
-                  </span>
-                  {mock.createdAt && (
-                    <span className={getThemeClasses("text-muted") + " text-xs"}>
-                      Conducted On : {new Date(mock.createdAt).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-4 mb-6">
-                  <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                    <Clock size={16} className="mr-2 text-blue-500" />
-                    {mock.durationMinutes || 60} mins
-                  </div>
-                  <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                    <CheckCircle size={16} className="mr-2 text-green-500" />
-                    75 questions
-                  </div>
-                  <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                    <Users size={16} className="mr-2 text-purple-500" />
-                    {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)}{" "}
-                    students
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <Link
-                    href={`/playy/${mock.shareCode}`}
-                    className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg ${getThemeClasses(
-                      "button-primary"
-                    )}`}
-                  >
-                    <Play size={18} className="mr-2" />
-                    Play Now
-                  </Link>
-
-                  <div className="flex gap-3">
-                    <Link
-                      href={`/mock-tests/${mock._id}/user-results`}
-                      className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${getThemeClasses(
-                        "button-secondary"
-                      )}`}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredMockTests.map((mock) => (
+                    <div
+                      key={mock._id}
+                      className={`rounded-lg shadow-lg overflow-hidden border ${getThemeClasses("card")} ${getThemeClasses("card-hover")} transition-shadow duration-300`}
                     >
-                      <BarChart size={16} className="mr-2 text-blue-500" />
-                      Results
-                    </Link>
-                    <Link
-                      href={`/mock-tests/${mock._id}/results`}
-                      className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 flex-1 border ${getThemeClasses(
-                        "button-secondary"
-                      )}`}
-                    >
-                      <Award size={16} className="mr-2 text-yellow-500" />
-                      Leaderboard
-                    </Link>
-                  </div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-4">
+                          <h2 className="text-base font-semibold">{mock.title}</h2>
+                          <span
+                            className={`px-3 py-1 text-xs font-medium rounded-lg ${getDifficultyColor(mock.difficulty || "")}`}
+                          >
+                            {mock.difficulty}
+                          </span>
+                        </div>
+
+                        <div className="mb-4 flex flex-wrap gap-1 items-center">
+                          <span
+                            className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
+                              theme === "dark" ? "bg-indigo-900 text-indigo-300" : "bg-indigo-100 text-indigo-800"
+                            }`}
+                          >
+                            {mock.tag || "TCS"}
+                          </span>
+                          
+                          {mock.createdAt && (
+                            <span className={getThemeClasses("text-muted") + " text-sm"}>
+                              {new Date(mock.createdAt).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-4 mb-6">
+                          <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
+                            <Clock size={16} className="mr-2 text-indigo-500" />
+                            {mock.durationMinutes || 60} mins
+                          </div>
+                          <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
+                            <CheckCircle size={16} className="mr-2 text-green-500" />
+                            75 questions
+                          </div>
+                          <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
+                            <Users size={16} className="mr-2 text-indigo-500" />
+                            {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)} students
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                          <Link
+                            href={`/playy/${mock.shareCode}`}
+                            className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 border-indigo-500 border-2 hover:shadow-lg  bg-transparent hover:bg-indigo-600 text-indigo-700 hover:text-white font-medium`}
+                          >
+                            <Play size={18} className="mr-2" />
+                            Play Now
+                          </Link>
+
+                         
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
               )}
               <div className="mt-8 text-center text-gray-500">
                 Showing {filteredMockTests.length} of {mockTests.length} mock tests
               </div>
             </div>
 
-            <div className=" lg:flex lg:justify-between mt-6">
+            <div className="lg:flex lg:justify-between mt-6">
               <Link href="/contact">
                 <button
-                  className={`px-4 w-full mb-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    theme === "dark" ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-blue-500 text-white hover:bg-blue-600"
-                  }`}
+                  className={`px-4 w-full mb-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${getThemeClasses("button-primary")}`}
                 >
                   Contact Us for More Quizzes
                 </button>
@@ -1108,7 +1039,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
               <Link href="/quiz-setup">
                 <button
                   className={`px-4 py-2 w-full rounded-lg text-sm font-medium transition-all duration-200 ${
-                    theme === "dark" ? "bg-blue-600 text-white hover:bg-blue-500" : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    theme === "dark" ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
                   }`}
                 >
                   Contribute More Quizzes
@@ -1118,10 +1049,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
           </div>
         </div>
       </div>
-    </div>
-    </div>
-  </main>
-   
+    </main>
   );
 };
 

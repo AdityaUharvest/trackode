@@ -1,7 +1,7 @@
 'use client'
 import { ReactNode, useEffect, useState } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Navbar from "@/components/Layout/Navbar";
+import Footer from "@/components/Layout/Footer";
 import { ThemeProvider, useTheme } from "@/components/ThemeContext";
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -21,7 +21,7 @@ function ClientLayoutContent({ children }: { children: ReactNode }) {
   return (
     <>
       <Navbar />
-      <div className={`min-h-screen pt-5 ${theme === 'dark' ? 'bg-[url("/image.png")]' : 'bg-white'}`}>
+      <div className={`min-h-screen pt-2 ${theme === 'dark' ? 'bg-[url("/image.png")]' : 'bg-white'}`}>
         {children}
       </div>
       <Footer />

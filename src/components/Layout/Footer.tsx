@@ -1,6 +1,6 @@
 "use client";
-import Carousel from "./Crousel";
-import { useTheme } from "./ThemeContext";
+import Carousel from "../Crousel";
+import { useTheme } from "../ThemeContext";
 import Link from "next/link";
 import Image from "next/image";
 export default function Footer() {

@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import toast, { Toaster } from 'react-hot-toast';
-import { useTheme } from "./ThemeContext";
+import { useTheme } from "../ThemeContext";
 import {
   Moon,
   Sun,
@@ -134,20 +134,22 @@ const Navbar: React.FC = () => {
       requiresAuth: true
     },
   ], [status]);
+
   const themeClasses = {
     background: theme === 'dark'
-      ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900'
-      : 'bg-gradient-to-br from-slate-50 via-white to-blue-50',
+      ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-indigo-900'
+      : 'bg-gradient-to-br from-slate-50 via-white to-indigo-50',
     text: theme === 'dark' ? 'text-white' : 'text-gray-900',
     textSecondary: theme === 'dark' ? 'text-gray-300' : 'text-gray-600',
     cardBg: theme === 'dark' ? 'bg-gray-800' : 'bg-white',
     cardBorder: theme === 'dark' ? 'border-gray-700' : 'border-gray-100',
     tagBg: {
+      indigo: theme === 'dark' ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700',
       blue: theme === 'dark' ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-700',
-      purple: theme === 'dark' ? 'bg-purple-900 text-purple-300' : 'bg-purple-100 text-purple-700',
       green: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-700'
     }
   };
+
   // Theme-based styles
   const themeStyles = useMemo(() => ({
     navbar: theme === "light"
@@ -168,33 +170,31 @@ const Navbar: React.FC = () => {
         ${themeStyles.navbar}
         ${scrolled ? 'shadow-lg backdrop-blur-2xl' : 'bg-gray-900/50 backdrop-blur-2xl'}
       `}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
             {/* Logo Section */}
             <div className="flex items-center">
               <Link
               href="/"
-              className="flex items-center gap-3 group transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg px-1 py-1"
+              className="flex items-center gap-3 group  transition-transform hover:-translate-y-1   rounded-lg px-1 py-1"
               aria-label="Trackode Home"
               >
               <div className="flex items-center">
                 <Image
                 priority
-                width={40}
-                height={40}
+                width={100}
+                height={100}
                 
                 src="/brand-dark.png"
                 alt="Trackode Logo"
-                className="transition-transform duration-300 bg-gradient-to-r from-white via-violet-200  to-violet-300 p-1 group-hover:scale-110 rounded-lg shadow-sm"
+                className="transition-transform duration-300 w-11 h-10  rounded-sm  group-hover:scale-105  "
                 />
-                <div className="ml-2 flex flex-col justify-center">
-                <span className={`text-xl font-extrabold tracking-tight text-gray-700 dark:text-gray-100 leading-tight`}>
-                  Trackode
+                <div className="ml-1 flex flex-col justify-center">
+                <span className={`text-xl font-black  text-gray-900 dark:text-gray-100 `}>
+                  Track<span className="text-indigo-500">ode</span>
                 </span>
-                <span className={`text-xs font-medium ${themeStyles.textSecondary} leading-tight`}>
-                  Quizzes & Mocks
-                </span>
+                
                 </div>
               </div>
               </Link>
@@ -244,7 +244,7 @@ const Navbar: React.FC = () => {
                     onClick={() => setDropdownOpen(!isDropdownOpen)}
                     className={`
                       flex items-center space-x-2 p-2 rounded-xl transition-all duration-200
-                      hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500
+                      hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-500
                       ${themeStyles.hover}
                     `}
                     aria-expanded={isDropdownOpen}
@@ -253,14 +253,14 @@ const Navbar: React.FC = () => {
                     <div className="relative">
                       {session.user?.image ? (
                         <img
-                          className="w-8 h-8 rounded-lg border-2 border-blue-500/20"
+                          className="w-8 h-8 rounded-lg border-2 border-indigo-500/20"
                           src={session.user.image}
                           alt="Profile"
                         />
                       ) : (
                         <div className={`
                           w-8 h-8 rounded-lg flex items-center justify-center
-                          ${theme === "light" ? "bg-blue-100 text-blue-600" : "bg-blue-900 text-blue-300"}
+                          ${theme === "light" ? "bg-indigo-100 text-indigo-600" : "bg-indigo-900 text-indigo-300"}
                         `}>
                           <User size={16} />
                         </div>
@@ -294,7 +294,7 @@ const Navbar: React.FC = () => {
                           ) : (
                             <div className={`
                               w-12 h-12 rounded-xl flex items-center justify-center
-                              ${theme === "light" ? "bg-blue-100 text-blue-600" : "bg-blue-900 text-blue-300"}
+                              ${theme === "light" ? "bg-indigo-100 text-indigo-600" : "bg-indigo-900 text-indigo-300"}
                             `}>
                               <User size={20} />
                             </div>
@@ -350,7 +350,7 @@ const Navbar: React.FC = () => {
                   className={`
                     flex items-center px-3 py-2 text-sm font-medium rounded-md
                     transition-all duration-300 hover:scale-105 group
-                    bg-gradient-to-r from-blue-600 to-violet-700 hover:from-blue-700 hover:to-violet-800
+                    bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800
                     text-white shadow-md hover:shadow-lg
                   `}
                 >
@@ -428,8 +428,8 @@ const NavItem: React.FC<{
         flex items-center px-3 py-2 rounded-xl text-sm font-medium
         transition-all duration-200 hover:scale-105 group
         ${theme === "light"
-          ? "text-gray-700 hover:bg-gray-100 hover:text-violet-600"
-          : "text-gray-300 hover:bg-gray-800/50 hover:text-violet-400"
+          ? "text-gray-700 hover:bg-gray-100 hover:text-indigo-600"
+          : "text-gray-300 hover:bg-gray-800/50 hover:text-indigo-400"
         }
       `}
     >
@@ -461,8 +461,8 @@ const MobileNavItem: React.FC<{
         flex items-center px-4 py-3 rounded-xl text-base font-medium
         transition-all duration-200 group
         ${theme === "light"
-          ? "text-gray-700 hover:bg-gray-100 hover:text-blue-600"
-          : "text-gray-300 hover:bg-gray-800/50 hover:text-blue-400"
+          ? "text-gray-700 hover:bg-gray-100 hover:text-indigo-600"
+          : "text-gray-300 hover:bg-gray-800/50 hover:text-indigo-400"
         }
       `}
     >
@@ -483,7 +483,7 @@ const DropdownItem: React.FC<{
     href={href}
     className={`
       flex items-center px-4 py-2 text-sm font-medium
-      transition-colors hover:bg-blue-500 hover:text-white
+      transition-colors hover:bg-indigo-500 hover:text-white
       ${theme === "light" ? "text-gray-700" : "text-gray-200"}
     `}
   >

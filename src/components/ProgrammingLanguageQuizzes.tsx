@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import QuizDashboard from "@/components/QuizesToPlay";
+import QuizDashboard from "@/components/QuizDashboard";
 
 interface Quiz {
   _id: string;

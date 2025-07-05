@@ -8,6 +8,13 @@ const inter = Inter({ subsets: ["latin"] });
 
 import "./globals.css";
 import { useTheme } from "@/components/ThemeContext";
+import { Roboto } from "next/font/google";
+import Head from "next/head";
+
+const roboto = Roboto({
+  weight: "400",
+  subsets: ["latin-ext"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -76,7 +83,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {// Replace with your theme logic or context
   return (
-    <html lang="en">
+    
+      <html lang="en" className={roboto.className}>
+      <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
+          rel="stylesheet"
+        />
+         <link rel="manifest" href="/manifest.json" />
+      </Head>
       <head>
         <link rel="manifest" href="/manifest.json" />
       </head>
