@@ -62,7 +62,7 @@ const HeroSection = () => {
 
   <div className="relative px-4 py-8 mx-auto z-10 flex-1 flex flex-col">
     <div className="flex mt-3 flex-col">
-      <div className="mb-6 flex flex-col items-center lg:justify-center">
+      <div className=" flex flex-col items-center lg:justify-center">
         <p className="text-indigo-400 mb-2">✨ Premium Quizzes & Mocks</p>
         <h1
           className="text-3xl md:text-4xl lg:text-4xl font-extrabold text-center"
@@ -102,17 +102,17 @@ const HeroSection = () => {
         </p>
       </div>
 {/* Feature highlights */}
-            <div className="grid lg:grid-cols-3 grid-cols-2 gap-2 my-4">
+            <div className="grid lg:grid-cols-3 grid-cols-2 gap-2 py-4 my-4">
               <div className="flex items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-indigo-200/50 dark:border-gray-700/50">
                
-                <span className="text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
+                <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
                   <img src="/icons/book.gif" alt="" className='w-10 h-10' />
                   Adaptive Learning
                   </span>
               </div>
               <div className="flex items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-pink-200/50 dark:border-gray-700/50">
-                 <span className="text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
+                 <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
                   <img src="/icons/task-management.gif" alt="" className='w-10 h-10' />
                   Real-time Feedback
@@ -120,14 +120,14 @@ const HeroSection = () => {
                
               </div>
               <div className="flex items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-purple-200/50 dark:border-gray-700/50">
-                <span className="text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
+                <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
                   <img src="/icons/coding.gif" alt="" className='w-10 h-10' />
                   AI - Powered
                   </span>
               </div>
               <div className="flex sm:hidden  items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-purple-200/50 dark:border-gray-700/50">
-                <span className="text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
+                <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
                   <img src="/icons/goals.gif" alt="" className='w-10 h-10' />
                   Mocks & Quizzes
