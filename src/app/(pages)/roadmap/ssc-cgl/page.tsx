@@ -35,7 +35,7 @@ export const metadata = {
         follow: true,
         nocache: true,
     },
-    themeColor: '#ffffff',
+    
     appleWebApp: {
         capable: true,
         title: 'Trackode SSC CGL Mock Test',
