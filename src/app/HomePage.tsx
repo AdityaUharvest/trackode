@@ -13,7 +13,7 @@ import { useTheme } from "../components/ThemeContext";
 import TechStackQuizSystem from '@/components/TechnologySection';
 import InteractiveQuiz from '@/components/DemoQuizzes';
 
-import RoadMap from '@/components/roadmaps/Main';
+import RoadMap from '@/components/HomePage/Roadmap';
 
 import AlternatingSections from '@/components/HomePage/AlternatingSections';
 
@@ -74,7 +74,7 @@ export default function HomePage() {
         {/* Technology Section */}
         <section
           id="technology"
-          className={`pb-16 pt-5 px-2  ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`py-16  px-2 max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           aria-labelledby="tech-stack-hading"
           style={{
             backgroundImage: theme === "dark"
@@ -96,8 +96,11 @@ export default function HomePage() {
                 className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                Technology We Cover
+                Technology <span className='text-indigo-500'>We Cover</span> 
               </h2>
+              <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                Explore our extensive tech stack quizzes and challenges
+              </p>
               <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </motion.div>
           </div>
@@ -107,14 +110,10 @@ export default function HomePage() {
           
         </section>
          <section 
-  className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
-  style={{
-    backgroundImage: theme === "dark"
-      ? "url('/image.png')"
-      : "url('/your-light-bg-image.jpg')",
-  }}
+  className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+  
 >
-  <div className="px-3 mx-auto max-w-7xl sm:px-4 lg:px-4">
+  <div className="px-3  sm:px-4 lg:px-4">
     <div className="text-center mb-8">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -126,7 +125,7 @@ export default function HomePage() {
                 className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                Featured Mock Exams
+                Featured <span className='text-indigo-500'>Mock Exams</span> 
               </h2>
         <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
           Prepare for your dream job with our industry-standard mock tests
@@ -196,15 +195,9 @@ export default function HomePage() {
 </section>
         {/* road map */}
         <section
-style={{
-            backgroundImage: theme === "dark"
-              ? "url('/image.png')"
-              : "url('/your-light-bg-image.jpg')",
-            
-            
-          }}
+
           className={`
-  pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+  py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
 
         >
           
@@ -214,7 +207,7 @@ style={{
 
 <section
 
-          className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`pb-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           style={{
             backgroundImage: theme === "dark"
               ? "url('/image.png')"
@@ -237,7 +230,7 @@ style={{
                   className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  Why Choose Trackode
+                  Why Choose <span className='text-indigo-500'>Trackode</span> 
                 </h2>
                 <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </motion.div>
@@ -369,8 +362,8 @@ style={{
         </section>
 
         {/* How it Works Section */}
-        <section
-          className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+        <section 
+          className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gradient-to-r from-indigo-100 to-blue-100"}`}
           aria-labelledby="features-heading"
 style={{
             backgroundImage: theme === "dark"
@@ -393,7 +386,7 @@ style={{
                   className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  How Trackode Works
+                  How Trackode <span className='text-indigo-600'>Works</span> 
                 </h2>
                 <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </motion.div>
@@ -476,7 +469,7 @@ style={{
         </section>
         {/* Demo Quiz Section */}
         <section
-          className={`pb-16  ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`py-16 mx-auto max-w-7xl  ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           aria-labelledby="demo-heading"
 style={{
             backgroundImage: theme === "dark"
@@ -498,8 +491,9 @@ style={{
                 className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                Try a Free Demo Quiz
+                Try a Free <span className='text-indigo-500'>Demo Quiz</span> 
               </h2>
+              
               <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </motion.div>
           </div>
@@ -511,7 +505,7 @@ style={{
 
         {/* Testimonials Section */}
         <section
-          className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"} rounded-lg`}
+          className={`py-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"} mx-auto max-w-7xl`}
           aria-labelledby="testimonials-heading"
           style={{
             backgroundImage: theme === "dark"
@@ -534,13 +528,13 @@ style={{
                   className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  What Our Users Say
+                  What our<span className='text-indigo-500'> Users Says</span> 
                 </h2>
                 
                 <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </motion.div>
               <p
-                className={`mt-4 max-w-2xl mx-auto lg:text-lg ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
+                className={`mt-4 max-w-2xl mx-auto  ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
               >
                 Hear from developers who have leveled up their skills with Trackode.
               </p>
@@ -609,7 +603,7 @@ style={{
         {/* FAQ Section */}
         <section
           id="faq"
-          className={`pb-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`py-16 max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           style={{
             backgroundImage: theme === "dark"
               ? "url('/image.png')"
@@ -630,8 +624,11 @@ style={{
                 className={`text-3xl sm:text-4xl font-bold tracking-tighter ${theme === "dark" ? "text-white" : "text-gray-900"}`}
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
-                Frequently Asked Questions
+                Frequently <span className='text-indigo-500'>Asked Questions</span> 
               </h2>
+              <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                Find answers to common questions about Trackode
+              </p>
               <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </motion.div>
           </div>

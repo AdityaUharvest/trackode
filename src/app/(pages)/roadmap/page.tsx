@@ -1,4 +1,4 @@
-import RoadMap from '@/components/roadmaps/Main';
+import RoadMap from '@/components/HomePage/Roadmap';
 import React from 'react';
 
 

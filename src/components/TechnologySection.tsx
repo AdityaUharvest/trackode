@@ -214,7 +214,7 @@ export default function TechStackQuizSystem() {
             
             
           }}
-  className={`px-2 rounded-xl  mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
+  className={`px-2 rounded-md  mx-auto ${theme === "dark" ? "bg-gray-800" : "bg-gray-100"}`}>
       
       <div>
 
@@ -250,7 +250,7 @@ export default function TechStackQuizSystem() {
                         transition: { duration: 0.3 },
                       }}
                       whileTap={{ scale: 0.95 }}
-                      className={`relative flex flex-col items-center p-6 rounded-2xl cursor-pointer backdrop-blur-md transition-all duration-300 
+                      className={`relative flex flex-col items-center p-6 rounded-lg cursor-pointer backdrop-blur-md transition-all duration-300 
                         ${theme === "dark" 
                           ? "bg-gray-700/50 border border-gray-700/50 hover:bg-gray-700/50" 
                           : "bg-white/50 border border-gray-200/50 hover:bg-gray-100/50"} 
@@ -265,7 +265,7 @@ export default function TechStackQuizSystem() {
 
                       {/* Tech Icon with Gradient Background */}
                       <div
-                        className="relative  p-3 rounded-full transition-all duration-300"
+                        className="relative  p-3 rounded-lg transition-all duration-300"
                         
                       >
                         <img

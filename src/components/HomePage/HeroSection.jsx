@@ -16,7 +16,7 @@ const HeroSection = () => {
     theme === "dark" 
       ? "bg-gray-900" 
       : "bg-gradient-to-br from-indigo-50 to-white"
-  } overflow-hidden min-h-[auto] sm:min-h-screen transition-all duration-500`}
+  } overflow-hidden max-w-7xl mx-auto transition-all duration-500`}
 >
   {/* Simple background elements */}
   <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -134,23 +134,33 @@ const HeroSection = () => {
                   </span>
               </div>
             </div>
-      <div className="lg:mt-0 flex lg:gap-5 gap-2 justify-center mb-5">
+      <div className="lg:mt-0 flex lg:gap-5  gap-2 justify-center mb-5">
         <Link
           href="/programming-quizzes"
-          className="px-4 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full hover:from-white hover:to-indigo-50 focus:outline-none focus:ring-4 hover:text-indigo-400 border-indigo-400 border-2 focus:ring-indigo-300 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl"
+          className="px-5 py-3 sm:py-4 text-base font-semibold text-white bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-full hover:from-white hover:to-indigo-50 focus:outline-none focus:ring-4 hover:text-indigo-400 border-indigo-400 border-2 focus:ring-indigo-300 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl"
         >
           Start Learning Now
           <ArrowRight className="inline-block ml-2 w-4 h-4 sm:w-5 sm:h-5" />
         </Link>
         <Link
           href="/dashboard"
-          className={`px-7 py-3 sm:py-4 text-base font-semibold rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl ${
+          className={`px-6 py-3 md:hidden sm:py-4 text-base font-semibold rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl ${
             theme === "dark" 
               ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-600" 
               : "text-indigo-500 bg-white hover:bg-indigo-500 hover:text-white border border-indigo-200"
           }`}
         >
-          View Dashboard
+          Dashboard
+        </Link>
+        <Link
+          href="/dashboard"
+          className={`px-10 py-3 hidden sm:block sm:py-4 text-base font-semibold rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl ${
+            theme === "dark" 
+              ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-600" 
+              : "text-indigo-500 bg-white hover:bg-indigo-500 hover:text-white border border-indigo-200"
+          }`}
+        >
+         View Dashboard
         </Link>
       </div>
 

@@ -153,7 +153,7 @@ function RoadMap() {
             
             
           }}
- className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-blue-100 
+ className=" bg-gradient-to-br from-gray-100 via-white to-blue-100 
                     dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-10 ">
 
       {/* Header Section */}
@@ -161,7 +161,7 @@ function RoadMap() {
         <div  className="relative">
           <h1 className="text-3xl md:text-4xl font-bold  
                           mb-2 leading-tight">
-            Trackode Roadmap
+            Trackode <span className='text-indigo-500'>Roadmap</span>
           </h1>
           <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500 rounded-full animate-pulse opacity-60"></div>
           <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-500 rounded-full  opacity-40"></div>
