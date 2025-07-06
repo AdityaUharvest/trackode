@@ -165,8 +165,8 @@ const SSCCHSLPreparation = () => {
               Exam Pattern Overview
             </h4>
             <div className="grid md:grid-cols-4 gap-4 mb-6">
-              <div className={`p-4 rounded-lg border ${theme === 'light' ? 'bg-blue-50 border-blue-100' : 'bg-blue-900 border-blue-800'}`}>
-                <h5 className={`font-bold ${theme === 'light' ? 'text-blue-700' : 'text-blue-400'}`}>Tier 1</h5>
+              <div className={`p-4 rounded-lg border ${theme === 'light' ? 'bg-indigo-50 border-indigo-100' : 'bg-indigo-900 border-indigo-800'}`}>
+                <h5 className={`font-bold ${theme === 'light' ? 'text-indigo-700' : 'text-indigo-400'}`}>Tier 1</h5>
                 <p className={theme === 'light' ? 'text-gray-700' : 'text-gray-200'}>100 questions</p>
                 <p className={theme === 'light' ? 'text-gray-700' : 'text-gray-200'}>60 minutes</p>
                 <p className={theme === 'light' ? 'text-gray-700' : 'text-gray-200'}>Cutoff: ~110-130</p>
@@ -239,8 +239,8 @@ const SSCCHSLPreparation = () => {
             </div>
           ))}
 
-          <div className={`p-6 rounded-lg border ${theme === 'light' ? 'bg-blue-50 border-blue-200' : 'bg-blue-900 border-blue-800'}`}>
-            <h4 className={`text-xl font-semibold mb-4 ${theme === 'light' ? 'text-blue-800' : 'text-blue-400'}`}>Preparation Tips</h4>
+          <div className={`p-6 rounded-lg border ${theme === 'light' ? 'bg-indigo-50 border-indigo-200' : 'bg-indigo-900 border-indigo-800'}`}>
+            <h4 className={`text-xl font-semibold mb-4 ${theme === 'light' ? 'text-indigo-800' : 'text-indigo-400'}`}>Preparation Tips</h4>
             <ul className={`list-disc pl-5 space-y-2 ${theme === 'light' ? 'text-gray-700' : 'text-gray-200'}`}>
               {sscCHSLRoadmap.generalTips.map((tip, index) => (
                 <li key={index}>{tip}</li>

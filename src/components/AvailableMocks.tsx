@@ -99,12 +99,12 @@ export default function MockTestsListClient({
         return theme === "dark" ? "hover:shadow-gray-900" : "hover:shadow-gray-300";
       case "input":
         return theme === "dark"
-          ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-400 focus:border-blue-400"
-          : "bg-white border-gray-300 text-gray-800 focus:ring-blue-500 focus:border-blue-500";
+          ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-indigo-400 focus:border-indigo-400"
+          : "bg-white border-gray-300 text-gray-800 focus:ring-indigo-500 focus:border-indigo-500";
       case "button-primary":
         return theme === "dark"
-          ? "bg-blue-600 hover:bg-blue-700 text-white"
-          : "bg-blue-500 hover:bg-blue-600 text-white";
+          ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+          : "bg-indigo-500 hover:bg-indigo-600 text-white";
       case "button-secondary":
         return theme === "dark"
           ? "bg-gray-700 hover:bg-gray-600 text-gray-200 border-gray-600"
@@ -329,8 +329,8 @@ export default function MockTestsListClient({
                   <span
                     className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
                       theme === "dark"
-                        ? "bg-blue-900 text-blue-300"
-                        : "bg-blue-100 text-blue-800"
+                        ? "bg-indigo-900 text-indigo-300"
+                        : "bg-indigo-100 text-indigo-800"
                     }`}
                   >
                     {mock.tag || "TCS"}
@@ -352,7 +352,7 @@ export default function MockTestsListClient({
 
                 <div className="flex flex-wrap gap-4 mb-6">
                   <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                    <Clock size={16} className="mr-2 text-blue-500" />
+                    <Clock size={16} className="mr-2 text-indigo-500" />
                     {mock.durationMinutes || 60} mins
                   </div>
                   <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>

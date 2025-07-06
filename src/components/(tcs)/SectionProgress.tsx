@@ -32,7 +32,7 @@ export function SectionProgress({
                 disabled={isCurrent}
                 className={`w-full text-left p-2 rounded flex justify-between items-center ${
                   isCurrent
-                    ? 'bg-blue-100 text-blue-800'
+                    ? 'bg-indigo-100 text-indigo-800'
                     : isCompleted
                     ? 'bg-green-50 text-green-800'
                     : 'hover:bg-gray-50'

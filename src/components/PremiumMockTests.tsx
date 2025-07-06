@@ -100,7 +100,7 @@ export default function MockTestDashboard() {
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center h-screen ${bgColor}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
@@ -117,7 +117,7 @@ export default function MockTestDashboard() {
           <h1 className={`sm:text-sm lg:text-lg font-bold ${textColor}`}>TCS NQT Dashboard</h1>
           <Link
             href="/mock-tests"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
           >
             New Mock Test
           </Link>
@@ -133,7 +133,7 @@ export default function MockTestDashboard() {
               onClick={() => setActiveTab('overview')}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'overview'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-indigo-500 text-indigo-600'
                   : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
               }`}
             >
@@ -143,7 +143,7 @@ export default function MockTestDashboard() {
               onClick={() => setActiveTab('mocks')}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'mocks'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-indigo-500 text-indigo-600'
                   : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
               }`}
             >
@@ -153,7 +153,7 @@ export default function MockTestDashboard() {
               onClick={() => setActiveTab('results')}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'results'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-indigo-500 text-indigo-600'
                   : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
               }`}
             >
@@ -163,7 +163,7 @@ export default function MockTestDashboard() {
               onClick={() => setActiveTab('stats')}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'stats'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-indigo-500 text-indigo-600'
                   : `border-transparent ${secondaryText} hover:text-gray-300 hover:border-gray-300`
               }`}
             >
@@ -230,8 +230,8 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
   { mocks: MockTest[]; attempts: Attempt[]; stats: UserStats | null; 
     theme: string; textColor: string; secondaryText: string }) {
   
-  const statCardBg = theme === 'dark' ? 'bg-gray-700' : 'bg-blue-50';
-  const statTextColor = theme === 'dark' ? 'text-gray-100' : 'text-blue-800';
+  const statCardBg = theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-50';
+  const statTextColor = theme === 'dark' ? 'text-gray-100' : 'text-indigo-800';
   
   return (
     <div className="space-y-8">
@@ -295,7 +295,7 @@ function OverviewTab({ mocks, attempts, stats, theme, textColor, secondaryText }
             style={{
               color: 'gray',
               backgroundColor: statCardBg,
-              borderColor: 'blue'
+              borderColor: 'indigo'
               
             }}
           />
@@ -344,7 +344,7 @@ function MockTestsTab({ mocks, setMocks, cardBg, borderColor, textColor, seconda
         <h2 className={`text-sm font-bold ${textColor}`}>My Mock Tests</h2>
         <Link
           href="/mock-tests"
-          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
         >
           New Mock Test
         </Link>
@@ -355,7 +355,7 @@ function MockTestsTab({ mocks, setMocks, cardBg, borderColor, textColor, seconda
           <p className={`mb-4 ${secondaryText}`}>You haven't created any mock tests yet</p>
           <Link
             href="/mock-tests"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
           >
             First Mock Test +
           </Link>
@@ -417,7 +417,7 @@ function MockTestsTab({ mocks, setMocks, cardBg, borderColor, textColor, seconda
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <Link
                       href={`/mock-tests/${mock._id}/results`}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      className="text-indigo-600 hover:text-indigo-900 mr-4"
                     >
                       Results
                     </Link>
@@ -466,7 +466,7 @@ function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, t
           <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
           {/* <Link
             href="/mock-tests"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
           >
             Browse Mock Tests
           </Link> */}
@@ -504,7 +504,7 @@ function ResultsTab({ attempts, cardBg, borderColor, textColor, secondaryText, t
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
                         href={`mock-tests/${attempt._id}/user-results`}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-indigo-600 hover:text-indigo-900"
                       >
                         View Detailed Result
                       </Link>

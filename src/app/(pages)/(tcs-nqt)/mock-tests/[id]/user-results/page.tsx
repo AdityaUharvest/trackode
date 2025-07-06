@@ -105,7 +105,7 @@ export default function UserQuizResult() {
   const correctOptionBg = theme === 'dark' ? 'bg-green-900/30 border-green-600' : 'bg-green-50 border-green-500';
   const wrongOptionBg = theme === 'dark' ? 'bg-red-900/30 border-red-600' : 'bg-red-50 border-red-500';
   const neutralOptionBg = theme === 'dark' ? 'bg-gray-800' : 'bg-gray-50';
-  const feedbackBg = theme === 'dark' ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200';
+  const feedbackBg = theme === 'dark' ? 'bg-indigo-900/20 border-indigo-700' : 'bg-indigo-50 border-indigo-200';
   const highlightBg = theme === 'dark' ? 'bg-indigo-900/30' : 'bg-indigo-50';
   const rankBadgeBg = theme === 'dark' ? 'bg-yellow-900/30 border-yellow-600' : 'bg-yellow-50 border-yellow-500';
 
@@ -514,9 +514,9 @@ console.log('Result:', result);
       <div className={`flex flex-col items-center justify-center min-h-screen ${bgColor} gap-4`}>
         <div className="animate-pulse flex flex-col items-center gap-6">
           <div className="relative">
-            <Loader2 className="h-16 w-16 animate-spin text-blue-500" />
+            <Loader2 className="h-16 w-16 animate-spin text-indigo-500" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-8 w-8 rounded-full bg-blue-500" />
+              <div className="h-8 w-8 rounded-full bg-indigo-500" />
             </div>
           </div>
           <div className="space-y-3 flex flex-col items-center">
@@ -668,8 +668,8 @@ console.log('Result:', result);
               <TabsList className="grid grid-cols-3 gap-2 mb-6">
                 <TabsTrigger
                   value="overview"
-                  className={`flex items-center gap-2 bg-blue-400 text-white hover:bg-blue-500 ${
-                    activeTab === 'overview' ? 'bg-blue-900 text-white' : ''
+                  className={`flex items-center gap-2 bg-indigo-400 text-white hover:bg-indigo-500 ${
+                    activeTab === 'overview' ? 'bg-indigo-900 text-white' : ''
                   }`}
                 >
                   <Trophy className="h-4 w-4" />
@@ -677,14 +677,14 @@ console.log('Result:', result);
                 </TabsTrigger>
                 <TabsTrigger
                   value="sections"
-                  className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2"
+                  className="flex bg-indigo-400 text-white hover:bg-indigo-500 items-center gap-2"
                 >
                   <BarChart3 className="h-4 w-4" />
                   <span className="hidden md:inline">Sections</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="questions"
-                  className="flex bg-blue-400 text-white hover:bg-blue-500 items-center gap-2"
+                  className="flex bg-indigo-400 text-white hover:bg-indigo-500 items-center gap-2"
                 >
                   <BookOpen className="h-4 w-4" />
                   <span className="hidden md:inline">Questions</span>
@@ -758,7 +758,7 @@ console.log('Result:', result);
                     className={`p-6 rounded-lg ${cardBg} border ${borderColor} col-span-1 md:col-span-2`}
                   >
                     <h3 className="font-medium mb-4 flex items-center gap-2">
-                      <BarChart3 className="h-2 w-2 text-blue-500" />
+                      <BarChart3 className="h-2 w-2 text-indigo-500" />
                       Section Performance
                     </h3>
                     <div className="space-y-2">
@@ -969,7 +969,7 @@ console.log('Result:', result);
                             <CardHeader className="pb-2">
                               <div className="">
                                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                  <Lightbulb className="h-4 w-4 text-blue-500" />
+                                  <Lightbulb className="h-4 w-4 text-indigo-500" />
                                   Section Feedback
                                 </CardTitle>
                                 {sectionFeedback[section.sectionName] ? (
@@ -1007,7 +1007,7 @@ console.log('Result:', result);
                           <Button
                             variant="outline"
                             onClick={() => setActiveTab('questions')}
-                            className="w-full bg-blue-400 text-white hover:bg-blue-500 hover:text-white"
+                            className="w-full bg-indigo-400 text-white hover:bg-indigo-500 hover:text-white"
                             size="sm"
                           >
                             View All Questions
@@ -1151,7 +1151,7 @@ console.log('Result:', result);
                                   <CardHeader className="pb-2">
                                     <div className="flex justify-between items-center">
                                       <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                        <Lightbulb className="h-4 w-4 text-blue-500" />
+                                        <Lightbulb className="h-4 w-4 text-indigo-500" />
                                         Explanation
                                       </CardTitle>
                                       <Button
@@ -1300,7 +1300,7 @@ console.log('Result:', result);
                     {performer.userName}
                   </span>
                 </div>
-                <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 py-1 px-3 rounded-full text-sm font-semibold">
+                <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 py-1 px-3 rounded-full text-sm font-semibold">
                   {performer.accuracy}%
                 </span>
               </div>

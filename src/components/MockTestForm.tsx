@@ -158,7 +158,7 @@ const MockTestCreator: React.FC = () => {
               <Popover>
                 <PopoverTrigger asChild>
                   <button type="button" className="focus:outline-none">
-                    <Info className="h-4 w-4 text-gray-500 hover:text-blue-600" />
+                    <Info className="h-4 w-4 text-gray-500 hover:text-indigo-600" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-3 text-sm">
@@ -197,8 +197,8 @@ const MockTestCreator: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className={`px-4 flex mx-auto py-2 rounded hover:bg-blue-700 disabled:bg-blue-300 ${
-            theme === 'dark' ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
+          className={`px-4 flex mx-auto py-2 rounded hover:bg-indigo-700 disabled:bg-indigo-300 ${
+            theme === 'dark' ? 'bg-indigo-600 text-white' : 'bg-indigo-600 text-white'
           }`}
         >
           {isLoading ? 'Creating...' : 'Create Mock Test'}

@@ -145,7 +145,7 @@ const Navbar: React.FC = () => {
     cardBorder: theme === 'dark' ? 'border-gray-700' : 'border-gray-100',
     tagBg: {
       indigo: theme === 'dark' ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700',
-      blue: theme === 'dark' ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-700',
+      indigo: theme === 'dark' ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700',
       green: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-700'
     }
   };
@@ -350,8 +350,8 @@ const Navbar: React.FC = () => {
                   className={`
                     flex items-center px-3 py-2 text-sm font-medium rounded-md
                     transition-all duration-300 hover:scale-105 group
-                    bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-700 hover:to-blue-800
-                    text-white shadow-md hover:shadow-lg
+                    bg-indigo-500 hover:bg-transparent border-2 hover:text-indigo-600 border-indigo-500 
+                    text-white
                   `}
                 >
                   <User size={16} className="mr-2" />

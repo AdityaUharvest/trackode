@@ -331,7 +331,7 @@ export default function QuizPage({ params }: any) {
         <p className="text-xl">You have already attempted this quiz.</p>
         <Link
           href="/dashboard"
-          className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg"
+          className="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg"
         >
           Dashboard
         </Link>
@@ -416,11 +416,11 @@ export default function QuizPage({ params }: any) {
                       className={`p-4 rounded-lg border-2 transition-all select-none ${
                         answers[quizData.questions[currentQuestion]._id] === option
                           ? theme === "dark"
-                            ? "border-blue-600 bg-blue-900"
-                            : "border-blue-600 bg-blue-50"
+                            ? "border-indigo-600 bg-indigo-900"
+                            : "border-indigo-600 bg-indigo-50"
                           : theme === "dark"
-                          ? "border-gray-700 hover:border-blue-400"
-                          : "border-gray-200 hover:border-blue-400"
+                          ? "border-gray-700 hover:border-indigo-400"
+                          : "border-gray-200 hover:border-indigo-400"
                       }`}
                     >
                       {option}
@@ -484,8 +484,8 @@ export default function QuizPage({ params }: any) {
                       className={`w-10 h-10 rounded-lg flex items-center justify-center border transition-all ${
                         currentQuestion === index
                           ? theme === "dark"
-                            ? "border-blue-600 bg-blue-900"
-                            : "border-blue-600 bg-blue-50"
+                            ? "border-indigo-600 bg-indigo-900"
+                            : "border-indigo-600 bg-indigo-50"
                           : questionStatus[index].answered
                           ? theme === "dark"
                             ? "border-green-600 bg-green-900"
@@ -540,7 +540,7 @@ export default function QuizPage({ params }: any) {
                 onClick={handleStartQuiz}
                 disabled={!declarationsAgreed || !termsAgreed}
                 className={`p-3 rounded-lg font-medium transition-all ${
-                  theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
+                  theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-700"
                 } text-white ${
                   !declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
                 }`}
@@ -705,8 +705,8 @@ export default function QuizPage({ params }: any) {
                           onChange={(e) => setDeclarationsAgreed(e.target.checked)}
                           className={`mt-1 form-checkbox h-5 w-5 rounded ${
                             theme === "dark"
-                              ? "text-blue-500 bg-gray-600 border-gray-500"
-                              : "text-blue-600 border-gray-300"
+                              ? "text-indigo-500 bg-gray-600 border-gray-500"
+                              : "text-indigo-600 border-gray-300"
                           }`}
                         />
                         <div>
@@ -727,8 +727,8 @@ export default function QuizPage({ params }: any) {
                           onChange={(e) => setTermsAgreed(e.target.checked)}
                           className={`mt-1 form-checkbox h-5 w-5 rounded ${
                             theme === "dark"
-                              ? "text-blue-500 bg-gray-600 border-gray-500"
-                              : "text-blue-600 border-gray-300"
+                              ? "text-indigo-500 bg-gray-600 border-gray-500"
+                              : "text-indigo-600 border-gray-300"
                           }`}
                         />
                         <div>
@@ -745,7 +745,7 @@ export default function QuizPage({ params }: any) {
                 onClick={handleStartQuiz}
                 disabled={!declarationsAgreed || !termsAgreed}
                 className={`px-6 py-3 rounded-lg font-medium transition-all ${
-                  theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"
+                  theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-700"
                 } text-white ${
                   !declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
                 }`}
@@ -868,7 +868,7 @@ const ScientificCalculator = ({ theme }: any) => {
             onClick={() => handleInput(btn)}
             className={`p-3 rounded-lg transition-colors ${
               btn === "="
-                ? "col-span-2 bg-blue-600 hover:bg-blue-700 text-white"
+                ? "col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white"
                 : theme === "dark"
                 ? "bg-gray-700 hover:bg-gray-600 text-white"
                 : "bg-gray-200 hover:bg-gray-300 text-black"

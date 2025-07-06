@@ -170,7 +170,7 @@ export default function DashBoard({ initialTab }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
@@ -200,8 +200,8 @@ export default function DashBoard({ initialTab }) {
                 className={`w-full text-left p-2 rounded-md text-sm flex items-center ${
                   activeTab === 'overview'
                     ? theme === 'dark'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 text-blue-800'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-indigo-100 text-indigo-800'
                     : theme === 'dark'
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
@@ -223,8 +223,8 @@ export default function DashBoard({ initialTab }) {
                 className={`w-full text-left p-2 rounded-md text-sm flex items-center ${
                   activeTab === 'mocks'
                     ? theme === 'dark'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 text-blue-800'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-indigo-100 text-indigo-800'
                     : theme === 'dark'
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
@@ -246,8 +246,8 @@ export default function DashBoard({ initialTab }) {
                 className={`w-full text-left p-2 rounded-md text-sm flex items-center ${
                   activeTab === 'quizzes'
                     ? theme === 'dark'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 text-blue-800'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-indigo-100 text-indigo-800'
                     : theme === 'dark'
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
@@ -269,8 +269,8 @@ export default function DashBoard({ initialTab }) {
                 className={`w-full text-left p-2 rounded-md text-sm flex items-center ${
                   activeTab === 'analytics'
                     ? theme === 'dark'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-blue-100 text-blue-800'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-indigo-100 text-indigo-800'
                     : theme === 'dark'
                     ? 'hover:bg-gray-700'
                     : 'hover:bg-gray-100'
@@ -296,7 +296,7 @@ export default function DashBoard({ initialTab }) {
           <button
             onClick={() => setActiveTab('overview')}
             className={`p-2 text-xs ${
-              activeTab === 'overview' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : ''
+              activeTab === 'overview' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : ''
             }`}
           >
             <div className="flex flex-col items-center">
@@ -307,7 +307,7 @@ export default function DashBoard({ initialTab }) {
           <button
             onClick={() => setActiveTab('quizzes')}
             className={`p-2 text-xs ${
-              activeTab === 'quizzes' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : ''
+              activeTab === 'quizzes' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : ''
             }`}
           >
             <div className="flex flex-col items-center">
@@ -318,7 +318,7 @@ export default function DashBoard({ initialTab }) {
           <button
             onClick={() => setActiveTab('mocks')}
             className={`p-2 text-xs ${
-              activeTab === 'mocks' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : ''
+              activeTab === 'mocks' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : ''
             }`}
           >
             <div className="flex flex-col items-center">
@@ -329,7 +329,7 @@ export default function DashBoard({ initialTab }) {
           <button
             onClick={() => setActiveTab('analytics')}
             className={`p-2 text-xs ${
-              activeTab === 'analytics' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : ''
+              activeTab === 'analytics' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : ''
             }`}
           >
             <div className="flex flex-col items-center">
@@ -435,7 +435,7 @@ export default function DashBoard({ initialTab }) {
           <div className="overflow-auto w-full">
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
+                <Loader2 className="animate-spin h-8 w-8 text-indigo-500" />
               </div>
             ) : (
               <MockDashboard

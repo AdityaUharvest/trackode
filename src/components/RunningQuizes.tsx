@@ -115,7 +115,7 @@ const QuestionForm: React.FC<{
   };
 
   return (
-    <div className={`mt-4 border rounded-lg p-6 ${theme === "dark" ? "border-blue-800 bg-gray-800" : "border-blue-600 bg-gray-100"}`}>
+    <div className={`mt-4 border rounded-lg p-6 ${theme === "dark" ? "border-indigo-800 bg-gray-800" : "border-indigo-600 bg-gray-100"}`}>
       <h4 className={`font-bold lg:text-xl sm:text-base mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Add New Question</h4>
       <div className="space-y-4">
         <div>
@@ -124,7 +124,7 @@ const QuestionForm: React.FC<{
             value={newQuestion.question}
             onChange={(e) => setNewQuestion({ ...newQuestion, question: e.target.value })}
             placeholder="Enter your question"
-            className={`w-full ${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+            className={`w-full ${theme === "dark" ? "bg-gray-900 border-indigo-800 text-white" : "bg-white border-indigo-600 text-black"}`}
           />
         </div>
         <div className="space-y-3">
@@ -135,14 +135,14 @@ const QuestionForm: React.FC<{
                 value={option}
                 onChange={(e) => handleOptionChange(optionIndex, e.target.value)}
                 placeholder={`Option ${optionIndex + 1}`}
-                className={`${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                className={`${theme === "dark" ? "bg-gray-900 border-indigo-800 text-white" : "bg-white border-indigo-600 text-black"}`}
               />
               <input
                 type="radio"
                 name="correctAnswer"
                 checked={newQuestion.correctAnswer === option}
                 onChange={() => setNewQuestion({ ...newQuestion, correctAnswer: option })}
-                className="ml-2 accent-blue-800"
+                className="ml-2 accent-indigo-800"
               />
             </div>
           ))}
@@ -175,7 +175,7 @@ const QuestionForm: React.FC<{
           </Button>
           <Button
             onClick={onSubmit}
-            className={`${theme === "dark" ? "bg-blue-600 hover:bg-blue-700" : "bg-blue-600 hover:bg-blue-700"} p-3 text-white flex items-center gap-2`}
+            className={`${theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-700"} p-3 text-white flex items-center gap-2`}
           >
             <Save size={16} />
             Save Question
@@ -219,14 +219,14 @@ const PreviewModal: React.FC<{
         <h2 className="text-xl font-bold mb-4">Preview Generated Questions</h2>
         <div className="space-y-4">
           {editableQuestions.map((q, index) => (
-            <div key={index} className={`border rounded-lg p-4 ${theme === "dark" ? "border-blue-800" : "border-blue-600"}`}>
+            <div key={index} className={`border rounded-lg p-4 ${theme === "dark" ? "border-indigo-800" : "border-indigo-600"}`}>
               <div className="space-y-2">
                 Question ({index+1})
                 <Textarea
                   value={q.question}
                   onChange={(e) => handleQuestionChange(index, e.target.value)}
                   placeholder="Enter your question"
-                  className={`w-full ${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                  className={`w-full ${theme === "dark" ? "bg-gray-900 border-indigo-800 text-white" : "bg-white border-indigo-600 text-black"}`}
                 />
                 {q.options.map((option, optionIndex) => (
                   <div key={optionIndex} className="flex items-center gap-2">
@@ -235,14 +235,14 @@ const PreviewModal: React.FC<{
                       value={option}
                       onChange={(e) => handleOptionChange(index, optionIndex, e.target.value)}
                       placeholder={`Option ${optionIndex + 1}`}
-                      className={`${theme === "dark" ? "bg-gray-900 border-blue-800 text-white" : "bg-white border-blue-600 text-black"}`}
+                      className={`${theme === "dark" ? "bg-gray-900 border-indigo-800 text-white" : "bg-white border-indigo-600 text-black"}`}
                     />
                     <input
                       type="radio"
                       name={`correctAnswer-${index}`}
                       checked={q.correctAnswer === option}
                       onChange={() => handleCorrectAnswerChange(index, option)}
-                      className="ml-2 accent-blue-800"
+                      className="ml-2 accent-indigo-800"
                     />
                   </div>
                 ))}
@@ -257,7 +257,7 @@ const PreviewModal: React.FC<{
           <Button 
             onClick={onConfirm}
             disabled={isLoading}
-            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+            className="bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2"
           >
             {isLoading ? (
               <>
@@ -629,7 +629,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
         <CardContent className="p-0  ">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"}`}></div>
+              <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-indigo-600"}`}></div>
             </div>
           ) : quizes.length === 0 ? (
             <div className={`text-center py-8 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
@@ -641,7 +641,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                 <AccordionItem 
                   key={index} 
                   value={`item-${index}`}
-                  className={`border rounded-lg transition-all ${theme === "dark" ? "border-blue-800 bg-gray-800" : "border-blue-200 bg-white"}`}
+                  className={`border rounded-lg transition-all ${theme === "dark" ? "border-indigo-800 bg-gray-800" : "border-indigo-200 bg-white"}`}
                 >
                   <AccordionTrigger className="hover:no-underline px-3 py-2 sm:px-4 sm:py-3">
                     <div className="flex flex-1 items-center justify-between gap-2">
@@ -686,7 +686,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
                             <Button 
                               onClick={() => handleAddQuestion(index, quiz._id)}
-                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "bg-blue-700 hover:bg-blue-800" : "bg-blue-600 hover:bg-blue-700"} text-white`}
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "bg-indigo-700 hover:bg-indigo-800" : "bg-indigo-600 hover:bg-indigo-700"} text-white`}
                             >
                               <Plus size={14} className="mr-1 sm:mr-2" />
                               Add
@@ -695,7 +695,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                             <Button 
                               asChild
                               variant="outline"
-                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "border-blue-700 text-blue-400" : "border-blue-600 text-blue-700"}`}
+                              className={`text-xs sm:text-sm h-8 ${theme === "dark" ? "border-indigo-700 text-indigo-400" : "border-indigo-600 text-indigo-700"}`}
                             >
                               <Link href={`quiz-result/${quiz._id}`}>
                                 <BarChart2 size={14} className="mr-1 sm:mr-2" />
@@ -803,7 +803,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                             {quiz.questions.map((q, qIndex) => (
                               <div
                                 key={q._id}
-                                className={`border rounded-lg p-4 ${theme === "dark" ? "border-blue-800 text-white bg-gray-800" : "border-blue-600 bg-gray-100"}`}
+                                className={`border rounded-lg p-4 ${theme === "dark" ? "border-indigo-800 text-white bg-gray-800" : "border-indigo-600 bg-gray-100"}`}
                               >
                                 {editingQuestionId === q._id ? (
                                   <QuestionForm
@@ -826,7 +826,7 @@ const RunningQuizes: React.FC<RunningQuizesProps> = ({ quizes,setQuizes,getQuize
                                               onClick={() => handleEditQuestion(q._id!, quiz)}
                                               variant="ghost"
                                               size="icon"
-                                              className="hover:bg-blue-500 hover:bg-opacity-20"
+                                              className="hover:bg-indigo-500 hover:bg-opacity-20"
                                             >
                                               <Edit size={16} />
                                             </Button>

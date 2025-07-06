@@ -55,8 +55,8 @@ export  default  function QuizJoinComponent() {
     <div className="w-full max-w-lg  mx-auto bg-white dark:bg-gray-700/50 rounded-2xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
     <div className="relative overflow-hidden">
       {/* violet gradient accent */}
-      <div className="absolute -left-4 -top-4 w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600  rounded-full opacity-20"></div>
-      <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full opacity-20"></div>
+      <div className="absolute -left-4 -top-4 w-20 h-20 bg-gradient-to-br from-indigo-500 to-indigo-600  rounded-full opacity-20"></div>
+      <div className="absolute -right-4 -bottom-4 w-20 h-20 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full opacity-20"></div>
       
       <div className="flex items-center p-4 relative z-10">
         {/* Icon and label for larger screens */}

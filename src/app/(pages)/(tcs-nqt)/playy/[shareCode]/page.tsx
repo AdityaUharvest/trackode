@@ -526,7 +526,7 @@ export default function QuizPlayer() {
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <Loader2 className="animate-spin h-12 w-12 text-blue-500" />
+        <Loader2 className="animate-spin h-12 w-12 text-indigo-500" />
       </div>
     );
   }
@@ -541,7 +541,7 @@ export default function QuizPlayer() {
           <div className="flex flex-col gap-4">
             <button
               onClick={() => router.push('/dashboard')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
             >
               Go to Dashboard
             </button>
@@ -570,13 +570,13 @@ export default function QuizPlayer() {
           <p className="mb-6">This quiz is not yet published. Please check back later.</p>
           <button
             onClick={() => router.push('/dashboard')}
-            className={`px-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+            className={`px-4 mr-3 py-2 rounded ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
           >
             Student Dashboard
           </button>
           <button
             onClick={() => router.push('/programming-quizzes')}
-            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
           >
             Explore Free Live Quizzes
           </button>
@@ -588,7 +588,7 @@ export default function QuizPlayer() {
   if (isSubmitting) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <Loader2 className="animate-spin h-12 w-12 text-blue-500" />
+        <Loader2 className="animate-spin h-12 w-12 text-indigo-500" />
         Submitting your answers...
       </div>
     );
@@ -602,7 +602,7 @@ export default function QuizPlayer() {
           <p className="mb-6">{error}</p>
           <button
             onClick={() => router.push('/')}
-            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
           >
             Go Home
           </button>
@@ -618,7 +618,7 @@ export default function QuizPlayer() {
           <div className="text-center mb-8">
             <h1 className="text-xl font-bold mb-2">{quiz?.title}</h1>
             {hasAttemptedQuestions && (
-              <div className={`inline-block px-4 py-2 rounded-full mb-4 ${theme === 'dark' ? 'bg-blue-900/50 text-blue-200' : 'bg-blue-100 text-blue-800'}`}>
+              <div className={`inline-block px-4 py-2 rounded-full mb-4 ${theme === 'dark' ? 'bg-indigo-900/50 text-indigo-200' : 'bg-indigo-100 text-indigo-800'}`}>
                 You have an in-progress attempt
               </div>
             )}
@@ -669,7 +669,7 @@ export default function QuizPlayer() {
                   <li key={index} className="flex items-start gap-3">
                     <div
                       className={`mt-1 w-5 h-5 p-2 rounded-full flex items-center justify-center ${
-                        theme === 'dark' ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800'
+                        theme === 'dark' ? 'bg-indigo-900 text-indigo-200' : 'bg-indigo-100 text-indigo-800'
                       }`}
                     >
                       {index + 1}
@@ -812,7 +812,7 @@ export default function QuizPlayer() {
                 await requestFullscreen();
                 setFullscreenPrompt(false);
               }}
-              className={`px-6 py-2 rounded ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+              className={`px-6 py-2 rounded ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
             >
               Enable Fullscreen
             </button>
@@ -881,8 +881,8 @@ export default function QuizPlayer() {
                     className={`p-4 rounded-lg transition-all border option ${
                       answers[currentQuestion._id] === index
                         ? theme === 'dark'
-                          ? 'border-blue-500 bg-blue-900/30'
-                          : 'border-blue-500 bg-blue-50'
+                          ? 'border-indigo-500 bg-indigo-900/30'
+                          : 'border-indigo-500 bg-indigo-50'
                         : theme === 'dark'
                           ? 'border-gray-700 hover:bg-gray-700'
                           : 'border-gray-200 hover:bg-gray-50'
@@ -892,7 +892,7 @@ export default function QuizPlayer() {
                       <div
                         className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
                           answers[currentQuestion._id] === index
-                            ? 'border-blue-500 bg-blue-500 text-white'
+                            ? 'border-indigo-500 bg-indigo-500 text-white'
                             : theme === 'dark'
                               ? 'border-gray-500'
                               : 'border-gray-300'
@@ -925,8 +925,8 @@ export default function QuizPlayer() {
                       disabled={currentQuestionIndex === currentQuestions.length - 1 || isTimeUp}
                       className={`flex-1 py-2.5 rounded-lg font-medium ${
                         theme === 'dark'
-                          ? 'bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50'
-                          : 'bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50'
+                          ? 'bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50'
+                          : 'bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-500/50'
                       } text-white`}
                     >
                       {currentQuestionIndex === currentQuestions.length - 1 ? 'Review' : 'Next Question'}
@@ -962,7 +962,7 @@ export default function QuizPlayer() {
                   }
                 }}
                 className={`px-4 py-2 rounded-lg ${
-                  theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'
+                  theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-500 hover:bg-indigo-600'
                 } text-white`}
               >
                 Continue to Next Section
@@ -983,8 +983,8 @@ export default function QuizPlayer() {
                   className={`aspect-square rounded flex items-center justify-center transition-all ${
                     currentQuestionIndex === index
                       ? theme === 'dark'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-blue-500 text-white'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-indigo-500 text-white'
                       : answers[q._id] !== undefined
                         ? theme === 'dark'
                           ? 'bg-green-900/50 text-green-200'
@@ -1034,8 +1034,8 @@ export default function QuizPlayer() {
                       } ${
                         ['/', '*', '-', '+', '='].includes(btn)
                           ? theme === 'dark'
-                            ? 'bg-blue-900 hover:bg-blue-800'
-                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            ? 'bg-indigo-900 hover:bg-indigo-800'
+                            : 'bg-indigo-500 hover:bg-indigo-600 text-white'
                           : ''
                       } ${
                         btn === 'C'

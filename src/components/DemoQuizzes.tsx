@@ -608,8 +608,8 @@ const questions:Questions = {
                 className={`px-2 py-1 rounded-md text-sm  transition-colors ${
                   currentTopic === topic
                     ? theme === "dark"
-                      ? "bg-blue-600 text-white"
-                      : "bg-blue-500 text-white"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-indigo-500 text-white"
                     : theme === "dark"
                     ? "bg-gray-600 text-gray-300 hover:bg-gray-500"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -645,8 +645,8 @@ const questions:Questions = {
                 }}
                 className={`px-6 py-2 text-sm rounded-md font-medium ${
                   theme === "dark"
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                    ? "bg-indigo-600 hover:bg-indigo-700 text-white"
+                    : "bg-indigo-500 hover:bg-indigo-600 text-white"
                 }`}
               >
                 Restart Quiz
@@ -755,8 +755,8 @@ const questions:Questions = {
                     onClick={handleAnswer}
                     className={`px-4 py-1.5 rounded-md text-sm font-medium ${
                       theme === "dark"
-                        ? "bg-blue-600 text-white hover:bg-blue-500"
-                        : "bg-blue-500 text-white hover:bg-blue-600"
+                        ? "bg-indigo-600 text-white hover:bg-indigo-500"
+                        : "bg-indigo-500 text-white hover:bg-indigo-600"
                     }`}
                   >
                     {currentQuestion < questions[currentTopic].length - 1 ? "Next" : "Finish"}

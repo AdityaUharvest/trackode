@@ -457,13 +457,13 @@ const TCS = () => {
                 <div
                   className={`p-4 rounded-lg border ${
                     theme === 'light'
-                      ? 'bg-blue-50 border-blue-100'
-                      : 'bg-blue-900 border-blue-800'
+                      ? 'bg-indigo-50 border-indigo-100'
+                      : 'bg-indigo-900 border-indigo-800'
                   }`}
                 >
                   <h5
                     className={`font-bold ${
-                      theme === 'light' ? 'text-blue-700' : 'text-blue-400'
+                      theme === 'light' ? 'text-indigo-700' : 'text-indigo-400'
                     }`}
                   >
                     Verbal Ability
@@ -691,13 +691,13 @@ const TCS = () => {
             <div
               className={`p-6 rounded-lg border ${
                 theme === 'light'
-                  ? 'bg-blue-50 border-blue-200'
-                  : 'bg-blue-900 border-blue-800'
+                  ? 'bg-indigo-50 border-indigo-200'
+                  : 'bg-indigo-900 border-indigo-800'
               }`}
             >
               <h4
                 className={`text-xl font-semibold mb-4 ${
-                  theme === 'light' ? 'text-blue-800' : 'text-blue-400'
+                  theme === 'light' ? 'text-indigo-800' : 'text-indigo-400'
                 }`}
               >
                 Preparation Tips

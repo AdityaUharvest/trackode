@@ -45,7 +45,7 @@ export default function QuizResultClient({ result }: { result: any }) {
                 <p className="text-base">{result.score}/{result.totalQuestions}</p>
               </div>
               <div className={`p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
-                <p className="font-medium text-blue-800">Date Attempted:</p>
+                <p className="font-medium text-indigo-800">Date Attempted:</p>
                 <p>{new Date(result.attemptedAt).toLocaleDateString()}</p>
               </div>
             </div>
@@ -103,13 +103,13 @@ export default function QuizResultClient({ result }: { result: any }) {
                     disabled={generatingId === index}
                     variant="outline"
                     size="sm"
-                    className={`${theme === 'dark' ? 'text-white border-blue-600 border-2 ' : ' bg-blue-600 hover:bg-blue-900 hover:text-white text-white'}`}
+                    className={`${theme === 'dark' ? 'text-white border-indigo-600 border-2 ' : ' bg-indigo-600 hover:bg-indigo-900 hover:text-white text-white'}`}
                   >
                     {generatingId === index ? 'Generating...' : 'Show Explanation'}
                   </Button>
 
                   {explanation[index] && (
-                    <div className={`mt-2 p-4 rounded-lg ${theme === 'dark' ? 'border-blue-600 bg-gray-900 text-gray-50' : 'bg-gray-100'}`}>
+                    <div className={`mt-2 p-4 rounded-lg ${theme === 'dark' ? 'border-indigo-600 bg-gray-900 text-gray-50' : 'bg-gray-100'}`}>
                       <h4 className="font-medium mb-2">Explanation</h4>
                       <p>{explanation[index]}</p>
                     </div>

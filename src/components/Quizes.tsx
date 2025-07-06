@@ -41,8 +41,8 @@ export default function Quizes({ quizes,setQuizes,getQuizes }: { quizes: Quiz[];
           <Link href="/quiz-setup">
             <Button
               className={`${theme === "dark"
-                  ? "bg-blue-600 hover:bg-blue-700"
-                  : "bg-blue-600 hover:bg-blue-700"
+                  ? "bg-indigo-600 hover:bg-indigo-700"
+                  : "bg-indigo-600 hover:bg-indigo-700"
                 } text-white p-2 flex items-center gap-2`}
             >
               <Plus size={16} />

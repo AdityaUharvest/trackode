@@ -20,6 +20,7 @@ import AlternatingSections from '@/components/HomePage/AlternatingSections';
 import MockExamCard from '@/components/MockExamCard';
 
 import HeroSection from '@/components/HomePage/HeroSection';
+import ProgrammingLanguageQuizzes from '@/components/HomePage/ProgrammingLanguageQuizzes';
 // import HeroSection from '@/components/HomePage/HeroSection';
 export default function HomePage() {
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -72,43 +73,8 @@ export default function HomePage() {
         
 
         {/* Technology Section */}
-        <section
-          id="technology"
-          className={`py-16  px-2 max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
-          aria-labelledby="tech-stack-hading"
-          style={{
-            backgroundImage: theme === "dark"
-              ? "url('/image.png')"
-              : "url('/your-light-bg-image.jpg')",
-            
-            
-          }}
-
-        >
-          <div className="text-center mb-10">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="relative inline-block"
-            >
-              <h2
-                className={`text-3xl sm:text-4xl font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
-                style={{ fontFamily: "'Inter', sans-serif" }}
-              >
-                Technology <span className='text-indigo-500'>We Cover</span> 
-              </h2>
-              <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                Explore our extensive tech stack quizzes and challenges
-              </p>
-              <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
-            </motion.div>
-          </div>
-          
-          <TechStackQuizSystem />
-         
-          
-        </section>
+        <ProgrammingLanguageQuizzes/>
+        
          <section 
   className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
   
@@ -232,7 +198,7 @@ export default function HomePage() {
                 >
                   Why Choose <span className='text-indigo-500'>Trackode</span> 
                 </h2>
-                <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </motion.div>
               <div className="flex mt-3 flex-wrap justify-center sm:gap-2">
                 <div
@@ -261,7 +227,7 @@ export default function HomePage() {
                   className={`flex items-center px-2 py-1 sm:px-3 sm:py-2 rounded-lg ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
                 >
                   <svg
-                    className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-blue-500"
+                    className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-1.5 text-indigo-500"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -308,7 +274,7 @@ export default function HomePage() {
               <div className="relative p-6 bg-white dark:bg-gray-700/50 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
                 <div className="absolute -top-5 left-6">
                   <div className="rounded-full p-3 bg-purple-100 dark:bg-purple-900">
-                    <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
                   </div>
@@ -320,8 +286,8 @@ export default function HomePage() {
               </div>
               <div className="relative p-6 bg-white dark:bg-gray-700/50 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
                 <div className="absolute -top-5 left-6">
-                  <div className="rounded-full p-3 bg-blue-100 dark:bg-blue-900">
-                    <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <div className="rounded-full p-3 bg-indigo-100 dark:bg-indigo-900">
+                    <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
                   </div>
@@ -347,7 +313,7 @@ export default function HomePage() {
               <div className="relative p-6 bg-white dark:bg-gray-700/50 rounded-xl shadow-md transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1">
                 <div className="absolute -top-5 left-6">
                   <div className="rounded-full p-3 bg-purple-100 dark:bg-purple-900">
-                    <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
                   </div>
@@ -363,7 +329,7 @@ export default function HomePage() {
 
         {/* How it Works Section */}
         <section 
-          className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gradient-to-r from-indigo-100 to-blue-100"}`}
+          className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gradient-to-r from-indigo-100 to-indigo-100"}`}
           aria-labelledby="features-heading"
 style={{
             backgroundImage: theme === "dark"
@@ -388,7 +354,7 @@ style={{
                 >
                   How Trackode <span className='text-indigo-600'>Works</span> 
                 </h2>
-                <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </motion.div>
             </div>
 
@@ -400,15 +366,15 @@ style={{
                   boxShadow: theme === "dark" ? "0 10px 30px -15px rgba(0, 0, 255, 0.3)" : "0 10px 30px -15px rgba(0, 0, 0, 0.1)"
                 }}
               >
-                <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-blue-500 transition-colors duration-300"></div>
+                <div className="absolute inset-0 rounded-xl border border-transparent group-hover:border-indigo-500 transition-colors duration-300"></div>
                 <div className="p-7 relative z-10">
-                  <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-blue-500 group-hover:bg-blue-400" : "bg-blue-100 group-hover:bg-blue-200"}`}>
-                    <svg className={`w-7 h-7 transition-transform duration-300 group-hover:scale-110 ${theme === "dark" ? "text-white" : "text-blue-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <div className={`flex items-center justify-center w-14 h-14 mb-6 rounded-full transition-all duration-300 ${theme === "dark" ? "bg-indigo-500 group-hover:bg-indigo-400" : "bg-indigo-100 group-hover:bg-indigo-200"}`}>
+                    <svg className={`w-7 h-7 transition-transform duration-300 group-hover:scale-110 ${theme === "dark" ? "text-white" : "text-indigo-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                   </div>
                   <div className="relative">
-                    <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-blue-300" : "text-blue-600"}`}>1</span>
+                    <span className={`absolute -left-6 top-1/2 transform -translate-y-1/2 text-5xl font-bold opacity-10 ${theme === "dark" ? "text-indigo-300" : "text-indigo-600"}`}>1</span>
                     <h3 className={`lg:text-lg font-bold mb-3 transition-all duration-300 group-hover:translate-x-1 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Create Your Quiz</h3>
                   </div>
                   <p className={`transition-all text-sm duration-300 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
@@ -494,7 +460,7 @@ style={{
                 Try a Free <span className='text-indigo-500'>Demo Quiz</span> 
               </h2>
               
-              <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </motion.div>
           </div>
           <InteractiveQuiz />
@@ -531,7 +497,7 @@ style={{
                   What our<span className='text-indigo-500'> Users Says</span> 
                 </h2>
                 
-                <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+                <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
               </motion.div>
               <p
                 className={`mt-4 max-w-2xl mx-auto  ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}
@@ -629,7 +595,7 @@ style={{
               <p className={`mt-2 max-w-2xl mx-auto text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
                 Find answers to common questions about Trackode
               </p>
-              <span className="absolute bottom-0 left-0 w-full h-1 bg-blue-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+              <span className="absolute bottom-0 left-0 w-full h-1 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </motion.div>
           </div>
           <Faq />

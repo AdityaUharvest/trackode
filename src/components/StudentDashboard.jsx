@@ -165,7 +165,7 @@ console.log(attempts);
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
@@ -178,10 +178,10 @@ console.log(attempts);
           icon="📚" 
           title="Overall Progress" 
           value={`${averagePercentage.toFixed(1)}%`} 
-          color="blue" 
+          color="indigo" 
         />
-        <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="blue" />
-        <StatCard theme={theme} icon="📝" title="Mocks Attempted" value={totalMocks} color="blue" />
+        <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="indigo" />
+        <StatCard theme={theme} icon="📝" title="Mocks Attempted" value={totalMocks} color="indigo" />
         <StatCard 
           theme={theme} 
           icon="🏆" 
@@ -238,7 +238,7 @@ console.log(attempts);
     <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         
-        <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="blue" />
+        <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="indigo" />
         <StatCard 
           theme={theme} 
           icon="🏆" 
@@ -279,7 +279,7 @@ console.log(attempts);
             icon="📝" 
             title="Total Mocks Taken" 
             value={totalMocks} 
-            color="blue" 
+            color="indigo" 
           />
           <StatCard 
             theme={theme} 
@@ -310,7 +310,7 @@ console.log(attempts);
             <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
             <Link 
               href="/mock-tests" 
-              className={`px-4 py-2 rounded-md ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+              className={`px-4 py-2 rounded-md ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
             >
               Browse Available Mocks
             </Link>
@@ -409,28 +409,28 @@ console.log(attempts);
           <div className={`fixed bottom-0 left-0 right-0 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} border-t ${borderColor} flex justify-around items-center h-16`}>
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'overview' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
+              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'overview' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <Home className="w-5 h-5" />
               <span className="text-xs mt-1">Overview</span>
             </button>
             <button 
               onClick={() => setActiveTab('quizzes')}
-              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'quizzes' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
+              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'quizzes' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <BookOpen className="w-5 h-5" />
               <span className="text-xs mt-1">Quizzes</span>
             </button>
             <button 
               onClick={() => setActiveTab('mocks')}
-              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'mocks' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
+              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'mocks' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <Award className="w-5 h-5" />
               <span className="text-xs mt-1">Mocks</span>
             </button>
             <button 
               onClick={() => setActiveTab('available-quizzes')}
-              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'available-quizzes' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : secondaryText}`}
+              className={`flex flex-col items-center justify-center p-2 ${activeTab === 'available-quizzes' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <List className="w-5 h-5" />
               <span className="text-xs mt-1">Available Quizzes</span>
@@ -445,14 +445,14 @@ console.log(attempts);
 
 const StatCard = ({ theme, icon, title, value, color, trend }) => {
   const colorClasses = {
-    blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' },
     green: { bg: 'bg-green-100', text: 'text-green-600' },
     orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
     purple: { bg: 'bg-purple-100', text: 'text-purple-600' }
   };
 
   return (
-    <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-blue-600`}>
+    <Card className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg shadow-sm border-l-4 border-indigo-600`}>
       <div className="flex items-center gap-4">
         <div className={`${colorClasses[color].bg} p-3 rounded-full`}>
           <span className={`${colorClasses[color].text} text-lg`}>{icon}</span>
@@ -520,7 +520,7 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
               </div>
               <Link 
                 href={`/mock-tests/${attempt.attemptId?attempt.attemptId:attempt._id}/user-results`}
-                className={`text-sm ${theme === 'dark' ? 'text-blue-400' : 'text-blue-600'}`}
+                className={`text-sm ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`}
               >
                 View
               </Link>

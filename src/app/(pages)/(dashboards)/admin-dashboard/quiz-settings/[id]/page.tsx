@@ -132,7 +132,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-blue-600"}`}></div>
+        <div className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme === "dark" ? "border-primary" : "border-indigo-600"}`}></div>
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={() => setIsEditingQuiz(true)} className="bg-blue-600 text-white hover:bg-blue-700">
+                  <Button onClick={() => setIsEditingQuiz(true)} className="bg-indigo-600 text-white hover:bg-indigo-700">
                     <Edit size={16} className="mr-2" />
                     Edit Quiz
                   </Button>
@@ -290,7 +290,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                       type="checkbox"
                       checked={updatedQuiz?.shuffleOptions || false}
                       onChange={(e) => handleQuizChange("shuffleOptions", e.target.checked)}
-                      className="ml-2 accent-blue-800"
+                      className="ml-2 accent-indigo-800"
                     />
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </CardHeader>
           {
       quiz.questions?.length === 0 && (
-        <Link href ="/admin-dashboard" className="bg-blue-600  ml-8 mr-8 justify-center flex text-white hover:bg-blue-700 p-2 rounded-lg">
+        <Link href ="/admin-dashboard" className="bg-indigo-600  ml-8 mr-8 justify-center flex text-white hover:bg-indigo-700 p-2 rounded-lg">
         Go to Dashboard
         </Link>
       )
@@ -390,7 +390,7 @@ const QuestionCard: React.FC<{
               </>
             ) : (
               <>
-                <Button onClick={() => setIsEditing(true)} className="bg-blue-600 text-sm text-white hover:bg-blue-700">
+                <Button onClick={() => setIsEditing(true)} className="bg-indigo-600 text-sm text-white hover:bg-indigo-700">
                   <Edit size={5} className="mr-2" />
                   Edit
                 </Button>
@@ -425,7 +425,7 @@ const QuestionCard: React.FC<{
                   name={`correctAnswer-${index}`}
                   checked={updatedQuestion.correctAnswer === option}
                   onChange={() => setUpdatedQuestion({ ...updatedQuestion, correctAnswer: option })}
-                  className="ml-2 text-sm accent-blue-800"
+                  className="ml-2 text-sm accent-indigo-800"
                 />
               </div>
             ))}

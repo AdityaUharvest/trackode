@@ -15,7 +15,7 @@ export default function QuizHistory({ results }: any) {
         {/* {results.length > 0 && (
           <a
             href="/dashboard/history"
-            className={`text-blue-600 hover:text-blue-700 text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
+            className={`text-indigo-600 hover:text-indigo-700 text-sm ${theme === 'dark' ? 'text-indigo-400 hover:text-indigo-300' : 'text-indigo-600 hover:text-indigo-700'}`}
           >
             View Full History →
           </a>
@@ -28,7 +28,7 @@ export default function QuizHistory({ results }: any) {
           </p>
           <a
             href="/programming-quizzes"
-            className={`inline-block ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-600 hover:bg-blue-700'} text-white px-6 py-2 rounded-lg transition-colors`}
+            className={`inline-block ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-600 hover:bg-indigo-700'} text-white px-6 py-2 rounded-lg transition-colors`}
           >
             Check Avialable Quizzes
           </a>
@@ -45,7 +45,7 @@ export default function QuizHistory({ results }: any) {
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h3 className={`text-sm group-hover:text-blue-600 transition-colors ${
+                  <h3 className={`text-sm group-hover:text-indigo-600 transition-colors ${
                     theme === 'dark' ? 'text-gray-100' : 'text-gray-800'
                   }`}>
                     {result?.title.replace("(","").replace(")","") || 'Deleted Quiz'}

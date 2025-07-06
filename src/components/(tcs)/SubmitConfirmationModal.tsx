@@ -39,7 +39,7 @@ export function SubmitConfirmationModal({
               className={`px-4 py-2 rounded ${
                 isTimeUp 
                 ? theme === 'dark' ? 'bg-red-600 hover:bg-red-500' : 'bg-red-500 hover:bg-red-600' 
-                : theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'
+                : theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-500 hover:bg-indigo-600'
               } text-white`}
             >
               {isSubmitting ? (

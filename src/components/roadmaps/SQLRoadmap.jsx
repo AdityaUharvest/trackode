@@ -6,7 +6,7 @@ const colorMap = {
   SQL: {
     borderGradient: "linear-gradient(to right, #3366CC, #003366)",
     badgeGradient: "linear-gradient(to right, #3366CC, #003366)",
-    textClass: "text-blue-600",
+    textClass: "text-indigo-600",
   },
 };
 

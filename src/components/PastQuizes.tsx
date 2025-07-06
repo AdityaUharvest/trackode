@@ -7,7 +7,7 @@ export default function PastQuizes() {
     return (
         <div>
            <button
-        className="w-full bg-slate-900 hover:bg-slate-950 text-white px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-blue-400"
+        className="w-full bg-slate-900 hover:bg-slate-950 text-white px-4 mt-2 py-3 rounded-lg flex justify-between items-center border-2 border-indigo-400"
         onClick={toggleDropdown}
       >
         <span className="font-medium">Past Quizes</span>

@@ -146,7 +146,7 @@ const QuizSetup = () => {
                 <PopoverTrigger asChild>
                   <button title="More Info" aria-label="More Info"
                   type="button" className="focus:outline-none">
-                    <Info className="h-4 w-4 text-gray-500 hover:text-blue-600" />
+                    <Info className="h-4 w-4 text-gray-500 hover:text-indigo-600" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent className="w-64 p-3 text-sm">
@@ -231,7 +231,7 @@ const QuizSetup = () => {
             <Button
               onClick={generateInstructions}
               disabled={isGenerating}
-              className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700"
+              className="flex items-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700"
             >
               {isGenerating && <Loader2 className="animate-spin" />}
               Generate with AI ✨
@@ -276,7 +276,7 @@ const QuizSetup = () => {
               <Button
                 key={index}
                 onClick={() => setCurrentStep(index + 1)}
-                className={`flex-1 text-white mx-2 ${currentStep === index + 1 ? 'bg-blue-600 text-white'  : 'bg-blue-500'} hover:bg-blue-700 hover:text-white `}
+                className={`flex-1 text-white mx-2 ${currentStep === index + 1 ? 'bg-indigo-600 text-white'  : 'bg-indigo-500'} hover:bg-indigo-700 hover:text-white `}
               >
                 {step.title}
               </Button>
@@ -284,7 +284,7 @@ const QuizSetup = () => {
           </div>
           <div className="h-2 bg-gray-200 ml-2 mr-2 rounded">
             <div
-              className="h-full bg-blue-600 rounded transition-all duration-300"
+              className="h-full bg-indigo-600 rounded transition-all duration-300"
               style={{ width: `${(currentStep / steps.length) * 100}%` }}
             />
           </div>
@@ -309,7 +309,7 @@ const QuizSetup = () => {
                 <Button
                   type="button"
                   onClick={() => setCurrentStep(currentStep + 1)}
-                  className="ml-auto bg-blue-700 hover:bg-blue-800 text-white"
+                  className="ml-auto bg-indigo-700 hover:bg-indigo-800 text-white"
                 >
                   Next
                 </Button>

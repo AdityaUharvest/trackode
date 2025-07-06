@@ -109,7 +109,7 @@ const QuestionSection: React.FC<QuestionSectionProps> = ({ mockTestId, section, 
           {questions.length > 0 && (
             <button
               onClick={saveQuestions}
-              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
             >
               Save Questions
             </button>
@@ -137,7 +137,7 @@ const QuestionSection: React.FC<QuestionSectionProps> = ({ mockTestId, section, 
                   <div className="space-x-2">
                     <button
                       onClick={() => handleEdit(index)}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-indigo-600 hover:text-indigo-800"
                     >
                       Edit
                     </button>

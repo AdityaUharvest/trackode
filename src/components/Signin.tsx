@@ -33,7 +33,7 @@ const SignInButton = () => {
   return (
     <>
       <Toaster />
-      <Button onClick={handleSignIn} className="flex bg-blue-600 w-full hover:bg-blue-700 hover:text-white text-white items-center gap-5 ">
+      <Button onClick={handleSignIn} className="flex bg-indigo-600 w-full hover:bg-indigo-700 hover:text-white text-white items-center gap-5 ">
         <div className=" rounded-full">
           <svg className="w-6" viewBox="0 0 533.5 544.3">
             <path d="M533.5 278.4c0-18.5-1.5-37.1-4.7-55.3H272.1v104.8h147c-6.1 33.8-25.7 63.7-54.4 82.7v68h87.7c51.5-47.4 81.1-117.4 81.1-200.2z" fill="#4285f4"/>

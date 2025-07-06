@@ -27,7 +27,7 @@ function TimePicker({ value, onChange, label }: any) {
         <select
           title="Hours"
           className={`w-full mt-1 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
-            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+            } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
           value={value.hours}
           onChange={(e) => handleChange(e, 'hours')}
         >
@@ -44,7 +44,7 @@ function TimePicker({ value, onChange, label }: any) {
         <select
           title="Minutes"
           className={`w-full mt-1 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
-            } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+            } focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
           value={value.minutes}
           onChange={(e) => handleChange(e, 'minutes')}
         >
@@ -131,7 +131,7 @@ function QuizSetup() {
             </label>
             <input
               className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-black" : "bg-gray-50 text-gray-800"
-                } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
               type="text"
               name="name"
               placeholder="Enter Quiz Name"
@@ -150,7 +150,7 @@ function QuizSetup() {
               <input
                 title="Start Date"
                 className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
-                  } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                 type="date"
                 name="startDate"
                 value={startDate}
@@ -166,7 +166,7 @@ function QuizSetup() {
               <input
                 title="End Date"
                 className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
-                  } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                  } placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                 type="date"
                 name="endDate"
                 value={endDate}
@@ -196,7 +196,7 @@ function QuizSetup() {
             </label>
             <input
               className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
-                } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
               type="text"
               name="total_marks"
               placeholder="Enter Total Marks"
@@ -213,7 +213,7 @@ function QuizSetup() {
             </label>
             <input
               className={`w-full px-4 py-2 rounded-lg ${theme === "dark" ? "bg-gray-50 text-gray-900" : "bg-gray-50 text-gray-800"
-                } placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                } placeholder-gray-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
               type="text"
               name="total_questions"
               placeholder="Enter Total Questions"
@@ -225,7 +225,7 @@ function QuizSetup() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full px-4 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
             Create Quiz
           </button>

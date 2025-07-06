@@ -276,7 +276,7 @@ export default function QuizResultsDashboard({ params }: any) {
   if (isLoading) {
     return (
       <div className={`flex items-center justify-center h-screen ${bgColor}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500">
           
         </div>
       </div>
@@ -317,7 +317,7 @@ export default function QuizResultsDashboard({ params }: any) {
       )}
 
 <div className="flex items-center justify-between mb-8">
-        <h1 className="text-base font-semibold text-blue-500">
+        <h1 className="text-base font-semibold text-indigo-500">
           {(() => {
             const hour = new Date().getHours();
             if (hour < 12) return 'Good morning';
@@ -441,7 +441,7 @@ export default function QuizResultsDashboard({ params }: any) {
                       <span className="text-gray-600 font-bold mr-3">{index + 4}</span>
                       <span className="font-medium">{performer.userName}</span>
                     </div>
-                    <span className="bg-blue-100 text-blue-800 py-1 px-2 rounded-full text-sm">
+                    <span className="bg-indigo-100 text-indigo-800 py-1 px-2 rounded-full text-sm">
                       {performer.accuracy}%
                     </span>
                   </div>
@@ -524,14 +524,14 @@ export default function QuizResultsDashboard({ params }: any) {
         ref={printingRef}
         className={`rounded-lg shadow overflow-hidden border ${cardBg} ${borderColor}`}
       >
-        <div className="flex justify-evenly border-b-blue-500 border-b-2 p-3">
+        <div className="flex justify-evenly border-b-indigo-500 border-b-2 p-3">
           <p className='text-center'>
-            <span className='text-blue-600 text-sm font-medium'>Participants: {quizStats.totalParticipants}</span> 
+            <span className='text-indigo-600 text-sm font-medium'>Participants: {quizStats.totalParticipants}</span> 
           </p>
           <p className='text-center'>
-            <span className='text-blue-600 text-sm font-medium'>{quizStats.quizTitle}</span> 
+            <span className='text-indigo-600 text-sm font-medium'>{quizStats.quizTitle}</span> 
           </p>
-          <span className='text-center text-blue-600 text-sm font-medium'>
+          <span className='text-center text-indigo-600 text-sm font-medium'>
             Visit:
             <Link target="blank" href='trackode.in/'> trackode.in</Link>
           </span>
@@ -736,7 +736,7 @@ export default function QuizResultsDashboard({ params }: any) {
                                       </div>
                                       <div className="w-full bg-gray-300 rounded-full h-2">
                                         <div 
-                                          className="bg-blue-500 h-2 rounded-full" 
+                                          className="bg-indigo-500 h-2 rounded-full" 
                                           style={{ width: `${(stats.answered / stats.totalQuestions) * 100}%` }}
                                         ></div>
                                       </div>
@@ -821,7 +821,7 @@ export default function QuizResultsDashboard({ params }: any) {
                               <div>
                                 <div className={`text-sm mb-1 ${secondaryText}`}>Time Spent</div>
                                 <div className="flex items-center">
-                                  <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <svg className="w-5 h-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                   </svg>
                                   <span className={`font-medium ${textColor}`}>

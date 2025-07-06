@@ -17,7 +17,7 @@ export default function PerformanceChart({ chartData }:any) {
         <h2 className="text-xl font-semibold">Performance Trend</h2>
         <div className="flex gap-2 text-sm">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+            <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>
             <span>Your Score</span>
           </div>
         </div>

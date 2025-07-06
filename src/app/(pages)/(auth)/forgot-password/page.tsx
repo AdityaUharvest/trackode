@@ -177,7 +177,7 @@ export default function ForgotPassword() {
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                             : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                        } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                         placeholder="you@example.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
@@ -189,7 +189,7 @@ export default function ForgotPassword() {
                         type="button"
                         onClick={sendOtp}
                         disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email) || countdown > 0}
-                        className={`p-2 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                        className={`p-2 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                           otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
                         }`}
                       >
@@ -216,7 +216,7 @@ export default function ForgotPassword() {
                           theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                             : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                        } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                         placeholder="123456"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
@@ -258,7 +258,7 @@ export default function ForgotPassword() {
                             theme === "dark"
                               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                               : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                           placeholder="••••••••"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
@@ -298,7 +298,7 @@ export default function ForgotPassword() {
                             theme === "dark"
                               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                               : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                           placeholder="••••••••"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
@@ -327,7 +327,7 @@ export default function ForgotPassword() {
                 <button
                   type="submit"
                   disabled={isLoading || !otpVerified}
-                  className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                  className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                     isLoading || !otpVerified ? "opacity-75 cursor-not-allowed" : ""
                   }`}
                 >
@@ -366,7 +366,7 @@ export default function ForgotPassword() {
               Remember your password?{" "}
               <Link
                 href="/signin"
-                className={`font-medium ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                className={`font-medium ${theme === "dark" ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-500"}`}
               >
                 Sign in
               </Link>

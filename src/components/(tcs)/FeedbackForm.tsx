@@ -137,7 +137,7 @@ export function FeedbackForm({ isOpen, onClose, quizId, quizTitle, theme }: Feed
                     type="button"
                     onClick={() => setDifficulty(3)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${difficulty === 3 ? 
-                      (theme === 'dark' ? 'bg-blue-800/80 text-blue-100' : 'bg-blue-100 text-blue-800') : 
+                      (theme === 'dark' ? 'bg-indigo-800/80 text-indigo-100' : 'bg-indigo-100 text-indigo-800') : 
                       theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
                   >
                     <span>Just Right</span>
@@ -166,7 +166,7 @@ export function FeedbackForm({ isOpen, onClose, quizId, quizTitle, theme }: Feed
                   rows={4}
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}
-                  className={`w-full px-4 py-3 rounded-lg border text-sm transition-all focus:ring-2 focus:ring-blue-500 focus:border-transparent ${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-white border-gray-300'}`}
+                  className={`w-full px-4 py-3 rounded-lg border text-sm transition-all focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${theme === 'dark' ? 'bg-gray-700/50 border-gray-600' : 'bg-white border-gray-300'}`}
                   placeholder="What did you like or dislike about this quiz?"
                 />
               </div>
@@ -187,7 +187,7 @@ export function FeedbackForm({ isOpen, onClose, quizId, quizTitle, theme }: Feed
                   <Button
                     type="submit"
                     disabled={isSubmitting || (!rating && !difficulty && !comments)}
-                    className={`w-full h-12 ${theme === 'dark' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'} transition-colors`}
+                    className={`w-full h-12 ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-500 hover:bg-indigo-600'} transition-colors`}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center gap-2">

@@ -299,7 +299,7 @@ export default function QuizResults({ params }: any) {
                       <td className="p-4 whitespace-nowrap">
                         <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
                           <div 
-                            className="bg-blue-600 h-2.5 rounded-full" 
+                            className="bg-indigo-600 h-2.5 rounded-full" 
                             style={{ width: `${(result.correctAnswers / result.totalQuestions) * 100 || 0}%` }}
                           ></div>
                         </div>

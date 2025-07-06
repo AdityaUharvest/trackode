@@ -42,17 +42,17 @@ const RoadmapList = () => {
               href={`/roadmap/${item.slug}`}
               className="block p-4 bg-gray-50 dark:bg-gray-700/50
                          rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 
-                         border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600
+                         border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600
                          transform hover:-translate-y-2 hover:scale-105"
             >
               {/* Background gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 
+              <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 
                             opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
               
               {/* Content */}
               <div className="relative z-10 flex flex-col items-center text-center space-y-4">
                 <div className="w-10 h-10 flex items-center justify-center rounded-full 
-                              bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30
+                              bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30
                               group-hover:scale-110 transition-transform duration-300">
                   <Image
                     src={item.icon}
@@ -64,7 +64,7 @@ const RoadmapList = () => {
                 </div>
                 
                 <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 
-                             group-hover:text-blue-600 dark:group-hover:text-blue-400 
+                             group-hover:text-indigo-600 dark:group-hover:text-indigo-400 
                              transition-colors duration-300">
                   {item.name}
                 </h3>
@@ -72,7 +72,7 @@ const RoadmapList = () => {
                 {/* Animated arrow */}
                 <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 
                               translate-y-2 group-hover:translate-y-0">
-                  <svg className="w-5 h-5 text-blue-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-indigo-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
                 </div>
@@ -153,7 +153,7 @@ function RoadMap() {
             
             
           }}
- className=" bg-gradient-to-br from-gray-100 via-white to-blue-100 
+ className=" bg-gradient-to-br from-gray-100 via-white to-indigo-100 
                     dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-10 ">
 
       {/* Header Section */}
@@ -163,7 +163,7 @@ function RoadMap() {
                           mb-2 leading-tight">
             Trackode <span className='text-indigo-500'>Roadmap</span>
           </h1>
-          <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-500 rounded-full animate-pulse opacity-60"></div>
+          <div className="absolute -top-4 -right-4 w-8 h-8 bg-indigo-500 rounded-full animate-pulse opacity-60"></div>
           <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-purple-500 rounded-full  opacity-40"></div>
         </div>
         
@@ -175,7 +175,7 @@ function RoadMap() {
             <span>17+ Roadmaps</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
             <span>Regular Updates</span>
           </div>
           <div className="flex items-center space-x-2">

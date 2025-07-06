@@ -6,7 +6,7 @@ const colorMap = {
   R: {
     borderGradient: "linear-gradient(to right, #198CE7, #0051A8)",
     badgeGradient: "linear-gradient(to right, #198CE7, #0051A8)",
-    textClass: "text-blue-500",
+    textClass: "text-indigo-500",
   },
 };
 

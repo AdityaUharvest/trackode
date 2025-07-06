@@ -124,8 +124,8 @@ export default function Faq() {
                     className={`flex-1 font-medium lg:text-base text-sm ${
                       openIndex === index
                         ? theme === "dark"
-                          ? "text-blue-400"
-                          : "text-blue-600"
+                          ? "text-indigo-400"
+                          : "text-indigo-600"
                         : ""
                     }`}
                   >
@@ -135,8 +135,8 @@ export default function Faq() {
                     className={`ml-4 flex-shrink-0 p-2 rounded-full transition-colors ${
                       openIndex === index
                         ? theme === "dark"
-                          ? "bg-blue-900/50 text-blue-400"
-                          : "bg-blue-100 text-blue-600"
+                          ? "bg-indigo-900/50 text-indigo-400"
+                          : "bg-indigo-100 text-indigo-600"
                         : theme === "dark"
                         ? "bg-gray-800 text-gray-400"
                         : "bg-gray-100 text-gray-500"
@@ -203,7 +203,7 @@ export default function Faq() {
             className={`max-w-2xl mx-auto p-5 rounded-xl ${
               theme === "dark"
                 ? "bg-gray-800/50 border border-gray-700"
-                : "bg-blue-50 border border-blue-100"
+                : "bg-indigo-50 border border-indigo-100"
             }`}
           >
             <h3
@@ -222,7 +222,7 @@ export default function Faq() {
             </p>
             <Link
               href="/contact"
-              className={`px-5 py-3 bg-gradient-to-r from-blue-600 to-violet-500 rounded-lg text-base  text-white transition-all 
+              className={`px-5 py-3 bg-gradient-to-r from-indigo-600 to-violet-500 rounded-lg text-base  text-white transition-all 
                 
               `}
             >

@@ -187,7 +187,7 @@ export default function SignUp() {
                         className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                             : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                         placeholder="John Doe"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -213,7 +213,7 @@ export default function SignUp() {
                           className={`block w-full pl-10 pr-3 py-2 rounded-md border text-sm ${theme === "dark"
                               ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                               : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${otpVerified ? "border-green-500" : ""
+                            } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${otpVerified ? "border-green-500" : ""
                             }`}
                           placeholder="you@example.com"
                           value={email}
@@ -231,7 +231,7 @@ export default function SignUp() {
                           type="button"
                           onClick={sendOtp}
                           disabled={otpLoading || !email || !/^\S+@\S+\.\S+$/.test(email) || countdown > 0}
-                          className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
+                          className={`py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${otpLoading || countdown > 0 ? "opacity-75 cursor-not-allowed" : ""
                             }`}
                         >
                           {otpLoading ? "Sending..." :
@@ -255,7 +255,7 @@ export default function SignUp() {
                             className={`block flex-grow pl-3 pr-3 py-2 rounded-md border text-sm ${theme === "dark"
                                 ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                                 : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                              } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                              } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                             placeholder="123456"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, ''))}
@@ -294,7 +294,7 @@ export default function SignUp() {
                         className={`block w-full pl-10 pr-10 py-2 rounded-md border text-sm ${theme === "dark"
                             ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                             : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                          } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -324,20 +324,20 @@ export default function SignUp() {
                     type="checkbox"
                     required
                     className={`h-4 w-4 rounded ${theme === "dark" ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"
-                      } focus:ring-blue-500`}
+                      } focus:ring-indigo-500`}
                   />
                   <label htmlFor="terms" className={`ml-2 block text-sm ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>
                     I agree to the{" "}
                     <Link
                       href="/terms"
-                      className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                      className={`${theme === "dark" ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-500"}`}
                     >
                       Terms of Service
                     </Link>{" "}
                     and{" "}
                     <Link
                       href="/privacy"
-                      className={`${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                      className={`${theme === "dark" ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-500"}`}
                     >
                       Privacy Policy
                     </Link>
@@ -348,7 +348,7 @@ export default function SignUp() {
                   <button
                     type="submit"
                     disabled={isLoading || !otpVerified}
-                    className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isLoading || !otpVerified ? "opacity-75 cursor-not-allowed" : ""
+                    className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isLoading || !otpVerified ? "opacity-75 cursor-not-allowed" : ""
                       }`}
                   >
                     {isLoading ? (
@@ -386,7 +386,7 @@ export default function SignUp() {
                 Already have an account?{" "}
                 <Link
                   href="/signin"
-                  className={`font-medium ${theme === "dark" ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-500"}`}
+                  className={`font-medium ${theme === "dark" ? "text-indigo-400 hover:text-indigo-300" : "text-indigo-600 hover:text-indigo-500"}`}
                 >
                   Sign in
                 </Link>

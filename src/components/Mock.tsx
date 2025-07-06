@@ -117,7 +117,7 @@ export default function Dashboard({
           <h1 className={`text-base font-semibold ${textColor}`}>Mock Test Dashboard</h1>
           <Link
             href="/mock-tests"
-            className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2  text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+            className="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2  text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
           >
             New Mock Test
           </Link>
@@ -135,7 +135,7 @@ export default function Dashboard({
                 onClick={() => setActiveTab(tab)}
                 className={`whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab
-                    ? 'border-blue-500 text-blue-600'
+                    ? 'border-indigo-500 text-indigo-600'
                     : `border-transparent ${secondaryText} hover:text-gray-700 hover:border-gray-300`
                 }`}
               >
@@ -209,8 +209,8 @@ function OverviewTab({
   secondaryText: string;
   isMobile: boolean;
 }) {
-  const statCardBg = theme === 'dark' ? 'bg-gray-700' : 'bg-blue-50';
-  const statTextColor = theme === 'dark' ? 'text-gray-100' : 'text-blue-800';
+  const statCardBg = theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-50';
+  const statTextColor = theme === 'dark' ? 'text-gray-100' : 'text-indigo-800';
 
   // Fallback for stats
   const safeStats = stats || {
@@ -419,7 +419,7 @@ function MockTestsTab({
           <p className={`mb-4 ${secondaryText}`}>You haven't created any mock tests yet</p>
           <Link
             href="/mock-tests"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
           >
             Create First Mock Test
           </Link>
@@ -512,7 +512,7 @@ function MockTestsTab({
                   )}
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div className="flex flex-wrap gap-2">
-                      <Button className="bg-blue-500 text-xs sm:text-sm px-2 py-1 h-auto text-white hover:bg-blue-600">
+                      <Button className="bg-indigo-500 text-xs sm:text-sm px-2 py-1 h-auto text-white hover:bg-indigo-600">
                         <Link href={`/mock-tests/${mock._id}/results`}>Results</Link>
                       </Button>
                       <Button
@@ -533,8 +533,8 @@ function MockTestsTab({
                         onClick={() => handleShare(mock)}
                         className={` h-auto sm:text-sm px-2 py-1 rounded ${
                           theme === 'dark'
-                            ? 'bg-blue-700 hover:bg-blue-600'
-                            : 'bg-blue-100 hover:bg-blue-200'
+                            ? 'bg-indigo-700 hover:bg-indigo-600'
+                            : 'bg-indigo-100 hover:bg-indigo-200'
                         }`}
                       >
                         <Share

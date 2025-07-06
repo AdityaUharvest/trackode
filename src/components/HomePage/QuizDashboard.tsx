@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useTheme } from "./ThemeContext";
+import { useTheme } from "../ThemeContext";
 import Link from "next/link";
 import {
   Clock,
@@ -400,286 +400,25 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className={`min-h-screen ${containerStyles[theme]} transition-colors duration-300`}>
+      <div className={` ${containerStyles[theme]} transition-colors duration-300`}>
         <div className="container rounded-lg mx-auto px-3 py-4">
-          {userStats.completedQuizzes > 0 && (
-            <div className="mb-8">
-              <button
-                onClick={() => setShowStats(!showStats)}
-                className={`flex w-full justify-between items-center gap-2 mb-4 px-4 py-2 rounded-lg ${
-                  theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
-                } transition-colors`}
-              >
-                <span className="font-medium">{showStats ? "Hide Stats" : "Show Stats"}</span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${showStats ? "rotate-180" : ""}`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {showStats && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                  <div
-                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                  >
-                    <h3 className={`text-lg text-center font-semibold mb-4 ${textStyles[theme].primary}`}>
-                      Completion
-                    </h3>
-                    <div className="relative h-40">
-                      <svg className="w-full h-full" viewBox="0 0 100 100">
-                        <circle
-                          className={theme === "dark" ? "text-gray-700" : "text-gray-200"}
-                          strokeWidth="8"
-                          stroke="currentColor"
-                          fill="transparent"
-                          r="40"
-                          cx="50"
-                          cy="50"
-                        />
-                        <circle
-                          className="text-indigo-500"
-                          strokeWidth="8"
-                          strokeDasharray={`${(userStats.completedQuizzes / userStats.totalQuizzes) * 251} 251`}
-                          strokeLinecap="round"
-                          stroke="currentColor"
-                          fill="transparent"
-                          r="40"
-                          cx="50"
-                          cy="50"
-                          transform="rotate(-90 50 50)"
-                        />
-                      </svg>
-                      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                        <span className={`text-2xl font-bold block ${textStyles[theme].primary}`}>
-                          {userStats.totalQuizzes > 0
-                            ? Math.round((userStats.completedQuizzes / userStats.totalQuizzes) * 100)
-                            : 0}
-                          %
-                        </span>
-                        <span className={`text-xs block ${textStyles[theme].muted}`}>
-                          {userStats.completedQuizzes} / {userStats.totalQuizzes}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                  >
-                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                      Average Score
-                    </h3>
-                    <div className="flex items-end mb-2">
-                      <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                        {userStats.averageScore.toFixed(1)}
-                      </p>
-                      <span className={textStyles[theme].muted}>%</span>
-                    </div>
-                    <div>
-                      <span className={`text-sm ${textStyles[theme].muted}`}>Across all quizzes</span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className={`text-sm mr-2 ${textStyles[theme].muted}`}>Trend:</span>
-                      {getTrendIcon(userStats.accuracyTrend)}
-                      <span
-                        className={`text-sm ml-1 capitalize ${
-                          userStats.accuracyTrend === "improving"
-                            ? "text-green-500"
-                            : userStats.accuracyTrend === "declining"
-                            ? "text-red-500"
-                            : textStyles[theme].secondary
-                        }`}
-                      >
-                        {userStats.accuracyTrend}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                  >
-                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                      Achievement
-                    </h3>
-                    <div className="flex items-center">
-                      <p className={`text-xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                        {getAchievementLevel()}
-                      </p>
-                      <span className="text-xl">✨</span>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                  >
-                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                      Highest Score
-                    </h3>
-                    <div className="flex items-end mb-2">
-                      <p className={`text-3xl font-bold mr-2 ${textStyles[theme].primary}`}>
-                        {userStats.highestScore}
-                      </p>
-                      <span className={textStyles[theme].muted}>%</span>
-                    </div>
-                    <div>
-                      <span className={`text-sm ${textStyles[theme].muted}`}>Your personal best</span>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-lg ${cardStyles[theme]}`}
-                  >
-                    <h3 className={`text-lg font-semibold mb-2 ${textStyles[theme].primary}`}>
-                      Recent Score
-                    </h3>
-                    <div className="flex items-end mb-2">
-                      <p
-                        className={`text-3xl font-bold mr-2 ${
-                          userStats.recentScore >= 80
-                            ? "text-green-500"
-                            : userStats.recentScore >= 50
-                            ? "text-yellow-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {userStats.recentScore}
-                      </p>
-                      <span className={textStyles[theme].muted}>%</span>
-                    </div>
-                    <div>
-                      <span className={`text-sm ${textStyles[theme].muted}`}>Latest attempt</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          
 
           <div className=" gap-6">
             <div className="flex-1">
-              <div className="mb-6">
-                <div className="flex flex-col md:flex-row md:items-center gap-4">
-                  <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search className="text-gray-400" size={16} />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Search quizzes or mock tests..."
-                      className={`w-full pl-8 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 ${getThemeClasses("input")}`}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="md:hidden">
-                    <button
-                      onClick={() => setShowMobileFilters(!showMobileFilters)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg w-full justify-center ${
-                        theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-100 hover:bg-gray-200"
-                      }`}
-                    >
-                      <Filter size={16} />
-                      <span>Filters</span>
-                    </button>
-                  </div>
-
-                  <div className="hidden md:flex gap-2">
-                    <div className="relative">
-                      <select
-                        value={activeFilter}
-                        onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${getThemeClasses("input")}`}
-                      >
-                        <option value="all">All Quizzes</option>
-                        <option value="active">Active</option>
-                        <option value="completed">Completed</option>
-                        <option value="ended">Ended</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    <div className="relative">
-                      <select
-                        value={difficultyFilter}
-                        onChange={(e) => {
-                          setDifficultyFilter(e.target.value);
-                          setMockFilter(e.target.value as any);
-                        }}
-                        className={`appearance-none pl-3 pr-8 py-2 rounded-lg text-sm border focus:outline-none focus:ring-1 ${getThemeClasses("input")}`}
-                      >
-                        <option value="all">All Levels</option>
-                        <option value="Easy">Easy</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Hard">Hard</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {showMobileFilters && (
-                  <div className="md:hidden space-y-2 mt-4">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
-                          Quiz Status
-                        </label>
-                        <select
-                          value={activeFilter}
-                          onChange={(e) => setActiveFilter(e.target.value as QuizFilter)}
-                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${getThemeClasses("input")}`}
-                        >
-                          <option value="all">All</option>
-                          <option value="active">Active</option>
-                          <option value="completed">Completed</option>
-                          <option value="ended">Ended</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className={`block text-sm font-medium mb-1 ${textStyles[theme].secondary}`}>
-                          Difficulty
-                        </label>
-                        <select
-                          value={difficultyFilter}
-                          onChange={(e) => {
-                            setDifficultyFilter(e.target.value);
-                            setMockFilter(e.target.value as any);
-                          }}
-                          className={`w-full pl-2 pr-6 py-1.5 rounded text-sm border ${getThemeClasses("input")}`}
-                        >
-                          <option value="all">All</option>
-                          <option value="Easy">Easy</option>
-                          <option value="Medium">Medium</option>
-                          <option value="Hard">Hard</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+             
 
               <div className="mb-16 mt-10">
-                <div className="items-center mb-10">
-                  <h2 className={`text-2xl text-center font-bold ${textStyles[theme].primary}`}>
-                    Programming Quizzes
-                  </h2>
-                  <p className={`text-center text-sm ${textStyles[theme].secondary}`}>
-                    Explore quizzes across various programming languages and levels
-                  </p>
+                <div className="items-center mb-10 ">
+                  <h2
+                className={`text-3xl sm:text-4xl text-center font-bold tracking-tight ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
+                Technology <span className='text-indigo-500'>We Cover</span> 
+              </h2>
+              <p className={`mt-2 max-w-2xl mx-auto text-center text-base ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                Explore our extensive tech stack quizzes and challenges
+              </p>
                 </div>
 
                 {Object.keys(organizedQuizzes).length === 0 ? (
@@ -698,7 +437,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {Object.keys(organizedQuizzes).map((section) => {
+                    {Object.keys(organizedQuizzes).slice(0,8).map((section) => {
                       const sectionLogo = getLanguageLogo(section);
                       return (
                         <div
@@ -935,118 +674,23 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
               )}
             </div>
 
-            <div className="mt-16">
-              <div className="items-center mb-6">
-                <h1 className={`text-2xl text-center font-bold ${textStyles[theme].primary}`}>
-                  Free Mock Tests
-                </h1>
-                <p className={`text-sm text-center ${textStyles[theme].muted}`}>
-                  Explore our collection of free mock tests to prepare for your next coding interview or exam.
-                </p>
-              </div>
+            
 
-              {filteredMockTests.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-500 text-sm mb-4">No mock tests found</div>
-                  <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setMockFilter("all");
-                      setDifficultyFilter("all");
-                    }}
-                    className={`px-6 py-2 rounded-lg ${getThemeClasses("button-primary")}`}
-                  >
-                    Clear filters
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredMockTests.map((mock) => (
-                    <div
-                      key={mock._id}
-                      className={`rounded-lg shadow-lg overflow-hidden border ${getThemeClasses("card")} ${getThemeClasses("card-hover")} transition-shadow duration-300`}
-                    >
-                      <div className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <h2 className="text-base font-semibold">{mock.title}</h2>
-                          <span
-                            className={`px-3 py-1 text-xs font-medium rounded-lg ${getDifficultyColor(mock.difficulty || "")}`}
-                          >
-                            {mock.difficulty}
-                          </span>
-                        </div>
-
-                        <div className="mb-4 flex flex-wrap gap-1 items-center">
-                          <span
-                            className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
-                              theme === "dark" ? "bg-indigo-900 text-indigo-300" : "bg-indigo-100 text-indigo-800"
-                            }`}
-                          >
-                            {mock.tag || "TCS"}
-                          </span>
-                          
-                          {mock.createdAt && (
-                            <span className={getThemeClasses("text-muted") + " text-sm"}>
-                              {new Date(mock.createdAt).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex flex-wrap gap-4 mb-6">
-                          <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                            <Clock size={16} className="mr-2 text-indigo-500" />
-                            {mock.durationMinutes || 60} mins
-                          </div>
-                          <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                            <CheckCircle size={16} className="mr-2 text-green-500" />
-                            75 questions
-                          </div>
-                          <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
-                            <Users size={16} className="mr-2 text-indigo-500" />
-                            {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)} students
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                          <Link
-                            href={`/playy/${mock.shareCode}`}
-                            className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 border-indigo-500 border-2 hover:shadow-lg  bg-transparent hover:bg-indigo-600 text-indigo-700 hover:text-white font-medium`}
-                          >
-                            <Play size={18} className="mr-2" />
-                            Play Now
-                          </Link>
-
-                         
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="mt-8 text-center text-gray-500">
-                Showing {filteredMockTests.length} of {mockTests.length} mock tests
-              </div>
-            </div>
-
-            <div className="lg:flex lg:justify-between mt-6">
-              <Link href="/contact">
-                <button
-                  className={`px-4 w-full mb-2 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${getThemeClasses("button-primary")}`}
-                >
-                  Contact Us for More Quizzes
-                </button>
-              </Link>
-              <Link href="/quiz-setup">
-                <button
-                  className={`px-4 py-2 w-full rounded-lg text-sm font-medium transition-all duration-200 ${
-                    theme === "dark" ? "bg-indigo-600 text-white hover:bg-indigo-500" : "bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
-                  }`}
-                >
-                  Contribute More Quizzes
-                </button>
-              </Link>
-            </div>
+            
           </div>
+          {/* CTA Button */}
+          <div className="text-center">
+             <Link
+                                    href="/programming-quiz"
+                                    className="inline-flex items-center justify-center px-6 py-3 hover:bg-indigo-500 hover:text-white text-indigo-500 bg-transparent border-indigo-600 border-2  font-semibold rounded-sm transition-colors duration-200"
+                                >
+                                    Explore All Quizzes
+                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </Link>
+          </div>
+                               
         </div>
       </div>
     </main>

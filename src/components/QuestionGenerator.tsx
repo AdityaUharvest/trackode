@@ -619,7 +619,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all transform hover:scale-[1.02] ${
               copied
                 ? 'bg-emerald-500 text-white shadow-emerald-200 dark:shadow-emerald-900'
-                : 'bg-blue-600 text-white shadow-blue-200 dark:shadow-blue-900 hover:bg-blue-700'
+                : 'bg-indigo-600 text-white shadow-indigo-200 dark:shadow-indigo-900 hover:bg-indigo-700'
             } shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
           >
             <svg
@@ -657,7 +657,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 max="50"
                 value={questionCount}
                 onChange={(e) => setQuestionCount(Math.min(50, Math.max(1, Number(e.target.value))))}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                 disabled={isGenerating || isSubmitting}
               />
               <div className="absolute right-3 top-2 text-xs text-gray-500 dark:text-gray-400">
@@ -683,14 +683,14 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 <input
                   type="text"
                   placeholder="e.g., Advanced Machine Learning"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   value={customSection}
                   onChange={(e) => setCustomSection(e.target.value)}
                 />
                 <button
                   onClick={addCustomSection}
                   disabled={!customSection.trim() || isGenerating || isSubmitting}
-                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Add Topic
                 </button>
@@ -709,7 +709,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                   key={category.name}
                   className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
                     activeTab === category.name
-                      ? 'bg-blue-600 text-white shadow-md'
+                      ? 'bg-indigo-600 text-white shadow-md'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                   onClick={() => {
@@ -734,7 +734,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 <input
                   type="text"
                   placeholder={`Search ${activeTab} topics...`}
-                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg  placeholder:text-base focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg  placeholder:text-base focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   value={quickFilter}
                   onChange={(e) => setQuickFilter(e.target.value)}
                 />
@@ -778,7 +778,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                               key={section!.value}
                               className={`p-3 rounded-lg text-left text-sm transition-all ${
                                 selectedSection === section!.value
-                                  ? 'bg-blue-600 text-white shadow-md'
+                                  ? 'bg-indigo-600 text-white shadow-md'
                                   : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
                               }`}
                               onClick={() => setSelectedSection(section!.value)}
@@ -799,8 +799,8 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
             disabled={isGenerating || isSubmitting || !selectedSection}
             className={`w-full mt-5 py-3 px-4 rounded-lg font-medium text-white transition-all transform hover:scale-[1.02] ${
               isGenerating
-                ? 'bg-blue-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 shadow-lg'
+                ? 'bg-indigo-400 cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg'
             } flex items-center justify-center gap-2`}
           >
             {isGenerating ? (
@@ -844,7 +844,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center">
-              <Loader2 className="animate-spin mx-auto w-8 h-8 text-blue-600 dark:text-blue-400" />
+              <Loader2 className="animate-spin mx-auto w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               <p className="mt-4 text-gray-500 dark:text-gray-400">
                 Generating your questions...
               </p>
@@ -867,7 +867,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                   <div className=" ">
                     <div className="flex-1 min-w-0">
                       <h3 className="text-base font-medium text-gray-800 dark:text-gray-100 mb-3">
-                        <span className="text-blue-600 dark:text-blue-400 mr-2">
+                        <span className="text-indigo-600 dark:text-indigo-400 mr-2">
                           Q{index + 1}.
                         </span>
                         {q.text}
@@ -899,7 +899,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                     <div className="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
                       <button
                         onClick={() => handleEdit(index)}
-                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-full"
+                        className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full"
                         title="Edit question"
                       >
                         <Pencil className="w-4 h-4" />
@@ -963,7 +963,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                     .then(() => toast.success('Quiz link copied to clipboard!'))
                     .catch(() => toast.error('Failed to copy link'))
                 }
-                className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
+                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium flex items-center gap-2 transition-colors"
               >
                 <Share2 className="w-4 h-4" />
                 Share

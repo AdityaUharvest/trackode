@@ -76,8 +76,8 @@ const QuizDashboard = () => {
   };
 
   const inputStyles = {
-    light: 'bg-white border-gray-300 focus:ring-blue-500 focus:border-blue-500',
-    dark: 'bg-gray-700 border-gray-600 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400'
+    light: 'bg-white border-gray-300 focus:ring-indigo-500 focus:border-indigo-500',
+    dark: 'bg-gray-700 border-gray-600 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-400'
   };
 
   const tableStyles = {
@@ -191,7 +191,7 @@ const QuizDashboard = () => {
   if (loading) {
     return (
       <div className={`flex justify-center items-center h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
       </div>
     );
   }
@@ -206,7 +206,7 @@ const QuizDashboard = () => {
         <input
           type="text"
           placeholder="Search quizzes..."
-          className={`w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 ${inputStyles[theme]}`}
+          className={`w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 ${inputStyles[theme]}`}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -254,8 +254,8 @@ const QuizDashboard = () => {
                       <button className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${
                         quiz.userPlayed 
                           ? theme === 'dark' 
-                            ? 'bg-blue-900 text-blue-200 hover:bg-blue-800' 
-                            : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                            ? 'bg-indigo-900 text-indigo-200 hover:bg-indigo-800' 
+                            : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100'
                           : theme === 'dark' 
                             ? 'bg-green-900 text-green-200 hover:bg-green-800' 
                             : 'bg-green-50 text-green-700 hover:bg-green-100'
