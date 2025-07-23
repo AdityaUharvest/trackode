@@ -627,7 +627,7 @@ console.log('Result:', result);
       )}
 
       <div className="mx-auto">
-        {/* Top Summary Card */}
+        {/* Top Summary Cardd */}
         <Card className={`mb-6 overflow-hidden border shadow-md ${bgColor}`}>
           <div className={`h-2 w-full ${performanceBadge.color}`}></div>
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2">
