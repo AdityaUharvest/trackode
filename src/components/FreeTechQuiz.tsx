@@ -147,7 +147,7 @@ export default function FreeTechQuizClient({ params }: any) {
 
   return (
     <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
-      <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 py-12">
+      <div className="px-4 mx-auto sm:px-6 lg:px-8 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between mb-8">
             <button 

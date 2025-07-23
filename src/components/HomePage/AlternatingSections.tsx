@@ -57,7 +57,7 @@ const AlternatingSections = () => {
     ];
 
     return (
-        <div className={` ${bg} max-w-7xl mx-auto  py-10 flex items-center`}>
+        <div className={` ${bg} mx-auto  py-10 flex items-center`}>
             <div className=" px-3 w-full">
                 {/* Header */}
                 <div className="text-center mb-10">

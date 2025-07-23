@@ -170,7 +170,7 @@ const Navbar: React.FC = () => {
         ${themeStyles.navbar}
         ${scrolled ? 'shadow-lg backdrop-blur-2xl' : 'bg-gray-900/50 backdrop-blur-2xl'}
       `}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-1 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 py-1 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
             {/* Logo Section */}

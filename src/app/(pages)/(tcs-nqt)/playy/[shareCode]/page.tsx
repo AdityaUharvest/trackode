@@ -764,7 +764,7 @@ export default function QuizPlayer() {
       <header
         className={`sticky top-0 z-10 mt-5 shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}
       >
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div className="mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <h1 className="text-sm ml-2 font-bold truncate max-w-xs">{quiz?.title}</h1>
           </div>
@@ -821,7 +821,7 @@ export default function QuizPlayer() {
       )}
 
       {/* Main Quiz Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Section Navigation - Left Sidebar */}
         <div className="lg:col-span-3">
           <SectionProgress

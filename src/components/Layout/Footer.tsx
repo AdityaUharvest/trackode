@@ -9,7 +9,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className={`py-16 max-w-7xl mx-auto ${
+    <footer className={`py-16 mx-auto ${
       theme === "dark" 
         ? "bg-gradient-to-b from-gray-900 to-black text-gray-200" 
         : "bg-gradient-to-b from-gray-50 to-gray-100 text-gray-700"

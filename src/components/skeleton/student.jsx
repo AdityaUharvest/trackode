@@ -1,7 +1,7 @@
 export default function SkeletonLoader({ theme }) {
     return (
       <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'} p-8`}>
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto">
           {/* Header Skeleton */}
           <div className="flex justify-between items-center mb-6">
             <div className="animate-pulse">

@@ -626,7 +626,7 @@ console.log('Result:', result);
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto">
         {/* Top Summary Card */}
         <Card className={`mb-6 overflow-hidden border shadow-md ${bgColor}`}>
           <div className={`h-2 w-full ${performanceBadge.color}`}></div>
@@ -1320,7 +1320,7 @@ console.log('Result:', result);
 
         {/* Actions Footer */}
         <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-50/90 to-transparent dark:from-gray-950/90 pt-12">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="mx-auto px-4 py-3 flex justify-between items-center">
             <Button variant="secondary" onClick={() => window.history.back()} size="sm">
               Back to Tests
             </Button>

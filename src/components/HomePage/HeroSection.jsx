@@ -16,7 +16,7 @@ const HeroSection = () => {
     theme === "dark" 
       ? "bg-gray-900" 
       : "bg-gradient-to-br from-indigo-50 to-white"
-  } overflow-hidden max-w-7xl mx-auto transition-all duration-500`}
+  } overflow-hidden mx-auto transition-all duration-500`}
 >
   {/* Simple background elements */}
   <div className="absolute inset-0 pointer-events-none overflow-hidden">

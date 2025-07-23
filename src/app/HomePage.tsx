@@ -76,7 +76,7 @@ export default function HomePage() {
         <ProgrammingLanguageQuizzes/>
         
          <section 
-  className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+  className={`py-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
   
 >
   <div className="px-3  sm:px-4 lg:px-4">
@@ -163,7 +163,7 @@ export default function HomePage() {
         <section
 
           className={`
-  py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+  py-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
 
         >
           
@@ -173,7 +173,7 @@ export default function HomePage() {
 
 <section
 
-          className={`pb-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`pb-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           style={{
             backgroundImage: theme === "dark"
               ? "url('/image.png')"
@@ -329,7 +329,7 @@ export default function HomePage() {
 
         {/* How it Works Section */}
         <section 
-          className={`py-16 mx-auto max-w-7xl ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gradient-to-r from-indigo-100 to-indigo-100"}`}
+          className={`py-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gradient-to-r from-indigo-100 to-indigo-100"}`}
           aria-labelledby="features-heading"
 style={{
             backgroundImage: theme === "dark"
@@ -435,7 +435,7 @@ style={{
         </section>
         {/* Demo Quiz Section */}
         <section
-          className={`py-16 mx-auto max-w-7xl  ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`py-16 mx-auto  ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           aria-labelledby="demo-heading"
 style={{
             backgroundImage: theme === "dark"
@@ -569,7 +569,7 @@ style={{
         {/* FAQ Section */}
         <section
           id="faq"
-          className={`py-16 max-w-7xl mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`py-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
           style={{
             backgroundImage: theme === "dark"
               ? "url('/image.png')"

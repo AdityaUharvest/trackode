@@ -329,7 +329,7 @@ console.log(attempts);
 };
   return (
     <div className={`min-h-screen ${bgColor} ${textColor} p-4 ${isMobile ? 'pb-24' : ''}`}>
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className={`text-base text-purple-500 font-bold flex items-center gap-1`}>
             

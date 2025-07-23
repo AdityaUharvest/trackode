@@ -113,7 +113,7 @@ export default function MockTestDashboard() {
     <div className={`min-h-screen ${bgColor}`}>
       {/* Header */}
       <header className={`shadow ${headerBg}`}>
-        <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
+        <div className="mx-auto px-4 py-6 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className={`sm:text-sm lg:text-lg font-bold ${textColor}`}>TCS NQT Dashboard</h1>
           <Link
             href="/mock-tests"
@@ -125,7 +125,7 @@ export default function MockTestDashboard() {
       </header>
 
       {/* Main Content */}
-      <main className={`max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 ${bgColor}`}>
+      <main className={`mx-auto px-4 py-6 sm:px-6 lg:px-8 ${bgColor}`}>
         {/* Tabs */}
         <div className={`border-b ${borderColor} mb-6`}>
           <nav className="-mb-px flex space-x-8">

@@ -125,7 +125,7 @@ export default function Dashboard({
       </header>
 
       {/* Main Content */}
-      <main className={`max-w-7xl mx-auto  sm:px-2 lg:px-2 ${bgColor}`}>
+      <main className={`mx-auto  sm:px-2 lg:px-2 ${bgColor}`}>
         {/* Tabs - Mobile friendly */}
         <div className={`${borderColor} mb-6 overflow-x-auto`}>
           <nav className="flex space-x-4 sm:space-x-8">
