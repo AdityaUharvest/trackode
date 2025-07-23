@@ -163,7 +163,7 @@ export default function HomePage() {
         <section
 
           className={`
-  py-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+  py-16 mx-auto `}
 
         >
           
