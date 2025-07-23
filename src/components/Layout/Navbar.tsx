@@ -145,7 +145,7 @@ const Navbar: React.FC = () => {
     cardBorder: theme === 'dark' ? 'border-gray-700' : 'border-gray-100',
     tagBg: {
       indigo: theme === 'dark' ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700',
-      indigo: theme === 'dark' ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700',
+      
       green: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-700'
     }
   };
