@@ -163,7 +163,7 @@ export default function HomePage() {
         <section
 
           className={`
-  py-16 mx-auto `}
+   `}
 
         >
           
@@ -173,7 +173,7 @@ export default function HomePage() {
 
 <section
 
-          className={`pb-16 mx-auto ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"}`}
+          className={`pb-16 mx-auto `}
           style={{
             backgroundImage: theme === "dark"
               ? "url('/image.png')"
@@ -184,7 +184,7 @@ export default function HomePage() {
 
         >
           
-          <div className="px-4 mx-auto   sm:px-6 ">
+          <div className="px-4 mx-auto py-10   sm:px-6 ">
             <div className="text-center mb-10">
               <motion.div
                 initial={{ opacity: 0, y: -20 }}
@@ -471,7 +471,7 @@ style={{
 
         {/* Testimonials Section */}
         <section
-          className={`py-16 ${theme === "dark" ? "bg-gray-700/50/50" : "bg-gray-100"} mx-auto max-w-7xl`}
+          className={`py-16  mx-auto `}
           aria-labelledby="testimonials-heading"
           style={{
             backgroundImage: theme === "dark"

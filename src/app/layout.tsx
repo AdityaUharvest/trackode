@@ -99,8 +99,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SessionProvider>
           <ClientLayout>
             
-           
-              {children}
+           <div className="px-2">{children}</div>
+              
             
             
             <StructuredData />
