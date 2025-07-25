@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import { SubmitConfirmationModal } from '@/components/(tcs)/SubmitConfirmationModal';
 import { QuizResultModal } from '@/components/(tcs)/QuizResultModal';
 import { SectionProgress } from '@/components/(tcs)/SectionProgress';
 import { QuestionTimer } from '@/components/(tcs)/QuestionTimer';
-import { Loader2, Calculator, Minimize2, Maximize2, ChevronLeft, ChevronRight, Lock, AlertTriangle } from 'lucide-react';
+import { Loader2, Calculator, Minimize2, Maximize2, ChevronLeft, ChevronRight, Lock, AlertTriangle, Wifi, WifiOff, AlertCircle } from 'lucide-react';
 import { useTheme } from '@/components/ThemeContext';
 import { FeedbackForm } from '@/components/(tcs)/FeedbackForm';
 import toast, { Toaster } from 'react-hot-toast';
@@ -68,27 +68,89 @@ export default function QuizPlayer() {
   const [fullscreenPrompt, setFullscreenPrompt] = useState(false);
   const [isTimeUp, setIsTimeUp] = useState(false);
   const fullscreenRequestRef = useRef(false);
+  
+  // Enhanced state for robustness
+  const [isOnline, setIsOnline] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
+  const [connectionError, setConnectionError] = useState('');
+  const [isInitializing, setIsInitializing] = useState(true);
 
-  // Initialize sections and load saved answers
+  // Enhanced error handling with retry logic
+  const handleApiError = useCallback((error: any, operation: string) => {
+    console.error(`${operation} error:`, error);
+    
+    if (!navigator.onLine) {
+      setIsOnline(false);
+      setConnectionError("You're offline. Please check your connection.");
+      return;
+    }
+
+    if (error.response?.status === 429) {
+      toast.error("Too many requests. Please wait a moment.");
+      return;
+    }
+
+    if (error.response?.status >= 500) {
+      toast.error("Server error. Retrying...");
+      setRetryCount(prev => prev + 1);
+      return;
+    }
+
+    const errorMessage = error.response?.data?.message || `Failed to ${operation}. Please try again.`;
+    toast.error(errorMessage);
+    setConnectionError(errorMessage);
+  }, []);
+
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      setConnectionError('');
+      toast.success("Connection restored");
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      setConnectionError("Connection lost. Your progress is saved locally.");
+      toast.error("You're offline. Your progress is being saved locally.");
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    setIsOnline(navigator.onLine);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
+        setIsInitializing(true);
+        setConnectionError('');
         setIsLoading(true);
 
-        // Fetch quiz data
-        const response = await axios.get(`/api/quiz/${shareCode}`);
+        // Fetch quiz data with timeout
+        const response = await axios.get(`/api/quiz/${shareCode}`, {
+          timeout: 15000,
+        });
         setQuiz(response.data.quiz);
         setQuestions(response.data.questions);
         setIsPublished(response.data.quiz.isPublished);
 
-        // Check if quiz is already attempted
-        const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
+        // Check if quiz is already attempted with timeout
+        const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`, {
+          timeout: 10000,
+        });
         if (attempted.data) {
           setHasAttempted(attempted.data);
         }
 
-        // Fetch and normalize sections
-        const res = await axios.get('/api/fetchSection');
+        // Fetch and normalize sections with timeout
+        const res = await axios.get('/api/fetchSection', {
+          timeout: 10000,
+        });
+        
         // Count questions for each section
         const questionCountMap: Record<string, number> = {};
         response.data.questions.forEach((q: Question) => {
@@ -107,9 +169,6 @@ export default function QuizPlayer() {
           };
         });
 
-        // Count questions in each section
-       
-
         // Filter out sections with 0 questions
         const filteredSections = normalizedSections.filter((s: any) => s.questionCount > 0);
 
@@ -122,26 +181,31 @@ export default function QuizPlayer() {
         const savedData = localStorage.getItem(`quiz_${shareCode}_data`);
         let savedTimers: Record<string, number> = {};
         if (savedData) {
-          const parsed = JSON.parse(savedData);
-          setAnswers(parsed.answers || {});
-          setSectionAnswers(parsed.sectionAnswers || {});
-          setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
-          savedTimers = parsed.sectionTimers || {};
+          try {
+            const parsed = JSON.parse(savedData);
+            setAnswers(parsed.answers || {});
+            setSectionAnswers(parsed.sectionAnswers || {});
+            setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
+            savedTimers = parsed.sectionTimers || {};
 
-          // Restore section states
-          if (parsed.sectionsState) {
-            filteredSections.forEach((section: any) => {
-              const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
-              if (savedSection) {
-                section.submitted = savedSection.submitted;
-                section.unlocked = savedSection.unlocked;
-              }
-            });
-          }
+            // Restore section states
+            if (parsed.sectionsState) {
+              filteredSections.forEach((section: any) => {
+                const savedSection = parsed.sectionsState.find((s: any) => s.name === section.name);
+                if (savedSection) {
+                  section.submitted = savedSection.submitted;
+                  section.unlocked = savedSection.unlocked;
+                }
+              });
+            }
 
-          const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
-          if (firstUnsubmitted) {
-            setCurrentSection(firstUnsubmitted.name);
+            const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
+            if (firstUnsubmitted) {
+              setCurrentSection(firstUnsubmitted.name);
+            }
+          } catch (parseError) {
+            console.error('Failed to parse saved data:', parseError);
+            toast.error('Failed to restore previous session data');
           }
         } else {
           setCurrentSection(filteredSections[0]?.name || '');
@@ -153,15 +217,67 @@ export default function QuizPlayer() {
         // Set final section state
         setSectionsData(normalizedSections);
         setSections(filteredSections);
+        
+        // Cache quiz data for offline access
+        localStorage.setItem(`quiz_${shareCode}_cache`, JSON.stringify({
+          quiz: response.data.quiz,
+          questions: response.data.questions,
+          sections: res.data.sections,
+          timestamp: Date.now()
+        }));
+        
+      } catch (err: any) {
+        handleApiError(err, 'load quiz data');
+        
+        // Try to load from cache as fallback
+        const cachedData = localStorage.getItem(`quiz_${shareCode}_cache`);
+        if (cachedData) {
+          try {
+            const parsed = JSON.parse(cachedData);
+            const isRecent = Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000; // 24 hours
+            if (isRecent && parsed.quiz && parsed.questions) {
+              setQuiz(parsed.quiz);
+              setQuestions(parsed.questions);
+              setIsPublished(parsed.quiz.isPublished);
+              toast.info('Loaded quiz from offline cache');
+              
+              // Set basic sections if available
+              if (parsed.sections) {
+                const normalizedSections = parsed.sections.map((s: any) => ({
+                  name: s.value,
+                  label: s.label,
+                  timeLimit: 60, // Default time
+                  questionCount: 1, // Default count
+                  submitted: false,
+                  unlocked: false,
+                }));
+                setSections(normalizedSections.filter((s: any) => s.questionCount > 0));
+              }
+              
+              setIsLoading(false);
+              setIsInitializing(false);
+              return;
+            }
+          } catch (parseError) {
+            console.error('Failed to parse cached data:', parseError);
+          }
+        }
+        
+        if (retryCount < 3) {
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+          }, 3000);
+        } else {
+          setError('Failed to load quiz. Please check your connection and try again.');
+        }
+      } finally {
         setIsLoading(false);
-      } catch (err) {
-        setError('Failed to load quiz. Please check the link and try again.');
-        setIsLoading(false);
+        setIsInitializing(false);
       }
     };
 
     fetchQuizData();
-  }, [shareCode]);
+  }, [shareCode, retryCount, handleApiError]);
 
   // Save answers and timers to localStorage
   useEffect(() => {
@@ -376,10 +492,20 @@ export default function QuizPlayer() {
         return;
       }
 
-      await axios.post(`/api/quiz/${shareCode}/answers`, {
+      // Save submission to localStorage first for offline recovery
+      const submissionData = {
         section: currentSection,
         answers: sectionAnswersObj,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(`quiz_${shareCode}_pending_submission`, JSON.stringify(submissionData));
+
+      await axios.post(`/api/quiz/${shareCode}/answers`, submissionData, {
+        timeout: 30000, // 30 second timeout
       });
+
+      // Clear pending submission after successful submit
+      localStorage.removeItem(`quiz_${shareCode}_pending_submission`);
 
       setSections((prev) =>
         prev.map((s) =>
@@ -403,17 +529,30 @@ export default function QuizPlayer() {
         const nextSection = sections[currentSectionIndex + 1].name;
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
+        toast.success(`Section "${currentSectionData?.label}" submitted successfully`);
       } else {
         await handleQuizSubmit();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting section:', err);
-      setError('Failed to save answers. Please try again.');
+      handleApiError(err, 'submit section');
+      
+      if (!navigator.onLine) {
+        toast.error('Submission saved offline. It will be sent when connection is restored.');
+        // Set up retry when online
+        const handleOnlineRetry = () => {
+          handleSectionSubmit();
+          window.removeEventListener('online', handleOnlineRetry);
+        };
+        window.addEventListener('online', handleOnlineRetry);
+      } else {
+        setError('Failed to save answers. Your progress is saved locally. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
       setShowSectionWarning(false);
-      setIsTimeUp(false); // Reset isTimeUp after submission
+      setIsTimeUp(false);
     }
   };
 
@@ -429,15 +568,41 @@ export default function QuizPlayer() {
 
       console.log('Total answers count:', totalAnswers);
 
-      await axios.post(`/api/quiz/${shareCode}/complete`, {
+      const submissionData = {
         answers: sectionAnswers,
+        timestamp: Date.now(),
+        totalAnswers
+      };
+
+      // Save final submission to localStorage
+      localStorage.setItem(`quiz_${shareCode}_final_submission`, JSON.stringify(submissionData));
+
+      await axios.post(`/api/quiz/${shareCode}/complete`, submissionData, {
+        timeout: 30000, // 30 second timeout
       });
 
+      // Clear all local storage after successful submission
       localStorage.removeItem(`quiz_${shareCode}_data`);
+      localStorage.removeItem(`quiz_${shareCode}_final_submission`);
+      localStorage.removeItem(`quiz_${shareCode}_cache`);
+      
+      toast.success('Quiz completed successfully!');
       setShowFeedbackModal(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting quiz:', err);
-      setError('Failed to submit quiz. Please try again.');
+      handleApiError(err, 'submit quiz');
+      
+      if (!navigator.onLine) {
+        toast.error('Final submission saved offline. It will be sent when connection is restored.');
+        // Set up retry when online
+        const handleOnlineRetry = () => {
+          handleQuizSubmit();
+          window.removeEventListener('online', handleOnlineRetry);
+        };
+        window.addEventListener('online', handleOnlineRetry);
+      } else {
+        setError('Failed to submit quiz. Your answers are saved locally. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
       setShowSubmitModal(false);
@@ -523,10 +688,35 @@ export default function QuizPlayer() {
   const hasQuestions = currentQuestions.length > 0;
   const isSectionSubmitted = currentSectionData?.submitted || false;
 
-  if (isLoading) {
+  if (isLoading || isInitializing) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <Loader2 className="animate-spin h-12 w-12 text-indigo-500" />
+        <div className="text-center max-w-md mx-4">
+          <Loader2 className="animate-spin h-12 w-12 mb-4 mx-auto text-indigo-500" />
+          <h3 className="text-lg font-semibold mb-2">
+            {retryCount > 0 ? `Retrying... (${retryCount}/3)` : 'Loading Quiz...'}
+          </h3>
+          <p className="text-gray-500 mb-4">
+            {connectionError || 'Please wait while we prepare your sectional quiz'}
+          </p>
+          {!isOnline && (
+            <div className="flex items-center justify-center mt-4 text-yellow-600">
+              <WifiOff className="h-5 w-5 mr-2" />
+              <span>You appear to be offline</span>
+            </div>
+          )}
+          {retryCount > 0 && (
+            <div className="mt-4">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-indigo-600 h-2 rounded-full transition-all duration-300" 
+                  style={{ width: `${(retryCount / 3) * 100}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">Retry attempt {retryCount} of 3</p>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -534,26 +724,35 @@ export default function QuizPlayer() {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <div className={`p-8 rounded-lg max-w-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-lg'}`}>
-          <h2 className="text-2xl font-bold mb-6">Quiz Already Attempted</h2>
-          <p className="text-sm mb-8 text-gray-500">
-            You have already completed this quiz. Explore other quizzes or mocks to continue your learning journey.
+          <div className="mb-6">
+            <AlertCircle className="h-16 w-16 mx-auto text-yellow-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-4">Quiz Already Attempted</h2>
+          <p className="text-gray-500 mb-6">
+            You have already completed this quiz. Each quiz can only be attempted once.
           </p>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             <button
               onClick={() => router.push('/dashboard')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-lg font-medium transition-colors ${
+                theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'
+              } text-white`}
             >
               Go to Dashboard
             </button>
             <button
               onClick={() => router.push('/programming-quizzes')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-lg font-medium transition-colors ${
+                theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'
+              } text-white`}
             >
               Explore Free Live Quizzes
             </button>
             <button
               onClick={() => router.push('/mocks')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-lg font-medium transition-colors ${
+                theme === 'dark' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'
+              } text-white`}
             >
               Explore Free Live Mocks
             </button>
@@ -597,15 +796,41 @@ export default function QuizPlayer() {
   if (error) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
-          <h2 className="text-lg font-bold mb-4">Error</h2>
-          <p className="mb-6">{error}</p>
-          <button
-            onClick={() => router.push('/')}
-            className={`px-4 py-2 rounded ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
-          >
-            Go Home
-          </button>
+        <div className={`p-8 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+          <div className="mb-6">
+            <AlertCircle className="h-16 w-16 mx-auto text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-4">Unable to Load Quiz</h2>
+          <p className="text-gray-500 mb-6">{error}</p>
+          {!isOnline && (
+            <div className="mb-6 p-3 bg-yellow-100 border border-yellow-300 text-yellow-800 rounded-lg">
+              <WifiOff className="h-5 w-5 inline mr-2" />
+              You're currently offline. Please check your connection.
+            </div>
+          )}
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                setError('');
+                setRetryCount(0);
+                setConnectionError('');
+                window.location.reload();
+              }}
+              className={`w-full px-6 py-3 rounded-lg font-medium transition-colors ${
+                theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'
+              } text-white`}
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className={`w-full px-6 py-3 rounded-lg font-medium transition-colors ${
+                theme === 'dark' ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'
+              } text-white`}
+            >
+              Go to Dashboard
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -682,37 +907,63 @@ export default function QuizPlayer() {
           </div>
            
           <div className="text-center">
-            {/* adding terms and i am ready for full screen check box */}
+            {/* Enhanced terms and fullscreen checkbox */}
             <div className="flex items-center justify-center mb-4">
               <input
-              type="checkbox"
-              id="terms"
-              className={`mr-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
-              checked={hideNavAndFooter}
-              onChange={(e) => {setHideNavAndFooter(e.target.checked)
-              setFullscreenPrompt(e.target.checked);
-              }}
+                type="checkbox"
+                id="terms"
+                className={`mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded ${
+                  theme === 'dark' ? 'bg-gray-700 border-gray-600' : 'bg-gray-200'
+                }`}
+                checked={hideNavAndFooter}
+                onChange={(e) => {
+                  setHideNavAndFooter(e.target.checked);
+                  setFullscreenPrompt(e.target.checked);
+                }}
+                aria-describedby="terms-description"
               />
               <label htmlFor="terms" className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-              I agree to the terms and conditions
+                I agree to the terms and conditions and understand this quiz requires fullscreen mode
               </label>
+            </div>
+            <div id="terms-description" className="text-xs text-gray-500 mb-6">
+              By checking this box, you consent to fullscreen mode and agree to follow quiz guidelines.
             </div>
 
             <button
-              onClick={()=>{startQuiz() 
-                requestFullscreen()
+              onClick={() => {
+                startQuiz();
+                requestFullscreen();
               }}
-              disabled={!hideNavAndFooter}
-              className={`px-8 py-3 rounded-lg font-medium text-base ${
-              theme === 'dark'
-                ? 'bg-green-700 hover:bg-green-600'
-                : 'bg-green-600 hover:bg-green-700'
-              } text-white shadow-md transition-all ${
-              !hideNavAndFooter ? 'opacity-50 cursor-not-allowed' : ''
+              disabled={!hideNavAndFooter || isInitializing}
+              className={`px-8 py-3 rounded-lg font-medium text-base flex items-center justify-center gap-2 transition-all ${
+                theme === 'dark'
+                  ? 'bg-green-700 hover:bg-green-600'
+                  : 'bg-green-600 hover:bg-green-700'
+              } text-white shadow-md ${
+                !hideNavAndFooter || isInitializing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
               }`}
+              aria-label="Start the sectional quiz in fullscreen mode"
             >
-              {hasAttemptedQuestions ? 'Continue Attempt' : 'Start Quiz Now'}
+              {isInitializing ? (
+                <>
+                  <Loader2 className="animate-spin h-5 w-5" />
+                  Initializing...
+                </>
+              ) : (
+                <>
+                  {hasAttemptedQuestions ? 'Continue Attempt' : 'Start Quiz Now'}
+                  {!isOnline && <WifiOff className="h-4 w-4 ml-2" />}
+                </>
+              )}
             </button>
+            
+            {!isOnline && (
+              <p className="text-sm text-yellow-600 mt-3">
+                <WifiOff className="h-4 w-4 inline mr-1" />
+                You're offline. Some features may be limited.
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -764,22 +1015,37 @@ export default function QuizPlayer() {
       <header
         className={`sticky top-0 z-10 mt-5 shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}
       >
+        {/* Network status indicator */}
+        {!isOnline && (
+          <div className="bg-yellow-100 border-b border-yellow-300 text-yellow-800 px-4 py-2 text-sm text-center">
+            <WifiOff className="h-4 w-4 inline mr-2" />
+            You're offline. Your progress is being saved locally.
+          </div>
+        )}
+        
         <div className="mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <h1 className="text-sm ml-2 font-bold truncate max-w-xs">{quiz?.title}</h1>
+            <h1 className="text-sm ml-2 font-bold truncate max-w-xs" title={quiz?.title}>
+              {quiz?.title}
+            </h1>
           </div>
 
           <div className="flex items-center gap-3">
             {currentSectionData?.timeLimit && !isSectionSubmitted && (
-              <QuestionTimer timeRemaining={sectionTimeRemaining} onTimeUp={handleSectionSubmit} />
+              <QuestionTimer 
+                timeRemaining={sectionTimeRemaining} 
+                onTimeUp={handleSectionSubmit}
+                aria-label={`Section timer: ${Math.floor(sectionTimeRemaining / 60)} minutes ${sectionTimeRemaining % 60} seconds remaining`}
+              />
             )}
 
             <button
               onClick={() => setShowCalculator(!showCalculator)}
-              className={`p-2 rounded-full ${
+              className={`p-2 rounded-full transition-colors ${
                 theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
               } ${showCalculator ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
-              title="Calculator"
+              title="Toggle Calculator"
+              aria-label="Toggle calculator"
             >
               <Calculator size={20} />
             </button>
@@ -792,11 +1058,24 @@ export default function QuizPlayer() {
                   document.exitFullscreen();
                 }
               }}
-              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-              title={isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'}
+              className={`p-2 rounded-full transition-colors ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              title={isFullScreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+              aria-label={isFullScreen ? 'Exit fullscreen mode' : 'Enter fullscreen mode'}
             >
               {isFullScreen ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
             </button>
+            
+            {/* Connection status indicator */}
+            <div className={`px-3 py-1 rounded-full flex items-center gap-1 text-xs ${
+              isOnline 
+                ? theme === 'dark' ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-800'
+                : theme === 'dark' ? 'bg-red-800 text-red-200' : 'bg-red-100 text-red-800'
+            }`}>
+              {isOnline ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+              <span className="hidden sm:inline">
+                {isOnline ? 'Online' : 'Offline'}
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -868,17 +1147,22 @@ export default function QuizPlayer() {
               </div>
 
               {/* Question Text */}
-              <div className="mb-8">
-                <ReactMarkdown>{currentQuestion.text}</ReactMarkdown>
+              <div className="mb-8" role="group" aria-labelledby="current-question-heading">
+                <h3 id="current-question-heading" className="sr-only">
+                  Question {currentQuestionIndex + 1} of {currentQuestions.length}
+                </h3>
+                <div className="prose max-w-none">
+                  <ReactMarkdown>{currentQuestion.text}</ReactMarkdown>
+                </div>
               </div>
 
               {/* Options */}
-              <div className="space-y-3 mb-8">
+              <fieldset className="space-y-3 mb-8">
+                <legend className="sr-only">Answer options for current question</legend>
                 {currentQuestion.options.map((option, index) => (
-                  <div
+                  <label
                     key={index}
-                    onClick={() => !isSectionSubmitted && !isTimeUp && handleAnswerSelect(currentQuestion._id, index)}
-                    className={`p-4 rounded-lg transition-all border option ${
+                    className={`p-4 rounded-lg transition-all border cursor-pointer flex items-center gap-3 ${
                       answers[currentQuestion._id] === index
                         ? theme === 'dark'
                           ? 'border-indigo-500 bg-indigo-900/30'
@@ -886,25 +1170,36 @@ export default function QuizPlayer() {
                         : theme === 'dark'
                           ? 'border-gray-700 hover:bg-gray-700'
                           : 'border-gray-200 hover:bg-gray-50'
-                    } ${isSectionSubmitted || isTimeUp ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
+                    } ${isSectionSubmitted || isTimeUp ? 'cursor-not-allowed opacity-80' : ''}`}
                   >
-                    <div className="flex items-center">
-                      <div
-                        className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
-                          answers[currentQuestion._id] === index
-                            ? 'border-indigo-500 bg-indigo-500 text-white'
-                            : theme === 'dark'
-                              ? 'border-gray-500'
-                              : 'border-gray-300'
-                        }`}
-                      >
-                        {String.fromCharCode(65 + index)}
-                      </div>
-                      <span className="break-words">{option}</span>
+                    <input
+                      type="radio"
+                      name={`question-${currentQuestion._id}`}
+                      value={index}
+                      checked={answers[currentQuestion._id] === index}
+                      onChange={() => !isSectionSubmitted && !isTimeUp && handleAnswerSelect(currentQuestion._id, index)}
+                      disabled={isSectionSubmitted || isTimeUp}
+                      className="sr-only"
+                      aria-describedby={`option-${index}-text`}
+                    />
+                    <div
+                      className={`w-6 h-6 rounded-full border flex items-center justify-center flex-shrink-0 ${
+                        answers[currentQuestion._id] === index
+                          ? 'border-indigo-500 bg-indigo-500 text-white'
+                          : theme === 'dark'
+                            ? 'border-gray-500'
+                            : 'border-gray-300'
+                      }`}
+                      aria-hidden="true"
+                    >
+                      {String.fromCharCode(65 + index)}
                     </div>
-                  </div>
+                    <span id={`option-${index}-text`} className="break-words flex-1">
+                      {option}
+                    </span>
+                  </label>
                 ))}
-              </div>
+              </fieldset>
 
               {/* Navigation Buttons */}
               <div className="flex justify-between gap-4">
