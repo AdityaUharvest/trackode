@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from 'react-hot-toast';;
 import { useSession } from "next-auth/react";
 import { useTheme } from "@/components/ThemeContext";
 import Link from "next/link";
-import { Loader2 } from "lucide-react";
+import { Loader2, Wifi, WifiOff, AlertCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 const requestFullscreen = (elem: any) => {
@@ -44,11 +44,59 @@ export default function QuizPage({ params }: any) {
   const [isMobile, setIsMobile] = useState(false);
   const [visibilityChanged, setVisibilityChanged] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  const [retryCount, setRetryCount] = useState(0);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const id = params.id;
 
   const fullscreenContentRef = useRef<HTMLDivElement>(null);
 
-  // Detect mobile device and set viewport meta
+  // Enhanced error handling with retry logic
+  const handleApiError = useCallback((error: any, operation: string) => {
+    console.error(`${operation} error:`, error);
+    
+    if (!navigator.onLine) {
+      setIsOnline(false);
+      toast.error("You're offline. Please check your connection.");
+      return;
+    }
+
+    if (error.response?.status === 429) {
+      toast.error("Too many requests. Please wait a moment.");
+      return;
+    }
+
+    if (error.response?.status >= 500) {
+      toast.error("Server error. Retrying...");
+      setRetryCount(prev => prev + 1);
+      return;
+    }
+
+    toast.error(error.response?.data?.message || `Failed to ${operation}. Please try again.`);
+  }, []);
+
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      toast.success("Connection restored");
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      toast.error("Connection lost. Your progress is saved locally.");
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Enhanced mobile detection and viewport management
   useEffect(() => {
     const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
@@ -59,29 +107,41 @@ export default function QuizPage({ params }: any) {
     if (isMobileDevice && viewportMeta) {
       viewportMeta.setAttribute(
         "content",
-        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
       );
+    }
+
+    // Prevent zoom on iOS
+    if (isMobileDevice) {
+      document.addEventListener('gesturestart', (e) => e.preventDefault());
+      document.addEventListener('gesturechange', (e) => e.preventDefault());
+      document.addEventListener('gestureend', (e) => e.preventDefault());
     }
 
     return () => {
       if (isMobileDevice && viewportMeta) {
         viewportMeta.setAttribute("content", "width=device-width, initial-scale=1.0");
       }
+      if (isMobileDevice) {
+        document.removeEventListener('gesturestart', (e) => e.preventDefault());
+        document.removeEventListener('gesturechange', (e) => e.preventDefault());
+        document.removeEventListener('gestureend', (e) => e.preventDefault());
+      }
     };
   }, []);
 
-  // Handle visibility changes (tab switching)
+  // Enhanced visibility change handling with better warnings
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "hidden" && hasStarted && !submitted) {
         setVisibilityChanged((prev) => {
           const newCount = prev + 1;
           if (newCount >= 3) {
-            handleSubmitQuiz(answers); // Pass current answers explicitly
-            toast.error("Quiz submitted due to leaving app 3 times");
+            handleSubmitQuiz(answers);
+            toast.error("Quiz submitted due to leaving the page 3 times");
             return 3;
           }
-          toast.dismiss(`Warning ${newCount}/3: Return to quiz immediately`);
+          toast.error(`Warning ${newCount}/3: Please return to the quiz immediately or it will be auto-submitted`);
           return newCount;
         });
       }
@@ -91,18 +151,26 @@ export default function QuizPage({ params }: any) {
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [hasStarted, submitted, answers]);
 
-  // Handle fullscreen changes and key restrictions
+  // Enhanced fullscreen handling with better error recovery
   useEffect(() => {
     const handleFullScreenChange = () => {
       if (!document.fullscreenElement && hasStarted && !submitted) {
         setFullScreenViolations((prev) => {
           const newCount = prev + 1;
           if (newCount >= 3) {
-            handleSubmitQuiz(answers); // Pass current answers explicitly
-            toast.error("Quiz submitted due to exiting fullscreen");
+            handleSubmitQuiz(answers);
+            toast.error("Quiz submitted due to exiting fullscreen mode");
             return 3;
           }
-          toast.error(`Please return to fullscreen (${newCount}/3 violations)`);
+          toast.error(`Fullscreen violation ${newCount}/3: Please return to fullscreen mode`);
+          // Auto-retry fullscreen after a short delay
+          setTimeout(() => {
+            if (fullscreenContentRef.current && !document.fullscreenElement) {
+              requestFullscreen(fullscreenContentRef.current).catch(() => {
+                toast.error("Please manually enable fullscreen mode");
+              });
+            }
+          }, 2000);
           return newCount;
         });
       }
@@ -123,12 +191,13 @@ export default function QuizPage({ params }: any) {
 
         if (
           blockedKeys.includes(e.key) ||
-          (e.ctrlKey && ["w", "q", "tab"].includes(e.key.toLowerCase())) ||
-          (e.altKey && e.key !== "Alt")
+          (e.ctrlKey && ["w", "q", "tab", "r", "f5"].includes(e.key.toLowerCase())) ||
+          (e.altKey && e.key !== "Alt") ||
+          e.key === "F5"
         ) {
           e.preventDefault();
           e.stopPropagation();
-          toast.error("Function disabled during quiz");
+          toast.error("This function is disabled during the quiz");
         }
       }
     };
@@ -165,53 +234,89 @@ export default function QuizPage({ params }: any) {
     console.error = () => {};
   }, []);
 
-  // Start quiz in fullscreen
+  // Enhanced start quiz with better error handling
   const handleStartQuiz = async () => {
     try {
+      setIsLoading(true);
       if (fullscreenContentRef.current) {
         await requestFullscreen(fullscreenContentRef.current);
         setHasStarted(true);
+        toast.success("Quiz started successfully");
       }
     } catch (error) {
+      console.error("Fullscreen error:", error);
       toast.error("Failed to enter fullscreen mode. Please allow fullscreen and try again.");
+      // Allow fallback start without fullscreen for mobile devices
+      if (isMobile) {
+        setTimeout(() => {
+          const confirm = window.confirm("Fullscreen is recommended for the best experience. Continue anyway?");
+          if (confirm) {
+            setHasStarted(true);
+            toast.info("Quiz started without fullscreen mode");
+          }
+        }, 1000);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Check if quiz has been attempted
+  // Enhanced quiz attempt checking with retry logic
   useEffect(() => {
     if (!id || !session?.user?.id) return;
 
     const checkAttempt = async () => {
       try {
+        setIsLoading(true);
+        setError("");
         const response = await axios.get("/api/attempted-quiz", {
           params: { id, userId: session?.user?.id },
+          timeout: 10000, // 10 second timeout
         });
 
         if (response.data.success) {
           setHasAttempted(true);
           toast.error("You have already attempted this quiz.");
         }
-      } catch (error) {
-        toast.error("Failed to check quiz attempt.");
+      } catch (error: any) {
+        handleApiError(error, "check quiz attempt");
+        if (retryCount < 3) {
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+          }, 2000);
+        } else {
+          setError("Failed to verify quiz attempt status. Please refresh the page.");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAttempt();
-  }, [id, session?.user?.id]);
+  }, [id, session?.user?.id, retryCount, handleApiError]);
 
-  // Fetch quiz data
+  // Enhanced quiz data fetching with better error handling
   useEffect(() => {
     if (!id || hasAttempted) return;
 
     const fetchQuiz = async () => {
       try {
-        const response = await axios.get(`/api/quiz-get/${id}`);
+        setIsLoading(true);
+        setError("");
+        const response = await axios.get(`/api/quiz-get/${id}`, {
+          timeout: 15000, // 15 second timeout
+        });
 
         if (response.data.active === false) {
-          toast.error("Quiz is not active");
-          router.push("/dashboard");
+          toast.error("This quiz is not currently active");
+          setTimeout(() => router.push("/dashboard"), 2000);
           return;
         }
+
+        if (!response.data.quiz || !response.data.quiz.questions) {
+          throw new Error("Invalid quiz data received");
+        }
+
         setQuizData(response.data.quiz);
         setQuestionStatus(
           Array(response.data.quiz.questions.length).fill({
@@ -220,13 +325,53 @@ export default function QuizPage({ params }: any) {
           })
         );
         setTimeLeft(response.data.quiz.duration * 60 * 60); // Convert hours to seconds
-      } catch (error) {
-        toast.error("Failed to load quiz.");
+        
+        // Save quiz data to localStorage for offline access
+        localStorage.setItem(`quiz_${id}_data`, JSON.stringify({
+          quiz: response.data.quiz,
+          timestamp: Date.now()
+        }));
+        
+      } catch (error: any) {
+        handleApiError(error, "load quiz");
+        
+        // Try to load from localStorage as fallback
+        const savedData = localStorage.getItem(`quiz_${id}_data`);
+        if (savedData) {
+          try {
+            const parsed = JSON.parse(savedData);
+            const isRecent = Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000; // 24 hours
+            if (isRecent && parsed.quiz) {
+              setQuizData(parsed.quiz);
+              setQuestionStatus(
+                Array(parsed.quiz.questions.length).fill({
+                  answered: false,
+                  marked: false,
+                })
+              );
+              setTimeLeft(parsed.quiz.duration * 60 * 60);
+              toast.info("Loaded quiz from offline storage");
+              return;
+            }
+          } catch (parseError) {
+            console.error("Failed to parse cached quiz data:", parseError);
+          }
+        }
+        
+        if (retryCount < 3) {
+          setTimeout(() => {
+            setRetryCount(prev => prev + 1);
+          }, 3000);
+        } else {
+          setError("Failed to load quiz. Please check your connection and try again.");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchQuiz();
-  }, [id, hasAttempted, router]);
+  }, [id, hasAttempted, router, retryCount, handleApiError]);
 
   // Timer logic
   useEffect(() => {
@@ -272,36 +417,56 @@ export default function QuizPage({ params }: any) {
     setCurrentQuestion(index);
   };
 
-  // Submit quiz
+  // Enhanced submit quiz with better error handling and retry logic
   const handleSubmitQuiz = async (currentAnswers: Record<string, string> = answers) => {
     if (submitted || isSubmitting) return;
     setIsSubmitting(true);
 
-    try {
-      const response = await axios.post(`/api/quiz-submit/${id}`, {
-        answers: currentAnswers,
-        session,
-        userId: session?.user?.id,
-        fullScreenViolations,
-        visibilityChanged,
-        submittedAutomatically:timeLeft <= 0? true : false,
-        timeLeft,
+    const submitData = {
+      answers: currentAnswers,
+      session,
+      userId: session?.user?.id,
+      fullScreenViolations,
+      visibilityChanged,
+      submittedAutomatically: timeLeft <= 0,
+      timeLeft,
+      timestamp: Date.now()
+    };
 
+    // Save to localStorage first
+    localStorage.setItem(`quiz_${id}_submission`, JSON.stringify(submitData));
+
+    try {
+      const response = await axios.post(`/api/quiz-submit/${id}`, submitData, {
+        timeout: 30000, // 30 second timeout for submission
       });
 
       if (response.data.success) {
         setSubmitted(true);
         toast.success(response.data.message || "Quiz submitted successfully");
+        localStorage.removeItem(`quiz_${id}_submission`); // Clear after successful submission
         setTimeout(() => {
-          document.exitFullscreen().catch(() => {});
-          router.push(`/programming-quizzes`);
-        }, 1500);
+          document.exitFullscreen?.().catch(() => {});
+          router.push("/programming-quizzes");
+        }, 2000);
       } else {
         throw new Error(response.data.message || "Submission failed");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Submission error:", error);
-      toast.error("Failed to submit quiz. Please try again.");
+      handleApiError(error, "submit quiz");
+      
+      if (!navigator.onLine) {
+        toast.error("Submission saved offline. It will be sent when connection is restored.");
+        // Set up retry when online
+        const handleOnlineRetry = () => {
+          handleSubmitQuiz(currentAnswers);
+          window.removeEventListener('online', handleOnlineRetry);
+        };
+        window.addEventListener('online', handleOnlineRetry);
+      } else {
+        toast.error("Failed to submit quiz. Your answers are saved locally. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -324,29 +489,93 @@ export default function QuizPage({ params }: any) {
   if (hasAttempted) {
     return (
       <div
-        className={`flex flex-col justify-center items-center gap-2 h-screen ${
+        className={`flex flex-col justify-center items-center gap-4 h-screen p-4 ${
           theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
         }`}
       >
-        <p className="text-xl">You have already attempted this quiz.</p>
-        <Link
-          href="/dashboard"
-          className="bg-indigo-500 hover:bg-indigo-600 text-white p-2 rounded-lg"
-        >
-          Dashboard
-        </Link>
+        <div className="text-center max-w-md">
+          <div className="mb-4">
+            <AlertCircle className="h-16 w-16 mx-auto text-yellow-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-4">Quiz Already Attempted</h2>
+          <p className="text-lg mb-6">You have already completed this quiz. You can only attempt each quiz once.</p>
+          <div className="space-y-3">
+            <Link
+              href="/dashboard"
+              className="block w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+            >
+              Go to Dashboard
+            </Link>
+            <Link
+              href="/programming-quizzes"
+              className="block w-full bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+            >
+              Browse Other Quizzes
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
 
-  if (!quizData) {
+  if (isLoading || !quizData) {
     return (
       <div
-        className={`flex justify-center items-center h-screen ${
+        className={`flex flex-col justify-center items-center h-screen ${
           theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
         }`}
       >
-        <Loader2 className="animate-spin" />
+        <div className="text-center">
+          <Loader2 className="animate-spin h-12 w-12 mb-4 mx-auto text-indigo-500" />
+          <h3 className="text-lg font-semibold mb-2">
+            {retryCount > 0 ? `Retrying... (${retryCount}/3)` : "Loading Quiz..."}
+          </h3>
+          <p className="text-gray-500">
+            {!isOnline ? "Checking for offline data..." : "Please wait while we prepare your quiz"}
+          </p>
+          {!isOnline && (
+            <div className="flex items-center justify-center mt-4 text-yellow-600">
+              <WifiOff className="h-5 w-5 mr-2" />
+              <span>You appear to be offline</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className={`flex flex-col justify-center items-center gap-4 h-screen p-4 ${
+          theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"
+        }`}
+      >
+        <div className="text-center max-w-md">
+          <div className="mb-4">
+            <AlertCircle className="h-16 w-16 mx-auto text-red-500" />
+          </div>
+          <h2 className="text-2xl font-bold mb-4">Unable to Load Quiz</h2>
+          <p className="text-lg mb-6">{error}</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => {
+                setError("");
+                setRetryCount(0);
+                window.location.reload();
+              }}
+              className="block w-full bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+            >
+              Try Again
+            </button>
+            <Link
+              href="/dashboard"
+              className="block w-full bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg font-medium transition-colors"
+            >
+              Go to Dashboard
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -376,44 +605,89 @@ export default function QuizPage({ params }: any) {
         onPaste={(e) => e.preventDefault()}
       >
         {hasStarted && (
-          <div className={`lg:p-6 p-2 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
-            <div className="flex justify-between items-center mb-8">
+          <div className={`lg:p-6 p-3 ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}>
+            {/* Network status indicator */}
+            {!isOnline && (
+              <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded-lg flex items-center">
+                <WifiOff className="h-5 w-5 mr-2" />
+                <span>You're offline. Your progress is being saved locally.</span>
+              </div>
+            )}
+            
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               {/* Enhanced Timer Display */}
               <div className="flex items-center gap-4">
-                
                 <div>
-                  <div className="text-sm opacity-70">⏰Time Remaining</div>
-                  <div className={`text-xl font-semibold ${parseInt(formatTime(timeLeft))<=60?'animate-pulse text-red-700':''}`}>{formatTime(timeLeft)}</div>
+                  <div className="text-sm opacity-70" role="timer" aria-live="polite">
+                    ⏰ Time Remaining
+                  </div>
+                  <div 
+                    className={`text-xl font-semibold ${
+                      timeLeft <= 600 ? 'animate-pulse text-red-700' : ''
+                    }`}
+                    aria-label={`Time remaining: ${formatTime(timeLeft)}`}
+                  >
+                    {formatTime(timeLeft)}
+                  </div>
+                  {timeLeft <= 600 && (
+                    <div className="text-sm text-red-600 font-medium">
+                      Less than 10 minutes left!
+                    </div>
+                  )}
                 </div>
               </div>
-              <button
-                onClick={() => setShowCalculator(!showCalculator)}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  theme === "dark"
-                    ? "bg-gray-700 hover:bg-gray-800"
-                    : "bg-gray-700 hover:bg-gray-800"
-                } text-white`}
-              >
-                {showCalculator ? "Close" : "Calculator"}
-              </button>
+              
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowCalculator(!showCalculator)}
+                  className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+                    theme === "dark"
+                      ? "bg-gray-700 hover:bg-gray-600"
+                      : "bg-gray-200 hover:bg-gray-300"
+                  }`}
+                  aria-label={showCalculator ? "Close calculator" : "Open calculator"}
+                >
+                  {showCalculator ? "Close" : "Calculator"}
+                </button>
+                
+                {/* Connection status indicator */}
+                <div className={`px-3 py-2 rounded-lg flex items-center gap-2 ${
+                  isOnline 
+                    ? theme === "dark" ? "bg-green-800 text-green-200" : "bg-green-100 text-green-800"
+                    : theme === "dark" ? "bg-red-800 text-red-200" : "bg-red-100 text-red-800"
+                }`}>
+                  {isOnline ? <Wifi className="h-4 w-4" /> : <WifiOff className="h-4 w-4" />}
+                  <span className="text-sm hidden sm:inline">
+                    {isOnline ? "Online" : "Offline"}
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               <div
                 className={`lg:col-span-3 rounded-lg shadow-lg p-4 ${
                   theme === "dark" ? "bg-gray-800" : "bg-white"
                 }`}
+                role="main"
+                aria-label="Quiz questions"
               >
-                <h3 className="text-xl font-semibold mb-6">Question {currentQuestion + 1}</h3>
-                <p className="mb-8">
-                  <ReactMarkdown>{quizData.questions[currentQuestion].question}</ReactMarkdown>
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 className="text-xl font-semibold mb-6" id="question-heading">
+                  Question {currentQuestion + 1} of {quizData.questions.length}
+                </h3>
+                
+                <div className="mb-8" role="group" aria-labelledby="question-heading">
+                  <div className="prose max-w-none">
+                    <ReactMarkdown>{quizData.questions[currentQuestion].question}</ReactMarkdown>
+                  </div>
+                </div>
+                
+                <fieldset className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  <legend className="sr-only">Answer options</legend>
                   {quizData.questions[currentQuestion].options.map((option: string, index: number) => (
-                    <button
+                    <label
                       key={index}
-                      onClick={() => handleAnswer(quizData.questions[currentQuestion]._id, option)}
-                      className={`p-4 rounded-lg border-2 transition-all select-none ${
+                      className={`p-4 rounded-lg border-2 transition-all cursor-pointer select-none flex items-start gap-3 ${
                         answers[quizData.questions[currentQuestion]._id] === option
                           ? theme === "dark"
                             ? "border-indigo-600 bg-indigo-900"
@@ -423,51 +697,81 @@ export default function QuizPage({ params }: any) {
                           : "border-gray-200 hover:border-indigo-400"
                       }`}
                     >
-                      {option}
-                    </button>
+                      <input
+                        type="radio"
+                        name={`question-${quizData.questions[currentQuestion]._id}`}
+                        value={option}
+                        checked={answers[quizData.questions[currentQuestion]._id] === option}
+                        onChange={() => handleAnswer(quizData.questions[currentQuestion]._id, option)}
+                        className="sr-only"
+                        aria-describedby={`option-${index}-text`}
+                      />
+                      <div
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                          answers[quizData.questions[currentQuestion]._id] === option
+                            ? "border-indigo-600 bg-indigo-600"
+                            : theme === "dark"
+                            ? "border-gray-500"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {answers[quizData.questions[currentQuestion]._id] === option && (
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        )}
+                      </div>
+                      <span id={`option-${index}-text`} className="break-words">
+                        {option}
+                      </span>
+                    </label>
                   ))}
-                </div>
+                </fieldset>
 
-                <div className="flex justify-between gap-1  mt-8">
+                <nav className="flex flex-col sm:flex-row justify-between gap-2 mt-8" aria-label="Question navigation">
                   <button
                     onClick={() => handleQuestionChange(currentQuestion - 1)}
                     disabled={currentQuestion === 0}
-                    className={`p-2 mb-2 rounded-lg transition-colors ${
-                      theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
-                    } disabled:opacity-50`}
+                    className={`px-4 py-2 rounded-lg transition-colors flex-1 sm:flex-none ${
+                      theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    aria-label="Go to previous question"
                   >
                     Previous
                   </button>
+                  
                   <button
                     onClick={handleMarkReview}
-                    className={`p-2 mb-2 ml-1 rounded-lg transition-colors ${
+                    className={`px-4 py-2 rounded-lg transition-colors flex-1 sm:flex-none ${
                       theme === "dark" ? "bg-orange-600 hover:bg-orange-700" : "bg-orange-500 hover:bg-orange-600"
                     } text-white`}
+                    aria-label="Mark current question for review"
                   >
                     Mark for Review
                   </button>
+                  
                   {currentQuestion === quizData.questions.length - 1 ? (
                     <button
                       onClick={() => handleSubmitQuiz()}
                       disabled={submitted || isSubmitting}
-                      className={`p-3 mb-2 ml-2 rounded-lg transition-colors ${
+                      className={`px-4 py-3 rounded-lg transition-colors flex-1 sm:flex-none ${
                         theme === "dark" ? "bg-red-600 hover:bg-red-700" : "bg-red-500 hover:bg-red-600"
-                      } text-white disabled:opacity-50`}
+                      } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                      aria-label="Submit the entire quiz"
                     >
-                      {submitted ? "Quiz Submitted" : isSubmitting ? "Submitting..." : "Submit"}
+                      {submitted ? "Quiz Submitted" : isSubmitting ? "Submitting..." : "Submit Quiz"}
                     </button>
                   ) : (
                     <button
                       onClick={() => handleQuestionChange(currentQuestion + 1)}
                       disabled={currentQuestion === quizData.questions.length - 1}
-                      className={`p-3 mb-2 rounded-lg transition-colors ${
-                        theme === "dark" ? "bg-gray-700 hover:bg-gray-800" : "bg-gray-200 hover:bg-gray-300"
-                      } disabled:opacity-50`}
+                      className={`px-4 py-3 rounded-lg transition-colors flex-1 sm:flex-none ${
+                        theme === "dark" ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-200 hover:bg-gray-300"
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      aria-label="Go to next question"
                     >
                       Next
                     </button>
                   )}
-                </div>
+                </nav>
               </div>
 
               <div
@@ -538,14 +842,24 @@ export default function QuizPage({ params }: any) {
               </div>
               <button
                 onClick={handleStartQuiz}
-                disabled={!declarationsAgreed || !termsAgreed}
-                className={`p-3 rounded-lg font-medium transition-all ${
+                disabled={!declarationsAgreed || !termsAgreed || isLoading}
+                className={`p-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                   theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-700"
                 } text-white ${
-                  !declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+                  !declarationsAgreed || !termsAgreed || isLoading 
+                    ? "opacity-50 cursor-not-allowed" 
+                    : "hover:scale-105"
                 }`}
+                aria-label="Start the quiz in fullscreen mode"
               >
-                Start Quiz
+                {isLoading ? (
+                  <>
+                    <Loader2 className="animate-spin h-5 w-5" />
+                    Starting Quiz...
+                  </>
+                ) : (
+                  "Start Quiz"
+                )}
               </button>
             </div>
 {/* quiz instructions  */}
@@ -743,14 +1057,24 @@ export default function QuizPage({ params }: any) {
                 </div>
                 <button
                 onClick={handleStartQuiz}
-                disabled={!declarationsAgreed || !termsAgreed}
-                className={`px-6 py-3 rounded-lg font-medium transition-all ${
+                disabled={!declarationsAgreed || !termsAgreed || isLoading}
+                className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
                   theme === "dark" ? "bg-indigo-600 hover:bg-indigo-700" : "bg-indigo-600 hover:bg-indigo-700"
                 } text-white ${
-                  !declarationsAgreed || !termsAgreed ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+                  !declarationsAgreed || !termsAgreed || isLoading 
+                    ? "opacity-50 cursor-not-allowed" 
+                    : "hover:scale-105"
                 }`}
+                aria-label="Start the quiz in fullscreen mode"
               >
-                Start Quiz
+                {isLoading ? (
+                  <>
+                    <Loader2 className="animate-spin h-5 w-5" />
+                    Starting Quiz...
+                  </>
+                ) : (
+                  "Start Quiz"
+                )}
               </button>
 
                
