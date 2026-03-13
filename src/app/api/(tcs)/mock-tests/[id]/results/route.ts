@@ -4,7 +4,6 @@ import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import User from '@/app/model/User';
 import Question from '@/app/model/MockQuestions';
-import Section from '@/app/model/Section';
 import MockResult from '@/app/model/MockResult';
 
 // Define TypeScript interfaces
@@ -32,6 +31,7 @@ interface IQuizAttempt {
   answers: Record<string, Record<string, number>>;
   startedAt: Date;
   completedAt?: Date;
+  updatedAt?: Date;
 }
 
 interface IMockTest {
@@ -82,25 +82,82 @@ interface IMockResult {
   completedAt: Date;
 }
 
-interface IPopulatedUserId {
-  name: string;
-  email: string;
-  _id: Types.ObjectId;
+function normalizeSectionName(sectionName: string): string {
+  return (sectionName || '').trim().toLowerCase();
 }
 
-interface IPopulatedQuizId {
-  title: string;
-  _id: Types.ObjectId;
+function buildSectionNameMap(allQuestions: IQuestion[], attemptAnswers: Record<string, Record<string, number>> = {}) {
+  const canonicalByNormalized = new Map<string, string>();
+
+  allQuestions.forEach((question) => {
+    const normalized = normalizeSectionName(question.section);
+    if (normalized && !canonicalByNormalized.has(normalized)) {
+      canonicalByNormalized.set(normalized, question.section);
+    }
+  });
+
+  Object.keys(attemptAnswers).forEach((sectionName) => {
+    const normalized = normalizeSectionName(sectionName);
+    if (normalized && !canonicalByNormalized.has(normalized)) {
+      canonicalByNormalized.set(normalized, sectionName);
+    }
+  });
+
+  return canonicalByNormalized;
 }
 
-interface IPopulatedMockResult extends Omit<IMockResult, 'userId' | 'quizId'> {
-  userId: IPopulatedUserId;
-  quizId: IPopulatedQuizId;
+function computeSectionResults(
+  allQuestions: IQuestion[],
+  questionsMap: Map<string, IQuestion>,
+  attemptAnswers: Record<string, Record<string, number>> = {}
+): ISectionResult[] {
+  const canonicalByNormalized = buildSectionNameMap(allQuestions, attemptAnswers);
+
+  return Array.from(canonicalByNormalized.entries()).map(([normalizedSectionName, canonicalSectionName]) => {
+    const sectionAnswers = Object.entries(attemptAnswers).reduce<Record<string, number>>((acc, [rawSectionName, answersByQuestion]) => {
+      if (normalizeSectionName(rawSectionName) === normalizedSectionName) {
+        return { ...acc, ...(answersByQuestion || {}) };
+      }
+      return acc;
+    }, {});
+
+    const sectionQuestions = allQuestions.filter((q) => normalizeSectionName(q.section) === normalizedSectionName);
+    const questions = Object.entries(sectionAnswers)
+      .map(([questionId, userAnswerIndex]): IQuestionResult | null => {
+        const question = questionsMap.get(questionId);
+        if (!question) return null;
+
+        return {
+          _id: question._id.toString(),
+          text: question.text,
+          options: question.options,
+          userAnswer: userAnswerIndex,
+          correctAnswer: question.correctAnswer,
+          explanation: question.explanation || ''
+        };
+      })
+      .filter((q): q is IQuestionResult => q !== null);
+
+    const correct = questions.reduce((sum, q) => sum + (q.userAnswer === q.correctAnswer ? 1 : 0), 0);
+
+    return {
+      sectionName: canonicalSectionName,
+      correct,
+      total: sectionQuestions.length,
+      questions
+    };
+  }).sort((a, b) => a.sectionName.localeCompare(b.sectionName));
 }
 
-export async function GET(request: NextRequest, { params }: any) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> }
+) {
   try {
-    const { id } = params;
+    const { id } = await params;
+    if (!id || id === 'undefined' || id === 'null') {
+      return NextResponse.json({ error: 'Missing quiz ID' }, { status: 400 });
+    }
     const quizId = id;
 
     // Connect to MongoDB
@@ -118,10 +175,6 @@ export async function GET(request: NextRequest, { params }: any) {
     if (!quiz) {
       return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
     }
-
-    // Get all sections
-    const sections = await Section.find();
-    const sectionNames = sections.map(section => section.value);
 
     // Fetch all questions
     const allQuestions = await Question.find({ mockTestId: quizId }).lean<IQuestion[]>();
@@ -152,100 +205,47 @@ export async function GET(request: NextRequest, { params }: any) {
       userMap.set(user._id.toString(), { name: user.name, email: user.email });
     });
 
-    // Get existing MockResults
-    const existingResults = await MockResult.find(
-      {
-        quizId: new Types.ObjectId(quizId),
-
-        attemptId: { $in: attempts.map(attempt => new Types.ObjectId(attempt._id)) }
-      }
-    ).populate<{ userId: IPopulatedUserId; quizId: IPopulatedQuizId; }>('userId quizId')
-      .lean() as unknown as IPopulatedMockResult[];
-    
-    const existingResultsMap = new Map<string, IPopulatedMockResult>();
-    existingResults.forEach(result => {
-      existingResultsMap.set(result.attemptId.toString(), result);
-    });
-
     const results = await Promise.all(attempts.map(async (attempt) => {
-      const attemptId = attempt._id.toString();
-      const existingResult = existingResultsMap.get(attemptId);
-
-      if (existingResult) {
-        return {
-          _id: attempt._id.toString(),
-          userId: attempt.userId,
-          userName: existingResult.userId.name || 'Unknown',
-          email: existingResult.userId.email || '',
-          quizTitle: existingResult.quizTitle,
-          startedAt: attempt.startedAt,
-          completedAt: attempt.completedAt,
-          totalAnswered: existingResult.sections.reduce((sum, s) => sum + s.questions.length, 0),
-          totalCorrect: existingResult.totalScore,
-          totalQuestions: existingResult.totalQuestions,
-          accuracy: existingResult.percentage,
-          sectionStats: existingResult.sections.map(section => ({
-            sectionName: section.sectionName,
-            answered: section.questions.length,
-            correct: section.correct,
-            totalQuestions: section.total
-          }))
-        };
-      }
-
-      // Process new result
-      const sectionResults: ISectionResult[] = sectionNames.map(sectionName => {
-        const sectionAnswers = attempt.answers[sectionName] || {};
-        const sectionQuestions = allQuestions.filter(q => q.section === sectionName);
-        
-        const questions = Object.entries(sectionAnswers)
-          .map(([questionId, userAnswerIndex]): IQuestionResult | null => {
-            const question = questionsMap.get(questionId);
-            if (!question) return null;
-            return {
-              _id: question._id.toString(),
-              text: question.text,
-              options: question.options,
-              userAnswer: userAnswerIndex,
-              correctAnswer: question.correctAnswer,
-              explanation: question.explanation || ''
-            };
-          })
-          .filter((q): q is IQuestionResult => q !== null);
-
-        const correct = questions.reduce((sum, q) => sum + (q.userAnswer === q.correctAnswer ? 1 : 0), 0);
-        const total = sectionQuestions.length;
-
-        return { sectionName, correct, total, questions };
-      });
+      const objectIdTimestamp = new Types.ObjectId(attempt._id).getTimestamp();
+      const safeStartedAt = attempt.startedAt || objectIdTimestamp;
+      // For in-progress attempts, use last activity (updatedAt) or current time as end marker.
+      const safeCompletedAt = attempt.completedAt || attempt.updatedAt || new Date();
+      const sectionResults = computeSectionResults(allQuestions, questionsMap, attempt.answers || {});
 
       const totalScore = sectionResults.reduce((sum, section) => sum + section.correct, 0);
       const totalQuestions = allQuestions.length;
       const percentage = Math.round((totalScore / totalQuestions) * 100);
       const totalAnswered = sectionResults.reduce((sum, section) => sum + section.questions.length, 0);
 
-      // Store new result
-      await MockResult.create({
-        userId: new Types.ObjectId(attempt.userId),
-        quizId: new Types.ObjectId(quizId),
-        quizTitle: attempt.quizTitle,
-        attemptId: new Types.ObjectId(attempt._id),
-        totalScore,
-        totalQuestions,
-        percentage,
-        sections: sectionResults.map(section => ({
-          sectionName: section.sectionName,
-          correct: section.correct,
-          total: section.total,
-          questions: section.questions.map(q => ({
-            questionId: new Types.ObjectId(q._id),
-            userAnswer: q.userAnswer,
-            correctAnswer: q.correctAnswer,
-            isCorrect: q.userAnswer === q.correctAnswer
-          }))
-        })),
-        completedAt: attempt.completedAt || new Date()
-      } as IMockResult);
+      await MockResult.findOneAndUpdate(
+        { attemptId: new Types.ObjectId(attempt._id) },
+        {
+          $set: {
+            userId: new Types.ObjectId(attempt.userId),
+            quizId: new Types.ObjectId(quizId),
+            quizTitle: attempt.quizTitle,
+            totalScore,
+            totalQuestions,
+            percentage,
+            sections: sectionResults.map(section => ({
+              sectionName: section.sectionName,
+              correct: section.correct,
+              total: section.total,
+              questions: section.questions.map(q => ({
+                questionId: new Types.ObjectId(q._id),
+                userAnswer: q.userAnswer,
+                correctAnswer: q.correctAnswer,
+                isCorrect: q.userAnswer === q.correctAnswer
+              }))
+            })),
+            completedAt: safeCompletedAt
+          },
+          $setOnInsert: {
+            attemptId: new Types.ObjectId(attempt._id)
+          }
+        },
+        { upsert: true }
+      );
 
       const userDetails = userMap.get(attempt.userId) || { name: 'Unknown', email: '' };
 
@@ -255,8 +255,8 @@ export async function GET(request: NextRequest, { params }: any) {
         userName: userDetails.name,
         email: userDetails.email,
         quizTitle: attempt.quizTitle,
-        startedAt: attempt.startedAt,
-        completedAt: attempt.completedAt,
+        startedAt: safeStartedAt,
+        completedAt: safeCompletedAt,
         totalAnswered,
         totalCorrect: totalScore,
         totalQuestions,

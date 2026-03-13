@@ -32,6 +32,13 @@ export async function POST(
         $set: {
           answers,
           completedAt: new Date()
+        },
+        $setOnInsert: {
+          quizId: quiz._id,
+          userId: session?.user?.id,
+          quizTitle: quiz.title,
+          quizDescription: quiz.description,
+          startedAt: new Date()
         }
       },
       { new: true, upsert:true}

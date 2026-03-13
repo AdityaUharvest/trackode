@@ -361,6 +361,7 @@ export default function QuizPlayer() {
   };
 
   const handleSectionSubmit = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     try {
       const currentSectionIndex = sections.findIndex((s) => s.name === currentSection);
@@ -418,6 +419,7 @@ export default function QuizPlayer() {
   };
 
   const handleQuizSubmit = async () => {
+    if (isSubmitting) return;
     setIsSubmitting(true);
     try {
       console.log('Submitting all answers:', sectionAnswers);
