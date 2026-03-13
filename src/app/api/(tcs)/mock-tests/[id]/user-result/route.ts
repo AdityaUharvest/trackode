@@ -171,10 +171,15 @@ function computeSectionResults(
   }).sort((a, b) => a.sectionName.localeCompare(b.sectionName));
 }
 
-export async function GET(request: NextRequest, { params }: any) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> }
+) {
   try {
-    const { id } = await params;
-    const attemptId = id;
+    const { id: attemptId } = await params;
+    if (!attemptId || attemptId === 'undefined' || attemptId === 'null') {
+      return NextResponse.json({ error: 'Missing attempt ID' }, { status: 400 });
+    }
     
     // Get current session user
     const session = await auth();

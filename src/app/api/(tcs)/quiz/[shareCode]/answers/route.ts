@@ -10,12 +10,27 @@ function hasUnsafeMongoPathChars(value: string): boolean {
 
 export async function POST(
   request: NextRequest,
-  { params }: any
+  { params }: { params: Promise<{ shareCode?: string }> }
 ) {
   try {
     await connectDB();
-    const {shareCode} =await params;
+    const { shareCode } = await params;
+    if (!shareCode) {
+      return NextResponse.json(
+        { message: 'Missing share code' },
+        { status: 400 }
+      );
+    }
+
     const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const userId = session.user.id;
     const { section, answers } = await request.json();
     
     // In a real app, you'd want to authenticate the user
@@ -42,13 +57,13 @@ export async function POST(
 
     const filter = {
       quizId: quiz._id,
-      userId: session.user.id
+      userId
     };
     const update = {
       $set: setUpdates,
       $setOnInsert: {
         quizId: quiz._id,
-        userId: session.user.id,
+        userId,
         quizTitle: quiz.title,
         quizDescription: quiz.description,
         startedAt: new Date()

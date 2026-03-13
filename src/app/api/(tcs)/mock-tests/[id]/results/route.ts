@@ -149,10 +149,12 @@ function computeSectionResults(
   }).sort((a, b) => a.sectionName.localeCompare(b.sectionName));
 }
 
-export async function GET(request: NextRequest, context?: { params?: { id?: string } | Promise<{ id?: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id?: string }> }
+) {
   try {
-    const resolvedParams = context?.params ? await context.params : undefined;
-    const id = resolvedParams?.id;
+    const { id } = await params;
     if (!id || id === 'undefined' || id === 'null') {
       return NextResponse.json({ error: 'Missing quiz ID' }, { status: 400 });
     }
