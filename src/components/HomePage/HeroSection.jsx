@@ -144,6 +144,7 @@ const HeroSection = () => {
         </Link>
         <Link
           href="/dashboard"
+          prefetch={false}
           className={`px-6 py-3 md:hidden sm:py-4 text-base font-semibold rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl ${
             theme === "dark" 
               ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-600" 
@@ -154,6 +155,7 @@ const HeroSection = () => {
         </Link>
         <Link
           href="/dashboard"
+          prefetch={false}
           className={`px-10 py-3 hidden sm:block sm:py-4 text-base font-semibold rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 shadow-lg hover:shadow-xl ${
             theme === "dark" 
               ? "text-white bg-gray-800 hover:bg-gray-700 border border-gray-600" 

@@ -19,12 +19,13 @@ export default function Signin() {
   const { status } = useSession();
 
   useEffect(() => {
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
     if (status === "authenticated") {
-      router.push("/");
+      router.replace(callbackUrl);
     } else if (status === "loading") {
       console.log("Session status is loading...");
     }
-  }, [status, router]);
+  }, [status, router, searchParams]);
 
   const submitHandler = async (e: any) => {
     e.preventDefault();
@@ -53,11 +54,10 @@ export default function Signin() {
       }
 
       if (response?.ok) {
-       
         toast.dismiss(loadingToast);
-        setTimeout(() => {
-          router.push(response.url || callbackUrl);
-        }, 1500);
+        router.replace(response.url || callbackUrl);
+        router.refresh();
+        return;
       }
     } catch (error) {
       toast.error("Sign in failed. Please try again.");
