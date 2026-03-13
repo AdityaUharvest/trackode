@@ -418,12 +418,14 @@ const NavItem: React.FC<{
   isAuthenticated?: boolean;
 }> = ({ href, icon, theme, children, requiresAuth = false, isAuthenticated = false }) => {
   const shouldShow = !requiresAuth || isAuthenticated;
+  const disablePrefetch = href.startsWith('/dashboard') || href.startsWith('/admin-dashboard');
 
   if (!shouldShow) return null;
 
   return (
     <Link
       href={href}
+      prefetch={!disablePrefetch}
       className={`
         flex items-center px-3 py-2 rounded-xl text-sm font-medium
         transition-all duration-200 hover:scale-105 group
@@ -450,12 +452,14 @@ const MobileNavItem: React.FC<{
   isAuthenticated?: boolean;
 }> = ({ href, icon, theme, children, onClick, requiresAuth = false, isAuthenticated = false }) => {
   const shouldShow = !requiresAuth || isAuthenticated;
+  const disablePrefetch = href.startsWith('/dashboard') || href.startsWith('/admin-dashboard');
 
   if (!shouldShow) return null;
 
   return (
     <Link
       href={href}
+      prefetch={!disablePrefetch}
       onClick={onClick}
       className={`
         flex items-center px-4 py-3 rounded-xl text-base font-medium
