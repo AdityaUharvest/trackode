@@ -176,6 +176,7 @@ export async function GET(
   { params }: { params: Promise<{ id?: string }> }
 ) {
   try {
+    
     const { id: attemptId } = await params;
     if (!attemptId || attemptId === 'undefined' || attemptId === 'null') {
       return NextResponse.json({ error: 'Missing attempt ID' }, { status: 400 });
