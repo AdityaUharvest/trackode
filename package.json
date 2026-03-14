@@ -14,8 +14,6 @@
     "test:mock:scenarios": "node scripts/test-scenarios.mjs"
   },
   "dependencies": {
-    "@vercel/analytics": "^1.5.0",
-    "@vercel/speed-insights": "^1.2.0",
     "@auth/mongodb-adapter": "^3.7.4",
     "@google/generative-ai": "^0.21.0",
     "@heroicons/react": "^2.2.0",
@@ -34,6 +32,7 @@
     "@react-spring/web": "^9.7.5",
     "@react-three/drei": "^10.0.7",
     "@react-three/fiber": "^9.1.2",
+    "@vercel/analytics": "^2.0.1",
     "axios": "^1.7.9",
     "bcr": "^1.0.0",
     "bcrypt": "^5.1.1",
