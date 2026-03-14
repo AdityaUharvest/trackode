@@ -3,6 +3,7 @@ import connectDB from '@/lib/util';
 import MockQuestion from '@/app/model/MockQuestions';
 import MockTest from '@/app/model/MoockTest';
 import { getSuperAdminSession } from '@/lib/superAdmin';
+import { Types } from 'mongoose';
 
 export async function GET(_request: NextRequest, { params }: any) {
   try {
@@ -14,13 +15,19 @@ export async function GET(_request: NextRequest, { params }: any) {
     await connectDB();
     const { id } = await params;
 
+    if (!Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ success: false, message: 'Invalid mock id' }, { status: 400 });
+    }
+
+    const targetMockId = new Types.ObjectId(id);
+
     const targetMock = await MockTest.findById(id).select('_id title').lean();
     if (!targetMock) {
       return NextResponse.json({ success: false, message: 'Mock not found' }, { status: 404 });
     }
 
     const sections = await MockQuestion.aggregate([
-      { $match: { mockTestId: targetMock._id } },
+      { $match: { mockTestId: targetMockId } },
       { $group: { _id: '$section', count: { $sum: 1 } } },
       { $sort: { _id: 1 } },
     ]);
@@ -81,6 +88,13 @@ export async function POST(request: NextRequest, { params }: any) {
     const sourceSection = String(payload?.sourceSection || '').trim();
     const replaceExisting = Boolean(payload?.replaceExisting);
 
+    if (!Types.ObjectId.isValid(id) || !Types.ObjectId.isValid(sourceMockId)) {
+      return NextResponse.json({ success: false, message: 'Invalid mock id' }, { status: 400 });
+    }
+
+    const targetMockObjectId = new Types.ObjectId(id);
+    const sourceMockObjectId = new Types.ObjectId(sourceMockId);
+
     if (!sourceMockId || !sourceSection) {
       return NextResponse.json(
         { success: false, message: 'sourceMockId and sourceSection are required' },
@@ -101,7 +115,7 @@ export async function POST(request: NextRequest, { params }: any) {
     }
 
     const sourceQuestions = await MockQuestion.find({
-      mockTestId: sourceMock._id,
+      mockTestId: sourceMockObjectId,
       section: sourceSection,
     }).lean();
 
@@ -109,7 +123,7 @@ export async function POST(request: NextRequest, { params }: any) {
       return NextResponse.json({ success: false, message: 'No questions found in source section' }, { status: 404 });
     }
 
-    const existingCount = await MockQuestion.countDocuments({ mockTestId: targetMock._id, section: sourceSection });
+    const existingCount = await MockQuestion.countDocuments({ mockTestId: targetMockObjectId, section: sourceSection });
 
     if (existingCount > 0 && !replaceExisting) {
       return NextResponse.json(
@@ -123,11 +137,11 @@ export async function POST(request: NextRequest, { params }: any) {
     }
 
     if (replaceExisting) {
-      await MockQuestion.deleteMany({ mockTestId: targetMock._id, section: sourceSection });
+      await MockQuestion.deleteMany({ mockTestId: targetMockObjectId, section: sourceSection });
     }
 
     const clonedDocs = sourceQuestions.map((question: any) => ({
-      mockTestId: targetMock._id,
+      mockTestId: targetMockObjectId,
       section: sourceSection,
       text: question.text,
       options: Array.isArray(question.options) ? question.options : [],
