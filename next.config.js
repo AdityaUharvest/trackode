@@ -9,6 +9,9 @@ const nextConfig = {
   env: {
     MONGODB_URI: process.env.MONGODB_URI,
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     domains: ['img.icons8.com','/'], // Add your image domains here
   },

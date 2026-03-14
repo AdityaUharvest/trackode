@@ -8,6 +8,11 @@ import Attempted from '@/app/model/Attempted';
 import MockResult from '@/app/model/MockResult';
 import MockQuestion from '@/app/model/MockQuestions';
 
+type SectionSummary = {
+  name: string;
+  count: number;
+};
+
 export async function GET() {
   try {
     const { isAllowed } = await getSuperAdminSession();
@@ -60,7 +65,7 @@ export async function GET() {
 
     const mappedMocks = mocks.map((mock: any) => {
       const key = String(mock._id);
-      const sections = sectionMap[key] || [];
+      const sections: SectionSummary[] = sectionMap[key] || [];
       return {
         ...mock,
         attempts: attemptsByMockId[key] || 0,
