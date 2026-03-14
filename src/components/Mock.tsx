@@ -212,13 +212,21 @@ function OverviewTab({
   const statCardBg = theme === 'dark' ? 'bg-gray-700' : 'bg-indigo-50';
   const statTextColor = theme === 'dark' ? 'text-gray-100' : 'text-indigo-800';
 
+  const normalizedSectionPerformance = Array.isArray(stats?.sectionPerformance)
+    ? stats.sectionPerformance
+    : [];
+  const normalizedRecentActivity = Array.isArray(stats?.recentActivity)
+    ? stats.recentActivity
+    : [];
+
   // Fallback for stats
-  const safeStats = stats || {
+  const safeStats = {
     totalAttempts: 0,
     averageScore: 0,
     bestScore: 0,
-    sectionPerformance: [],
-    recentActivity: [],
+    sectionPerformance: normalizedSectionPerformance,
+    recentActivity: normalizedRecentActivity,
+    ...(stats || {}),
   };
 
   // Normalize recentActivity dates

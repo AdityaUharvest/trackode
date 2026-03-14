@@ -24,11 +24,18 @@ export async function GET(request: Request) {
     
     // Calculate stats
     const totalAttempts = attempts.length;
-    const averageScore = attempts.reduce((sum, attempt) => 
-      sum + (attempt.score / attempt.totalQuestions) * 100, 0) / totalAttempts;
-    const bestScore = Math.max(...attempts.map(attempt => 
-      (attempt.score / attempt.totalQuestions) * 100
-    ));
+    const normalizedPercentages = attempts
+      .map((attempt) => {
+        const totalQuestions = Number(attempt.totalQuestions) || 0;
+        const score = Number(attempt.score) || 0;
+        if (totalQuestions <= 0) return 0;
+        return (score / totalQuestions) * 100;
+      });
+
+    const averageScore =
+      normalizedPercentages.reduce((sum, pct) => sum + pct, 0) /
+      (normalizedPercentages.length || 1);
+    const bestScore = Math.max(...normalizedPercentages);
     
     // Calculate section performance
     const sectionPerformance = calculateSectionPerformance(attempts);
@@ -86,7 +93,13 @@ function calculateRecentActivity(attempts: any[]) {
   
   // Count attempts per day
   attempts.forEach(attempt => {
-    const dateStr = new Date(attempt.completedAt).toISOString().split('T')[0];
+    const rawDate = attempt.completedAt || attempt.updatedAt || attempt.startedAt;
+    if (!rawDate) return;
+
+    const parsedDate = new Date(rawDate);
+    if (Number.isNaN(parsedDate.getTime())) return;
+
+    const dateStr = parsedDate.toISOString().split('T')[0];
     if (activityMap.has(dateStr)) {
       activityMap.set(dateStr, activityMap.get(dateStr) + 1);
     }
