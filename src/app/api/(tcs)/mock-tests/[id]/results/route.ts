@@ -38,6 +38,7 @@ interface IMockTest {
   _id: Types.ObjectId;
   title: string;
   createdBy: string;
+  durationMinutes?: number;
 }
 
 interface IQuestionResult {
@@ -81,6 +82,8 @@ interface IMockResult {
   sections: IStoredSectionResult[];
   completedAt: Date;
 }
+
+type AttemptStatus = 'completed' | 'in-progress' | 'left';
 
 function normalizeSectionName(sectionName: string): string {
   return (sectionName || '').trim().toLowerCase();
@@ -183,13 +186,18 @@ export async function GET(
       questionsMap.set(question._id.toString(), question);
     });
 
-    // Get all attempts
+    // Include both completed and in-progress attempts in the list.
+    // Only completed attempts are persisted in MockResult as final results.
     const attempts = await QuizAttempt.find({ quizId }).lean<IQuizAttempt[]>();
     if (!attempts.length) {
       return NextResponse.json({
         quizId,
         quizTitle: quiz.title,
         totalParticipants: 0,
+        completedParticipants: 0,
+        leftParticipants: 0,
+        inProgressParticipants: 0,
+        leaderboardFinalized: true,
         attempts: [],
         createdBy: quiz.createdBy,
       });
@@ -208,8 +216,21 @@ export async function GET(
     const results = await Promise.all(attempts.map(async (attempt) => {
       const objectIdTimestamp = new Types.ObjectId(attempt._id).getTimestamp();
       const safeStartedAt = attempt.startedAt || objectIdTimestamp;
-      // For in-progress attempts, use last activity (updatedAt) or current time as end marker.
-      const safeCompletedAt = attempt.completedAt || attempt.updatedAt || new Date();
+      const safeCompletedAt = attempt.completedAt || null;
+      const lastActivityAt = attempt.updatedAt || safeStartedAt;
+      const quizDurationMinutes = Math.max(0, Number(quiz.durationMinutes || 0));
+      const expectedEndAt =
+        quizDurationMinutes > 0
+          ? new Date(lastActivityAt.getTime() + quizDurationMinutes * 60 * 1000)
+          : null;
+      const hasLikelyLeft =
+        !safeCompletedAt &&
+        Boolean(expectedEndAt && Date.now() > expectedEndAt.getTime());
+      const status: AttemptStatus = safeCompletedAt
+        ? 'completed'
+        : hasLikelyLeft
+        ? 'left'
+        : 'in-progress';
       const sectionResults = computeSectionResults(allQuestions, questionsMap, attempt.answers || {});
 
       const totalScore = sectionResults.reduce((sum, section) => sum + section.correct, 0);
@@ -217,35 +238,37 @@ export async function GET(
       const percentage = Math.round((totalScore / totalQuestions) * 100);
       const totalAnswered = sectionResults.reduce((sum, section) => sum + section.questions.length, 0);
 
-      await MockResult.findOneAndUpdate(
-        { attemptId: new Types.ObjectId(attempt._id) },
-        {
-          $set: {
-            userId: new Types.ObjectId(attempt.userId),
-            quizId: new Types.ObjectId(quizId),
-            quizTitle: attempt.quizTitle,
-            totalScore,
-            totalQuestions,
-            percentage,
-            sections: sectionResults.map(section => ({
-              sectionName: section.sectionName,
-              correct: section.correct,
-              total: section.total,
-              questions: section.questions.map(q => ({
-                questionId: new Types.ObjectId(q._id),
-                userAnswer: q.userAnswer,
-                correctAnswer: q.correctAnswer,
-                isCorrect: q.userAnswer === q.correctAnswer
-              }))
-            })),
-            completedAt: safeCompletedAt
+      if (safeCompletedAt) {
+        await MockResult.findOneAndUpdate(
+          { attemptId: new Types.ObjectId(attempt._id) },
+          {
+            $set: {
+              userId: new Types.ObjectId(attempt.userId),
+              quizId: new Types.ObjectId(quizId),
+              quizTitle: attempt.quizTitle,
+              totalScore,
+              totalQuestions,
+              percentage,
+              sections: sectionResults.map(section => ({
+                sectionName: section.sectionName,
+                correct: section.correct,
+                total: section.total,
+                questions: section.questions.map(q => ({
+                  questionId: new Types.ObjectId(q._id),
+                  userAnswer: q.userAnswer,
+                  correctAnswer: q.correctAnswer,
+                  isCorrect: q.userAnswer === q.correctAnswer
+                }))
+              })),
+              completedAt: safeCompletedAt
+            },
+            $setOnInsert: {
+              attemptId: new Types.ObjectId(attempt._id)
+            }
           },
-          $setOnInsert: {
-            attemptId: new Types.ObjectId(attempt._id)
-          }
-        },
-        { upsert: true }
-      );
+          { upsert: true }
+        );
+      }
 
       const userDetails = userMap.get(attempt.userId) || { name: 'Unknown', email: '' };
 
@@ -257,6 +280,9 @@ export async function GET(
         quizTitle: attempt.quizTitle,
         startedAt: safeStartedAt,
         completedAt: safeCompletedAt,
+        lastActivityAt,
+        expectedEndAt,
+        status,
         totalAnswered,
         totalCorrect: totalScore,
         totalQuestions,
@@ -270,15 +296,39 @@ export async function GET(
       };
     }));
 
-    // Sort by most recently completed first
-    results.sort((a, b) => 
-      (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0)
-    );
+    const completedParticipants = results.filter((attempt) => attempt.status === 'completed').length;
+    const leftParticipants = results.filter((attempt) => attempt.status === 'left').length;
+    const inProgressParticipants = results.filter((attempt) => attempt.status === 'in-progress').length;
+    const allAttemptsClosed = inProgressParticipants === 0;
+
+    if (allAttemptsClosed) {
+      // Final leaderboard mode: highest score first once no one is in progress.
+      results.sort((a, b) => {
+        if ((b.totalCorrect || 0) !== (a.totalCorrect || 0)) {
+          return (b.totalCorrect || 0) - (a.totalCorrect || 0);
+        }
+        if ((b.accuracy || 0) !== (a.accuracy || 0)) {
+          return (b.accuracy || 0) - (a.accuracy || 0);
+        }
+        return (b.completedAt?.getTime() || b.lastActivityAt?.getTime() || 0) -
+          (a.completedAt?.getTime() || a.lastActivityAt?.getTime() || 0);
+      });
+    } else {
+      // Live monitoring mode: latest activity first while attempts are still in progress.
+      results.sort((a, b) =>
+        (b.completedAt?.getTime() || b.lastActivityAt?.getTime() || 0) -
+          (a.completedAt?.getTime() || a.lastActivityAt?.getTime() || 0)
+      );
+    }
 
     return NextResponse.json({
       quizId,
       quizTitle: quiz.title,
       totalParticipants: results.length,
+      completedParticipants,
+      leftParticipants,
+      inProgressParticipants,
+      leaderboardFinalized: allAttemptsClosed,
       attempts: results,
       createdBy: quiz.createdBy,
     });

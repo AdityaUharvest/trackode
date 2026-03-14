@@ -10,7 +10,6 @@ type MockActionsMenuProps = {
   onEdit: () => void;
   onShare: () => void;
   onManageSections: () => void;
-  onViewResults: () => void;
   onTogglePublish: () => void;
   onDelete: () => void;
 };
@@ -22,7 +21,6 @@ export function MockActionsMenu({
   onEdit,
   onShare,
   onManageSections,
-  onViewResults,
   onTogglePublish,
   onDelete,
 }: MockActionsMenuProps) {
@@ -63,13 +61,6 @@ export function MockActionsMenu({
       >
         View questions
       </Link>
-      <button
-        onClick={onViewResults}
-        disabled={busy}
-        className="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Individual mock results
-      </button>
       <div className="my-1 border-t border-slate-200" />
       <button
         onClick={onDelete}

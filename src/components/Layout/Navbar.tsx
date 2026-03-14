@@ -327,7 +327,7 @@ const Navbar: React.FC = () => {
                           Super Admin
                         </DropdownItem>
                         <DropdownItem
-                          href={`/profile/${session.user?.email}`}
+                          href={`/profile/${session.user?.id || session.user?.email}`}
                           icon={<Settings size={16} />}
                           theme={theme}
                         >

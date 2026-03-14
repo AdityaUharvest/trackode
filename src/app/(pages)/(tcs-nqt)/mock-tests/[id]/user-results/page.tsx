@@ -64,6 +64,7 @@ interface UserAttempt {
   quizTitle: string;
   startedAt: string;
   completedAt: string;
+  status?: 'completed' | 'in-progress' | 'left';
   totalAnswered: number;
   totalCorrect: number;
   totalQuestions: number;
@@ -94,6 +95,7 @@ export default function UserQuizResult() {
   const [activeTab, setActiveTab] = useState('overview');
   const [attempts, setAttempts] = useState<UserAttempt[]>([]);
   const [topPerformers, setTopPerformers] = useState<UserAttempt[]>([]);
+  const [leaderboardFinalized, setLeaderboardFinalized] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
   // Theme-based styles
@@ -160,15 +162,20 @@ export default function UserQuizResult() {
         }
         const attemptsData = await attemptsResponse.json();
 
-        // Sort attempts by accuracy and add ranking
-        const sortedAttempts = [...attemptsData.attempts].sort((a, b) => b.accuracy - a.accuracy);
-        const rankedAttempts = sortedAttempts.map((attempt, index) => ({
+        // Keep API-provided order. API switches to score-desc once all attempts are closed.
+        const attemptList: UserAttempt[] = Array.isArray(attemptsData?.attempts)
+          ? (attemptsData.attempts as UserAttempt[])
+          : [];
+        const isFinalized = Boolean(attemptsData?.leaderboardFinalized);
+        setLeaderboardFinalized(isFinalized);
+
+        const rankedAttempts = attemptList.map((attempt, index) => ({
           ...attempt,
           rank: index + 1,
         }));
 
         setAttempts(rankedAttempts);
-        setTopPerformers(rankedAttempts.slice(0, 3));
+        setTopPerformers(isFinalized ? rankedAttempts : rankedAttempts.slice(0, 3));
         
         // Trigger confetti effect
         setShowConfetti(true);
@@ -626,7 +633,135 @@ console.log('Result:', result);
         </div>
       )}
 
-      <div className="mx-auto">
+      <div className="mx-auto space-y-6">
+        {topPerformers.length > 0 && (
+          <Card className="overflow-hidden border border-indigo-100 bg-white shadow-sm dark:border-indigo-900/40 dark:bg-gray-900">
+            <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-cyan-500 to-emerald-500" />
+            <CardHeader className="pb-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <CardTitle className="text-lg">Leaderboard Standings</CardTitle>
+                <span
+                  className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold ${
+                    leaderboardFinalized
+                      ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                      : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+                  }`}
+                >
+                  {leaderboardFinalized ? 'Final Ranking' : 'Live Ranking'}
+                </span>
+              </div>
+              <CardDescription>
+                {leaderboardFinalized
+                  ? 'All attempts are closed. Ranking is finalized by score.'
+                  : 'Leaderboard is live and may change until all attempts are closed.'}
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                {topPerformers[0] && (
+                  <div className="rounded-xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-100 p-4 shadow-sm">
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="text-sm font-semibold text-yellow-800">Rank #1</span>
+                      <Trophy className="h-5 w-5 text-yellow-700" />
+                    </div>
+                    <p className="line-clamp-1 text-base font-bold text-gray-900 dark:text-gray-900">{topPerformers[0].userName}</p>
+                    <p className="mt-1 text-sm font-medium text-yellow-900">{topPerformers[0].accuracy}% accuracy</p>
+                    <p className="mt-1 text-xs text-yellow-800/90">Score {topPerformers[0].totalCorrect}/{topPerformers[0].totalQuestions}</p>
+                  </div>
+                )}
+                {topPerformers[1] && (
+                  <div className="rounded-xl border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-4 shadow-sm">
+                    <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+                      <Medal className="h-4 w-4" /> Rank #2
+                    </div>
+                    <p className="line-clamp-1 text-base font-semibold text-gray-900">{topPerformers[1].userName}</p>
+                    <p className="mt-1 text-sm font-medium text-slate-700">{topPerformers[1].accuracy}% accuracy</p>
+                    <p className="mt-1 text-xs text-slate-600">Score {topPerformers[1].totalCorrect}/{topPerformers[1].totalQuestions}</p>
+                  </div>
+                )}
+                {topPerformers[2] && (
+                  <div className="rounded-xl border border-orange-200 bg-gradient-to-br from-orange-50 to-amber-50 p-4 shadow-sm">
+                    <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-orange-700">
+                      <Medal className="h-4 w-4" /> Rank #3
+                    </div>
+                    <p className="line-clamp-1 text-base font-semibold text-gray-900">{topPerformers[2].userName}</p>
+                    <p className="mt-1 text-sm font-medium text-orange-700">{topPerformers[2].accuracy}% accuracy</p>
+                    <p className="mt-1 text-xs text-orange-700/80">Score {topPerformers[2].totalCorrect}/{topPerformers[2].totalQuestions}</p>
+                  </div>
+                )}
+              </div>
+
+              {attempts.length > 0 && (
+                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
+                  <div className="max-h-[360px] overflow-auto">
+                    <table className="min-w-full text-sm">
+                      <thead className="sticky top-0 z-10 bg-indigo-100 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100">
+                        <tr>
+                          <th className="p-3 text-left font-semibold">Rank</th>
+                          <th className="p-3 text-left font-semibold">Player Name</th>
+                          <th className="p-3 text-left font-semibold">Score</th>
+                          <th className="p-3 text-left font-semibold">Answered</th>
+                          <th className="p-3 text-left font-semibold">Accuracy</th>
+                          <th className="p-3 text-left font-semibold">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                        {attempts.map((attempt: UserAttempt, index: number) => {
+                          const rank = attempt.rank || index + 1;
+                          const medalIcon = renderMedal(rank);
+
+                          return (
+                            <tr key={attempt._id} className="bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800">
+                              <td className="p-3 font-semibold text-gray-800 dark:text-gray-100">
+                                <div className="flex items-center gap-2">
+                                  {medalIcon ? medalIcon : <span className="text-xs font-bold text-gray-500">#{rank}</span>}
+                                  {!medalIcon && renderRankBadge(rank)}
+                                  {medalIcon && <span className="text-xs font-bold text-gray-600 dark:text-gray-300">#{rank}</span>}
+                                </div>
+                              </td>
+                              <td className="p-3 font-medium text-gray-800 dark:text-gray-100">{attempt.userName || 'Unknown'}</td>
+                              <td className="p-3 font-semibold text-gray-900 dark:text-gray-100">
+                                {attempt.totalCorrect ?? 0}/{attempt.totalQuestions ?? 0}
+                              </td>
+                              <td className="p-3 text-gray-700 dark:text-gray-200">
+                                {attempt.totalAnswered ?? 0}/{attempt.totalQuestions ?? 0}
+                              </td>
+                              <td className="p-3">
+                                <div className="w-24 rounded-full bg-gray-200 dark:bg-gray-700">
+                                  <div className="h-2 rounded-full bg-indigo-600" style={{ width: `${attempt.accuracy ?? 0}%` }} />
+                                </div>
+                                <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">{attempt.accuracy ?? 0}%</div>
+                              </td>
+                              <td className="p-3">
+                                <span
+                                  className={`inline-flex rounded-md px-2 py-1 text-xs font-medium ${
+                                    attempt.status === 'left'
+                                      ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+                                      : attempt.status === 'in-progress'
+                                      ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+                                      : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                                  }`}
+                                >
+                                  {attempt.status === 'left'
+                                    ? 'Left Quiz'
+                                    : attempt.status === 'in-progress'
+                                    ? 'In Progress'
+                                    : 'Completed'}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Top Summary Cardd */}
         <Card className={`mb-6 overflow-hidden border shadow-md ${bgColor}`}>
           <div className={`h-2 w-full ${performanceBadge.color}`}></div>
@@ -1212,109 +1347,6 @@ console.log('Result:', result);
                 })}
               </TabsContent>
             </Tabs>
-            <div className="mt-6">
-  {topPerformers.length > 0 && (
-    <div className="relative flex flex-col items-center">
-      <h3 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">Leaderboard</h3>
-      {/* Top 3 Podium */}
-      <div className="flex items-end justify-center w-full mb-10 space-x-3 md:space-x-6">
-        {/* 2nd Place */}
-        {topPerformers.length >= 2 && (
-          <div className="flex flex-col items-center transform transition-all duration-300 hover:scale-105">
-            <div className="bg-gradient-to-b from-gray-200 to-gray-300 rounded-t-xl w-28 md:w-32 p-5 flex flex-col items-center h-32 shadow-lg">
-              <div className="text-2xl font-extrabold text-gray-700">2</div>
-              <div className="text-sm md:text-base text-center font-semibold text-gray-700 line-clamp-2">
-                {topPerformers[1].userName}
-              </div>
-              <div className="text-sm md:text-base font-bold text-gray-700 mt-2">
-                {topPerformers[1].accuracy}%
-              </div>
-            </div>
-            <div className="bg-gradient-to-b from-gray-400 to-gray-500 h-20 w-28 md:w-32 flex items-center justify-center rounded-b-xl shadow-md">
-              <div className="text-3xl animate-pulse">🥈</div>
-            </div>
-          </div>
-        )}
-
-        {/* 1st Place */}
-        {topPerformers.length >= 1 && (
-          <div className="flex flex-col items-center transform transition-all duration-300 hover:scale-105 relative">
-            <div className="bg-gradient-to-b from-yellow-200 to-yellow-300 rounded-t-xl w-32 md:w-40 p-6 flex flex-col items-center h-40 shadow-xl border-2 border-yellow-400">
-              <div className="text-3xl font-extrabold text-yellow-800">1</div>
-              <div className="text-base md:text-lg text-center font-bold text-yellow-900 line-clamp-2">
-                {topPerformers[0].userName}
-              </div>
-              <div className="text-base md:text-lg font-bold text-yellow-800 mt-3">
-                {topPerformers[0].accuracy}%
-              </div>
-            </div>
-            <div className="bg-gradient-to-b from-yellow-400 to-yellow-600 h-24 w-32 md:w-40 flex items-center justify-center rounded-b-xl shadow-lg relative">
-              <div className="text-4xl animate-bounce">
-                <Trophy className="h-12 w-12 text-yellow-700 drop-shadow-md" />
-              </div>
-              <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-                <div className="sparkle animate-sparkle"></div>
-                <div className="sparkle animate-sparkle delay-200"></div>
-                <div className="sparkle animate-sparkle delay-400"></div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 3rd Place */}
-        {topPerformers.length >= 3 && (
-          <div className="flex flex-col items-center transform transition-all duration-300 hover:scale-105">
-            <div className="bg-gradient-to-b from-orange-200 to-orange-300 rounded-t-xl w-28 md:w-32 p-5 flex flex-col items-center h-32 shadow-lg">
-              <div className="text-2xl font-extrabold text-orange-700">3</div>
-              <div className="text-sm md:text-base text-center font-semibold text-orange-800 line-clamp-2">
-                {topPerformers[2].userName}
-              </div>
-              <div className="text-sm md:text-base font-bold text-orange-700 mt-2">
-                {topPerformers[2].accuracy}%
-              </div>
-            </div>
-            <div className="bg-gradient-to-b from-orange-400 to-orange-500 h-16 w-28 md:w-32 flex items-center justify-center rounded-b-xl shadow-md">
-              <div className="text-3xl animate-pulse">🥉</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Other rankings */}
-      {topPerformers.length > 3 && (
-        <div className="w-full max-w-2xl mt-6">
-          <h3 className="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-100">
-            Other Top Performers
-          </h3>
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
-            {topPerformers.slice(3).map((performer, index) => (
-              <div
-                key={index}
-                className="flex justify-between items-center p-4 border-b last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex items-center">
-                  <span className="text-gray-600 dark:text-gray-300 font-bold mr-4">
-                    {index + 4}
-                  </span>
-                  <span className="font-medium text-gray-800 dark:text-gray-100">
-                    {performer.userName}
-                  </span>
-                </div>
-                <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 py-1 px-3 rounded-full text-sm font-semibold">
-                  {performer.accuracy}%
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )}
-
-  {/* Add CSS for enhanced styling and animations */}
-  
-</div>
-            
           </CardContent>
         </Card>
 

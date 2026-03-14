@@ -59,7 +59,10 @@ export function MocksTab({
     _id: string;
     userName?: string;
     email?: string;
+    status?: 'completed' | 'in-progress' | 'left';
     completedAt?: string;
+    lastActivityAt?: string;
+    expectedEndAt?: string;
     totalAnswered?: number;
     totalCorrect?: number;
     totalQuestions?: number;
@@ -115,7 +118,7 @@ export function MocksTab({
     };
   }, [actionMockId]);
 
-  const filtered = search
+  const filtered = (search
     ? mocks.filter(
         (m) =>
           m.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -123,7 +126,14 @@ export function MocksTab({
             s.name.toLowerCase().includes(search.toLowerCase())
           )
       )
-    : mocks;
+    : mocks
+  ).slice().sort((a, b) => {
+    const attemptDiff = (b.attempts ?? 0) - (a.attempts ?? 0);
+    if (attemptDiff !== 0) {
+      return attemptDiff;
+    }
+    return (a.title || '').localeCompare(b.title || '');
+  });
 
   const handleShareMock = async (mock: MockItem) => {
     if (!mock.shareCode) {
@@ -373,11 +383,19 @@ export function MocksTab({
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
                       {[
                         { label: 'Score', value: `${selectedAttempt.totalCorrect ?? 0}/${selectedAttempt.totalQuestions ?? 0} (${pct}%)` },
+                        {
+                          label: 'Status',
+                          value:
+                            selectedAttempt.status === 'left'
+                              ? 'Left Quiz'
+                              : selectedAttempt.status === 'in-progress'
+                              ? 'In Progress'
+                              : 'Completed',
+                        },
                         { label: 'Level', value: perfLabel },
                         { label: 'Answered', value: String(selectedAttempt.totalAnswered ?? 0) },
                         { label: 'Unanswered', value: String(Math.max(0, (selectedAttempt.totalQuestions || 0) - (selectedAttempt.totalAnswered || 0))) },
                         { label: 'Incorrect', value: String(Math.max(0, (selectedAttempt.totalAnswered || 0) - (selectedAttempt.totalCorrect || 0))) },
-                        { label: 'Sections', value: String(sections.length) },
                       ].map(({ label, value }) => (
                         <div key={label} className="rounded-lg border border-slate-200 bg-white p-3">
                           <p className="text-xs uppercase tracking-[0.12em] text-slate-500">{label}</p>
@@ -472,6 +490,7 @@ export function MocksTab({
                         <th className="px-3 py-2">Answered</th>
                         <th className="px-3 py-2">Score</th>
                         <th className="px-3 py-2">Accuracy</th>
+                        <th className="px-3 py-2">Status</th>
                         <th className="px-3 py-2">Completed At</th>
                         <th className="px-3 py-2 text-right">Details</th>
                       </tr>
@@ -479,14 +498,17 @@ export function MocksTab({
                     <tbody className="divide-y divide-slate-200">
                       {resultsLoading && (
                         <tr>
-                          <td colSpan={7} className="px-3 py-6 text-center text-sm text-slate-500">
-                            Loading individual results...
+                          <td colSpan={8} className="px-3 py-8">
+                            <div className="flex flex-col items-center justify-center gap-2 text-slate-500">
+                              <span className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
+                              <span className="text-sm">Loading individual results...</span>
+                            </div>
                           </td>
                         </tr>
                       )}
                       {!resultsLoading && resultsData.length === 0 && (
                         <tr>
-                          <td colSpan={7} className="px-3 py-6 text-center text-sm text-slate-400">
+                          <td colSpan={8} className="px-3 py-6 text-center text-sm text-slate-400">
                             No attempts found for this mock.
                           </td>
                         </tr>
@@ -507,8 +529,31 @@ export function MocksTab({
                                 {attempt.accuracy ?? 0}%
                               </span>
                             </td>
+                            <td className="px-3 py-2">
+                              <span
+                                className={`inline-flex rounded-md px-2 py-1 text-xs font-medium ${
+                                  attempt.status === 'left'
+                                    ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+                                    : attempt.status === 'in-progress'
+                                    ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+                                    : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                                }`}
+                              >
+                                {attempt.status === 'left'
+                                  ? 'Left Quiz'
+                                  : attempt.status === 'in-progress'
+                                  ? 'In Progress'
+                                  : 'Completed'}
+                              </span>
+                            </td>
                             <td className="px-3 py-2 text-xs text-slate-500">
-                              {attempt.completedAt ? new Date(attempt.completedAt).toLocaleString() : '-'}
+                              {attempt.completedAt
+                                ? new Date(attempt.completedAt).toLocaleString()
+                                : attempt.status === 'left' && attempt.expectedEndAt
+                                ? `Left after ${new Date(attempt.expectedEndAt).toLocaleString()}`
+                                : attempt.lastActivityAt
+                                ? `Last active ${new Date(attempt.lastActivityAt).toLocaleString()}`
+                                : '-'}
                             </td>
                             <td className="px-3 py-2 text-right">
                               <button
@@ -629,50 +674,56 @@ export function MocksTab({
 
                   {/* Actions */}
                   <td className="px-4 py-3 align-top text-right">
-                    <div
-                      ref={actionMockId === mock._id ? actionMenuRef : null}
-                      className="relative inline-block text-left"
-                    >
+                    <div className="inline-flex items-center gap-2">
                       <button
-                        onClick={() => setActionMockId((current) => (current === mock._id ? '' : mock._id))}
+                        onClick={() => handleOpenMockResults(mock)}
                         disabled={busy}
-                        aria-label={`Open actions for ${mock.title}`}
-                        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-base font-semibold text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        ...
+                        Results
                       </button>
 
-                      {actionMockId === mock._id && (
-                        <MockActionsMenu
-                          mock={mock}
-                          busy={busy}
-                          onClose={() => setActionMockId('')}
-                          onEdit={() => {
-                            setActionMockId('');
-                            onBeginEdit(mock);
-                          }}
-                          onShare={() => {
-                            setActionMockId('');
-                            handleShareMock(mock);
-                          }}
-                          onManageSections={() => {
-                            setActionMockId('');
-                            onManageSections(mock);
-                          }}
-                          onViewResults={() => {
-                            setActionMockId('');
-                            handleOpenMockResults(mock);
-                          }}
-                          onTogglePublish={() => {
-                            setActionMockId('');
-                            onPublishToggle(mock._id, Boolean(mock.isPublished));
-                          }}
-                          onDelete={() => {
-                            setActionMockId('');
-                            onConfirmDelete(mock);
-                          }}
-                        />
-                      )}
+                      <div
+                        ref={actionMockId === mock._id ? actionMenuRef : null}
+                        className="relative inline-block text-left"
+                      >
+                        <button
+                          onClick={() => setActionMockId((current) => (current === mock._id ? '' : mock._id))}
+                          disabled={busy}
+                          aria-label={`Open actions for ${mock.title}`}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-base font-semibold text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          ...
+                        </button>
+
+                        {actionMockId === mock._id && (
+                          <MockActionsMenu
+                            mock={mock}
+                            busy={busy}
+                            onClose={() => setActionMockId('')}
+                            onEdit={() => {
+                              setActionMockId('');
+                              onBeginEdit(mock);
+                            }}
+                            onShare={() => {
+                              setActionMockId('');
+                              handleShareMock(mock);
+                            }}
+                            onManageSections={() => {
+                              setActionMockId('');
+                              onManageSections(mock);
+                            }}
+                            onTogglePublish={() => {
+                              setActionMockId('');
+                              onPublishToggle(mock._id, Boolean(mock.isPublished));
+                            }}
+                            onDelete={() => {
+                              setActionMockId('');
+                              onConfirmDelete(mock);
+                            }}
+                          />
+                        )}
+                      </div>
                     </div>
                   </td>
                 </tr>

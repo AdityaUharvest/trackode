@@ -9,20 +9,37 @@ export async function GET(req: NextRequest, { params }: any) {
     await connectDB();
     const session = await auth();
     const userId = session?.user?.id;
-    const quizId = await MockTest.findOne({ shareCode });
-    
-    const isAttempted = await QuizAttempt.findOne({ quizId: quizId, userId: userId });
-    
-    if (isAttempted) {
+    if (!userId) {
         return NextResponse.json({
-            isAttempted: true,
-            
-        }
-           
-        );
+            isAttempted: false,
+            hasInProgress: false,
+        });
     }
-    return NextResponse.json(
-        false
-        
-    );
+
+    const quiz = await MockTest.findOne({ shareCode });
+    if (!quiz) {
+        return NextResponse.json({
+            isAttempted: false,
+            hasInProgress: false,
+        });
+    }
+
+    const attempt = (await QuizAttempt.findOne({ quizId: quiz._id, userId })
+        .sort({ updatedAt: -1 })
+        .lean()) as { _id: unknown; completedAt?: Date | null } | null;
+    if (!attempt) {
+        return NextResponse.json({
+            isAttempted: false,
+            hasInProgress: false,
+        });
+    }
+
+    const isCompleted = Boolean(attempt.completedAt);
+
+    return NextResponse.json({
+        isAttempted: isCompleted,
+        hasInProgress: !isCompleted,
+        attemptId: String(attempt._id),
+        completedAt: attempt.completedAt || null,
+    });
 }
