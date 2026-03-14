@@ -31,6 +31,13 @@ type QuizDetail = QuizResultItem & {
   timeLeft?: number;
 };
 
+type MockDetailSection = {
+  sectionName: string;
+  correct: number;
+  total: number;
+  questions?: Array<{ isCorrect?: boolean }>;
+};
+
 type DeleteIntent = {
   kind: 'mock' | 'quiz';
   id: string;
@@ -52,6 +59,44 @@ function StatBlock({ label, value }: { label: string; value: string }) {
   );
 }
 
+function InsightCard({
+  title,
+  text,
+  tone = 'neutral',
+}: {
+  title: string;
+  text: string;
+  tone?: 'neutral' | 'good' | 'warn';
+}) {
+  const toneClass =
+    tone === 'good'
+      ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+      : tone === 'warn'
+      ? 'border-amber-200 bg-amber-50 text-amber-900'
+      : 'border-slate-200 bg-slate-50 text-slate-900';
+
+  return (
+    <div className={`rounded-lg border p-3 ${toneClass}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">{title}</p>
+      <p className="mt-1 text-sm leading-6">{text}</p>
+    </div>
+  );
+}
+
+function getPerformanceLabel(percentage: number) {
+  if (percentage >= 85) return 'Excellent';
+  if (percentage >= 70) return 'Strong';
+  if (percentage >= 50) return 'Average';
+  return 'Needs Improvement';
+}
+
+function getPerformanceSummary(percentage: number) {
+  if (percentage >= 85) return 'Very strong outcome with consistently high accuracy.';
+  if (percentage >= 70) return 'Good performance with a solid grasp of most areas.';
+  if (percentage >= 50) return 'Mixed performance. There are clear strengths, but also gaps to improve.';
+  return 'Low accuracy overall. Review weak sections and wrong answers first.';
+}
+
 function ModalShell({
   title,
   onClose,
@@ -63,7 +108,7 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-3xl rounded-xl border border-slate-200 bg-white shadow-xl">
+      <div className="w-full max-w-5xl rounded-xl border border-slate-200 bg-white shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
           <h3 className="text-base font-semibold text-slate-900">{title}</h3>
           <button
@@ -379,6 +424,81 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
     }
   };
 
+  const mockInsights = useMemo(() => {
+    if (!mockDetail) {
+      return null;
+    }
+
+    const detailSections = (mockDetail.sections || []) as MockDetailSection[];
+
+    const answeredQuestions = detailSections.reduce(
+      (sum, section) => sum + (section.questions?.length || 0),
+      0
+    );
+    const incorrectQuestions = Math.max(0, answeredQuestions - (mockDetail.totalScore || 0));
+    const unansweredQuestions = Math.max(0, (mockDetail.totalQuestions || 0) - answeredQuestions);
+    const sections = detailSections.map((section) => ({
+      ...section,
+      answered: section.questions?.length || 0,
+      unanswered: Math.max(0, section.total - (section.questions?.length || 0)),
+      accuracy: section.total > 0 ? Math.round((section.correct / section.total) * 100) : 0,
+    }));
+
+    const strongestSection = [...sections].sort((a, b) => b.accuracy - a.accuracy)[0] || null;
+    const weakestSection = [...sections].sort((a, b) => a.accuracy - b.accuracy)[0] || null;
+    const lowSections = sections.filter((section) => section.accuracy < 50);
+    const percentage = Math.round(mockDetail.percentage || 0);
+
+    return {
+      answeredQuestions,
+      incorrectQuestions,
+      unansweredQuestions,
+      strongestSection,
+      weakestSection,
+      lowSections,
+      percentage,
+      performanceLabel: getPerformanceLabel(percentage),
+      performanceSummary: getPerformanceSummary(percentage),
+      sections,
+    };
+  }, [mockDetail]);
+
+  const quizInsights = useMemo(() => {
+    if (!quizDetail) {
+      return null;
+    }
+
+    const answers = quizDetail.answers || [];
+    const answeredQuestions = answers.length;
+    const correctAnswers =
+      typeof quizDetail.correctAnswers === 'number'
+        ? quizDetail.correctAnswers
+        : answers.filter((answer) => answer.isCorrect).length;
+    const incorrectAnswers =
+      typeof quizDetail.incorrectAnswers === 'number'
+        ? quizDetail.incorrectAnswers
+        : Math.max(0, answeredQuestions - correctAnswers);
+    const unansweredQuestions = Math.max(0, (quizDetail.totalQuestions || 0) - answeredQuestions);
+    const percentage =
+      (quizDetail.totalQuestions || 0) > 0
+        ? Math.round(((quizDetail.score || 0) / (quizDetail.totalQuestions || 1)) * 100)
+        : 0;
+    const wrongAnswers = answers.filter((answer) => !answer.isCorrect);
+    const flaggedByProctoring = (quizDetail.fullScreenViolations || 0) + (quizDetail.visibilityChanged || 0);
+
+    return {
+      answeredQuestions,
+      correctAnswers,
+      incorrectAnswers,
+      unansweredQuestions,
+      percentage,
+      wrongAnswers,
+      flaggedByProctoring,
+      performanceLabel: getPerformanceLabel(percentage),
+      performanceSummary: getPerformanceSummary(percentage),
+    };
+  }, [quizDetail]);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -644,13 +764,46 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
           title={`Mock Result: ${mockDetail.quizTitle || mockDetail.quizId?.title || 'Untitled'}`}
           onClose={() => setMockDetail(null)}
         >
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-6">
             <StatBlock label="User" value={mockDetail.userId?.name || mockDetail.userId?.email || 'Unknown'} />
             <StatBlock
               label="Score"
               value={`${mockDetail.totalScore || 0}/${mockDetail.totalQuestions || 0} (${Math.round(
                 mockDetail.percentage || 0
               )}%)`}
+            />
+            <StatBlock label="Level" value={mockInsights?.performanceLabel || '-'} />
+            <StatBlock label="Answered" value={String(mockInsights?.answeredQuestions || 0)} />
+            <StatBlock label="Unanswered" value={String(mockInsights?.unansweredQuestions || 0)} />
+            <StatBlock label="Incorrect" value={String(mockInsights?.incorrectQuestions || 0)} />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-3">
+            <InsightCard
+              title="Overall Interpretation"
+              text={mockInsights?.performanceSummary || 'No interpretation available.'}
+              tone={mockInsights && mockInsights.percentage >= 70 ? 'good' : mockInsights && mockInsights.percentage < 50 ? 'warn' : 'neutral'}
+            />
+            <InsightCard
+              title="Strongest Section"
+              text={
+                mockInsights?.strongestSection
+                  ? `${mockInsights.strongestSection.sectionName} at ${mockInsights.strongestSection.accuracy}% accuracy.`
+                  : 'No strongest section available.'
+              }
+              tone="good"
+            />
+            <InsightCard
+              title="Needs Attention"
+              text={
+                mockInsights?.lowSections?.length
+                  ? `${mockInsights.lowSections.length} section(s) are below 50% accuracy. Start with ${mockInsights.lowSections
+                      .slice(0, 2)
+                      .map((section) => section.sectionName)
+                      .join(', ')}.`
+                  : 'No section is below 50% accuracy.'
+              }
+              tone={mockInsights?.lowSections?.length ? 'warn' : 'neutral'}
             />
           </div>
 
@@ -660,23 +813,47 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
                 <tr>
                   <th className="px-3 py-2 text-left">Section</th>
                   <th className="px-3 py-2 text-left">Correct</th>
+                  <th className="px-3 py-2 text-left">Answered</th>
+                  <th className="px-3 py-2 text-left">Unanswered</th>
                   <th className="px-3 py-2 text-left">Total</th>
                   <th className="px-3 py-2 text-left">Accuracy</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
-                {(mockDetail.sections || []).map((section) => (
+                {(mockInsights?.sections || []).map((section) => (
                   <tr key={section.sectionName}>
                     <td className="px-3 py-2 font-medium text-slate-900">{section.sectionName}</td>
                     <td className="px-3 py-2 text-slate-700">{section.correct}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.answered}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.unanswered}</td>
                     <td className="px-3 py-2 text-slate-700">{section.total}</td>
                     <td className="px-3 py-2 text-slate-700">
-                      {section.total > 0 ? Math.round((section.correct / section.total) * 100) : 0}%
+                      {section.accuracy}%
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <InsightCard
+              title="Completion Insight"
+              text={
+                mockInsights
+                  ? `${mockInsights.answeredQuestions} out of ${mockDetail.totalQuestions || 0} questions were answered, leaving ${mockInsights.unansweredQuestions} unanswered.`
+                  : 'No completion insight available.'
+              }
+            />
+            <InsightCard
+              title="Weakest Section"
+              text={
+                mockInsights?.weakestSection
+                  ? `${mockInsights.weakestSection.sectionName} is lowest at ${mockInsights.weakestSection.accuracy}% accuracy.`
+                  : 'No weakest section available.'
+              }
+              tone={mockInsights?.weakestSection && mockInsights.weakestSection.accuracy < 50 ? 'warn' : 'neutral'}
+            />
           </div>
         </ModalShell>
       )}
@@ -742,11 +919,38 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
 
       {quizDetail && (
         <ModalShell title={`Quiz Result: ${quizDetail.quiz?.name || quizDetail.title || 'Untitled'}`} onClose={() => setQuizDetail(null)}>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-6">
             <StatBlock label="User" value={quizDetail.student?.name || quizDetail.student?.email || 'Unknown'} />
             <StatBlock label="Score" value={`${quizDetail.score || 0}/${quizDetail.totalQuestions || 0}`} />
-            <StatBlock label="Correct Answers" value={String(quizDetail.correctAnswers || 0)} />
-            <StatBlock label="Incorrect Answers" value={String(quizDetail.incorrectAnswers || 0)} />
+            <StatBlock label="Level" value={quizInsights?.performanceLabel || '-'} />
+            <StatBlock label="Answered" value={String(quizInsights?.answeredQuestions || 0)} />
+            <StatBlock label="Correct" value={String(quizInsights?.correctAnswers || 0)} />
+            <StatBlock label="Incorrect" value={String(quizInsights?.incorrectAnswers || 0)} />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-3">
+            <InsightCard
+              title="Overall Interpretation"
+              text={quizInsights?.performanceSummary || 'No interpretation available.'}
+              tone={quizInsights && quizInsights.percentage >= 70 ? 'good' : quizInsights && quizInsights.percentage < 50 ? 'warn' : 'neutral'}
+            />
+            <InsightCard
+              title="Completion Insight"
+              text={
+                quizInsights
+                  ? `${quizInsights.answeredQuestions} answered and ${quizInsights.unansweredQuestions} unanswered out of ${quizDetail.totalQuestions || 0}.`
+                  : 'No completion insight available.'
+              }
+            />
+            <InsightCard
+              title="Question Insight"
+              text={
+                quizInsights
+                  ? `${quizInsights.wrongAnswers.length} question(s) were answered incorrectly. Review those first to improve this attempt.`
+                  : 'No question insight available.'
+              }
+              tone={quizInsights?.wrongAnswers.length ? 'warn' : 'neutral'}
+            />
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -754,6 +958,28 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
             <StatBlock label="Visibility Changes" value={String(quizDetail.visibilityChanged || 0)} />
             <StatBlock label="Submitted Automatically" value={quizDetail.submittedAutomatically ? 'Yes' : 'No'} />
             <StatBlock label="Time Left" value={`${quizDetail.timeLeft || 0}s`} />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
+            <InsightCard
+              title="Proctoring Signal"
+              text={
+                quizInsights
+                  ? quizInsights.flaggedByProctoring > 0
+                    ? `${quizInsights.flaggedByProctoring} proctoring event(s) detected from fullscreen and visibility changes.`
+                    : 'No proctoring issues were detected in this attempt.'
+                  : 'No proctoring insight available.'
+              }
+              tone={quizInsights && quizInsights.flaggedByProctoring > 0 ? 'warn' : 'good'}
+            />
+            <InsightCard
+              title="Accuracy"
+              text={
+                quizInsights
+                  ? `${quizInsights.correctAnswers} correct out of ${quizDetail.totalQuestions || 0} total questions gives ${quizInsights.percentage}% overall accuracy.`
+                  : 'No accuracy insight available.'
+              }
+            />
           </div>
 
           {!!quizDetail.answers?.length && (
@@ -790,6 +1016,22 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          )}
+
+          {!!quizInsights?.wrongAnswers.length && (
+            <div className="mt-5">
+              <h4 className="text-sm font-semibold text-slate-900">Priority Review Questions</h4>
+              <div className="mt-2 space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                {quizInsights.wrongAnswers.slice(0, 5).map((answer, index) => (
+                  <div key={`${answer.question || 'wrong'}-${index}`} className="rounded-md bg-white p-3 ring-1 ring-slate-200">
+                    <p className="text-sm font-medium text-slate-900">{answer.question || 'Question text unavailable'}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Marked: {answer.userAnswer || '-'} | Correct: {answer.correctAnswer || '-'}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           )}

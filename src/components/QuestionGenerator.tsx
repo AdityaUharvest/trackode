@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import QuestionEditor from './(tcs)/QuestionEditor';
 import axios from 'axios';
-import { Button } from './ui/button';
-import { useTheme } from './ThemeContext';
-import { Loader2, ChevronDown, BookOpen, EyeOff, Eye, ArrowLeft, Pencil, Save, Share2, Trash2 } from 'lucide-react';
+import { Loader2, ChevronDown, BookOpen, EyeOff, Eye, ArrowLeft, Pencil, Save, Share2, Trash2, ListChecks, Layers } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 import Link from 'next/link';
 
@@ -43,6 +41,12 @@ interface EditingQuestion extends Question {
   index: number;
 }
 
+interface QuizSectionInfo {
+  value: string;
+  label: string;
+  count: number;
+}
+
 export default function QuestionGenerator({ isPublished, mockTest, shareCode }: QuestionGeneratorProps) {
   // State for sections and categories
   const [sections, setSections] = useState<Section[]>([]);
@@ -53,7 +57,6 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [questionCount, setQuestionCount] = useState<number>(25);
   const [isAddingCustomSection, setIsAddingCustomSection] = useState(false);
 
-  const { theme } = useTheme();
   const params = useParams();
   const mockTestId = params.id as string;
 
@@ -65,8 +68,34 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   const [isGenerating, setIsGenerating] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isPublishedd, setIsPublished] = useState(isPublished);
+  const [isPublishedState, setIsPublishedState] = useState(isPublished);
   const [copied, setCopied] = useState(false);
+  const [quizSections, setQuizSections] = useState<QuizSectionInfo[]>([]);
+
+  const selectedSectionLabel =
+    sections.find((section) => section.value === selectedSection)?.label || selectedSection || 'Not selected';
+  const activeCategory = categories.find((category) => category.name === activeTab) || null;
+  const activeCategoryTopicCount = activeCategory
+    ? activeCategory.subcategories.reduce((sum, subcategory) => sum + subcategory.sections.length, 0)
+    : 0;
+  const step2Options = (activeCategory?.subcategories || [])
+    .flatMap((subcategory) =>
+      subcategory.sections.map((value) => {
+        const found = sections.find((section) => section.value === value);
+        if (!found) {
+          return null;
+        }
+        return {
+          value: found.value,
+          label: found.label,
+          subcategory: subcategory.name,
+        };
+      })
+    )
+    .filter((item): item is { value: string; label: string; subcategory: string } => Boolean(item));
+  const filteredStep2Options = step2Options.filter((item) =>
+    item.label.toLowerCase().includes(quickFilter.toLowerCase())
+  );
 
   // Define categories structure
   const predefinedCategories: Category[] = [
@@ -341,6 +370,10 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
     fetchQuestions();
   }, [mockTestId, selectedSection]);
 
+  useEffect(() => {
+    refreshQuizSections();
+  }, [mockTestId, sections]);
+
   const fetchQuestions = async () => {
     try {
       setIsLoading(true);
@@ -354,6 +387,37 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       setErrorMessage('Failed to load questions. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const refreshQuizSections = async () => {
+    try {
+      const res = await axios.get(`/api/mock-tests/${mockTestId}/questions`);
+      const allQuestions = Array.isArray(res.data) ? res.data : [];
+
+      const counter = allQuestions.reduce((acc: Record<string, number>, question: any) => {
+        const sectionKey = String(question?.section || 'general').trim();
+        if (!sectionKey) {
+          return acc;
+        }
+        acc[sectionKey] = (acc[sectionKey] || 0) + 1;
+        return acc;
+      }, {});
+
+      const mapped = Object.entries(counter)
+        .map(([value, count]) => {
+          const found = sections.find((section) => section.value === value);
+          return {
+            value,
+            label: found?.label || value,
+            count,
+          };
+        })
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+
+      setQuizSections(mapped);
+    } catch (error) {
+      console.error('Failed to load quiz section summary', error);
     }
   };
 
@@ -407,8 +471,8 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   };
 
   const generateQuestions = async () => {
-    if (questionCount < 1 || questionCount > 100) {
-      setErrorMessage('Please enter a number of questions between 1 and 100.');
+    if (questionCount < 1 || questionCount > 50) {
+      setErrorMessage('Please enter a number of questions between 1 and 50.');
       return;
     }
 
@@ -525,6 +589,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
       if (response.data.success) {
         setSuccessMessage(`Successfully saved ${questions.length} questions!`);
         toast.success(`Successfully saved ${questions.length} questions!`);
+        await refreshQuizSections();
         setTimeout(() => setSuccessMessage(''), 3000);
       } else {
         throw new Error('Failed to save questions');
@@ -541,13 +606,13 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
     try {
       setErrorMessage('');
       const res = await axios.post(`/api/mock-tests/${mockTestId}/publish`, {
-        isPublished: !isPublished,
+        isPublished: !isPublishedState,
       });
       if (res.data.success) {
-        setSuccessMessage('Quiz published successfully!');
-        toast.success('Quiz published successfully!');
+        setSuccessMessage(`Quiz ${isPublishedState ? 'unpublished' : 'published'} successfully!`);
+        toast.success(`Quiz ${isPublishedState ? 'unpublished' : 'published'} successfully!`);
         setTimeout(() => setSuccessMessage(''), 3000);
-        setIsPublished(!isPublished);
+        setIsPublishedState(!isPublishedState);
       } else {
         throw new Error('Failed to publish quiz');
       }
@@ -565,6 +630,17 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
     if (window.confirm('Are you sure you want to delete this question?')) {
       const updatedQuestions = questions.filter((_, i) => i !== index);
       setQuestions(updatedQuestions);
+
+      setQuizSections((prev) =>
+        prev
+          .map((section) =>
+            section.value === selectedSection
+              ? { ...section, count: Math.max(0, section.count - 1) }
+              : section
+          )
+          .filter((section) => section.count > 0)
+      );
+
       setSuccessMessage('Question deleted successfully!');
       toast.success('Question deleted successfully!');
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -595,24 +671,28 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-8">
   <div className="mx-auto">
     {/* Header Section */}
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-      <div className="flex items-center gap-3">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Question Adder
-        </h1>
+    <div className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Question Builder</h1>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Build and manage questions for <span className="font-semibold">{mockTest}</span>
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Share code: {shareCode}</p>
+        </div>
         <span
           className={`px-3 py-1 rounded-lg text-xs font-semibold shadow-sm ${
-            isPublished
+            isPublishedState
               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200'
               : 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200'
           }`}
         >
-          {isPublished ? 'Published' : 'Draft'}
+          {isPublishedState ? 'Published' : 'Draft'}
         </span>
       </div>
-      
+
       <div className="flex flex-wrap gap-3">
-        {isPublished && (
+        {isPublishedState && (
           <button
             onClick={handleShareLink}
             disabled={isGenerating || isSubmitting || copied}
@@ -634,102 +714,116 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
           </button>
         )}
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <ListChecks className="w-4 h-4" />
+            Questions Loaded
+          </div>
+          <p className="mt-1 text-xl font-semibold text-gray-800 dark:text-gray-100">{questions.length}</p>
+        </div>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <Layers className="w-4 h-4" />
+            Current Section
+          </div>
+          <p className="mt-1 truncate text-sm font-semibold text-gray-800 dark:text-gray-100">{selectedSectionLabel}</p>
+        </div>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-3">
+          <div className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Generate Count</div>
+          <p className="mt-1 text-xl font-semibold text-gray-800 dark:text-gray-100">{questionCount}</p>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          Sections In This Quiz
+        </p>
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {quizSections.length > 0
+            ? `This quiz currently has questions in ${quizSections.length} section(s).`
+            : 'No saved sections yet. Generate and save questions to create sections.'}
+        </p>
+        {quizSections.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {quizSections.map((section) => (
+              <button
+                key={section.value}
+                onClick={() => setSelectedSection(section.value)}
+                className={`inline-flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors ${
+                  selectedSection === section.value
+                    ? 'border-indigo-600 bg-indigo-600 text-white'
+                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600'
+                }`}
+              >
+                <span className="max-w-[220px] truncate">{section.label}</span>
+                <span
+                  className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                    selectedSection === section.value
+                      ? 'bg-white/20 text-white'
+                      : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200'
+                  }`}
+                >
+                  {section.count}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
 
     {/* Main Content Grid */}
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Left Panel - Controls */}
       <div className="lg:col-span-1 space-y-6">
+        <div className="lg:sticky lg:top-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-            Quiz Settings
+            Controls
           </h2>
-          
-          {/* Question Count */}
-          <div className="mb-6">
-            <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Number of Questions
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                min="1"
-                max="50"
-                value={questionCount}
-                onChange={(e) => setQuestionCount(Math.min(50, Math.max(1, Number(e.target.value))))}
-                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                disabled={isGenerating || isSubmitting}
-              />
-              <div className="absolute right-3 top-2 text-xs text-gray-500 dark:text-gray-400">
-                Max: 50
-              </div>
-            </div>
-          </div>
+          <p className="mb-4 text-xs text-gray-500 dark:text-gray-400">
+            Follow steps: choose category, pick topic, set count, then generate.
+          </p>
 
-          {/* Custom Topic */}
-          <div className="mb-6">
-            <button
-              onClick={() => setIsAddingCustomSection(!isAddingCustomSection)}
-              className="flex items-center justify-between w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+          <div className="mb-5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">Step 1</p>
+            <label className="mt-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Choose Category</label>
+            <select
+              value={activeTab || ''}
+              onChange={(event) => {
+                const categoryName = event.target.value;
+                setActiveTab(categoryName);
+                setQuickFilter('');
+                const firstSection =
+                  categories.find((category) => category.name === categoryName)?.subcategories[0]?.sections[0] || '';
+                if (firstSection) {
+                  setSelectedSection(firstSection);
+                }
+              }}
+              className="mt-2 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
             >
-              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                Add Custom Topic
-              </span>
-              <ChevronDown className={`w-4 h-4 transition-transform ${isAddingCustomSection ? 'rotate-180' : ''}`} />
-            </button>
-            
-            {isAddingCustomSection && (
-              <div className="mt-4 space-y-3 animate-fadeIn">
-                <input
-                  type="text"
-                  placeholder="e.g., Advanced Machine Learning"
-                  className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                  value={customSection}
-                  onChange={(e) => setCustomSection(e.target.value)}
-                />
-                <button
-                  onClick={addCustomSection}
-                  disabled={!customSection.trim() || isGenerating || isSubmitting}
-                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Add Topic
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Category Selection */}
-          <div className="mb-6">
-            <label className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Select Category
-            </label>
-            <div className=" pb-2 space-2 flex flex-wrap gap-2">
               {categories.map((category) => (
-                <button
-                  key={category.name}
-                  className={`px-4 py-2 rounded-lg whitespace-nowrap text-sm font-medium transition-colors ${
-                    activeTab === category.name
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                  onClick={() => {
-                    setActiveTab(category.name);
-                    setQuickFilter('');
-                    const firstSection = category.subcategories[0]?.sections[0];
-                    if (firstSection) {
-                      setSelectedSection(firstSection);
-                    }
-                  }}
-                >
+                <option key={category.name} value={category.name}>
                   {category.name}
-                </button>
+                </option>
               ))}
-            </div>
+            </select>
+            <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+              {activeCategory
+                ? `${activeCategoryTopicCount} topic(s) available in ${activeCategory.name}`
+                : 'No category selected'}
+            </p>
           </div>
 
-          {/* Section Selection */}
           {activeTab && (
-            <div className="space-y-4">
+            <div className="mb-5 space-y-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 p-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">Step 2</p>
+                <p className="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300">Choose Topic/Section</p>
+              </div>
+
               <div className="relative">
                 <input
                   type="text"
@@ -753,46 +847,75 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 </svg>
               </div>
 
-              <div className="max-h-96 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
-                {categories
-                  .find((c) => c.name === activeTab)
-                  ?.subcategories.map((subcategory) => {
-                    const filteredSections = subcategory.sections
-                      .map((value) => sections.find((s) => s.value === value))
-                      .filter(
-                        (section) =>
-                          section &&
-                          section.label.toLowerCase().includes(quickFilter.toLowerCase())
-                      );
-
-                    if (filteredSections.length === 0) return null;
-
-                    return (
-                      <div key={subcategory.name} className="mb-6">
-                        <h3 className="font-medium text-gray-700 dark:text-gray-300 mb-3">
-                          {subcategory.name}
-                        </h3>
-                        <div className="grid grid-cols-1 gap-2">
-                          {filteredSections.map((section) => (
-                            <button
-                              key={section!.value}
-                              className={`p-3 rounded-lg text-left text-sm transition-all ${
-                                selectedSection === section!.value
-                                  ? 'bg-indigo-600 text-white shadow-md'
-                                  : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
-                              }`}
-                              onClick={() => setSelectedSection(section!.value)}
-                            >
-                              {section!.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
+              <div>
+                <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Section Dropdown
+                </label>
+                <select
+                  value={selectedSection}
+                  onChange={(event) => setSelectedSection(event.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                >
+                  {filteredStep2Options.map((item) => (
+                    <option key={`${item.subcategory}-${item.value}`} value={item.value}>
+                      {item.label} ({item.subcategory})
+                    </option>
+                  ))}
+                </select>
+                {filteredStep2Options.length === 0 && (
+                  <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    No topics match your filter for this category.
+                  </p>
+                )}
               </div>
             </div>
           )}
+
+          <div className="mb-5 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 p-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">Step 3</p>
+            <label className="mt-1 block text-sm font-medium text-gray-700 dark:text-gray-300">Number of Questions</label>
+            <div className="relative mt-2">
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={questionCount}
+                onChange={(e) => setQuestionCount(Math.min(50, Math.max(1, Number(e.target.value))))}
+                className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                disabled={isGenerating || isSubmitting}
+              />
+              <div className="absolute right-3 top-2 text-xs text-gray-500 dark:text-gray-400">Max: 50</div>
+            </div>
+          </div>
+
+          <div className="mb-6 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 p-3">
+            <button
+              onClick={() => setIsAddingCustomSection(!isAddingCustomSection)}
+              className="flex items-center justify-between w-full px-3 py-2 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">Add Custom Topic</span>
+              <ChevronDown className={`w-4 h-4 transition-transform ${isAddingCustomSection ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isAddingCustomSection && (
+              <div className="mt-3 space-y-3 animate-fadeIn">
+                <input
+                  type="text"
+                  placeholder="e.g., Advanced Machine Learning"
+                  className="w-full px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={customSection}
+                  onChange={(e) => setCustomSection(e.target.value)}
+                />
+                <button
+                  onClick={addCustomSection}
+                  disabled={!customSection.trim() || isGenerating || isSubmitting}
+                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add Topic
+                </button>
+              </div>
+            )}
+          </div>
 
           <button
             onClick={generateQuestions}
@@ -809,9 +932,10 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 <span>Generating Questions...</span>
               </>
             ) : (
-              `Generate ${questionCount} Questions`
+              `Step 4: Generate ${questionCount} Questions`
             )}
           </button>
+        </div>
         </div>
       </div>
 
@@ -842,11 +966,18 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
 
         {/* Questions List */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          {!isLoading && !editingQuestion && questions.length > 0 && (
+            <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 px-6 py-3">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                Showing {questions.length} question(s) for section: <span className="font-semibold">{selectedSectionLabel}</span>
+              </p>
+            </div>
+          )}
           {isLoading ? (
             <div className="p-12 text-center">
               <Loader2 className="animate-spin mx-auto w-8 h-8 text-indigo-600 dark:text-indigo-400" />
               <p className="mt-4 text-gray-500 dark:text-gray-400">
-                Generating your questions...
+                Loading questions...
               </p>
             </div>
           ) : editingQuestion ? (
@@ -896,20 +1027,22 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                         ))}
                       </div>
                     </div>
-                    <div className="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                    <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         onClick={() => handleEdit(index)}
-                        className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full"
+                        className="inline-flex items-center gap-1 rounded-md border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300"
                         title="Edit question"
                       >
                         <Pencil className="w-4 h-4" />
+                        Edit
                       </button>
                       <button
                         onClick={() => handleDelete(index)}
-                        className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-full"
+                        className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 dark:border-red-700 dark:bg-red-900/30 dark:text-red-300"
                         title="Delete question"
                       >
                         <Trash2 className="w-4 h-4" />
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -922,10 +1055,10 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 <BookOpen className="w-10 h-10 text-gray-400 dark:text-gray-500" />
               </div>
               <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-2">
-                No questions yet
+                No questions available
               </h3>
               <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                Select a topic and generate questions to get started. Your quiz will appear here.
+                Pick a topic from the left panel and generate questions. You can then edit, delete, publish, and save from this page.
               </p>
             </div>
           )}
@@ -939,12 +1072,12 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
                 onClick={handlePublish}
                 disabled={isSubmitting}
                 className={`px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-colors ${
-                  isPublished
+                  isPublishedState
                     ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
                     : 'bg-orange-600 text-white hover:bg-orange-700'
                 }`}
               >
-                {isPublished ? (
+                {isPublishedState ? (
                   <>
                     <EyeOff className="w-4 h-4" />
                     Unpublish

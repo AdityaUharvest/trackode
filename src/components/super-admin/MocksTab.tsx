@@ -186,15 +186,7 @@ export function MocksTab({
                       >
                         {mock.isPublished ? 'Published' : 'Draft'}
                       </span>
-                      <span
-                        className={`inline-block w-fit rounded-md px-2 py-1 text-xs font-medium ${
-                          mock.public
-                            ? 'bg-slate-900 text-white'
-                            : 'bg-slate-100 text-slate-600 ring-1 ring-slate-200'
-                        }`}
-                      >
-                        {mock.public ? 'Public' : 'Unlisted'}
-                      </span>
+                      
                     </div>
                   </td>
 
