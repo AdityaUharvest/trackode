@@ -14,6 +14,7 @@ import type {
   AppSettings,
   ConfirmOptions,
   MockDraft,
+  MockAttemptItem,
   MockItem,
   MockResultItem,
   QuizItem,
@@ -42,6 +43,7 @@ export default function SuperAdminPanel() {
   const [stats, setStats] = useState<SuperStats | null>(null);
   const [mocks, setMocks] = useState<MockItem[]>([]);
   const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
+  const [mockAttempts, setMockAttempts] = useState<MockAttemptItem[]>([]);
   const [mockResults, setMockResults] = useState<MockResultItem[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResultItem[]>([]);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -74,6 +76,7 @@ export default function SuperAdminPanel() {
       setStats(dashboardData.stats || null);
       setMocks(Array.isArray(dashboardData.mocks) ? dashboardData.mocks : []);
       setQuizzes(Array.isArray(dashboardData.quizzes) ? dashboardData.quizzes : []);
+      setMockAttempts(Array.isArray(dashboardData.quizAttempts) ? dashboardData.quizAttempts : []);
       setMockResults(Array.isArray(dashboardData.mockResults) ? dashboardData.mockResults : []);
       setQuizResults(Array.isArray(dashboardData.quizResults) ? dashboardData.quizResults : []);
 
@@ -454,6 +457,7 @@ export default function SuperAdminPanel() {
               )}
               {activeTab === 'results' && (
                 <ResultsTab
+                  mockAttempts={mockAttempts}
                   mockResults={mockResults}
                   quizResults={quizResults}
                   onDataChanged={loadDashboard}

@@ -7,6 +7,8 @@ import QuizAttempt from '@/app/model/QuizAttempt';
 import Attempted from '@/app/model/Attempted';
 import MockResult from '@/app/model/MockResult';
 import MockQuestion from '@/app/model/MockQuestions';
+import User from '@/app/model/User';
+import { Types } from 'mongoose';
 
 type SectionSummary = {
   name: string;
@@ -75,6 +77,54 @@ export async function GET() {
       };
     });
 
+    const userIds = Array.from(
+      new Set(
+        quizAttempts
+          .map((attempt: any) => String(attempt.userId || '').trim())
+          .filter((id) => Types.ObjectId.isValid(id))
+      )
+    );
+
+    const users = userIds.length
+      ? await User.find({ _id: { $in: userIds } }).select('name email').lean()
+      : [];
+
+    const userMap = users.reduce((acc, user: any) => {
+      acc[String(user._id)] = {
+        name: user.name,
+        email: user.email,
+      };
+      return acc;
+    }, {} as Record<string, { name?: string; email?: string }>);
+
+    const mockTitleById = mappedMocks.reduce((acc, mock: any) => {
+      acc[String(mock._id)] = String(mock.title || '');
+      return acc;
+    }, {} as Record<string, string>);
+
+    const mappedAttempts = quizAttempts.map((attempt: any) => {
+      const quizId = String(attempt.quizId || '');
+      const userId = String(attempt.userId || '');
+      const answers = attempt.answers && typeof attempt.answers === 'object' ? attempt.answers : {};
+      const answeredCount = Object.values(answers as Record<string, Record<string, number>>).reduce(
+        (sum, sectionAnswers) => sum + Object.keys(sectionAnswers || {}).length,
+        0
+      );
+
+      return {
+        ...attempt,
+        quizId,
+        userId,
+        quizTitle: attempt.quizTitle || mockTitleById[quizId] || 'Untitled Mock',
+        user: {
+          name: userMap[userId]?.name || attempt.userName || '',
+          email: userMap[userId]?.email || attempt.email || '',
+        },
+        isCompleted: Boolean(attempt.completedAt),
+        answeredCount,
+      };
+    });
+
     return NextResponse.json({
       success: true,
       data: {
@@ -89,6 +139,7 @@ export async function GET() {
         },
         mocks: mappedMocks,
         quizzes,
+        quizAttempts: mappedAttempts,
         mockResults,
         quizResults,
       },
