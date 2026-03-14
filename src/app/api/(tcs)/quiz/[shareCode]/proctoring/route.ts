@@ -3,8 +3,16 @@ import { auth } from '@/auth';
 import connectDB from '@/lib/util';
 import MockTest from '@/app/model/MoockTest';
 import QuizAttempt from '@/app/model/QuizAttempt';
+import { Types } from 'mongoose';
 
 type ProctoringEventType = 'fullscreen_exit' | 'tab_hidden' | 'copy_attempt' | 'context_menu';
+
+interface IMockTest {
+  _id: Types.ObjectId;
+  title: string;
+  description?: string;
+  isPublished: boolean;
+}
 
 const incrementKeyByType: Record<ProctoringEventType, string> = {
   fullscreen_exit: 'proctoring.fullscreenExitCount',
@@ -42,7 +50,7 @@ export async function POST(
       return NextResponse.json({ message: 'Invalid event type' }, { status: 400 });
     }
 
-    const quiz = await MockTest.findOne({ shareCode }).lean();
+    const quiz = await MockTest.findOne({ shareCode }).lean<IMockTest>();
     if (!quiz) {
       return NextResponse.json({ message: 'Quiz not found' }, { status: 404 });
     }
