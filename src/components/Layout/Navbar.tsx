@@ -320,6 +320,13 @@ const Navbar: React.FC = () => {
                           Dashboard
                         </DropdownItem>
                         <DropdownItem
+                          href="/super-admin"
+                          icon={<BarChart size={16} />}
+                          theme={theme}
+                        >
+                          Super Admin
+                        </DropdownItem>
+                        <DropdownItem
                           href={`/profile/${session.user?.email}`}
                           icon={<Settings size={16} />}
                           theme={theme}
@@ -418,7 +425,10 @@ const NavItem: React.FC<{
   isAuthenticated?: boolean;
 }> = ({ href, icon, theme, children, requiresAuth = false, isAuthenticated = false }) => {
   const shouldShow = !requiresAuth || isAuthenticated;
-  const disablePrefetch = href.startsWith('/dashboard') || href.startsWith('/admin-dashboard');
+  const disablePrefetch =
+    href.startsWith('/dashboard') ||
+    href.startsWith('/admin-dashboard') ||
+    href.startsWith('/super-admin');
 
   if (!shouldShow) return null;
 
@@ -452,7 +462,10 @@ const MobileNavItem: React.FC<{
   isAuthenticated?: boolean;
 }> = ({ href, icon, theme, children, onClick, requiresAuth = false, isAuthenticated = false }) => {
   const shouldShow = !requiresAuth || isAuthenticated;
-  const disablePrefetch = href.startsWith('/dashboard') || href.startsWith('/admin-dashboard');
+  const disablePrefetch =
+    href.startsWith('/dashboard') ||
+    href.startsWith('/admin-dashboard') ||
+    href.startsWith('/super-admin');
 
   if (!shouldShow) return null;
 

@@ -6,6 +6,7 @@ export async function middleware(req: NextRequest) {
   const protectedPaths = [
     '/dashboard',
     '/admin-dashboard',
+    '/super-admin',
     '/quiz-play',
     '/quiz-result',
     '/quiz-setup',
