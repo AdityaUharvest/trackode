@@ -5,6 +5,20 @@ import connectDB from "./lib/util";
 import User from "@/app/model/User";
 import bcrypt from "bcryptjs";
 
+const isSuperAdminEmail = (email) => {
+  if (!email) return false;
+  const allowList = (process.env.SUPER_ADMIN_EMAILS || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (allowList.length === 0) {
+    return false;
+  }
+
+  return allowList.includes(String(email).toLowerCase());
+};
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET,
@@ -86,6 +100,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.isSuperAdmin = isSuperAdminEmail(user.email);
+      } else if (token?.email) {
+        token.isSuperAdmin = isSuperAdminEmail(token.email);
       }
       return token;
     },
@@ -93,6 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token?.id) {
         session.user.id = token.id; 
       }
+      session.user.isSuperAdmin = Boolean(token?.isSuperAdmin);
       return session;
     },
   },

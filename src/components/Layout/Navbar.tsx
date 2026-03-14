@@ -55,6 +55,7 @@ const useOutsideClick = <T extends HTMLElement>(
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
+  const canAccessSuperAdmin = Boolean((session?.user as any)?.isSuperAdmin);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
   const [isNotificationOpen, setNotificationOpen] = useState(false);
@@ -319,13 +320,15 @@ const Navbar: React.FC = () => {
                         >
                           Dashboard
                         </DropdownItem>
-                        <DropdownItem
-                          href="/super-admin"
-                          icon={<BarChart size={16} />}
-                          theme={theme}
-                        >
-                          Super Admin
-                        </DropdownItem>
+                        {canAccessSuperAdmin ? (
+                          <DropdownItem
+                            href="/super-admin"
+                            icon={<BarChart size={16} />}
+                            theme={theme}
+                          >
+                            Super Admin
+                          </DropdownItem>
+                        ) : null}
                         <DropdownItem
                           href={`/profile/${session.user?.id || session.user?.email}`}
                           icon={<Settings size={16} />}

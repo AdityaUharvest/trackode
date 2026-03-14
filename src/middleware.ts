@@ -1,6 +1,20 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
+function isSuperAdminEmail(email?: string | null): boolean {
+  if (!email) return false;
+  const allowList = (process.env.SUPER_ADMIN_EMAILS || '')
+    .split(',')
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (allowList.length === 0) {
+    return false;
+  }
+
+  return allowList.includes(email.toLowerCase());
+}
+
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname
   const protectedPaths = [
@@ -36,6 +50,13 @@ export async function middleware(req: NextRequest) {
       signInUrl.searchParams.set('callbackUrl', req.url)
       console.log(`Redirecting to login from ${path}`) // Debug log
       return NextResponse.redirect(signInUrl)
+    }
+
+    if (path.startsWith('/super-admin')) {
+      const email = typeof token?.email === 'string' ? token.email : '';
+      if (!isSuperAdminEmail(email)) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
     }
 
     

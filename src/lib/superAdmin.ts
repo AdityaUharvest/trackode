@@ -11,9 +11,9 @@ export function isSuperAdminEmail(email?: string | null): boolean {
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean);
 
-  // If no allow-list is configured, keep current behavior permissive for authenticated users.
+  // Security default: no allow-list means no one is treated as super admin.
   if (allowList.length === 0) {
-    return true;
+    return false;
   }
 
   return allowList.includes(email.toLowerCase());
