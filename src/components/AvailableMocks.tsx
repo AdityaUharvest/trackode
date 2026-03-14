@@ -30,6 +30,8 @@ interface MockTest {
   createdAt?: string;
   tag: string;
   creator: string;
+  sections?: Array<{ name: string; count: number }>;
+  questionCount?: number;
 }
 
 interface MockTestsListClientProps {
@@ -40,12 +42,17 @@ export default function MockTestsListClient({
   initialTests,
 }: MockTestsListClientProps) {
   const { theme } = useTheme();
-  const [mockTests] = useState<MockTest[]>(initialTests);
+  const [mockTests, setMockTests] = useState<MockTest[]>(initialTests);
   const [filteredTests, setFilteredTests] = useState<MockTest[]>(initialTests);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState<"all" | "Easy" | "Medium" | "Hard">("all");
   const [showContactForm, setShowContactForm] = useState(false);
   const { data: session } = useSession();
+
+  useEffect(() => {
+    setMockTests(initialTests);
+    setFilteredTests(initialTests);
+  }, [initialTests]);
 
   useEffect(() => {
     let results = mockTests;
@@ -357,7 +364,7 @@ export default function MockTestsListClient({
                   </div>
                   <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
                     <CheckCircle size={16} className="mr-2 text-green-500" />
-                    75 questions
+                    {mock.questionCount || 0} questions
                   </div>
                   <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
                     <Users size={16} className="mr-2 text-violet-500" />
@@ -365,6 +372,37 @@ export default function MockTestsListClient({
                     students
                   </div>
                 </div>
+
+                {Array.isArray(mock.sections) && mock.sections.length > 0 && (
+                  <div className="mb-4">
+                    <p className={`mb-2 text-xs font-medium uppercase tracking-wide ${getThemeClasses("text-muted")}`}>
+                      Sections
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {mock.sections.slice(0, 4).map((section) => (
+                        <span
+                          key={`${mock._id}-${section.name}`}
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs ${
+                            theme === "dark"
+                              ? "bg-gray-700 text-gray-200"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                          title={`${section.count} questions`}
+                        >
+                          <span>{section.name}</span>
+                          <span className={`rounded-full px-1 ${theme === "dark" ? "bg-gray-600" : "bg-white"}`}>
+                            {section.count}
+                          </span>
+                        </span>
+                      ))}
+                      {mock.sections.length > 4 && (
+                        <span className={`text-xs ${getThemeClasses("text-muted")}`}>
+                          +{mock.sections.length - 4} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 <div className="flex flex-col gap-3">
                   <Link

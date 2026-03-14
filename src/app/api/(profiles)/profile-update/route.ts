@@ -6,7 +6,16 @@ export async function PUT(request: NextRequest) {
     await connectDB();
     try{
         const {updatedData,userId} = await request.json();
-        const user = await User.findOne({email:updatedData.email});
+        const targetUserId = userId || updatedData?.userId;
+
+        if (!targetUserId) {
+            return NextResponse.json({message: 'Missing user id'}, {status: 400});
+        }
+
+        const user = await User.findById(targetUserId);
+        if (!user) {
+            return NextResponse.json({message: 'User not found'}, {status: 404});
+        }
        
         user.name = updatedData.name;
         user.email = updatedData.email;
@@ -18,10 +27,14 @@ export async function PUT(request: NextRequest) {
         user.github= updatedData.github;
         user.linkedin= updatedData.linkedin;
         user.leetcode= updatedData.leetcode;
+        user.twitter = updatedData.twitter;
+        user.image = updatedData.image;
+        user.dob = updatedData.dob || undefined;
         user.languages = updatedData.languages;
         user.interests = updatedData.interests;
+        user.public = updatedData.public;
         
-        user.save();
+        await user.save();
 
         return NextResponse.json({message: 'Profile updated successfully', data: updatedData}, {status: 200});
 

@@ -1,8 +1,13 @@
 import { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
 import MockTestsListClient from "@/components/AvailableMocks";
 import connectDB from "@/lib/util";
 import MockTest from "@/app/model/MoockTest"; // Fixed typo: MoockTest → MockTest
 import QuizAttempt from "@/app/model/QuizAttempt";
+import MockQuestion from "@/app/model/MockQuestions";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface MockTestType {
   _id: string;
@@ -16,6 +21,8 @@ interface MockTestType {
   createdAt?: string;
   tag: string;
   creator: string;
+  sections?: Array<{ name: string; count: number }>;
+  questionCount?: number;
 }
 
 // Metadata for SEO
@@ -51,6 +58,7 @@ function serializeId(id: any) {
 }
 
 async function fetchMockTests(): Promise<MockTestType[]> {
+  noStore();
   await connectDB();
   const mocks = await MockTest.find({ public: true, isPublished: true })
     .select('title durationMinutes shareCode userPlayed category difficulty createdAt tag creator')
@@ -58,6 +66,30 @@ async function fetchMockTests(): Promise<MockTestType[]> {
     .lean();
 
   const mockIds = mocks.map((mock: any) => mock._id);
+
+  const sectionAggregation = await MockQuestion.aggregate([
+    { $match: { mockTestId: { $in: mockIds } } },
+    {
+      $group: {
+        _id: {
+          mockTestId: '$mockTestId',
+          section: '$section',
+        },
+        questionCount: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const sectionMap = sectionAggregation.reduce((acc: Record<string, Array<{ name: string; count: number }>>, item: any) => {
+    const mockId = serializeId(item._id?.mockTestId);
+    const sectionName = String(item._id?.section || 'General').trim() || 'General';
+    if (!acc[mockId]) {
+      acc[mockId] = [];
+    }
+    acc[mockId].push({ name: sectionName, count: item.questionCount || 0 });
+    return acc;
+  }, {});
+
   const attemptCounts = await QuizAttempt.aggregate([
     { $match: { quizId: { $in: mockIds } } },
     { $group: { _id: '$quizId', count: { $sum: 1 } } }
@@ -82,6 +114,8 @@ async function fetchMockTests(): Promise<MockTestType[]> {
       createdAt: obj.createdAt ? new Date(obj.createdAt).toISOString() : undefined,
       tag: obj.tag || 'TCS',
       creator: obj.creator || 'Anonymous',
+      sections: sectionMap[mockId] || [],
+      questionCount: (sectionMap[mockId] || []).reduce((sum, section) => sum + (section.count || 0), 0),
     };
   });
 }
