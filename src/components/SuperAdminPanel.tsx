@@ -438,6 +438,8 @@ export default function SuperAdminPanel() {
                   onCloseSections={() => setManagingSectionsMockId('')}
                   onRemoveSection={handleRemoveSection}
                   onImportSection={handleImportSection}
+                  onToast={toast}
+                  onDataChanged={loadDashboard}
                 />
               )}
               {activeTab === 'quizzes' && (
@@ -446,6 +448,8 @@ export default function SuperAdminPanel() {
                   busyQuizzes={busyQuizzes}
                   onToggle={handleQuizToggle}
                   onConfirmDelete={handleConfirmDeleteQuiz}
+                  onToast={toast}
+                  onDataChanged={loadDashboard}
                 />
               )}
               {activeTab === 'results' && (

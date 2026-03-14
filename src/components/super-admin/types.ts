@@ -14,6 +14,9 @@ export type MockItem = {
   _id: string;
   title: string;
   description?: string;
+  startTime?: string;
+  endTime?: string;
+  durationMinutes?: number;
   difficulty?: 'Easy' | 'Medium' | 'Hard';
   public?: boolean;
   isPublished?: boolean;
@@ -31,6 +34,7 @@ export type QuizItem = {
   name: string;
   active?: boolean;
   public?: boolean;
+  shareCode?: string;
   totalQuestions?: number;
   createdAt?: string;
   createdBy?: { name?: string; email?: string };
