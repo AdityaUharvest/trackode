@@ -3,6 +3,15 @@ import MockTest from '@/app/model/MoockTest';
 import Question from '@/app/model/MockQuestions';
 import connectDB from '@/lib/util';
 
+function shuffleArray<T>(items: T[]): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: any
@@ -20,9 +29,10 @@ export async function GET(
       );
     }
     
-    const questions = await Question.find({ mockTestId: quiz._id });
+    const questions = await Question.find({ mockTestId: quiz._id }).lean();
+    const shuffledQuestions = shuffleArray(questions);
     
-    return NextResponse.json({ quiz, questions });
+    return NextResponse.json({ quiz, questions: shuffledQuestions });
   } catch (error) {
     console.error('Error fetching quiz:', error);
     return NextResponse.json(

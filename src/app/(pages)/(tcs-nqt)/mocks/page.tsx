@@ -9,13 +9,13 @@ interface MockTestType {
   title: string;
   durationMinutes: number;
   shareCode: string;
-  quizAttempts?: any[];
+  attemptCount?: number;
   userPlayed?: number;
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
   createdAt?: string;
-  tag:string
-  creator:string
+  tag: string;
+  creator: string;
 }
 
 // Metadata for SEO
@@ -50,44 +50,38 @@ function serializeId(id: any) {
   return id?.toString ? id.toString() : id;
 }
 
-function serializeAttempt(attempt: any) {
-  return {
-    ...attempt.toObject(),
-    _id: serializeId(attempt._id),
-    quizId: serializeId(attempt.quizId),
-    userId: serializeId(attempt.userId),
-    // Add more fields if needed
-  };
-}
-
 async function fetchMockTests(): Promise<MockTestType[]> {
   await connectDB();
-  const mocks = await MockTest.find({ public: true, isPublished: true }).sort({ createdAt: -1 });
+  const mocks = await MockTest.find({ public: true, isPublished: true })
+    .select('title durationMinutes shareCode userPlayed category difficulty createdAt tag creator')
+    .sort({ createdAt: -1 })
+    .lean();
 
-  // Update userPlayed in the database for each mock
-  
-  const mockIds = mocks.map((mock) => mock._id);
+  const mockIds = mocks.map((mock: any) => mock._id);
+  const attemptCounts = await QuizAttempt.aggregate([
+    { $match: { quizId: { $in: mockIds } } },
+    { $group: { _id: '$quizId', count: { $sum: 1 } } }
+  ]);
 
-  const quizAttempts = await QuizAttempt.find({ quizId: { $in: mockIds } });
+  const attemptCountMap = new Map<string, number>();
+  attemptCounts.forEach((item: any) => {
+    attemptCountMap.set(serializeId(item._id), item.count || 0);
+  });
 
-  const quizAttemptMap = quizAttempts.reduce((acc, attempt) => {
-    const key = attempt.quizId.toString();
-    if (!acc[key]) {
-      acc[key] = [];
-    }
-    acc[key].push(serializeAttempt(attempt));
-    return acc;
-  }, {} as Record<string, any[]>);
-
-  return mocks.map((mock) => {
-    const obj = mock.toObject();
+  return mocks.map((obj: any) => {
+    const mockId = serializeId(obj._id);
     return {
-      ...obj,
-      _id: serializeId(obj._id),
-      quizAttempts: quizAttemptMap[obj._id.toString()] || [],
+      _id: mockId,
+      title: obj.title || '',
+      durationMinutes: obj.durationMinutes || 60,
+      shareCode: obj.shareCode || '',
+      attemptCount: attemptCountMap.get(mockId) || 0,
       userPlayed: obj.userPlayed || Math.floor(Math.random() * 500) + 50,
       category: obj.category || "TCS",
       difficulty: obj.difficulty || (["Easy", "Medium", "Hard"][Math.floor(Math.random() * 3)] as "Easy" | "Medium" | "Hard"),
+      createdAt: obj.createdAt ? new Date(obj.createdAt).toISOString() : undefined,
+      tag: obj.tag || 'TCS',
+      creator: obj.creator || 'Anonymous',
     };
   });
 }

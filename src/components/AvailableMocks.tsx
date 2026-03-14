@@ -23,7 +23,7 @@ interface MockTest {
   title: string;
   durationMinutes: number;
   shareCode: string;
-  quizAttempts?: any[];
+  attemptCount?: number;
   userPlayed?: number;
   category?: string;
   difficulty?: "Easy" | "Medium" | "Hard";
@@ -325,9 +325,14 @@ export default function MockTestsListClient({
                   </span>
                 </div>
 
-                <div className="mb-4 flex flex-wrap gap-2 items-center">
+                <div className={`flex items-center text-sm mb-3 ${getThemeClasses("text-muted")}`}>
+                  <BarChart size={16} className="mr-2 text-blue-500" />
+                  {(mock.attemptCount || 0) + (mock.userPlayed || 0)} attempts
+                </div>
+
+                <div className="mb-4 flex flex-wrap items-center gap-2">
                   <span
-                    className={`inline-block text-xs px-2 py-1 rounded mr-2 ${
+                    className={`inline-block text-xs px-2 py-1 rounded ${
                       theme === "dark"
                         ? "bg-indigo-900 text-indigo-300"
                         : "bg-indigo-100 text-indigo-800"
@@ -335,14 +340,9 @@ export default function MockTestsListClient({
                   >
                     {mock.tag || "TCS"}
                   </span>
-                  <span
-                    className={`inline-block text-xs px-2 py-1 rounded ${getThemeClasses(
-                      "creator"
-                    )}`}
-                  >
-                    <User size={14} className="inline mr-1" />
-                     By {mock.creator.split(" ")[0] || "Unknown"}
-                  </span>
+
+                  
+
                   {mock.createdAt && (
                     <span className={getThemeClasses("text-muted") + " text-xs"}>
                       Conducted On : {new Date(mock.createdAt).toLocaleDateString()}
@@ -361,7 +361,7 @@ export default function MockTestsListClient({
                   </div>
                   <div className={`flex items-center text-sm ${getThemeClasses("text-muted")}`}>
                     <Users size={16} className="mr-2 text-violet-500" />
-                    {(mock.quizAttempts?.length || 0) + (mock.userPlayed || 0)}{" "}
+                    {(mock.attemptCount || 0) + (mock.userPlayed || 0)}{" "}
                     students
                   </div>
                 </div>

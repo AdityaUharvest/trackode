@@ -75,6 +75,48 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isRetryableSmtpError(error: any): boolean {
+  const code = error?.responseCode;
+  const message = String(error?.message || '').toLowerCase();
+  const transientCodes = new Set([421, 450, 451, 452]);
+
+  return (
+    transientCodes.has(code) ||
+    message.includes('temporary system problem') ||
+    message.includes('try again later') ||
+    message.includes('timeout') ||
+    error?.code === 'ETIMEDOUT' ||
+    error?.code === 'ECONNECTION' ||
+    error?.code === 'ESOCKET'
+  );
+}
+
+async function sendMailWithRetry(mailOptions: any, maxAttempts = 3): Promise<void> {
+  let attempt = 0;
+  let lastError: any;
+
+  while (attempt < maxAttempts) {
+    attempt += 1;
+    try {
+      await transporter.sendMail(mailOptions);
+      return;
+    } catch (error: any) {
+      lastError = error;
+      if (!isRetryableSmtpError(error) || attempt >= maxAttempts) {
+        throw error;
+      }
+
+      // Exponential backoff to absorb temporary SMTP provider throttling.
+      const backoffMs = 1000 * Math.pow(2, attempt - 1);
+      await sleep(backoffMs);
+    }
+  }
+
+  throw lastError;
+}
+
 // Function to generate enhanced email HTML for quiz results
 const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: any) => {
   const timeTaken = attempt.completedAt && attempt.startedAt
@@ -246,7 +288,6 @@ const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: a
               </div>
               <div>
                 <p style="margin: 0 0 8px;"><strong>Accuracy:</strong> ${attempt.accuracy}%</p>
-                <p style="margin: 0;"><strong>Time Taken:</strong> ${timeTaken} min</p>
               </div>
             </div>
           </div>
@@ -372,11 +413,14 @@ export async function POST(request: NextRequest) {
       result.rank = index + 1;
     });
 
-    // Send emails to each participant
-    const emailPromises = results.map(async (attempt) => {
+    const failedEmails: Array<{ email: string; reason: string }> = [];
+    let sentCount = 0;
+
+    // Send emails sequentially to avoid SMTP burst throttling.
+    for (const attempt of results) {
       if (!attempt.email) {
         console.warn(`No email found for user: ${attempt.userName}`);
-        return;
+        continue;
       }
 
       const mailOptions = {
@@ -386,10 +430,32 @@ export async function POST(request: NextRequest) {
         html: generateQuizResultEmail(attempt.userName, quiz.title, attempt),
       };
 
-      await transporter.sendMail(mailOptions);
-    });
+      try {
+        await sendMailWithRetry(mailOptions, 3);
+        sentCount += 1;
+      } catch (mailError: any) {
+        failedEmails.push({
+          email: attempt.email,
+          reason: mailError?.message || 'Unknown email send error',
+        });
+      }
 
-    await Promise.all(emailPromises);
+      // Small pacing gap between recipients further reduces provider throttling.
+      await sleep(200);
+    }
+
+    if (failedEmails.length > 0) {
+      const totalWithEmail = results.filter((r) => !!r.email).length;
+      return NextResponse.json(
+        {
+          success: sentCount > 0,
+          message: `Sent ${sentCount}/${totalWithEmail} quiz result emails`,
+          failedCount: failedEmails.length,
+          failedEmails,
+        },
+        { status: sentCount > 0 ? 207 : 502 }
+      );
+    }
 
     return NextResponse.json(
       { success: true, message: 'Quiz results sent successfully to all participants' },
