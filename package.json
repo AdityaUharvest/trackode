@@ -14,6 +14,8 @@
     "test:mock:scenarios": "node scripts/test-scenarios.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "@auth/mongodb-adapter": "^3.7.4",
     "@google/generative-ai": "^0.21.0",
     "@heroicons/react": "^2.2.0",

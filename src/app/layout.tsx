@@ -3,6 +3,8 @@ import ClientLayout from "@/app/client-layout/ClientLayout";
 import { SessionProvider } from "next-auth/react";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -104,6 +106,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             
             
             <StructuredData />
+            <Analytics />
+            <SpeedInsights />
           </ClientLayout>
         </SessionProvider>
       </body>
