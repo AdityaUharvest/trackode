@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState, type ReactNode } from 'react';
-import type { MockResultItem, QuizResultItem } from './types';
+import type { MockAttemptItem, MockResultItem, QuizResultItem } from './types';
 import { ResultsCard } from './ui';
 
 type ResultsTabProps = {
+  mockAttempts: MockAttemptItem[];
   mockResults: MockResultItem[];
   quizResults: QuizResultItem[];
   onDataChanged: () => Promise<void>;
@@ -39,13 +40,13 @@ type MockDetailSection = {
 };
 
 type DeleteIntent = {
-  kind: 'mock' | 'quiz';
+  kind: 'mock' | 'quiz' | 'attempt';
   id: string;
   label: string;
 };
 
 type BulkDeleteIntent = {
-  kind: 'mock' | 'quiz';
+  kind: 'mock' | 'quiz' | 'attempt';
   ids: string[];
   label: string;
 };
@@ -124,8 +125,8 @@ function ModalShell({
   );
 }
 
-export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }: ResultsTabProps) {
-  const [activeKind, setActiveKind] = useState<'mock' | 'quiz'>('mock');
+export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChanged, onToast }: ResultsTabProps) {
+  const [activeKind, setActiveKind] = useState<'mock' | 'quiz' | 'attempt'>('mock');
   const [query, setQuery] = useState('');
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -133,6 +134,7 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
   const [bulkDeleteIntent, setBulkDeleteIntent] = useState<BulkDeleteIntent | null>(null);
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
   const [selectedQuizIds, setSelectedQuizIds] = useState<string[]>([]);
+  const [selectedAttemptIds, setSelectedAttemptIds] = useState<string[]>([]);
 
   const [mockDetail, setMockDetail] = useState<MockDetail | null>(null);
   const [quizDetail, setQuizDetail] = useState<QuizDetail | null>(null);
@@ -164,6 +166,18 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
     });
   }, [mockResults, normalizedQuery]);
 
+  const filteredMockAttempts = useMemo(() => {
+    if (!normalizedQuery) {
+      return mockAttempts;
+    }
+
+    return mockAttempts.filter((attempt) => {
+      const user = `${attempt.user?.name || ''} ${attempt.user?.email || ''}`.toLowerCase();
+      const quiz = `${attempt.quizTitle || ''}`.toLowerCase();
+      return user.includes(normalizedQuery) || quiz.includes(normalizedQuery);
+    });
+  }, [mockAttempts, normalizedQuery]);
+
   const filteredQuizResults = useMemo(() => {
     if (!normalizedQuery) {
       return quizResults;
@@ -177,10 +191,13 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
   }, [quizResults, normalizedQuery]);
 
   const visibleMockIds = filteredMockResults.map((result) => result._id);
+  const visibleAttemptIds = filteredMockAttempts.map((attempt) => attempt._id);
   const visibleQuizIds = filteredQuizResults.map((result) => result._id);
 
   const allVisibleMockSelected =
     visibleMockIds.length > 0 && visibleMockIds.every((id) => selectedMockIds.includes(id));
+  const allVisibleAttemptSelected =
+    visibleAttemptIds.length > 0 && visibleAttemptIds.every((id) => selectedAttemptIds.includes(id));
   const allVisibleQuizSelected =
     visibleQuizIds.length > 0 && visibleQuizIds.every((id) => selectedQuizIds.includes(id));
 
@@ -195,6 +212,15 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
 
   const toggleQuizSelection = (id: string, checked: boolean) => {
     setSelectedQuizIds((prev) => {
+      if (checked) {
+        return prev.includes(id) ? prev : [...prev, id];
+      }
+      return prev.filter((item) => item !== id);
+    });
+  };
+
+  const toggleAttemptSelection = (id: string, checked: boolean) => {
+    setSelectedAttemptIds((prev) => {
       if (checked) {
         return prev.includes(id) ? prev : [...prev, id];
       }
@@ -217,6 +243,15 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
         return Array.from(new Set([...prev, ...visibleQuizIds]));
       }
       return prev.filter((id) => !visibleQuizIds.includes(id));
+    });
+  };
+
+  const toggleAllVisibleAttempts = (checked: boolean) => {
+    setSelectedAttemptIds((prev) => {
+      if (checked) {
+        return Array.from(new Set([...prev, ...visibleAttemptIds]));
+      }
+      return prev.filter((id) => !visibleAttemptIds.includes(id));
     });
   };
 
@@ -361,7 +396,9 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
       const endpoint =
         deleteIntent.kind === 'mock'
           ? `/api/admin/results/mock/${deleteIntent.id}`
-          : `/api/admin/results/quiz/${deleteIntent.id}`;
+          : deleteIntent.kind === 'quiz'
+          ? `/api/admin/results/quiz/${deleteIntent.id}`
+          : `/api/admin/results/attempt/${deleteIntent.id}`;
 
       const response = await fetch(endpoint, { method: 'DELETE' });
       const payload = await response.json();
@@ -373,11 +410,13 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
       setDeleteIntent(null);
       if (deleteIntent.kind === 'mock') {
         setSelectedMockIds((prev) => prev.filter((id) => id !== deleteIntent.id));
-      } else {
+      } else if (deleteIntent.kind === 'quiz') {
         setSelectedQuizIds((prev) => prev.filter((id) => id !== deleteIntent.id));
+      } else {
+        setSelectedAttemptIds((prev) => prev.filter((id) => id !== deleteIntent.id));
       }
       await onDataChanged();
-      onToast('Result deleted', 'success');
+      onToast(deleteIntent.kind === 'attempt' ? 'Attempt deleted' : 'Result deleted', 'success');
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not delete result', 'error');
     } finally {
@@ -395,7 +434,9 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
       const endpoint =
         bulkDeleteIntent.kind === 'mock'
           ? '/api/admin/results/mock/bulk'
-          : '/api/admin/results/quiz/bulk';
+          : bulkDeleteIntent.kind === 'quiz'
+          ? '/api/admin/results/quiz/bulk'
+          : '/api/admin/results/attempt/bulk';
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -410,8 +451,10 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
 
       if (bulkDeleteIntent.kind === 'mock') {
         setSelectedMockIds([]);
-      } else {
+      } else if (bulkDeleteIntent.kind === 'quiz') {
         setSelectedQuizIds([]);
+      } else {
+        setSelectedAttemptIds([]);
       }
 
       setBulkDeleteIntent(null);
@@ -502,6 +545,7 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <StatBlock label="Mock Attempts" value={String(mockAttempts.length)} />
         <StatBlock label="Mock Results" value={String(mockResults.length)} />
         <StatBlock label="Avg Mock Score" value={`${avgMockPercent}%`} />
         <StatBlock label="Quiz Results" value={String(quizResults.length)} />
@@ -518,6 +562,14 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
               }`}
             >
               Mock Results
+            </button>
+            <button
+              onClick={() => setActiveKind('attempt')}
+              className={`rounded px-3 py-1.5 text-sm font-medium ${
+                activeKind === 'attempt' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              Mock Attempts
             </button>
             <button
               onClick={() => setActiveKind('quiz')}
@@ -541,15 +593,19 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
           <p className="text-xs text-slate-500">
             {activeKind === 'mock'
               ? `${selectedMockIds.length} mock result(s) selected`
-              : `${selectedQuizIds.length} quiz result(s) selected`}
+              : activeKind === 'quiz'
+              ? `${selectedQuizIds.length} quiz result(s) selected`
+              : `${selectedAttemptIds.length} attempt(s) selected`}
           </p>
           <div className="flex gap-2">
             <button
               onClick={() => {
                 if (activeKind === 'mock') {
                   setSelectedMockIds([]);
-                } else {
+                } else if (activeKind === 'quiz') {
                   setSelectedQuizIds([]);
+                } else {
+                  setSelectedAttemptIds([]);
                 }
               }}
               className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
@@ -557,15 +613,28 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
               Clear Selection
             </button>
             <button
-              disabled={activeKind === 'mock' ? selectedMockIds.length === 0 : selectedQuizIds.length === 0}
+              disabled={
+                activeKind === 'mock'
+                  ? selectedMockIds.length === 0
+                  : activeKind === 'quiz'
+                  ? selectedQuizIds.length === 0
+                  : selectedAttemptIds.length === 0
+              }
               onClick={() =>
                 setBulkDeleteIntent({
                   kind: activeKind,
-                  ids: activeKind === 'mock' ? selectedMockIds : selectedQuizIds,
+                  ids:
+                    activeKind === 'mock'
+                      ? selectedMockIds
+                      : activeKind === 'quiz'
+                      ? selectedQuizIds
+                      : selectedAttemptIds,
                   label:
                     activeKind === 'mock'
                       ? `${selectedMockIds.length} mock result(s)`
-                      : `${selectedQuizIds.length} quiz result(s)`,
+                      : activeKind === 'quiz'
+                      ? `${selectedQuizIds.length} quiz result(s)`
+                      : `${selectedAttemptIds.length} attempt(s)`,
                 })
               }
               className="rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
@@ -666,6 +735,91 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
           </tbody>
         </table>
       </ResultsCard>
+      )}
+
+      {activeKind === 'attempt' && (
+        <ResultsCard title="Mock Attempts (In-Progress + Completed)">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <tr>
+                <th className="px-3 py-2 text-left">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleAttemptSelected}
+                    onChange={(event) => toggleAllVisibleAttempts(event.target.checked)}
+                    aria-label="Select all visible mock attempts"
+                  />
+                </th>
+                <th className="px-3 py-2 text-left">User</th>
+                <th className="px-3 py-2 text-left">Mock</th>
+                <th className="px-3 py-2 text-left">Status</th>
+                <th className="px-3 py-2 text-left">Answered</th>
+                <th className="px-3 py-2 text-left">Started</th>
+                <th className="px-3 py-2 text-left">Completed</th>
+                <th className="px-3 py-2 text-right">Controls</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {filteredMockAttempts.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-3 py-6 text-center text-xs text-slate-400">
+                    No attempts
+                  </td>
+                </tr>
+              )}
+              {filteredMockAttempts.map((attempt) => (
+                <tr key={attempt._id} className="hover:bg-slate-50">
+                  <td className="px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedAttemptIds.includes(attempt._id)}
+                      onChange={(event) => toggleAttemptSelection(attempt._id, event.target.checked)}
+                      aria-label={`Select attempt ${attempt._id}`}
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-700">
+                    {attempt.user?.name ?? attempt.user?.email ?? 'Unknown'}
+                  </td>
+                  <td className="px-3 py-2 text-xs font-medium text-slate-900">{attempt.quizTitle || '—'}</td>
+                  <td className="px-3 py-2 text-xs">
+                    <span
+                      className={`rounded px-2 py-0.5 font-medium ${
+                        attempt.isCompleted
+                          ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
+                          : 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
+                      }`}
+                    >
+                      {attempt.isCompleted ? 'Completed' : 'In Progress'}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-700">{attempt.answeredCount ?? 0}</td>
+                  <td className="px-3 py-2 text-xs text-slate-400">
+                    {attempt.startedAt ? new Date(attempt.startedAt).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-400">
+                    {attempt.completedAt ? new Date(attempt.completedAt).toLocaleDateString() : '-'}
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() =>
+                          setDeleteIntent({
+                            kind: 'attempt',
+                            id: attempt._id,
+                            label: attempt.quizTitle || 'this mock attempt',
+                          })
+                        }
+                        className="rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ResultsCard>
       )}
 
       {activeKind === 'quiz' && (
@@ -1141,9 +1295,10 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
       )}
 
       {deleteIntent && (
-        <ModalShell title="Delete Result" onClose={() => setDeleteIntent(null)}>
+        <ModalShell title={deleteIntent.kind === 'attempt' ? 'Delete Attempt' : 'Delete Result'} onClose={() => setDeleteIntent(null)}>
           <p className="text-sm text-slate-600">
-            Delete result for <span className="font-medium text-slate-900">{deleteIntent.label}</span>? This action cannot be undone.
+            Delete {deleteIntent.kind === 'attempt' ? 'attempt' : 'result'} for{' '}
+            <span className="font-medium text-slate-900">{deleteIntent.label}</span>? This action cannot be undone.
           </p>
           <div className="mt-5 flex justify-end gap-2">
             <button
@@ -1164,7 +1319,7 @@ export function ResultsTab({ mockResults, quizResults, onDataChanged, onToast }:
       )}
 
       {bulkDeleteIntent && (
-        <ModalShell title="Bulk Delete Results" onClose={() => setBulkDeleteIntent(null)}>
+        <ModalShell title={bulkDeleteIntent.kind === 'attempt' ? 'Bulk Delete Attempts' : 'Bulk Delete Results'} onClose={() => setBulkDeleteIntent(null)}>
           <p className="text-sm text-slate-600">
             Delete <span className="font-medium text-slate-900">{bulkDeleteIntent.label}</span>? This action cannot be undone.
           </p>

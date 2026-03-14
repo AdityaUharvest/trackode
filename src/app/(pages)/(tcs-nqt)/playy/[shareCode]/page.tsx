@@ -50,6 +50,7 @@ export default function QuizPlayer() {
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showResultModal, setShowResultModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [isCompletionPersisted, setIsCompletionPersisted] = useState(false);
   const [sectionTimeRemaining, setSectionTimeRemaining] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
@@ -171,7 +172,7 @@ export default function QuizPlayer() {
         // Check if quiz is already attempted
         const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
         if (attempted.data) {
-          setHasAttempted(attempted.data);
+          setHasAttempted(attempted.data?.isAttempted);
         }
 
         // Fetch and normalize sections
@@ -523,6 +524,7 @@ export default function QuizPlayer() {
       await axios.post(`/api/quiz/${shareCode}/complete`, {
         answers: sectionAnswers,
       });
+      setIsCompletionPersisted(true);
 
       localStorage.removeItem(`quiz_${shareCode}_data`);
       localStorage.removeItem(`quiz_${shareCode}_question_order`);
@@ -542,6 +544,28 @@ export default function QuizPlayer() {
     setShowFeedbackModal(false);
     setHideNavAndFooter(false);
     router.push('/dashboard');
+  };
+
+  const ensureQuizCompleted = async () => {
+    if (isCompletionPersisted) return true;
+
+    try {
+      await axios.post(`/api/quiz/${shareCode}/complete`, {
+        answers: sectionAnswers,
+      });
+      setIsCompletionPersisted(true);
+      return true;
+    } catch (completionError) {
+      console.error('Failed to persist completion while closing feedback modal:', completionError);
+      toast.error('Could not finalize quiz yet. Please try again.');
+      return false;
+    }
+  };
+
+  const handleFeedbackDismiss = async () => {
+    const isCompleted = await ensureQuizCompleted();
+    if (!isCompleted) return;
+    handleFeedbackComplete();
   };
 
   // Fullscreen handling
@@ -1198,7 +1222,7 @@ export default function QuizPlayer() {
       {/* Feedback Modal */}
       <FeedbackForm
         isOpen={showFeedbackModal}
-        onClose={handleFeedbackComplete}
+        onClose={handleFeedbackDismiss}
         quizId={quiz?._id}
         quizTitle={quiz?.title}
         theme={theme}

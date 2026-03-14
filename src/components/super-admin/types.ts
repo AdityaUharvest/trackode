@@ -74,6 +74,18 @@ export type QuizResultItem = {
   quiz?: { name?: string };
 };
 
+export type MockAttemptItem = {
+  _id: string;
+  quizId?: string;
+  quizTitle?: string;
+  userId?: string;
+  user?: { name?: string; email?: string };
+  startedAt?: string;
+  completedAt?: string;
+  answeredCount?: number;
+  isCompleted?: boolean;
+};
+
 export type AppSettings = {
   maintenanceMode: boolean;
   quizzesEnabled: boolean;
