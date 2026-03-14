@@ -106,6 +106,11 @@ export async function GET() {
       const quizId = String(attempt.quizId || '');
       const userId = String(attempt.userId || '');
       const answers = attempt.answers && typeof attempt.answers === 'object' ? attempt.answers : {};
+      const proctoring = attempt.proctoring && typeof attempt.proctoring === 'object' ? attempt.proctoring : {};
+      const fullscreenExitCount = Number(proctoring.fullscreenExitCount || 0);
+      const tabSwitchCount = Number(proctoring.tabSwitchCount || 0);
+      const copyAttemptCount = Number(proctoring.copyAttemptCount || 0);
+      const contextMenuCount = Number(proctoring.contextMenuCount || 0);
       const answeredCount = Object.values(answers as Record<string, Record<string, number>>).reduce(
         (sum, sectionAnswers) => sum + Object.keys(sectionAnswers || {}).length,
         0
@@ -122,6 +127,11 @@ export async function GET() {
         },
         isCompleted: Boolean(attempt.completedAt),
         answeredCount,
+        fullscreenExitCount,
+        tabSwitchCount,
+        copyAttemptCount,
+        contextMenuCount,
+        proctoringFlags: fullscreenExitCount + tabSwitchCount + copyAttemptCount + contextMenuCount,
       };
     });
 

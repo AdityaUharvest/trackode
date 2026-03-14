@@ -220,6 +220,25 @@ export async function GET(
       return NextResponse.json({ error: 'Quiz not found' }, { status: 404 });
     }
 
+    // Auto-complete the attempt if the quiz duration has elapsed and it was never completed
+    // (covers tab-close / network-drop abandonment where /complete was never called)
+    let effectiveAttempt: IQuizAttempt = attempt;
+    if (!attempt.completedAt && attempt.startedAt && quiz.durationMinutes) {
+      const expiredAt = new Date(attempt.startedAt).getTime() + (quiz.durationMinutes as number) * 60 * 1000;
+      if (Date.now() > expiredAt) {
+        const autoCompletedAt = new Date();
+        await QuizAttempt.updateOne(
+          { _id: new Types.ObjectId(attemptId) },
+          { $set: { completedAt: autoCompletedAt } }
+        );
+        effectiveAttempt = { ...attempt, completedAt: autoCompletedAt };
+      }
+    }
+
+    if (!effectiveAttempt.completedAt) {
+      return NextResponse.json({ error: 'Result is available only after quiz completion' }, { status: 409 });
+    }
+
     // Get all questions for this quiz with explanations
     const allQuestions = await Question.find({ mockTestId: quizId }).lean<IQuestion[]>();
     const questionsMap = new Map<string, IQuestion>();
@@ -227,20 +246,20 @@ export async function GET(
       questionsMap.set(question._id.toString(), question);
     });
 
-    const sectionResults = computeSectionResults(allQuestions, questionsMap, attempt.answers || {});
+    const sectionResults = computeSectionResults(allQuestions, questionsMap, effectiveAttempt.answers || {});
 
     // Calculate totals
     const totalScore = sectionResults.reduce((sum, section) => sum + section.correct, 0);
     const totalQuestions = allQuestions.length;
-    const percentage = Math.round((totalScore / totalQuestions) * 100);
+    const percentage = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
 
     // Construct the response
     const result = {
       quizId: String(quizId),
       attemptId: String(attemptId),
       userName: session.user.name || 'User',
-      quizTitle: attempt.quizTitle,
-      completedAt: attempt.completedAt,
+      quizTitle: effectiveAttempt.quizTitle,
+      completedAt: effectiveAttempt.completedAt,
       totalScore,
       totalQuestions,
       sections: sectionResults,
@@ -255,7 +274,7 @@ export async function GET(
         $set: {
           userId: new Types.ObjectId(userId),
           quizId: new Types.ObjectId(quizId),
-          quizTitle: attempt.quizTitle,
+          quizTitle: effectiveAttempt.quizTitle,
           totalScore,
           totalQuestions,
           percentage,
@@ -270,7 +289,7 @@ export async function GET(
               isCorrect: q.userAnswer === q.correctAnswer
             }))
           })),
-          completedAt: attempt.completedAt || new Date()
+          completedAt: effectiveAttempt.completedAt
         },
         $setOnInsert: {
           attemptId: new Types.ObjectId(attemptId)

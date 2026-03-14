@@ -2,6 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import MockResult from '@/app/model/MockResult';
+import QuizAttempt from '@/app/model/QuizAttempt';
 import { auth } from '@/auth';
 
 interface FeedbackRequest {
@@ -28,6 +29,15 @@ export async function POST(request: NextRequest, { params }: any) {
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ error: 'Invalid attempt ID' }, { status: 400 });
+    }
+
+    const attempt = await QuizAttempt.findOne({
+      _id: new mongoose.Types.ObjectId(id),
+      userId: session.user.id,
+    }).lean();
+
+    if (!attempt) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     let updateQuery: any;

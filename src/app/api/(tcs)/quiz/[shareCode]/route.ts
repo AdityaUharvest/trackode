@@ -2,6 +2,7 @@ import { NextResponse ,NextRequest} from 'next/server';
 import MockTest from '@/app/model/MoockTest';
 import Question from '@/app/model/MockQuestions';
 import connectDB from '@/lib/util';
+import { auth } from '@/auth';
 
 function shuffleArray<T>(items: T[]): T[] {
   const shuffled = [...items];
@@ -20,6 +21,14 @@ export async function GET(
     await connectDB();
     const { shareCode } = await params;
 
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { message: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
     
     const quiz = await MockTest.findOne({ shareCode: shareCode });
     if (!quiz) {
@@ -28,11 +37,25 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    if (!quiz.isPublished) {
+      return NextResponse.json(
+        { message: 'Quiz is not published' },
+        { status: 403 }
+      );
+    }
     
     const questions = await Question.find({ mockTestId: quiz._id }).lean();
     const shuffledQuestions = shuffleArray(questions);
+
+    const safeQuestions = shuffledQuestions.map((question: any) => ({
+      _id: question._id,
+      section: question.section,
+      text: question.text,
+      options: question.options,
+    }));
     
-    return NextResponse.json({ quiz, questions: shuffledQuestions });
+    return NextResponse.json({ quiz, questions: safeQuestions });
   } catch (error) {
     console.error('Error fetching quiz:', error);
     return NextResponse.json(

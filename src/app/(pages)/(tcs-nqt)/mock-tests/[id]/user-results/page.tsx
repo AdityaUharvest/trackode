@@ -105,6 +105,11 @@ export default function UserQuizResult() {
   const [activeQuestionSection, setActiveQuestionSection] = useState('');
   const [focusedQuestion, setFocusedQuestion] = useState<FocusedQuestionState | null>(null);
 
+  const getSafePercentage = (numerator: number, denominator: number) => {
+    if (!denominator || denominator <= 0) return 0;
+    return Math.round((numerator / denominator) * 100);
+  };
+
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
   const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
@@ -128,11 +133,14 @@ export default function UserQuizResult() {
         // Fetch user's own result
         const userResponse = await fetch(`/api/mock-tests/${quizId}/user-result`);
         if (!userResponse.ok) {
+          if (userResponse.status === 409) {
+            setError('Result is not available yet. Please complete the quiz first.');
+            return;
+          }
           throw new Error('Failed to fetch user results');
         }
         const userData = await userResponse.json();
         setResult(userData);
-        console.log('User Data:', userData);
 
         const firstSectionWithQuestions = (userData.sections || []).find(
           (section: SectionResult) => section.total > 0
@@ -163,7 +171,6 @@ export default function UserQuizResult() {
 
         // Fetch all attempts for leaderboard
         const attemptsResponse = await fetch(`/api/mock-tests/${userData.quizId}/results`);
-        console.log('Attempts Response:', attemptsResponse);
         if (!attemptsResponse.ok) {
           throw new Error('Failed to fetch attempts');
         }
@@ -188,15 +195,7 @@ export default function UserQuizResult() {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
       } catch (err) {
-        // auto refresh the page if error occurs
-        if (err instanceof Error && err.message === 'Failed to fetch user results') {
-          setTimeout(() => {
-            window.location.reload();
-          }
-          , 10000);
-          
-        }
-        
+        setError(err instanceof Error ? err.message : 'Failed to load result data');
 
       } finally {
         setLoading(false);
@@ -207,8 +206,6 @@ export default function UserQuizResult() {
       fetchData();
     }
   }, [session, quizId]);
-console.log('Result:', result);
-
   const getSectionLabel = (sectionName: string) =>
     sectionName
       .split('-')
@@ -574,7 +571,7 @@ console.log('Result:', result);
     );
   }
 
-  const overallPercentage = Math.round((result.totalScore / result.totalQuestions) * 100);
+  const overallPercentage = getSafePercentage(result.totalScore, result.totalQuestions);
   const performanceBadge = getScoreBadge(overallPercentage);
   const availableQuestionSections = result.sections.filter((section) => section.total > 0);
   const selectedQuestionSection =
@@ -938,10 +935,10 @@ console.log('Result:', result);
                     </h3>
                     <div className="space-y-3">
                       {result.sections.map((section) => {
-                        const sectionPercentage = Math.round((section.correct / section.total) * 100);
-                        const sectionBadge = getScoreBadge(sectionPercentage);
-
                         if (section.total === 0) return null;
+
+                        const sectionPercentage = getSafePercentage(section.correct, section.total);
+                        const sectionBadge = getScoreBadge(sectionPercentage);
 
                         return (
                           <div key={section.sectionName} className="space-y-2 rounded-lg border border-gray-200 p-3 dark:border-gray-700">
@@ -1067,7 +1064,7 @@ console.log('Result:', result);
                   </TabsList>
 
                   {availableQuestionSections.map((section) => {
-                    const sectionPercentage = Math.round((section.correct / section.total) * 100);
+                    const sectionPercentage = getSafePercentage(section.correct, section.total);
 
                     return (
                       <TabsContent key={section.sectionName} value={section.sectionName} className="space-y-4">

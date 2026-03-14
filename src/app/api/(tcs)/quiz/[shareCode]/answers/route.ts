@@ -2,6 +2,7 @@ import { NextResponse ,NextRequest} from 'next/server';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import connectDB from '@/lib/util';
 import MockTest from '@/app/model/MoockTest';
+import Question from '@/app/model/MockQuestions';
 import { auth } from '@/auth';
 
 function hasUnsafeMongoPathChars(value: string): boolean {
@@ -32,6 +33,19 @@ export async function POST(
 
     const userId = session.user.id;
     const { section, answers } = await request.json();
+    if (typeof section !== 'string' || !section.trim() || !answers || typeof answers !== 'object') {
+      return NextResponse.json(
+        { message: 'Invalid section answers payload' },
+        { status: 400 }
+      );
+    }
+    const sectionName = section.trim();
+    if (hasUnsafeMongoPathChars(sectionName)) {
+      return NextResponse.json(
+        { message: 'Invalid section name' },
+        { status: 400 }
+      );
+    }
     
     // In a real app, you'd want to authenticate the user
     const quiz = await MockTest.findOne({ shareCode: shareCode });
@@ -41,11 +55,69 @@ export async function POST(
         { status: 404 }
       );
     }
+    if (!quiz.isPublished) {
+      return NextResponse.json(
+        { message: 'Quiz is not published' },
+        { status: 403 }
+      );
+    }
+
+    // Reject saves once the quiz duration has fully expired for this user's attempt
+    const existingAttempt = await QuizAttempt.findOne({
+      quizId: quiz._id,
+      userId,
+      $or: [{ completedAt: null }, { completedAt: { $exists: false } }],
+    }).select({ startedAt: 1 }).lean<{ startedAt?: Date }>();
+
+    // Block entirely if the user already has a completed attempt for this quiz.
+    const alreadyCompleted = await QuizAttempt.exists({
+      quizId: quiz._id,
+      userId,
+      completedAt: { $ne: null },
+    });
+    if (alreadyCompleted) {
+      return NextResponse.json(
+        { message: 'Quiz already completed' },
+        { status: 409 }
+      );
+    }
+
+    if (existingAttempt?.startedAt && quiz.durationMinutes) {
+      const expiredAt = new Date(existingAttempt.startedAt).getTime() + (quiz.durationMinutes as number) * 60 * 1000;
+      if (Date.now() > expiredAt) {
+        return NextResponse.json(
+          { message: 'Quiz time has expired' },
+          { status: 410 }
+        );
+      }
+    }
+
+    const sectionQuestions = await Question.find({ mockTestId: quiz._id })
+      .select({ _id: 1, section: 1, options: 1 })
+      .lean<Array<{ _id: unknown; section?: string; options?: string[] }>>();
+
+    const normalizedSection = sectionName.toLowerCase();
+    const questionMetaById = new Map<string, { optionCount: number }>();
+
+    sectionQuestions.forEach((question) => {
+      const questionSection = (question.section || '').trim().toLowerCase();
+      if (questionSection !== normalizedSection) return;
+
+      questionMetaById.set(String(question._id), {
+        optionCount: Array.isArray(question.options) ? question.options.length : 0,
+      });
+    });
+
     const setUpdates: Record<string, number> = {};
     for (const [questionId, answerIndex] of Object.entries(answers)) {
       if (hasUnsafeMongoPathChars(questionId)) continue;
       if (typeof answerIndex !== 'number' || !Number.isInteger(answerIndex)) continue;
-      setUpdates[`answers.${section}.${questionId}`] = answerIndex;
+
+      const questionMeta = questionMetaById.get(questionId);
+      if (!questionMeta) continue;
+      if (answerIndex < 0 || answerIndex >= questionMeta.optionCount) continue;
+
+      setUpdates[`answers.${sectionName}.${questionId}`] = answerIndex;
     }
 
     if (Object.keys(setUpdates).length === 0) {
@@ -57,7 +129,8 @@ export async function POST(
 
     const filter = {
       quizId: quiz._id,
-      userId
+      userId,
+      $or: [{ completedAt: null }, { completedAt: { $exists: false } }]
     };
     const update = {
       $set: setUpdates,
