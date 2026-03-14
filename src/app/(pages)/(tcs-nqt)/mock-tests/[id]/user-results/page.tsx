@@ -73,6 +73,13 @@ interface UserAttempt {
   rank?: number;
 }
 
+type FocusedQuestionState = {
+  sectionName: string;
+  sectionLabel: string;
+  question: QuestionResult;
+  index: number;
+};
+
 export default function UserQuizResult() {
   const { data: session } = useSession();
   const { theme } = useTheme();
@@ -81,8 +88,6 @@ export default function UserQuizResult() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
-  const [expandedQuestions, setExpandedQuestions] = useState<Record<string, boolean>>({});
   const [expandedExplanations, setExpandedExplanations] = useState<Record<string, boolean>>({});
   const [loadingExplanations, setLoadingExplanations] = useState<Record<string, boolean>>({});
   const [detailedExplanations, setDetailedExplanations] = useState<Record<string, string>>({});
@@ -97,6 +102,13 @@ export default function UserQuizResult() {
   const [topPerformers, setTopPerformers] = useState<UserAttempt[]>([]);
   const [leaderboardFinalized, setLeaderboardFinalized] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [activeQuestionSection, setActiveQuestionSection] = useState('');
+  const [focusedQuestion, setFocusedQuestion] = useState<FocusedQuestionState | null>(null);
+
+  const getSafePercentage = (numerator: number, denominator: number) => {
+    if (!denominator || denominator <= 0) return 0;
+    return Math.round((numerator / denominator) * 100);
+  };
 
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
@@ -110,6 +122,8 @@ export default function UserQuizResult() {
   const feedbackBg = theme === 'dark' ? 'bg-indigo-900/20 border-indigo-700' : 'bg-indigo-50 border-indigo-200';
   const highlightBg = theme === 'dark' ? 'bg-indigo-900/30' : 'bg-indigo-50';
   const rankBadgeBg = theme === 'dark' ? 'bg-yellow-900/30 border-yellow-600' : 'bg-yellow-50 border-yellow-500';
+  const panelBg = theme === 'dark' ? 'bg-gray-900/80' : 'bg-white';
+  const mutedText = theme === 'dark' ? 'text-gray-300' : 'text-gray-600';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,20 +133,21 @@ export default function UserQuizResult() {
         // Fetch user's own result
         const userResponse = await fetch(`/api/mock-tests/${quizId}/user-result`);
         if (!userResponse.ok) {
+          if (userResponse.status === 409) {
+            setError('Result is not available yet. Please complete the quiz first.');
+            return;
+          }
           throw new Error('Failed to fetch user results');
         }
         const userData = await userResponse.json();
         setResult(userData);
-        console.log('User Data:', userData);
-        // Expand all sections by default
-        const defaultExpanded = userData.sections.reduce(
-          (acc: Record<string, boolean>, section: SectionResult) => {
-            acc[section.sectionName] = true;
-            return acc;
-          },
-          {}
+
+        const firstSectionWithQuestions = (userData.sections || []).find(
+          (section: SectionResult) => section.total > 0
         );
-        setExpandedSections(defaultExpanded);
+        if (firstSectionWithQuestions) {
+          setActiveQuestionSection(firstSectionWithQuestions.sectionName);
+        }
 
         // Set existing feedback if available
         if (userData.overallFeedback) {
@@ -156,7 +171,6 @@ export default function UserQuizResult() {
 
         // Fetch all attempts for leaderboard
         const attemptsResponse = await fetch(`/api/mock-tests/${userData.quizId}/results`);
-        console.log('Attempts Response:', attemptsResponse);
         if (!attemptsResponse.ok) {
           throw new Error('Failed to fetch attempts');
         }
@@ -181,15 +195,7 @@ export default function UserQuizResult() {
         setShowConfetti(true);
         setTimeout(() => setShowConfetti(false), 5000);
       } catch (err) {
-        // auto refresh the page if error occurs
-        if (err instanceof Error && err.message === 'Failed to fetch user results') {
-          setTimeout(() => {
-            window.location.reload();
-          }
-          , 10000);
-          
-        }
-        
+        setError(err instanceof Error ? err.message : 'Failed to load result data');
 
       } finally {
         setLoading(false);
@@ -200,20 +206,11 @@ export default function UserQuizResult() {
       fetchData();
     }
   }, [session, quizId]);
-console.log('Result:', result);
-  const toggleSection = (sectionName: string) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [sectionName]: !prev[sectionName],
-    }));
-  };
-
-  const toggleQuestion = (questionId: string) => {
-    setExpandedQuestions((prev) => ({
-      ...prev,
-      [questionId]: !prev[questionId],
-    }));
-  };
+  const getSectionLabel = (sectionName: string) =>
+    sectionName
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
 
   const saveQuestionFeedback = async (questionId: string, explanation: string) => {
     try {
@@ -574,8 +571,13 @@ console.log('Result:', result);
     );
   }
 
-  const overallPercentage = Math.round((result.totalScore / result.totalQuestions) * 100);
+  const overallPercentage = getSafePercentage(result.totalScore, result.totalQuestions);
   const performanceBadge = getScoreBadge(overallPercentage);
+  const availableQuestionSections = result.sections.filter((section) => section.total > 0);
+  const selectedQuestionSection =
+    availableQuestionSections.find((section) => section.sectionName === activeQuestionSection) ||
+    availableQuestionSections[0] ||
+    null;
 
   // For the circular progress indicator
   const circumference = 2 * Math.PI * 40; // r = 40
@@ -589,7 +591,7 @@ console.log('Result:', result);
   };
 
   return (
-    <div className={`min-h-screen p-2 md:p-6 ${bgColor}`}>
+    <div className={`min-h-screen p-3 pb-36 md:p-6 md:pb-28 ${bgColor}`}>
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
           <div className="confetti-container">
@@ -633,9 +635,9 @@ console.log('Result:', result);
         </div>
       )}
 
-      <div className="mx-auto space-y-6">
+      <div className="mx-auto max-w-7xl space-y-6">
         {topPerformers.length > 0 && (
-          <Card className="overflow-hidden border border-indigo-100 bg-white shadow-sm dark:border-indigo-900/40 dark:bg-gray-900">
+          <Card className="overflow-hidden border border-indigo-100 shadow-sm dark:border-indigo-900/40 dark:bg-gray-900">
             <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-cyan-500 to-emerald-500" />
             <CardHeader className="pb-3">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -657,7 +659,7 @@ console.log('Result:', result);
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-5">
               <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                 {topPerformers[0] && (
                   <div className="rounded-xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-100 p-4 shadow-sm">
@@ -693,10 +695,10 @@ console.log('Result:', result);
               </div>
 
               {attempts.length > 0 && (
-                <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
-                  <div className="max-h-[360px] overflow-auto">
+                <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+                  <div className="max-h-[380px] overflow-auto">
                     <table className="min-w-full text-sm">
-                      <thead className="sticky top-0 z-10 bg-indigo-100 text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100">
+                      <thead className="sticky top-0 z-10 border-b border-gray-200 bg-gray-100 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200">
                         <tr>
                           <th className="p-3 text-left font-semibold">Rank</th>
                           <th className="p-3 text-left font-semibold">Player Name</th>
@@ -712,7 +714,10 @@ console.log('Result:', result);
                           const medalIcon = renderMedal(rank);
 
                           return (
-                            <tr key={attempt._id} className="bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800">
+                            <tr
+                              key={attempt._id}
+                              className="bg-white odd:bg-gray-50/50 hover:bg-indigo-50/40 dark:bg-gray-900 dark:odd:bg-gray-800/60 dark:hover:bg-gray-800"
+                            >
                               <td className="p-3 font-semibold text-gray-800 dark:text-gray-100">
                                 <div className="flex items-center gap-2">
                                   {medalIcon ? medalIcon : <span className="text-xs font-bold text-gray-500">#{rank}</span>}
@@ -728,10 +733,10 @@ console.log('Result:', result);
                                 {attempt.totalAnswered ?? 0}/{attempt.totalQuestions ?? 0}
                               </td>
                               <td className="p-3">
-                                <div className="w-24 rounded-full bg-gray-200 dark:bg-gray-700">
+                                <div className="h-2 w-24 rounded-full bg-gray-200 dark:bg-gray-700">
                                   <div className="h-2 rounded-full bg-indigo-600" style={{ width: `${attempt.accuracy ?? 0}%` }} />
                                 </div>
-                                <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">{attempt.accuracy ?? 0}%</div>
+                                <div className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300">{attempt.accuracy ?? 0}%</div>
                               </td>
                               <td className="p-3">
                                 <span
@@ -763,12 +768,12 @@ console.log('Result:', result);
         )}
 
         {/* Top Summary Cardd */}
-        <Card className={`mb-6 overflow-hidden border shadow-md ${bgColor}`}>
+        <Card className={`mb-6 overflow-hidden border shadow-sm ${cardBg} ${borderColor}`}>
           <div className={`h-2 w-full ${performanceBadge.color}`}></div>
-          <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2">
+          <CardHeader className="flex flex-col gap-4 pb-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle className="text-sm md:text-sm">{result.quizTitle}</CardTitle>
-              <CardDescription className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mt-1">
+              <CardTitle className="text-xl font-semibold tracking-tight md:text-2xl">{result.quizTitle}</CardTitle>
+              <CardDescription className="mt-2 flex flex-col gap-1 text-sm md:flex-row md:items-center md:gap-3">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   {new Date(result.completedAt).toLocaleDateString()}
@@ -798,44 +803,78 @@ console.log('Result:', result);
             </div>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 gap-3 pb-6 md:grid-cols-4">
+              <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
+                <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Score</p>
+                <p className="mt-1 text-lg font-semibold">{result.totalScore}/{result.totalQuestions}</p>
+              </div>
+              <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
+                <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Accuracy</p>
+                <p className="mt-1 text-lg font-semibold">{overallPercentage}%</p>
+              </div>
+              <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
+                <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Sections</p>
+                <p className="mt-1 text-lg font-semibold">{result.sections.length}</p>
+              </div>
+              <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
+                <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Attempted</p>
+                <p className="mt-1 text-lg font-semibold">
+                  {result.sections.reduce((sum, section) => sum + section.questions.length, 0)}/{result.totalQuestions}
+                </p>
+              </div>
+            </div>
+
             <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-3 gap-2 mb-6">
+              <div
+                className={`mb-4 rounded-xl border p-1 ${
+                  theme === 'dark' ? 'border-gray-800 bg-gray-950/70' : 'border-gray-200 bg-gray-100/70'
+                }`}
+              >
+                <TabsList className="grid h-auto grid-cols-1 gap-2 bg-transparent p-0 sm:grid-cols-2">
                 <TabsTrigger
                   value="overview"
-                  className={`flex items-center gap-2 bg-indigo-400 text-white hover:bg-indigo-500 ${
-                    activeTab === 'overview' ? 'bg-indigo-900 text-white' : ''
-                  }`}
+                  className="group rounded-lg border border-transparent bg-white/80 px-3 py-3 text-left transition-all data-[state=active]:border-indigo-500 data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-white dark:bg-gray-900/80 dark:hover:bg-gray-900 dark:data-[state=active]:border-indigo-400 dark:data-[state=active]:bg-indigo-700"
                 >
-                  <Trophy className="h-4 w-4" />
-                  <span className="hidden md:inline">Overview</span>
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-md bg-indigo-100 p-2 text-indigo-600 transition-colors group-data-[state=active]:bg-white/15 group-data-[state=active]:text-white dark:bg-indigo-900/60 dark:text-indigo-300">
+                      <Trophy className="h-4 w-4" />
+                    </span>
+                    <span className="flex flex-col items-start">
+                      <span className="text-sm font-semibold">Overview</span>
+                      <span className="text-xs text-gray-500 group-data-[state=active]:text-indigo-100 dark:text-gray-400">
+                        Summary and AI insight
+                      </span>
+                    </span>
+                  </div>
                 </TabsTrigger>
                 <TabsTrigger
                   value="sections"
-                  className="flex bg-indigo-400 text-white hover:bg-indigo-500 items-center gap-2"
+                  className="group rounded-lg border border-transparent bg-white/80 px-3 py-3 text-left transition-all data-[state=active]:border-indigo-500 data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-sm hover:bg-white dark:bg-gray-900/80 dark:hover:bg-gray-900 dark:data-[state=active]:border-indigo-400 dark:data-[state=active]:bg-indigo-700"
                 >
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden md:inline">Sections</span>
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-md bg-indigo-100 p-2 text-indigo-600 transition-colors group-data-[state=active]:bg-white/15 group-data-[state=active]:text-white dark:bg-indigo-900/60 dark:text-indigo-300">
+                      <BarChart3 className="h-4 w-4" />
+                    </span>
+                    <span className="flex flex-col items-start">
+                      <span className="text-sm font-semibold">Sections</span>
+                      <span className="text-xs text-gray-500 group-data-[state=active]:text-indigo-100 dark:text-gray-400">
+                        Topic-wise breakdown
+                      </span>
+                    </span>
+                  </div>
                 </TabsTrigger>
-                <TabsTrigger
-                  value="questions"
-                  className="flex bg-indigo-400 text-white hover:bg-indigo-500 items-center gap-2"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden md:inline">Questions</span>
-                </TabsTrigger>
-              </TabsList>
+                </TabsList>
+              </div>
 
               {/* Overview Tab */}
               <TabsContent value="overview" className="space-y-6">
                 {/* Leaderboard Podium */}
                 
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                   {/* Score Circle */}
-                  <div
-                    className={`flex flex-col items-center justify-center p-6 rounded-lg ${cardBg} border ${borderColor} relative`}
-                  >
+                  <div className={`relative flex flex-col items-center justify-center rounded-xl border p-6 ${cardBg} ${borderColor}`}>
                     <div className="relative flex items-center justify-center">
                       <svg width="120" height="120" viewBox="0 0 100 100">
                         <circle
@@ -870,7 +909,7 @@ console.log('Result:', result);
                         />
                       </svg>
                       <div className="absolute flex flex-col items-center">
-                        <span className="text-sm font-bold">{overallPercentage}%</span>
+                        <span className="text-xl font-bold">{overallPercentage}%</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">Overall Score</span>
                       </div>
                     </div>
@@ -889,39 +928,37 @@ console.log('Result:', result);
                   </div>
 
                   {/* Section Performance */}
-                  <div
-                    className={`p-6 rounded-lg ${cardBg} border ${borderColor} col-span-1 md:col-span-2`}
-                  >
+                  <div className={`col-span-1 rounded-xl border p-6 md:col-span-2 ${cardBg} ${borderColor}`}>
                     <h3 className="font-medium mb-4 flex items-center gap-2">
-                      <BarChart3 className="h-2 w-2 text-indigo-500" />
+                      <BarChart3 className="h-4 w-4 text-indigo-500" />
                       Section Performance
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {result.sections.map((section) => {
-                        const sectionPercentage = Math.round((section.correct / section.total) * 100);
-                        const sectionBadge = getScoreBadge(sectionPercentage);
-
                         if (section.total === 0) return null;
 
+                        const sectionPercentage = getSafePercentage(section.correct, section.total);
+                        const sectionBadge = getScoreBadge(sectionPercentage);
+
                         return (
-                          <div key={section.sectionName} className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium">
+                          <div key={section.sectionName} className="space-y-2 rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-sm font-medium">
                                   {section.sectionName
                                     .split('-')
                                     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                                     .join(' ')}
                                 </span>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-xs font-medium">
                                   Attempted: {section.questions.length}/{section.total}
                                 </Badge>
-                                <Badge variant="outline" className="text-xs">
+                                <Badge variant="outline" className="text-xs font-medium">
                                   Correct: {section.correct}/{section.questions.length}
                                 </Badge>
                               </div>
                               <span
-                                className={`text-sm font-medium ${
+                                className={`text-sm font-semibold ${
                                   sectionPercentage >= 70
                                     ? 'text-green-500'
                                     : sectionPercentage >= 60
@@ -963,8 +1000,8 @@ console.log('Result:', result);
                 {/* AI Analysis */}
                 <Card className={`${highlightBg} border ${borderColor}`}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Brain className="h-2 w-2 text-indigo-500" />
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Brain className="h-4 w-4 text-indigo-500" />
                       AI Performance Analysis
                     </CardTitle>
                     <CardDescription>
@@ -1006,357 +1043,241 @@ console.log('Result:', result);
 
               {/* Sections Tab */}
               <TabsContent value="sections" className="space-y-6">
-                {result.sections.map((section) => {
-                  const sectionPercentage = Math.round((section.correct / section.total) * 100);
-                  const sectionBadge = getScoreBadge(sectionPercentage);
-
-                  if (section.total === 0) return null;
-
-                  return (
-                    <Card key={section.sectionName} className="overflow-hidden">
-                      <div className={`h-1 w-full ${sectionBadge.color}`}></div>
-                      <CardHeader
-                        className={`flex flex-row items-center justify-between cursor-pointer ${sectionHeaderBg} hover:bg-gray-100 dark:hover:bg-gray-800/80 transition-colors`}
-                        onClick={() => toggleSection(section.sectionName)}
+                <Tabs
+                  value={activeQuestionSection || availableQuestionSections[0]?.sectionName || ''}
+                  onValueChange={setActiveQuestionSection}
+                  className="space-y-4"
+                >
+                  <TabsList className="h-auto w-full justify-start gap-2 overflow-x-auto bg-transparent p-0">
+                    {availableQuestionSections.map((section) => (
+                      <TabsTrigger
+                        key={section.sectionName}
+                        value={section.sectionName}
+                        className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium data-[state=active]:border-indigo-500 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700 dark:border-gray-700 dark:bg-gray-900 dark:data-[state=active]:border-indigo-400 dark:data-[state=active]:bg-indigo-950/40 dark:data-[state=active]:text-indigo-200"
                       >
-                        <div>
-                          <CardTitle className="text-sm flex items-center gap-2">
-                            {section.sectionName
-                              .split('-')
-                              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                              .join(' ')}
-                            <Badge
-                              variant={
-                                sectionPercentage >= 70
-                                  ? 'secondary'
-                                  : sectionPercentage >= 40
-                                  ? 'outline'
-                                  : 'destructive'
+                        <span className="mr-2">{getSectionLabel(section.sectionName)}</span>
+                        <Badge variant="outline" className="text-[10px]">
+                          {section.questions.length}
+                        </Badge>
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+
+                  {availableQuestionSections.map((section) => {
+                    const sectionPercentage = getSafePercentage(section.correct, section.total);
+
+                    return (
+                      <TabsContent key={section.sectionName} value={section.sectionName} className="space-y-4">
+                        <div className={`flex flex-wrap items-center gap-2 rounded-lg border p-3 ${cardBg} ${borderColor}`}>
+                          <span className="text-sm font-semibold">{getSectionLabel(section.sectionName)}</span>
+                          <Badge variant={sectionPercentage >= 70 ? 'secondary' : sectionPercentage >= 40 ? 'outline' : 'destructive'}>
+                            {section.correct}/{section.total}
+                          </Badge>
+                          <Badge variant="outline">Accuracy {sectionPercentage}%</Badge>
+                          <Badge variant="outline">Attempted {section.questions.length}</Badge>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                          {section.questions.map((question, index) => (
+                            <Card
+                              key={question._id}
+                              className={`border text-sm shadow-sm ${
+                                question.userAnswer === question.correctAnswer
+                                  ? 'border-green-500 dark:border-green-700'
+                                  : 'border-red-500 dark:border-red-700'
+                              } cursor-pointer transition hover:-translate-y-0.5 hover:shadow-md`}
+                              onClick={() =>
+                                setFocusedQuestion({
+                                  sectionName: section.sectionName,
+                                  sectionLabel: getSectionLabel(section.sectionName),
+                                  question,
+                                  index,
+                                })
                               }
                             >
-                              {section.correct}/{section.total} ({sectionPercentage}%)
-                            </Badge>
-                          </CardTitle>
-                        </div>
-                        <button
-                          className={`p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleSection(section.sectionName);
-                          }}
-                        >
-                          {expandedSections[section.sectionName] ? (
-                            <ChevronUp className="h-2 w-2" />
-                          ) : (
-                            <ChevronDown className="h-2 w-2" />
-                          )}
-                        </button>
-                      </CardHeader>
-
-                      {expandedSections[section.sectionName] && (
-                        <CardContent className={`p-4 ${bgColor} space-y-6`}>
-                          {/* Questions summary for this section */}
-                          <div className="space-y-2">
-                            <h4 className="font-medium text-sm flex items-center gap-2">
-                              <BookOpen className="h-4 w-4 text-indigo-500" />
-                              Questions Summary
-                            </h4>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                              {section.questions.map((question, idx) => {
-                                const isCorrect = question.userAnswer === question.correctAnswer;
-                                return (
-                                  <Card
-                                    key={question._id}
-                                    className={`border cursor-pointer transition-all ${
-                                      isCorrect
-                                        ? 'border-green-500 dark:border-green-700'
-                                        : 'border-red-500 dark:border-red-700'
-                                    } hover:shadow-md`}
-                                    onClick={() => {
-                                      toggleQuestion(question._id);
-                                      setActiveTab('questions');
-                                    }}
-                                  >
-                                    <CardContent className="p-3 flex flex-col items-center text-center">
-                                      <div
-                                        className={`w-4 h-4 rounded-full flex items-center justify-center mb-1 ${
-                                          isCorrect
-                                            ? 'bg-green-100 dark:bg-green-900/30'
-                                            : 'bg-red-100 dark:bg-red-900/30'
-                                        }`}
-                                      >
-                                        {isCorrect ? (
-                                          <CheckCircle2 className="h-2 w-2 text-green-500" />
-                                        ) : (
-                                          <XCircle className="h-2 w-2 text-red-500" />
-                                        )}
-                                      </div>
-                                      <span className="text-xs font-medium">Question {idx + 1}</span>
-                                    </CardContent>
-                                  </Card>
-                                );
-                              })}
-                            </div>
-                          </div>
-
-                          {/* Section Feedback */}
-                          <Card className={`${feedbackBg} border-none`}>
-                            <CardHeader className="pb-2">
-                              <div className="">
-                                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                  <Lightbulb className="h-4 w-4 text-indigo-500" />
-                                  Section Feedback
-                                </CardTitle>
-                                {sectionFeedback[section.sectionName] ? (
-                                  <Markdown>{sectionFeedback[section.sectionName]}</Markdown>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    onClick={() => generateSectionFeedback(section.sectionName)}
-                                    disabled={loadingFeedback.sections[section.sectionName]}
-                                    className="h-8"
-                                  >
-                                    {loadingFeedback.sections[section.sectionName] ? (
-                                      <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Generating...
-                                      </>
-                                    ) : sectionFeedback[section.sectionName] ? (
-                                      <>
-                                        Refresh
-                                        <Sparkles className="h-4 w-4 ml-1" />
-                                      </>
-                                    ) : (
-                                      <>
-                                        Generate
-                                        <Sparkles className="h-4 w-4 ml-1" />
-                                      </>
-                                    )}
-                                  </Button>
-                                )}
-                              </div>
-                            </CardHeader>
-                          </Card>
-
-                          <Button
-                            variant="outline"
-                            onClick={() => setActiveTab('questions')}
-                            className="w-full bg-indigo-400 text-white hover:bg-indigo-500 hover:text-white"
-                            size="sm"
-                          >
-                            View All Questions
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                        </CardContent>
-                      )}
-                    </Card>
-                  );
-                })}
-              </TabsContent>
-
-              {/* Questions Tab */}
-              <TabsContent value="questions" className="space-y-4">
-                {result.sections.map((section) => {
-                  if (section.total === 0) return null;
-
-                  return (
-                    <div key={section.sectionName} className="space-y-4">
-                      <h3 className="font-medium text-sm flex items-center gap-2">
-                        <BookOpen className="h-2 w-2 text-indigo-500" />
-                        {section.sectionName
-                          .split('-')
-                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(' ')}
-                        <Badge variant="outline">
-                          {section.correct}/{section.total}
-                        </Badge>
-                      </h3>
-
-                      <div className="space-y-4">
-                        {section.questions.map((question, index) => (
-                          <Card
-                            key={question._id}
-                            className={`border text-xm ${
-                              question.userAnswer === question.correctAnswer
-                                ? 'border-green-500 dark:border-green-700'
-                                : 'border-red-500 dark:border-red-700'
-                            }`}
-                          >
-                            <CardHeader
-                              className="cursor-pointer flex flex-row items-start justify-between"
-                              onClick={() => toggleQuestion(question._id)}
-                            >
-                              <div className="flex gap-3">
-                                <div
-                                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                    question.userAnswer === question.correctAnswer
-                                      ? 'bg-green-100 dark:bg-green-900/30'
-                                      : 'bg-red-100 dark:bg-red-900/30'
-                                  }`}
-                                >
-                                  {question.userAnswer === question.correctAnswer ? (
-                                    <CheckCircle2 className="h-2 w-2 text-green-500" />
-                                  ) : (
-                                    <XCircle className="h-2 w-2 text-red-500" />
-                                  )}
-                                </div>
-                                <div>
-                                  <CardTitle className="text-sm font-medium">
-                                    Question {index + 1}
-                                  </CardTitle>
-                                  <CardDescription className="line-clamp-1">
-                                    {question.text}
-                                  </CardDescription>
-                                </div>
-                              </div>
-                              <button
-                                className="mt-1 p-1 rounded-full hover:bg-gray-200 bg-green-500 dark:hover:bg-gray-700 transition-colors"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toggleQuestion(question._id);
-                                }}
-                              >
-                                {expandedQuestions[question._id] ? (
-                                  <ChevronUp className="h-2 w-2" />
-                                ) : (
-                                  <ChevronDown className="h-2 w-2" />
-                                )}
-                              </button>
-                            </CardHeader>
-
-                            {expandedQuestions[question._id] && (
-                              <CardContent className="space-y-4 pt-0">
-                                <Separator />
-
-                                {/* Options list */}
-                                <div className="space-y-2 mt-2">
-                                  {question.options.map((option, index) => {
-                                    const isCorrect = index === question.correctAnswer;
-                                    const isUserSelection = index === question.userAnswer;
-
-                                    let optionClass = neutralOptionBg;
-                                    let iconComponent = null;
-
-                                    if (isCorrect) {
-                                      optionClass = correctOptionBg;
-                                      iconComponent = (
-                                        <CheckCircle2 className="h-2 w-2 text-green-500 flex-shrink-0" />
-                                      );
-                                    } else if (isUserSelection) {
-                                      optionClass = wrongOptionBg;
-                                      iconComponent = (
-                                        <XCircle className="h-2 w-2 text-red-500 flex-shrink-0" />
-                                      );
-                                    }
-
-                                    return (
-                                      <div
-                                        key={index}
-                                        className={`p-3 text-xs rounded-lg border ${optionClass}`}
-                                      >
-                                        <div className="flex items-start justify-between">
-                                          <div className="flex items-start">
-                                            <span className="mr-2 font-medium">
-                                              {String.fromCharCode(65 + index)}.
-                                            </span>
-                                            <p>{option}</p>
-                                          </div>
-                                          {iconComponent}
-                                        </div>
-                                        {isCorrect && (
-                                          <p className="text-xs mt-1 text-green-600 dark:text-green-400 flex items-center gap-1">
-                                            <CheckCircle2 className="h-3 w-3" />
-                                            Correct Answer
-                                          </p>
-                                        )}
-                                        {isUserSelection && !isCorrect && (
-                                          <p className="text-xs mt-1 text-red-600 dark:text-red-400 flex items-center gap-1">
-                                            <XCircle className="h-3 w-3" />
-                                            Your Answer
-                                          </p>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-
-                                {/* Explanation section */}
-                                <Card className={`${feedbackBg} border-none`}>
-                                  <CardHeader className="pb-2">
-                                    <div className="flex justify-between items-center">
-                                      <CardTitle className="text-sm font-medium flex items-center gap-2">
-                                        <Lightbulb className="h-4 w-4 text-indigo-500" />
-                                        Explanation
-                                      </CardTitle>
-                                      <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleQuestionExplanation(
-                                            question._id,
-                                            question.text,
-                                            question.userAnswer,
-                                            question.correctAnswer,
-                                            question.options
-                                          );
-                                        }}
-                                        disabled={loadingExplanations[question._id]}
-                                        className="h-8"
-                                      >
-                                        {loadingExplanations[question._id] ? (
-                                          <>
-                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            Generating...
-                                          </>
-                                        ) : expandedExplanations[question._id] ? (
-                                          <>
-                                            Hide
-                                            <ChevronUp className="h-4 w-4 ml-1" />
-                                          </>
-                                        ) : (
-                                          <>
-                                            Explain
-                                            <ChevronDown className="h-4 w-4 ml-1" />
-                                          </>
-                                        )}
-                                      </Button>
+                              <CardContent className="p-3">
+                                <div className="mb-2 flex items-start justify-between gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <div
+                                      className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
+                                        question.userAnswer === question.correctAnswer
+                                          ? 'bg-green-100 dark:bg-green-900/30'
+                                          : 'bg-red-100 dark:bg-red-900/30'
+                                      }`}
+                                    >
+                                      {question.userAnswer === question.correctAnswer ? (
+                                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                                      ) : (
+                                        <XCircle className="h-3.5 w-3.5 text-red-500" />
+                                      )}
                                     </div>
-                                  </CardHeader>
+                                    <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Q{index + 1}</span>
+                                  </div>
+                                  <Badge variant="outline" className="text-[10px]">
+                                    {question.userAnswer === question.correctAnswer ? 'Correct' : 'Wrong'}
+                                  </Badge>
+                                </div>
 
-                                  {expandedExplanations[question._id] && (
-                                    <CardContent>
-                                      <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <p>
-                                          {detailedExplanations[question._id] ||
-                                            question.explanation ||
-                                            'No explanation available.'}
-                                        </p>
-                                      </div>
-                                    </CardContent>
-                                  )}
-                                </Card>
+                                <p className="line-clamp-2 text-xs leading-5 text-gray-700 dark:text-gray-200">{question.text}</p>
+                               
                               </CardContent>
-                            )}
-                          </Card>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                            </Card>
+                          ))}
+                        </div>
+
+                        <Card className={`${feedbackBg} border`}>
+                          <CardHeader className="pb-2">
+                            <div>
+                              <CardTitle className="text-sm font-medium flex items-center gap-2">
+                                <Lightbulb className="h-4 w-4 text-indigo-500" />
+                                Section Feedback
+                              </CardTitle>
+                              {sectionFeedback[section.sectionName] ? (
+                                <Markdown>{sectionFeedback[section.sectionName]}</Markdown>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => generateSectionFeedback(section.sectionName)}
+                                  disabled={loadingFeedback.sections[section.sectionName]}
+                                  className="h-8"
+                                >
+                                  {loadingFeedback.sections[section.sectionName] ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      Generating...
+                                    </>
+                                  ) : sectionFeedback[section.sectionName] ? (
+                                    <>
+                                      Refresh
+                                      <Sparkles className="h-4 w-4 ml-1" />
+                                    </>
+                                  ) : (
+                                    <>
+                                      Generate
+                                      <Sparkles className="h-4 w-4 ml-1" />
+                                    </>
+                                  )}
+                                </Button>
+                              )}
+                            </div>
+                          </CardHeader>
+                        </Card>
+                      </TabsContent>
+                    );
+                  })}
+                </Tabs>
               </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
 
+        {focusedQuestion && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+            <div className={`w-full max-w-3xl rounded-xl border shadow-xl ${cardBg} ${borderColor}`}>
+              <div className={`flex items-start justify-between border-b p-4 ${borderColor}`}>
+                <div>
+                  <p className="text-xs font-medium uppercase tracking-wide text-indigo-500">
+                    {focusedQuestion.sectionLabel}
+                  </p>
+                  <h3 className="mt-1 text-lg font-semibold">Question {focusedQuestion.index + 1}</h3>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setFocusedQuestion(null)}>
+                  Close
+                </Button>
+              </div>
+
+              <div className="max-h-[70vh] space-y-4 overflow-auto p-4">
+                <p className="text-sm leading-6">{focusedQuestion.question.text}</p>
+
+                <div className="space-y-2">
+                  {focusedQuestion.question.options.map((option, optionIndex) => {
+                    const isCorrect = optionIndex === focusedQuestion.question.correctAnswer;
+                    const isUserSelection = optionIndex === focusedQuestion.question.userAnswer;
+
+                    let optionClass = neutralOptionBg;
+                    if (isCorrect) optionClass = correctOptionBg;
+                    else if (isUserSelection) optionClass = wrongOptionBg;
+
+                    return (
+                      <div key={optionIndex} className={`rounded-lg border p-3 text-sm ${optionClass}`}>
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="mr-2 font-medium">{String.fromCharCode(65 + optionIndex)}.</span>
+                            <span>{option}</span>
+                          </div>
+                          {isCorrect ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : null}
+                          {!isCorrect && isUserSelection ? <XCircle className="h-4 w-4 text-red-500" /> : null}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <Card className={`${feedbackBg} border`}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-medium flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-indigo-500" />
+                        Explanation
+                      </CardTitle>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() =>
+                          toggleQuestionExplanation(
+                            focusedQuestion.question._id,
+                            focusedQuestion.question.text,
+                            focusedQuestion.question.userAnswer,
+                            focusedQuestion.question.correctAnswer,
+                            focusedQuestion.question.options
+                          )
+                        }
+                        disabled={loadingExplanations[focusedQuestion.question._id]}
+                      >
+                        {loadingExplanations[focusedQuestion.question._id] ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Generating...
+                          </>
+                        ) : expandedExplanations[focusedQuestion.question._id] ? (
+                          <>
+                            Hide
+                            <ChevronUp className="h-4 w-4 ml-1" />
+                          </>
+                        ) : (
+                          <>
+                            Explain
+                            <ChevronDown className="h-4 w-4 ml-1" />
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  {expandedExplanations[focusedQuestion.question._id] && (
+                    <CardContent>
+                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                        <p>
+                          {detailedExplanations[focusedQuestion.question._id] ||
+                            focusedQuestion.question.explanation ||
+                            'No explanation available.'}
+                        </p>
+                      </div>
+                    </CardContent>
+                  )}
+                </Card>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Actions Footer */}
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-50/90 to-transparent dark:from-gray-950/90 pt-12">
-          <div className="mx-auto px-4 py-3 flex justify-between items-center">
+          <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white/95 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-950/95">
+              <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
             <Button variant="secondary" onClick={() => window.history.back()} size="sm">
               Back to Tests
             </Button>
-            <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"

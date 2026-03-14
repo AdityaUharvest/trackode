@@ -24,6 +24,23 @@ const QuizAttemptSchema: Schema = new Schema({
   quizEndTime: { type: Date },
 
   quizDescription: { type: String},
-});
+  proctoring: {
+    fullscreenExitCount: { type: Number, default: 0 },
+    tabSwitchCount: { type: Number, default: 0 },
+    copyAttemptCount: { type: Number, default: 0 },
+    contextMenuCount: { type: Number, default: 0 },
+    lastViolationAt: { type: Date },
+    events: {
+      type: [
+        {
+          type: { type: String },
+          at: { type: Date, default: Date.now },
+          detail: { type: String },
+        },
+      ],
+      default: [],
+    },
+  },
+}, { timestamps: true });
 
 export default mongoose.models.QuizAttempt || mongoose.model<IQuizAttempt>('QuizAttempt', QuizAttemptSchema);

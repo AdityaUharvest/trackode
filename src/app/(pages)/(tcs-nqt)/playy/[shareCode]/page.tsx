@@ -58,6 +58,7 @@ export default function QuizPlayer() {
   const [calcInput, setCalcInput] = useState('');
   const [hasAttemptedQuestions, setHasAttemptedQuestions] = useState(false);
   const [hasAttempted, setHasAttempted] = useState<boolean>(false);
+  const [hasInProgressFromDB, setHasInProgressFromDB] = useState<boolean>(false);
   const [isPublished, setIsPublished] = useState<boolean>(false);
   const [showSectionWarning, setShowSectionWarning] = useState(false);
   const [fullscreenExits, setFullscreenExits] = useState(0);
@@ -70,6 +71,52 @@ export default function QuizPlayer() {
   const [isTimeUp, setIsTimeUp] = useState(false);
   const fullscreenRequestRef = useRef(false);
   const optionOrderRef = useRef<Record<string, number[]>>({});
+  // Refs kept in sync with state so the beforeunload handler always sees fresh values
+  // without needing to be re-registered (avoids stale closures on unmount).
+  const abandonGuardRef = useRef({
+    isCompletionPersisted: false,
+    sectionAnswers: {} as Record<string, Record<string, number>>,
+    // Only true once every section has been API-saved and we are about to call /complete
+    allSectionsSubmitted: false,
+  });
+
+  // Keep abandonGuardRef in sync
+  useEffect(() => { abandonGuardRef.current.isCompletionPersisted = isCompletionPersisted; }, [isCompletionPersisted]);
+  useEffect(() => { abandonGuardRef.current.sectionAnswers = sectionAnswers; }, [sectionAnswers]);
+
+  // Fire /complete via sendBeacon ONLY when every section has already been API-saved
+  // but the tab was closed before /complete could respond (e.g. network dropout on
+  // the very last request). This is intentionally NOT triggered mid-quiz on partial
+  // section saves to avoid prematurely marking an in-progress attempt as complete.
+  useEffect(() => {
+    const handleUnload = () => {
+      const { isCompletionPersisted: persisted, sectionAnswers: ans, allSectionsSubmitted } = abandonGuardRef.current;
+      if (persisted || !allSectionsSubmitted) return;
+      const code = Array.isArray(shareCode) ? shareCode[0] : shareCode;
+      if (!code) return;
+      const blob = new Blob([JSON.stringify({ answers: ans })], { type: 'application/json' });
+      navigator.sendBeacon(`/api/quiz/${code}/complete`, blob);
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('pagehide', handleUnload); // Safari
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('pagehide', handleUnload);
+    };
+  }, [shareCode]);
+
+  const reportProctoringEvent = (eventType: 'fullscreen_exit' | 'tab_hidden' | 'copy_attempt' | 'context_menu', detail = '') => {
+    if (!quizStarted || !shareCode) return;
+
+    void fetch(`/api/quiz/${shareCode}/proctoring`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventType, detail }),
+      keepalive: true,
+    }).catch(() => {
+      // Ignore telemetry failures to avoid blocking quiz flow.
+    });
+  };
 
   // Initialize sections and load saved answers
   useEffect(() => {
@@ -169,10 +216,18 @@ export default function QuizPlayer() {
         setQuestions(displayQuestions);
         setIsPublished(response.data.quiz.isPublished);
 
-        // Check if quiz is already attempted
+        // Check if quiz has already been attempted
         const attempted = await axios.get(`/api/quiz/${shareCode}/attempted`);
-        if (attempted.data) {
-          setHasAttempted(attempted.data?.isAttempted);
+        if (attempted.data?.isAttempted) {
+          setHasAttempted(true);
+        }
+        if (attempted.data?.hasInProgress) {
+          setHasInProgressFromDB(true);
+          // Restore fullscreen exit count so the warning tally is accurate on resume
+          const savedExits = Number(attempted.data?.fullscreenExitCount) || 0;
+          if (savedExits > 0) {
+            setFullscreenExits(savedExits);
+          }
         }
 
         // Fetch and normalize sections
@@ -230,6 +285,26 @@ export default function QuizPlayer() {
           if (firstUnsubmitted) {
             setCurrentSection(firstUnsubmitted.name);
           }
+        } else if (attempted.data?.hasInProgress && Array.isArray(attempted.data?.submittedSections) && (attempted.data.submittedSections as string[]).length > 0) {
+          // No localStorage but the DB has a partial attempt from another session.
+          // Restore the submitted sections so the user resumes from where they left off.
+          const dbSubmitted: string[] = attempted.data.submittedSections;
+          const normalizedDbSubmitted = dbSubmitted.map((s: string) => s.trim().toLowerCase());
+          filteredSections.forEach((section: any) => {
+            if (normalizedDbSubmitted.includes(section.name.trim().toLowerCase())) {
+              section.submitted = true;
+              section.unlocked = true;
+            }
+          });
+          // Unlock the next unsubmitted section
+          const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
+          if (firstUnsubmitted) {
+            firstUnsubmitted.unlocked = true;
+            setCurrentSection(firstUnsubmitted.name);
+          } else {
+            setCurrentSection(filteredSections[filteredSections.length - 1]?.name || '');
+          }
+          setHasAttemptedQuestions(true);
         } else {
           setCurrentSection(filteredSections[0]?.name || '');
         }
@@ -467,10 +542,27 @@ export default function QuizPlayer() {
         return;
       }
 
-      await axios.post(`/api/quiz/${shareCode}/answers`, {
-        section: currentSection,
-        answers: sectionAnswersObj,
-      });
+      try {
+        await axios.post(`/api/quiz/${shareCode}/answers`, {
+          section: currentSection,
+          answers: sectionAnswersObj,
+        });
+      } catch (saveErr: any) {
+        const status = saveErr?.response?.status;
+        if (status === 410) {
+          // Quiz time fully expired — force-complete with whatever was answered so far
+          toast.error('Quiz time has expired. Submitting your progress...');
+          await handleQuizSubmit({ skipSubmittingGuard: true });
+          return;
+        }
+        if (status === 409) {
+          // Already completed (e.g. submitted from another tab/device)
+          toast.error('Quiz already submitted. Redirecting...');
+          router.push('/dashboard');
+          return;
+        }
+        throw saveErr;
+      }
 
       setSections((prev) =>
         prev.map((s) =>
@@ -495,7 +587,10 @@ export default function QuizPlayer() {
         setCurrentSection(nextSection);
         setCurrentQuestionIndex(0);
       } else {
-        await handleQuizSubmit();
+        // Every section has been API-saved. Arm the sendBeacon guard so that if
+        // the tab is closed before /complete responds, the beacon fires it.
+        abandonGuardRef.current.allSectionsSubmitted = true;
+        await handleQuizSubmit({ skipSubmittingGuard: true });
       }
     } catch (err) {
       console.error('Error submitting section:', err);
@@ -508,9 +603,12 @@ export default function QuizPlayer() {
     }
   };
 
-  const handleQuizSubmit = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+  const handleQuizSubmit = async (options?: { skipSubmittingGuard?: boolean }) => {
+    const skipSubmittingGuard = Boolean(options?.skipSubmittingGuard);
+    if (isSubmitting && !skipSubmittingGuard) return;
+    if (!skipSubmittingGuard) {
+      setIsSubmitting(true);
+    }
     try {
       console.log('Submitting all answers:', sectionAnswers);
 
@@ -534,7 +632,9 @@ export default function QuizPlayer() {
       console.error('Error submitting quiz:', err);
       setError('Failed to submit quiz. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      if (!skipSubmittingGuard) {
+        setIsSubmitting(false);
+      }
       setShowSubmitModal(false);
       setIsTimeUp(false);
     }
@@ -576,14 +676,18 @@ export default function QuizPlayer() {
       setIsFullScreen(!!document.fullscreenElement);
 
       if (!document.fullscreenElement && quizStarted) {
-        setFullscreenExits((prev) => prev + 1);
-        if (fullscreenExits >= 3) {
-          toast.error('Maximum fullscreen exits reached. Submitting your progress...');
-          handleQuizSubmit();
-        } else {
-          toast.error(`Warning ${fullscreenExits + 1}/4: Please stay in fullscreen mode`);
-          setFullscreenPrompt(true);
-        }
+        setFullscreenExits((prev) => {
+          const nextCount = prev + 1;
+          reportProctoringEvent('fullscreen_exit', `count:${nextCount}`);
+          if (nextCount >= 4) {
+            toast.error('Maximum fullscreen exits reached. Submitting your progress...');
+            handleQuizSubmit();
+          } else {
+            toast.error(`Warning ${nextCount}/4: Please stay in fullscreen mode`);
+            setFullscreenPrompt(true);
+          }
+          return nextCount;
+        });
       }
     };
 
@@ -602,7 +706,12 @@ export default function QuizPlayer() {
 
   // Prevent context menu and text selection
   useEffect(() => {
-    const handleContextMenu = (e: Event) => e.preventDefault();
+    const handleContextMenu = (e: Event) => {
+      if (quizStarted) {
+        reportProctoringEvent('context_menu');
+      }
+      e.preventDefault();
+    };
     document.addEventListener('contextmenu', handleContextMenu);
 
     const handleSelectStart = (e: Event) => e.preventDefault();
@@ -612,13 +721,45 @@ export default function QuizPlayer() {
       document.removeEventListener('contextmenu', handleContextMenu);
       document.removeEventListener('selectstart', handleSelectStart);
     };
-  }, []);
+  }, [quizStarted, shareCode]);
+
+  useEffect(() => {
+    if (!quizStarted) return;
+
+    const handleVisibilityChange = () => {
+      const active = !document.hidden;
+      setIsTabActive(active);
+      if (!active) {
+        reportProctoringEvent('tab_hidden', 'visibilitychange');
+      }
+    };
+
+    const handleWindowBlur = () => {
+      setIsTabActive(false);
+      reportProctoringEvent('tab_hidden', 'window_blur');
+    };
+
+    const handleWindowFocus = () => {
+      setIsTabActive(true);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleWindowBlur);
+    window.addEventListener('focus', handleWindowFocus);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleWindowBlur);
+      window.removeEventListener('focus', handleWindowFocus);
+    };
+  }, [quizStarted, shareCode]);
 
   // Prevent copying
   useEffect(() => {
     const handleCopy = (e: ClipboardEvent) => {
       if (quizStarted) {
         e.preventDefault();
+        reportProctoringEvent('copy_attempt');
         toast.error('Copying is disabled during the quiz');
       }
     };
@@ -734,9 +875,9 @@ export default function QuizPlayer() {
         <div className={`p-8 rounded-xl shadow-lg w-full max-w-3xl mx-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="text-center mb-8">
             <h1 className="text-xl font-bold mb-2">{quiz?.title}</h1>
-            {hasAttemptedQuestions && (
-              <div className={`inline-block px-4 py-2 rounded-full mb-4 ${theme === 'dark' ? 'bg-indigo-900/50 text-indigo-200' : 'bg-indigo-100 text-indigo-800'}`}>
-                You have an in-progress attempt
+            {(hasAttemptedQuestions || hasInProgressFromDB) && (
+              <div className={`inline-block px-4 py-2 rounded-full mb-4 ${theme === 'dark' ? 'bg-amber-900/50 text-amber-200' : 'bg-amber-100 text-amber-800'}`}>
+                {hasAttemptedQuestions ? 'You have an in-progress attempt (this device)' : 'You have an unfinished attempt — resuming from where you left off'}
               </div>
             )}
           </div>
@@ -828,7 +969,7 @@ export default function QuizPlayer() {
               !hideNavAndFooter ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {hasAttemptedQuestions ? 'Continue Attempt' : 'Start Quiz Now'}
+              {hasAttemptedQuestions || hasInProgressFromDB ? 'Resume Attempt' : 'Start Quiz Now'}
             </button>
           </div>
         </div>

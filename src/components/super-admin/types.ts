@@ -84,6 +84,11 @@ export type MockAttemptItem = {
   completedAt?: string;
   answeredCount?: number;
   isCompleted?: boolean;
+  fullscreenExitCount?: number;
+  tabSwitchCount?: number;
+  copyAttemptCount?: number;
+  contextMenuCount?: number;
+  proctoringFlags?: number;
 };
 
 export type AppSettings = {

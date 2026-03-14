@@ -235,7 +235,7 @@ export async function GET(
 
       const totalScore = sectionResults.reduce((sum, section) => sum + section.correct, 0);
       const totalQuestions = allQuestions.length;
-      const percentage = Math.round((totalScore / totalQuestions) * 100);
+      const percentage = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
       const totalAnswered = sectionResults.reduce((sum, section) => sum + section.questions.length, 0);
 
       if (safeCompletedAt) {
@@ -314,11 +314,17 @@ export async function GET(
           (a.completedAt?.getTime() || a.lastActivityAt?.getTime() || 0);
       });
     } else {
-      // Live monitoring mode: latest activity first while attempts are still in progress.
-      results.sort((a, b) =>
-        (b.completedAt?.getTime() || b.lastActivityAt?.getTime() || 0) -
-          (a.completedAt?.getTime() || a.lastActivityAt?.getTime() || 0)
-      );
+      // Live monitoring mode: sort by score even while attempts are still in progress.
+      results.sort((a, b) => {
+        if ((b.totalCorrect || 0) !== (a.totalCorrect || 0)) {
+          return (b.totalCorrect || 0) - (a.totalCorrect || 0);
+        }
+        if ((b.accuracy || 0) !== (a.accuracy || 0)) {
+          return (b.accuracy || 0) - (a.accuracy || 0);
+        }
+        return (b.completedAt?.getTime() || b.lastActivityAt?.getTime() || 0) -
+          (a.completedAt?.getTime() || a.lastActivityAt?.getTime() || 0);
+      });
     }
 
     return NextResponse.json({

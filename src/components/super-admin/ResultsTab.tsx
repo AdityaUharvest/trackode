@@ -754,6 +754,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
                 <th className="px-3 py-2 text-left">Mock</th>
                 <th className="px-3 py-2 text-left">Status</th>
                 <th className="px-3 py-2 text-left">Answered</th>
+                <th className="px-3 py-2 text-left">Flags</th>
                 <th className="px-3 py-2 text-left">Started</th>
                 <th className="px-3 py-2 text-left">Completed</th>
                 <th className="px-3 py-2 text-right">Controls</th>
@@ -762,7 +763,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
             <tbody className="divide-y divide-slate-200">
               {filteredMockAttempts.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-3 py-6 text-center text-xs text-slate-400">
+                  <td colSpan={9} className="px-3 py-6 text-center text-xs text-slate-400">
                     No attempts
                   </td>
                 </tr>
@@ -793,6 +794,12 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
                     </span>
                   </td>
                   <td className="px-3 py-2 text-xs text-slate-700">{attempt.answeredCount ?? 0}</td>
+                  <td className="px-3 py-2 text-xs text-slate-700">
+                    <span className="font-semibold">{attempt.proctoringFlags ?? 0}</span>
+                    <span className="ml-1 text-slate-400">
+                      (F:{attempt.fullscreenExitCount ?? 0} T:{attempt.tabSwitchCount ?? 0} C:{attempt.copyAttemptCount ?? 0} M:{attempt.contextMenuCount ?? 0})
+                    </span>
+                  </td>
                   <td className="px-3 py-2 text-xs text-slate-400">
                     {attempt.startedAt ? new Date(attempt.startedAt).toLocaleDateString() : '-'}
                   </td>

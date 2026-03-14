@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "postbuild": "next-sitemap"
+    "postbuild": "next-sitemap",
+    "test:mock:multi": "node scripts/test-mock-playground-multi-user.mjs",
+    "test:mock:load": "node scripts/test-mock-playground-load.mjs",
+    "test:indian:1000": "node scripts/test-indian-1000.mjs",
+    "test:mock:scenarios": "node scripts/test-scenarios.mjs"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",
