@@ -34,6 +34,13 @@ export default function DashBoard({ initialTab }) {
   const [mockTests, setMockTests] = useState([]);
   const [attempts, setAttempts] = useState([]);
   const [stats, setStats] = useState(null);
+  const defaultStats = {
+    totalAttempts: 0,
+    averageScore: 0,
+    bestScore: 0,
+    sectionPerformance: [],
+    recentActivity: [],
+  };
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
@@ -106,7 +113,20 @@ export default function DashBoard({ initialTab }) {
 
         setMockTests(mocksData);
         setAttempts(attemptsData);
-        setStats(statsData);
+        if (statsRes.ok) {
+          setStats({
+            ...defaultStats,
+            ...(statsData || {}),
+            sectionPerformance: Array.isArray(statsData?.sectionPerformance)
+              ? statsData.sectionPerformance
+              : [],
+            recentActivity: Array.isArray(statsData?.recentActivity)
+              ? statsData.recentActivity
+              : [],
+          });
+        } else {
+          setStats(defaultStats);
+        }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
         toast.error('Failed to load dashboard data');

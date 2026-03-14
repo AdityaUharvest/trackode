@@ -11,9 +11,14 @@ export const metadata: Metadata = {
 };
 
 // Server-side component wrapper
-export default function Dashboard({ searchParams }:any) {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams?: Promise<{ tab?: string }>;
+}) {
   // Default to 'overview' if no tab is provided
-  const activeTab = searchParams.tab || 'overview';
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const activeTab = resolvedSearchParams?.tab || 'overview';
 
   return <DashBoard initialTab={activeTab} />;
 }
