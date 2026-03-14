@@ -68,17 +68,104 @@ export default function QuizPlayer() {
   const [fullscreenPrompt, setFullscreenPrompt] = useState(false);
   const [isTimeUp, setIsTimeUp] = useState(false);
   const fullscreenRequestRef = useRef(false);
+  const optionOrderRef = useRef<Record<string, number[]>>({});
 
   // Initialize sections and load saved answers
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
         setIsLoading(true);
+        const savedDataKey = `quiz_${shareCode}_data`;
+        const savedDataRaw = localStorage.getItem(savedDataKey);
+        const hasInProgressSnapshot = Boolean(savedDataRaw);
+
+        const getOrderedQuestionsForAttempt = (fetchedQuestions: Question[]): Question[] => {
+          const orderStorageKey = `quiz_${shareCode}_question_order`;
+
+          try {
+            const storedOrderRaw = hasInProgressSnapshot ? localStorage.getItem(orderStorageKey) : null;
+            if (storedOrderRaw) {
+              const storedOrder = JSON.parse(storedOrderRaw) as string[];
+              if (Array.isArray(storedOrder) && storedOrder.length === fetchedQuestions.length) {
+                const byId = new Map(fetchedQuestions.map((q) => [q._id, q]));
+                const ordered = storedOrder
+                  .map((id) => byId.get(id))
+                  .filter((q): q is Question => Boolean(q));
+
+                if (ordered.length === fetchedQuestions.length) {
+                  return ordered;
+                }
+              }
+            }
+          } catch (storageError) {
+            console.warn('Failed to parse stored question order:', storageError);
+          }
+
+          const shuffled = [...fetchedQuestions];
+          for (let i = shuffled.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+
+          localStorage.setItem(orderStorageKey, JSON.stringify(shuffled.map((q) => q._id)));
+          return shuffled;
+        };
+
+        const applyStableOptionShuffle = (orderedQuestions: Question[]): Question[] => {
+          const optionOrderStorageKey = `quiz_${shareCode}_option_order`;
+          const storedOptionOrderRaw = hasInProgressSnapshot ? localStorage.getItem(optionOrderStorageKey) : null;
+          const persistedOptionOrder: Record<string, number[]> = {};
+
+          try {
+            if (storedOptionOrderRaw) {
+              const parsed = JSON.parse(storedOptionOrderRaw) as Record<string, number[]>;
+              if (parsed && typeof parsed === 'object') {
+                Object.assign(persistedOptionOrder, parsed);
+              }
+            }
+          } catch (storageError) {
+            console.warn('Failed to parse stored option order:', storageError);
+          }
+
+          const nextOptionOrder: Record<string, number[]> = {};
+          const questionsWithShuffledOptions = orderedQuestions.map((question) => {
+            const candidate = persistedOptionOrder[question._id];
+            const isValidCandidate =
+              Array.isArray(candidate) &&
+              candidate.length === question.options.length &&
+              candidate.every((idx) => Number.isInteger(idx) && idx >= 0 && idx < question.options.length) &&
+              new Set(candidate).size === question.options.length;
+
+            const permutation = isValidCandidate
+              ? [...candidate]
+              : [...Array(question.options.length).keys()];
+
+            if (!isValidCandidate) {
+              for (let i = permutation.length - 1; i > 0; i -= 1) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [permutation[i], permutation[j]] = [permutation[j], permutation[i]];
+              }
+            }
+
+            nextOptionOrder[question._id] = permutation;
+
+            return {
+              ...question,
+              options: permutation.map((originalIndex) => question.options[originalIndex]),
+            };
+          });
+
+          optionOrderRef.current = nextOptionOrder;
+          localStorage.setItem(optionOrderStorageKey, JSON.stringify(nextOptionOrder));
+          return questionsWithShuffledOptions;
+        };
 
         // Fetch quiz data
         const response = await axios.get(`/api/quiz/${shareCode}`);
+        const orderedQuestions = getOrderedQuestionsForAttempt(response.data.questions || []);
+        const displayQuestions = applyStableOptionShuffle(orderedQuestions);
         setQuiz(response.data.quiz);
-        setQuestions(response.data.questions);
+        setQuestions(displayQuestions);
         setIsPublished(response.data.quiz.isPublished);
 
         // Check if quiz is already attempted
@@ -91,7 +178,7 @@ export default function QuizPlayer() {
         const res = await axios.get('/api/fetchSection');
         // Count questions for each section
         const questionCountMap: Record<string, number> = {};
-        response.data.questions.forEach((q: Question) => {
+        displayQuestions.forEach((q: Question) => {
           questionCountMap[q.section] = (questionCountMap[q.section] || 0) + 1;
         });
 
@@ -119,10 +206,9 @@ export default function QuizPlayer() {
         }
 
         // Load saved answers and timers from localStorage
-        const savedData = localStorage.getItem(`quiz_${shareCode}_data`);
         let savedTimers: Record<string, number> = {};
-        if (savedData) {
-          const parsed = JSON.parse(savedData);
+        if (savedDataRaw) {
+          const parsed = JSON.parse(savedDataRaw);
           setAnswers(parsed.answers || {});
           setSectionAnswers(parsed.sectionAnswers || {});
           setHasAttemptedQuestions(Object.keys(parsed.answers || {}).length > 0);
@@ -297,9 +383,12 @@ export default function QuizPlayer() {
     const currentSectionObj = sections.find((s) => s.name === currentSection);
     if (currentSectionObj?.submitted) return;
 
+    const optionOrder = optionOrderRef.current[questionId];
+    const originalOptionIndex = Array.isArray(optionOrder) ? optionOrder[optionIndex] : optionIndex;
+
     setAnswers((prev) => ({
       ...prev,
-      [questionId]: optionIndex,
+      [questionId]: originalOptionIndex,
     }));
 
     setSectionAnswers((prev) => {
@@ -309,7 +398,7 @@ export default function QuizPlayer() {
       }
       newSectionAnswers[currentSection] = {
         ...newSectionAnswers[currentSection],
-        [questionId]: optionIndex,
+        [questionId]: originalOptionIndex,
       };
       return newSectionAnswers;
     });
@@ -436,6 +525,8 @@ export default function QuizPlayer() {
       });
 
       localStorage.removeItem(`quiz_${shareCode}_data`);
+      localStorage.removeItem(`quiz_${shareCode}_question_order`);
+      localStorage.removeItem(`quiz_${shareCode}_option_order`);
       setShowFeedbackModal(true);
     } catch (err) {
       console.error('Error submitting quiz:', err);
@@ -876,12 +967,17 @@ export default function QuizPlayer() {
 
               {/* Options */}
               <div className="space-y-3 mb-8">
-                {currentQuestion.options.map((option, index) => (
+                {currentQuestion.options.map((option, index) => {
+                  const optionOrder = optionOrderRef.current[currentQuestion._id] || [];
+                  const originalOptionIndex = optionOrder[index] ?? index;
+                  const isSelected = answers[currentQuestion._id] === originalOptionIndex;
+
+                  return (
                   <div
                     key={index}
                     onClick={() => !isSectionSubmitted && !isTimeUp && handleAnswerSelect(currentQuestion._id, index)}
                     className={`p-4 rounded-lg transition-all border option ${
-                      answers[currentQuestion._id] === index
+                      isSelected
                         ? theme === 'dark'
                           ? 'border-indigo-500 bg-indigo-900/30'
                           : 'border-indigo-500 bg-indigo-50'
@@ -893,7 +989,7 @@ export default function QuizPlayer() {
                     <div className="flex items-center">
                       <div
                         className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
-                          answers[currentQuestion._id] === index
+                          isSelected
                             ? 'border-indigo-500 bg-indigo-500 text-white'
                             : theme === 'dark'
                               ? 'border-gray-500'
@@ -905,7 +1001,8 @@ export default function QuizPlayer() {
                       <span className="break-words">{option}</span>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Navigation Buttons */}
