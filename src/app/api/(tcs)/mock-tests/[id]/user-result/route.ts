@@ -30,6 +30,7 @@ interface IQuizAttempt {
 interface IMockTest {
   _id: Types.ObjectId;
   title: string;
+  durationMinutes: number;
 }
 
 interface IQuestionResult {

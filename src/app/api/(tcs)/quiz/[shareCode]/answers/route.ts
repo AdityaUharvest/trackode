@@ -32,7 +32,18 @@ export async function POST(
     }
 
     const userId = session.user.id;
-    const { section, answers } = await request.json();
+
+    let payload: { section?: unknown; answers?: unknown };
+    try {
+      payload = await request.json();
+    } catch {
+      return NextResponse.json(
+        { message: 'Invalid JSON payload' },
+        { status: 400 }
+      );
+    }
+
+    const { section, answers } = payload;
     if (typeof section !== 'string' || !section.trim() || !answers || typeof answers !== 'object') {
       return NextResponse.json(
         { message: 'Invalid section answers payload' },
