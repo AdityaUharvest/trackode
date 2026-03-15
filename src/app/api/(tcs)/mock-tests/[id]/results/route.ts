@@ -162,6 +162,11 @@ export async function GET(
       return NextResponse.json({ error: 'Missing quiz ID' }, { status: 400 });
     }
     const quizId = id;
+    const pageParam = Number.parseInt(request.nextUrl.searchParams.get('page') || '1', 10);
+    const limitParam = Number.parseInt(request.nextUrl.searchParams.get('limit') || '25', 10);
+    const queryParam = (request.nextUrl.searchParams.get('q') || '').trim().toLowerCase();
+    const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1;
+    const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 100) : 25;
 
     // Connect to MongoDB
     if (mongoose.connection.readyState !== 1) {
@@ -199,6 +204,15 @@ export async function GET(
         inProgressParticipants: 0,
         leaderboardFinalized: true,
         attempts: [],
+        topPerformers: [],
+        pagination: {
+          page: 1,
+          limit,
+          total: 0,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
         createdBy: quiz.createdBy,
       });
     }
@@ -327,15 +341,60 @@ export async function GET(
       });
     }
 
+    const visibleResults = queryParam
+      ? results.filter((attempt) => {
+          const userName = (attempt.userName || '').toLowerCase();
+          const email = (attempt.email || '').toLowerCase();
+          return userName.includes(queryParam) || email.includes(queryParam);
+        })
+      : results;
+
+    const rankedResults = visibleResults.map((attempt, index) => ({
+      ...attempt,
+      rank: index + 1,
+    }));
+    const visibleCount = visibleResults.length;
+    const visibleAvgAccuracy =
+      visibleCount > 0
+        ? Math.round(visibleResults.reduce((sum, attempt) => sum + (attempt.accuracy || 0), 0) / visibleCount)
+        : 0;
+    const visibleAvgAnswered =
+      visibleCount > 0
+        ? Math.round(visibleResults.reduce((sum, attempt) => sum + (attempt.totalAnswered || 0), 0) / visibleCount)
+        : 0;
+    const visibleCompletions = visibleResults.filter((attempt) => attempt.status === 'completed').length;
+
+    const total = rankedResults.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+    const safePage = Math.min(page, totalPages);
+    const start = (safePage - 1) * limit;
+    const pagedAttempts = rankedResults.slice(start, start + limit);
+
     return NextResponse.json({
       quizId,
       quizTitle: quiz.title,
-      totalParticipants: results.length,
+      totalParticipants: total,
       completedParticipants,
       leftParticipants,
       inProgressParticipants,
       leaderboardFinalized: allAttemptsClosed,
-      attempts: results,
+      attempts: pagedAttempts,
+      topPerformers: rankedResults.slice(0, 3),
+      summary: {
+        participants: visibleCount,
+        avgAccuracy: visibleAvgAccuracy,
+        avgAnswered: visibleAvgAnswered,
+        totalQuestions: allQuestions.length,
+        completions: visibleCompletions,
+      },
+      pagination: {
+        page: safePage,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: safePage < totalPages,
+        hasPrevPage: safePage > 1,
+      },
       createdBy: quiz.createdBy,
     });
 

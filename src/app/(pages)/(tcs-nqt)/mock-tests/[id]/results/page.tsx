@@ -60,6 +60,15 @@ export default function QuizResultsDashboard({ params }: any) {
   const [expandedAttempt, setExpandedAttempt] = useState<string | null>(null);
   const [sectionFilter, setSectionFilter] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 25,
+    total: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
   const [quizStats, setQuizStats] = useState({
     quizTitle: '',
     totalParticipants: 0,
@@ -140,19 +149,23 @@ export default function QuizResultsDashboard({ params }: any) {
     const fetchAttempts = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`/api/mock-tests/${quizId}/results`);
+        const response = await fetch(`/api/mock-tests/${quizId}/results?page=${page}&limit=25`);
         const data = await response.json();
-        
-        // Sort attempts by accuracy and add ranking
-        const sortedAttempts = [...data.attempts].sort((a, b) => b.accuracy - a.accuracy);
-        const rankedAttempts = sortedAttempts.map((attempt, index) => ({
-          ...attempt,
-          rank: index + 1
-        }));
-        
-        setAttempts(rankedAttempts);
-        setTopPerformers(rankedAttempts.slice(0, 3));
-        setFilteredAttempts(rankedAttempts);
+
+        const attemptList: UserAttempt[] = Array.isArray(data?.attempts) ? data.attempts : [];
+        const topThree: UserAttempt[] = Array.isArray(data?.topPerformers) ? data.topPerformers : attemptList.slice(0, 3);
+
+        setAttempts(attemptList);
+        setTopPerformers(topThree);
+        setFilteredAttempts(attemptList);
+        setPagination({
+          page: data?.pagination?.page ?? page,
+          limit: data?.pagination?.limit ?? 25,
+          total: data?.pagination?.total ?? attemptList.length,
+          totalPages: data?.pagination?.totalPages ?? 1,
+          hasNextPage: Boolean(data?.pagination?.hasNextPage),
+          hasPrevPage: Boolean(data?.pagination?.hasPrevPage),
+        });
         
         setQuizStats({
           quizTitle: data.quizTitle,
@@ -167,7 +180,7 @@ export default function QuizResultsDashboard({ params }: any) {
     };
 
     fetchAttempts();
-  }, [quizId]);
+  }, [quizId, page]);
   console.log('attempts:', attempts);
   useEffect(() => {
     let results = [...attempts];
@@ -871,13 +884,23 @@ export default function QuizResultsDashboard({ params }: any) {
 
       <div className={`flex justify-between items-center mt-6 ${textColor}`}>
         <div className={`text-sm ${secondaryText}`}>
-          Showing {filteredAttempts.length} of {attempts.length} results
+          Showing {filteredAttempts.length} of {pagination.total} results (Page {pagination.page} of {pagination.totalPages})
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" className={`${borderColor}`} disabled>
+          <Button
+            variant="outline"
+            className={`${borderColor}`}
+            disabled={!pagination.hasPrevPage || isLoading}
+            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          >
             Previous
           </Button>
-          <Button variant="outline" className={`${borderColor}`} disabled>
+          <Button
+            variant="outline"
+            className={`${borderColor}`}
+            disabled={!pagination.hasNextPage || isLoading}
+            onClick={() => setPage((prev) => prev + 1)}
+          >
             Next
           </Button>
         </div>

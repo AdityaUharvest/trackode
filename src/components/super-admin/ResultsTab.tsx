@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { MockAttemptItem, MockResultItem, QuizResultItem } from './types';
 import { ResultsCard } from './ui';
 
@@ -49,6 +49,24 @@ type BulkDeleteIntent = {
   kind: 'mock' | 'quiz' | 'attempt';
   ids: string[];
   label: string;
+};
+
+type PaginationState = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+};
+
+const DEFAULT_PAGINATION: PaginationState = {
+  page: 1,
+  limit: 25,
+  total: 0,
+  totalPages: 1,
+  hasNextPage: false,
+  hasPrevPage: false,
 };
 
 function StatBlock({ label, value }: { label: string; value: string }) {
@@ -128,13 +146,28 @@ function ModalShell({
 export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChanged, onToast }: ResultsTabProps) {
   const [activeKind, setActiveKind] = useState<'mock' | 'quiz' | 'attempt'>('mock');
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [listLoading, setListLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteIntent, setDeleteIntent] = useState<DeleteIntent | null>(null);
   const [bulkDeleteIntent, setBulkDeleteIntent] = useState<BulkDeleteIntent | null>(null);
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
   const [selectedQuizIds, setSelectedQuizIds] = useState<string[]>([]);
   const [selectedAttemptIds, setSelectedAttemptIds] = useState<string[]>([]);
+  const [pageByKind, setPageByKind] = useState({ mock: 1, quiz: 1, attempt: 1 });
+  const [mockRows, setMockRows] = useState<MockResultItem[]>(mockResults);
+  const [quizRows, setQuizRows] = useState<QuizResultItem[]>(quizResults);
+  const [attemptRows, setAttemptRows] = useState<MockAttemptItem[]>(mockAttempts);
+  const [paginationByKind, setPaginationByKind] = useState<{
+    mock: PaginationState;
+    quiz: PaginationState;
+    attempt: PaginationState;
+  }>({
+    mock: { ...DEFAULT_PAGINATION, total: mockResults.length },
+    quiz: { ...DEFAULT_PAGINATION, total: quizResults.length },
+    attempt: { ...DEFAULT_PAGINATION, total: mockAttempts.length },
+  });
 
   const [mockDetail, setMockDetail] = useState<MockDetail | null>(null);
   const [quizDetail, setQuizDetail] = useState<QuizDetail | null>(null);
@@ -142,57 +175,87 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
   const [editingMock, setEditingMock] = useState<MockDetail | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<QuizDetail | null>(null);
 
-  const totalMockScore = mockResults.reduce((sum, r) => sum + (r.totalScore || 0), 0);
-  const totalMockQuestions = mockResults.reduce((sum, r) => sum + (r.totalQuestions || 0), 0);
+  const totalMockScore = mockRows.reduce((sum, r) => sum + (r.totalScore || 0), 0);
+  const totalMockQuestions = mockRows.reduce((sum, r) => sum + (r.totalQuestions || 0), 0);
   const avgMockPercent =
     totalMockQuestions > 0 ? Math.round((totalMockScore / totalMockQuestions) * 100) : 0;
 
-  const totalQuizScore = quizResults.reduce((sum, r) => sum + (r.score || 0), 0);
-  const totalQuizQuestions = quizResults.reduce((sum, r) => sum + (r.totalQuestions || 0), 0);
+  const totalQuizScore = quizRows.reduce((sum, r) => sum + (r.score || 0), 0);
+  const totalQuizQuestions = quizRows.reduce((sum, r) => sum + (r.totalQuestions || 0), 0);
   const avgQuizPercent =
     totalQuizQuestions > 0 ? Math.round((totalQuizScore / totalQuizQuestions) * 100) : 0;
 
-  const normalizedQuery = query.trim().toLowerCase();
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedQuery(query.trim());
+    }, 300);
 
-  const filteredMockResults = useMemo(() => {
-    if (!normalizedQuery) {
-      return mockResults;
-    }
+    return () => window.clearTimeout(timer);
+  }, [query]);
 
-    return mockResults.filter((result) => {
-      const user = `${result.userId?.name || ''} ${result.userId?.email || ''}`.toLowerCase();
-      const quiz = `${result.quizTitle || ''}`.toLowerCase();
-      return user.includes(normalizedQuery) || quiz.includes(normalizedQuery);
-    });
-  }, [mockResults, normalizedQuery]);
+  const fetchListData = useCallback(
+    async (kind: 'mock' | 'quiz' | 'attempt', page: number, search: string) => {
+      setListLoading(true);
+      try {
+        const queryParams = new URLSearchParams({
+          kind,
+          page: String(page),
+          limit: '25',
+        });
+        if (search) {
+          queryParams.set('q', search);
+        }
 
-  const filteredMockAttempts = useMemo(() => {
-    if (!normalizedQuery) {
-      return mockAttempts;
-    }
+        const response = await fetch(`/api/admin/results/list?${queryParams.toString()}`, { cache: 'no-store' });
+        const payload = await response.json();
+        if (!response.ok || !payload?.success) {
+          throw new Error(payload?.message || 'Failed to load results');
+        }
 
-    return mockAttempts.filter((attempt) => {
-      const user = `${attempt.user?.name || ''} ${attempt.user?.email || ''}`.toLowerCase();
-      const quiz = `${attempt.quizTitle || ''}`.toLowerCase();
-      return user.includes(normalizedQuery) || quiz.includes(normalizedQuery);
-    });
-  }, [mockAttempts, normalizedQuery]);
+        const pagination: PaginationState = {
+          page: payload?.pagination?.page ?? page,
+          limit: payload?.pagination?.limit ?? 25,
+          total: payload?.pagination?.total ?? 0,
+          totalPages: payload?.pagination?.totalPages ?? 1,
+          hasNextPage: Boolean(payload?.pagination?.hasNextPage),
+          hasPrevPage: Boolean(payload?.pagination?.hasPrevPage),
+        };
 
-  const filteredQuizResults = useMemo(() => {
-    if (!normalizedQuery) {
-      return quizResults;
-    }
+        if (kind === 'mock') {
+          setMockRows(Array.isArray(payload?.items) ? (payload.items as MockResultItem[]) : []);
+        } else if (kind === 'quiz') {
+          setQuizRows(Array.isArray(payload?.items) ? (payload.items as QuizResultItem[]) : []);
+        } else {
+          setAttemptRows(Array.isArray(payload?.items) ? (payload.items as MockAttemptItem[]) : []);
+        }
 
-    return quizResults.filter((result) => {
-      const user = `${result.student?.name || ''} ${result.student?.email || ''}`.toLowerCase();
-      const quiz = `${result.quiz?.name || ''} ${result.title || ''}`.toLowerCase();
-      return user.includes(normalizedQuery) || quiz.includes(normalizedQuery);
-    });
-  }, [quizResults, normalizedQuery]);
+        setPaginationByKind((prev) => ({ ...prev, [kind]: pagination }));
+      } catch (cause) {
+        onToast(cause instanceof Error ? cause.message : 'Could not load results', 'error');
+      } finally {
+        setListLoading(false);
+      }
+    },
+    [onToast]
+  );
 
-  const visibleMockIds = filteredMockResults.map((result) => result._id);
-  const visibleAttemptIds = filteredMockAttempts.map((attempt) => attempt._id);
-  const visibleQuizIds = filteredQuizResults.map((result) => result._id);
+  useEffect(() => {
+    setPageByKind((prev) => ({ ...prev, [activeKind]: 1 }));
+  }, [activeKind, debouncedQuery]);
+
+  useEffect(() => {
+    const currentPage = pageByKind[activeKind];
+    fetchListData(activeKind, currentPage, debouncedQuery);
+  }, [activeKind, debouncedQuery, fetchListData, pageByKind]);
+
+  const visibleMockIds = mockRows.map((result) => result._id);
+  const visibleAttemptIds = attemptRows.map((attempt) => attempt._id);
+  const visibleQuizIds = quizRows.map((result) => result._id);
+  const activePagination = paginationByKind[activeKind];
+
+  const goToActivePage = (page: number) => {
+    setPageByKind((prev) => ({ ...prev, [activeKind]: page }));
+  };
 
   const allVisibleMockSelected =
     visibleMockIds.length > 0 && visibleMockIds.every((id) => selectedMockIds.includes(id));
@@ -344,6 +407,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
 
       setEditingMock(null);
       await onDataChanged();
+      await fetchListData(activeKind, pageByKind[activeKind], debouncedQuery);
       onToast('Mock result updated', 'success');
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not save mock result', 'error');
@@ -378,6 +442,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
 
       setEditingQuiz(null);
       await onDataChanged();
+      await fetchListData(activeKind, pageByKind[activeKind], debouncedQuery);
       onToast('Quiz result updated', 'success');
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not save quiz result', 'error');
@@ -416,6 +481,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         setSelectedAttemptIds((prev) => prev.filter((id) => id !== deleteIntent.id));
       }
       await onDataChanged();
+      await fetchListData(activeKind, pageByKind[activeKind], debouncedQuery);
       onToast(deleteIntent.kind === 'attempt' ? 'Attempt deleted' : 'Result deleted', 'success');
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not delete result', 'error');
@@ -459,6 +525,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
 
       setBulkDeleteIntent(null);
       await onDataChanged();
+  await fetchListData(activeKind, pageByKind[activeKind], debouncedQuery);
       onToast(payload?.message || 'Selected results deleted', 'success');
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not bulk delete results', 'error');
@@ -545,10 +612,10 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <StatBlock label="Mock Attempts" value={String(mockAttempts.length)} />
-        <StatBlock label="Mock Results" value={String(mockResults.length)} />
+        <StatBlock label="Mock Attempts" value={String(paginationByKind.attempt.total)} />
+        <StatBlock label="Mock Results" value={String(paginationByKind.mock.total)} />
         <StatBlock label="Avg Mock Score" value={`${avgMockPercent}%`} />
-        <StatBlock label="Quiz Results" value={String(quizResults.length)} />
+        <StatBlock label="Quiz Results" value={String(paginationByKind.quiz.total)} />
         <StatBlock label="Avg Quiz Score" value={`${avgQuizPercent}%`} />
       </div>
 
@@ -645,6 +712,12 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         </div>
       </div>
 
+      {listLoading && (
+        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-500">
+          Loading results...
+        </div>
+      )}
+
       {activeKind === 'mock' && (
         <ResultsCard title="Individual Mock Results">
         <table className="min-w-full text-sm">
@@ -667,14 +740,14 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {filteredMockResults.length === 0 && (
+            {mockRows.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-3 py-6 text-center text-xs text-slate-400">
                   No results
                 </td>
               </tr>
             )}
-            {filteredMockResults.map((r) => (
+            {mockRows.map((r) => (
               <tr key={r._id} className="hover:bg-slate-50">
                 <td className="px-3 py-2">
                   <input
@@ -761,14 +834,14 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
-              {filteredMockAttempts.length === 0 && (
+              {attemptRows.length === 0 && (
                 <tr>
                   <td colSpan={9} className="px-3 py-6 text-center text-xs text-slate-400">
                     No attempts
                   </td>
                 </tr>
               )}
-              {filteredMockAttempts.map((attempt) => (
+              {attemptRows.map((attempt) => (
                 <tr key={attempt._id} className="hover:bg-slate-50">
                   <td className="px-3 py-2">
                     <input
@@ -850,14 +923,14 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {filteredQuizResults.length === 0 && (
+            {quizRows.length === 0 && (
               <tr>
                 <td colSpan={6} className="px-3 py-6 text-center text-xs text-slate-400">
                   No results
                 </td>
               </tr>
             )}
-            {filteredQuizResults.map((r) => (
+            {quizRows.map((r) => (
               <tr key={r._id} className="hover:bg-slate-50">
                 <td className="px-3 py-2">
                   <input
@@ -913,6 +986,28 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         </table>
       </ResultsCard>
       )}
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
+        <p className="text-xs text-slate-500">
+          Page {activePagination.page} of {activePagination.totalPages} · {activePagination.total} total record(s)
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            disabled={!activePagination.hasPrevPage || listLoading}
+            onClick={() => goToActivePage(Math.max(1, activePagination.page - 1))}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            disabled={!activePagination.hasNextPage || listLoading}
+            onClick={() => goToActivePage(activePagination.page + 1)}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
 
       {loadingDetails && (
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">

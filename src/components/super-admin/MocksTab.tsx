@@ -48,6 +48,7 @@ export function MocksTab({
   onToast,
   onDataChanged,
 }: MocksTabProps) {
+  const PAGE_SIZE = 25;
   type MockAttemptSection = {
     sectionName: string;
     answered: number;
@@ -73,6 +74,21 @@ export function MocksTab({
   type MockResultsPayload = {
     quizTitle?: string;
     attempts?: MockAttempt[];
+    summary?: {
+      participants?: number;
+      avgAccuracy?: number;
+      avgAnswered?: number;
+      totalQuestions?: number;
+      completions?: number;
+    };
+    pagination?: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+      hasNextPage: boolean;
+      hasPrevPage: boolean;
+    };
   };
 
   const [search, setSearch] = useState('');
@@ -80,7 +96,32 @@ export function MocksTab({
   const [showResultsModal, setShowResultsModal] = useState(false);
   const [resultsLoading, setResultsLoading] = useState(false);
   const [resultsMockTitle, setResultsMockTitle] = useState('');
+  const [resultsMockId, setResultsMockId] = useState('');
+  const [resultsSearch, setResultsSearch] = useState('');
+  const [debouncedResultsSearch, setDebouncedResultsSearch] = useState('');
+  const [mockPage, setMockPage] = useState(1);
   const [resultsData, setResultsData] = useState<MockAttempt[]>([]);
+  const [resultsSummary, setResultsSummary] = useState<{
+    participants: number;
+    avgAccuracy: number;
+    avgAnswered: number;
+    totalQuestions: number;
+    completions: number;
+  }>({
+    participants: 0,
+    avgAccuracy: 0,
+    avgAnswered: 0,
+    totalQuestions: 0,
+    completions: 0,
+  });
+  const [resultsPagination, setResultsPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 1,
+    hasNextPage: false,
+    hasPrevPage: false,
+  });
   const [selectedAttempt, setSelectedAttempt] = useState<MockAttempt | null>(null);
   const [creating, setCreating] = useState(false);
   const [newMockTitle, setNewMockTitle] = useState('');
@@ -118,6 +159,14 @@ export function MocksTab({
     };
   }, [actionMockId]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedResultsSearch(resultsSearch.trim());
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [resultsSearch]);
+
   const filtered = (search
     ? mocks.filter(
         (m) =>
@@ -134,6 +183,33 @@ export function MocksTab({
     }
     return (a.title || '').localeCompare(b.title || '');
   });
+
+  const totalMockPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginatedMocks = filtered.slice((mockPage - 1) * PAGE_SIZE, mockPage * PAGE_SIZE);
+
+  useEffect(() => {
+    setMockPage(1);
+  }, [search]);
+
+  useEffect(() => {
+    if (mockPage > totalMockPages) {
+      setMockPage(totalMockPages);
+    }
+  }, [mockPage, totalMockPages]);
+
+  useEffect(() => {
+    if (!showResultsModal || !resultsMockId) {
+      return;
+    }
+
+    const selectedMock = mocks.find((m) => m._id === resultsMockId);
+    if (!selectedMock) {
+      return;
+    }
+
+    void handleOpenMockResults(selectedMock, 1, debouncedResultsSearch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedResultsSearch, showResultsModal, resultsMockId]);
 
   const handleShareMock = async (mock: MockItem) => {
     if (!mock.shareCode) {
@@ -195,15 +271,25 @@ export function MocksTab({
     }
   };
 
-  const handleOpenMockResults = async (mock: MockItem) => {
+  const handleOpenMockResults = async (mock: MockItem, page = 1, searchTerm = resultsSearch) => {
     setResultsMockTitle(mock.title || 'Mock');
+    setResultsMockId(mock._id);
     setShowResultsModal(true);
     setResultsLoading(true);
     setResultsData([]);
+    setResultsSummary({ participants: 0, avgAccuracy: 0, avgAnswered: 0, totalQuestions: 0, completions: 0 });
     setSelectedAttempt(null);
 
     try {
-      const response = await fetch(`/api/mock-tests/${mock._id}/results`, { cache: 'no-store' });
+      const query = new URLSearchParams({
+        page: String(page),
+        limit: '20',
+      });
+      if (searchTerm.trim()) {
+        query.set('q', searchTerm.trim());
+      }
+
+      const response = await fetch(`/api/mock-tests/${mock._id}/results?${query.toString()}`, { cache: 'no-store' });
       const payload = (await response.json()) as MockResultsPayload;
 
       if (!response.ok) {
@@ -212,8 +298,32 @@ export function MocksTab({
 
       setResultsMockTitle(payload.quizTitle || mock.title || 'Mock');
       setResultsData(Array.isArray(payload.attempts) ? payload.attempts : []);
+      setResultsSummary({
+        participants: payload.summary?.participants ?? payload.pagination?.total ?? 0,
+        avgAccuracy: payload.summary?.avgAccuracy ?? 0,
+        avgAnswered: payload.summary?.avgAnswered ?? 0,
+        totalQuestions: payload.summary?.totalQuestions ?? 0,
+        completions: payload.summary?.completions ?? 0,
+      });
+      setResultsPagination({
+        page: payload.pagination?.page ?? page,
+        limit: payload.pagination?.limit ?? 20,
+        total: payload.pagination?.total ?? 0,
+        totalPages: payload.pagination?.totalPages ?? 1,
+        hasNextPage: Boolean(payload.pagination?.hasNextPage),
+        hasPrevPage: Boolean(payload.pagination?.hasPrevPage),
+      });
     } catch (cause) {
       setResultsData([]);
+      setResultsSummary({ participants: 0, avgAccuracy: 0, avgAnswered: 0, totalQuestions: 0, completions: 0 });
+      setResultsPagination({
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPrevPage: false,
+      });
       onToast(cause instanceof Error ? cause.message : 'Could not load mock results', 'error');
     } finally {
       setResultsLoading(false);
@@ -327,18 +437,18 @@ export function MocksTab({
               {!resultsLoading && resultsData.length > 0 && (
                 <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
                   {[
-                    { label: 'Participants', value: String(resultsData.length) },
+                    { label: 'Participants', value: String(resultsSummary.participants || resultsPagination.total || resultsData.length) },
                     {
                       label: 'Avg Accuracy',
-                      value: `${Math.round(resultsData.reduce((s, a) => s + (a.accuracy || 0), 0) / resultsData.length)}%`,
+                      value: `${resultsSummary.avgAccuracy}%`,
                     },
                     {
                       label: 'Avg Answered',
-                      value: `${Math.round(resultsData.reduce((s, a) => s + (a.totalAnswered || 0), 0) / resultsData.length)} / ${resultsData[0]?.totalQuestions ?? 0}`,
+                      value: `${resultsSummary.avgAnswered} / ${resultsSummary.totalQuestions}`,
                     },
                     {
                       label: 'Completions',
-                      value: String(resultsData.filter((a) => a.completedAt).length),
+                      value: String(resultsSummary.completions),
                     },
                   ].map(({ label, value }) => (
                     <div key={label} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
@@ -481,8 +591,46 @@ export function MocksTab({
 
               {/* Attempts table */}
               {!selectedAttempt && (
-                <div className="overflow-x-auto rounded-lg border border-slate-200">
-                  <table className="min-w-full text-sm">
+                <div>
+                  <form
+                    className="mb-3 flex flex-col gap-2 sm:flex-row"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      const selectedMock = mocks.find((m) => m._id === resultsMockId);
+                      if (!selectedMock) return;
+                      handleOpenMockResults(selectedMock, 1, resultsSearch);
+                    }}
+                  >
+                    <input
+                      value={resultsSearch}
+                      onChange={(event) => setResultsSearch(event.target.value)}
+                      placeholder="Search by user name or email"
+                      className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
+                    />
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="submit"
+                        className="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        Search
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResultsSearch('');
+                          const selectedMock = mocks.find((m) => m._id === resultsMockId);
+                          if (!selectedMock) return;
+                          handleOpenMockResults(selectedMock, 1, '');
+                        }}
+                        className="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  </form>
+
+                  <div className="overflow-x-auto rounded-lg border border-slate-200">
+                    <table className="min-w-full text-sm">
                     <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
                       <tr>
                         <th className="px-3 py-2">User</th>
@@ -509,7 +657,7 @@ export function MocksTab({
                       {!resultsLoading && resultsData.length === 0 && (
                         <tr>
                           <td colSpan={8} className="px-3 py-6 text-center text-sm text-slate-400">
-                            No attempts found for this mock.
+                            {resultsSearch.trim() ? 'No attempts found for this search.' : 'No attempts found for this mock.'}
                           </td>
                         </tr>
                       )}
@@ -566,7 +714,40 @@ export function MocksTab({
                           </tr>
                         ))}
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
+
+                  {!resultsLoading && resultsPagination.total > 0 && (
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <p className="text-xs text-slate-500">
+                        Showing {resultsData.length} of {resultsPagination.total} attempts (Page {resultsPagination.page} of {resultsPagination.totalPages})
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            const selectedMock = mocks.find((m) => m._id === resultsMockId);
+                            if (!selectedMock || !resultsPagination.hasPrevPage) return;
+                            handleOpenMockResults(selectedMock, resultsPagination.page - 1, resultsSearch);
+                          }}
+                          disabled={!resultsPagination.hasPrevPage || resultsLoading}
+                          className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Previous
+                        </button>
+                        <button
+                          onClick={() => {
+                            const selectedMock = mocks.find((m) => m._id === resultsMockId);
+                            if (!selectedMock || !resultsPagination.hasNextPage) return;
+                            handleOpenMockResults(selectedMock, resultsPagination.page + 1, resultsSearch);
+                          }}
+                          disabled={!resultsPagination.hasNextPage || resultsLoading}
+                          className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -606,14 +787,14 @@ export function MocksTab({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {filtered.length === 0 && (
+            {paginatedMocks.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
                   No mocks found
                 </td>
               </tr>
             )}
-            {filtered.map((mock) => {
+            {paginatedMocks.map((mock) => {
               const busy = Boolean(busyMocks[mock._id]);
 
               return (
@@ -676,7 +857,10 @@ export function MocksTab({
                   <td className="px-4 py-3 align-top text-right">
                     <div className="inline-flex items-center gap-2">
                       <button
-                        onClick={() => handleOpenMockResults(mock)}
+                        onClick={() => {
+                          setResultsSearch('');
+                          handleOpenMockResults(mock, 1, '');
+                        }}
                         disabled={busy}
                         className="rounded-md border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                       >
@@ -731,6 +915,28 @@ export function MocksTab({
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
+        <p className="text-xs text-slate-500">
+          Page {mockPage} of {totalMockPages} · Showing {paginatedMocks.length} of {filtered.length} mock(s)
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMockPage((prev) => Math.max(1, prev - 1))}
+            disabled={mockPage <= 1}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setMockPage((prev) => Math.min(totalMockPages, prev + 1))}
+            disabled={mockPage >= totalMockPages}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );

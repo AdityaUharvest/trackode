@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTheme } from '@/components/ThemeContext';
 import { useParams } from 'next/navigation';
@@ -104,15 +104,43 @@ export default function UserQuizResult() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [activeQuestionSection, setActiveQuestionSection] = useState('');
   const [focusedQuestion, setFocusedQuestion] = useState<FocusedQuestionState | null>(null);
+  const [leaderboardSearch, setLeaderboardSearch] = useState('');
 
   const getSafePercentage = (numerator: number, denominator: number) => {
     if (!denominator || denominator <= 0) return 0;
     return Math.round((numerator / denominator) * 100);
   };
 
+  const normalizedLeaderboardSearch = leaderboardSearch.trim().toLowerCase();
+
+  const filteredAttempts = useMemo(() => {
+    if (!normalizedLeaderboardSearch) {
+      return attempts;
+    }
+
+    return attempts.filter((attempt) => {
+      const userName = (attempt.userName || '').toLowerCase();
+      const email = (attempt.email || '').toLowerCase();
+      const status = (attempt.status || '').toLowerCase();
+      return (
+        userName.includes(normalizedLeaderboardSearch) ||
+        email.includes(normalizedLeaderboardSearch) ||
+        status.includes(normalizedLeaderboardSearch)
+      );
+    });
+  }, [attempts, normalizedLeaderboardSearch]);
+
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
   const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
+                  <div className="border-b border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/60">
+                    <input
+                      value={leaderboardSearch}
+                      onChange={(event) => setLeaderboardSearch(event.target.value)}
+                      placeholder="Search player by name, email, or status"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 md:max-w-md"
+                    />
+                  </div>
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200';
   const cardBg = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
   const sectionHeaderBg = theme === 'dark' ? 'bg-gray-800/70' : 'bg-gray-50';
@@ -170,7 +198,7 @@ export default function UserQuizResult() {
         }
 
         // Fetch all attempts for leaderboard
-        const attemptsResponse = await fetch(`/api/mock-tests/${userData.quizId}/results`);
+        const attemptsResponse = await fetch(`/api/mock-tests/${userData.quizId}/results?page=1&limit=10`);
         if (!attemptsResponse.ok) {
           throw new Error('Failed to fetch attempts');
         }
@@ -182,14 +210,12 @@ export default function UserQuizResult() {
           : [];
         const isFinalized = Boolean(attemptsData?.leaderboardFinalized);
         setLeaderboardFinalized(isFinalized);
+        const topThree: UserAttempt[] = Array.isArray(attemptsData?.topPerformers)
+          ? (attemptsData.topPerformers as UserAttempt[])
+          : attemptList.slice(0, 3);
 
-        const rankedAttempts = attemptList.map((attempt, index) => ({
-          ...attempt,
-          rank: index + 1,
-        }));
-
-        setAttempts(rankedAttempts);
-        setTopPerformers(isFinalized ? rankedAttempts : rankedAttempts.slice(0, 3));
+        setAttempts(attemptList);
+        setTopPerformers(isFinalized ? topThree : topThree.slice(0, 3));
         
         // Trigger confetti effect
         setShowConfetti(true);
@@ -709,8 +735,16 @@ export default function UserQuizResult() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                        {attempts.map((attempt: UserAttempt, index: number) => {
-                          const rank = attempt.rank || index + 1;
+                        {filteredAttempts.length === 0 && (
+                          <tr>
+                            <td colSpan={6} className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                              No matching users found.
+                            </td>
+                          </tr>
+                        )}
+                        {filteredAttempts.map((attempt: UserAttempt, index: number) => {
+                          const originalIndex = attempts.findIndex((item) => item._id === attempt._id);
+                          const rank = attempt.rank || originalIndex + 1 || index + 1;
                           const medalIcon = renderMedal(rank);
 
                           return (

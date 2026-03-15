@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import type { QuizItem } from './types';
 import { ActionBtn } from './ui';
@@ -16,8 +16,10 @@ type QuizzesTabProps = {
 };
 
 export function QuizzesTab({ quizzes, busyQuizzes, onToggle, onConfirmDelete, onToast, onDataChanged }: QuizzesTabProps) {
+  const PAGE_SIZE = 25;
   const { data: session } = useSession();
   const [search, setSearch] = useState('');
+  const [quizPage, setQuizPage] = useState(1);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [creating, setCreating] = useState(false);
   const [newQuizName, setNewQuizName] = useState('');
@@ -111,6 +113,15 @@ export function QuizzesTab({ quizzes, busyQuizzes, onToggle, onConfirmDelete, on
       )
     : quizzes;
 
+  const totalQuizPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginatedQuizzes = filtered.slice((quizPage - 1) * PAGE_SIZE, quizPage * PAGE_SIZE);
+
+  useEffect(() => {
+    if (quizPage > totalQuizPages) {
+      setQuizPage(totalQuizPages);
+    }
+  }, [quizPage, totalQuizPages]);
+
   return (
     <div className="space-y-3">
       {showCreateModal && (
@@ -200,7 +211,10 @@ export function QuizzesTab({ quizzes, busyQuizzes, onToggle, onConfirmDelete, on
           className="w-full max-w-xs rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-400"
           placeholder="Search by name or owner…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setQuizPage(1);
+          }}
         />
         <div className="flex items-center gap-2">
           <span className="text-sm text-slate-500">{filtered.length} quizzes</span>
@@ -227,14 +241,14 @@ export function QuizzesTab({ quizzes, busyQuizzes, onToggle, onConfirmDelete, on
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200">
-            {filtered.length === 0 && (
+            {paginatedQuizzes.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
                   No quizzes found
                 </td>
               </tr>
             )}
-            {filtered.map((quiz) => {
+            {paginatedQuizzes.map((quiz) => {
               const busy = Boolean(busyQuizzes[quiz._id]);
               return (
                 <tr
@@ -306,6 +320,28 @@ export function QuizzesTab({ quizzes, busyQuizzes, onToggle, onConfirmDelete, on
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
+        <p className="text-xs text-slate-500">
+          Page {quizPage} of {totalQuizPages} · Showing {paginatedQuizzes.length} of {filtered.length} quiz(es)
+        </p>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setQuizPage((prev) => Math.max(1, prev - 1))}
+            disabled={quizPage <= 1}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setQuizPage((prev) => Math.min(totalQuizPages, prev + 1))}
+            disabled={quizPage >= totalQuizPages}
+            className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
