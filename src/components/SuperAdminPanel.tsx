@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ConfirmModal } from './super-admin/ConfirmModal';
 import { MocksTab } from './super-admin/MocksTab';
 import { OverviewTab } from './super-admin/OverviewTab';
 import { QuizzesTab } from './super-admin/QuizzesTab';
 import { ResultsTab } from './super-admin/ResultsTab';
 import { SettingsTab } from './super-admin/SettingsTab';
+import { UsersInsightsTab } from './super-admin/UsersInsightsTab';
 import { ToastStack, useToast } from './super-admin/ToastStack';
 import { PanelMessage } from './super-admin/ui';
 import { DEFAULT_SETTINGS } from './super-admin/types';
@@ -28,6 +29,7 @@ const TABS: Array<[TabId, string]> = [
   ['mocks', 'Mocks'],
   ['quizzes', 'Quizzes'],
   ['results', 'Results'],
+  ['users', 'Users & Insights'],
   ['settings', 'Settings'],
 ];
 
@@ -47,6 +49,10 @@ export default function SuperAdminPanel() {
   const [mockResults, setMockResults] = useState<MockResultItem[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResultItem[]>([]);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+
+  const [refreshTick, setRefreshTick] = useState(0);
+  const bgRefreshActive = useRef(false);
+  const isLoadingRef = useRef(true);
 
   const [busyMocks, setBusyMocks] = useState<Record<string, boolean>>({});
   const [busyQuizzes, setBusyQuizzes] = useState<Record<string, boolean>>({});
@@ -87,13 +93,52 @@ export default function SuperAdminPanel() {
       const message = cause instanceof Error ? cause.message : 'Failed to load data';
       setError(message);
     } finally {
+      isLoadingRef.current = false;
       setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
+
+  const silentRefresh = useCallback(async () => {
+    if (isLoadingRef.current || bgRefreshActive.current) return;
+    bgRefreshActive.current = true;
+    try {
+      const [dashboardRes, settingsRes] = await Promise.all([
+        fetch('/api/admin/super-dashboard', { cache: 'no-store' }),
+        fetch('/api/admin/settings', { cache: 'no-store' }),
+      ]);
+      const dashboardPayload = await dashboardRes.json();
+      const settingsPayload = await settingsRes.json();
+      if (!dashboardRes.ok || !dashboardPayload?.success) return;
+      const d = dashboardPayload.data;
+      setStats(d.stats || null);
+      setMocks(Array.isArray(d.mocks) ? d.mocks : []);
+      setQuizzes(Array.isArray(d.quizzes) ? d.quizzes : []);
+      setMockAttempts(Array.isArray(d.quizAttempts) ? d.quizAttempts : []);
+      setMockResults(Array.isArray(d.mockResults) ? d.mockResults : []);
+      setQuizResults(Array.isArray(d.quizResults) ? d.quizResults : []);
+      if (settingsRes.ok && settingsPayload?.success) {
+        setSettings({ ...DEFAULT_SETTINGS, ...(settingsPayload.settings || {}) });
+      }
+      setRefreshTick((t) => t + 1);
+    } catch {
+      // silent — don't surface errors for background refreshes
+    } finally {
+      bgRefreshActive.current = false;
     }
   }, []);
 
   useEffect(() => {
     loadDashboard();
   }, [loadDashboard]);
+
+  useEffect(() => {
+    const id = setInterval(() => { void silentRefresh(); }, 60_000);
+    return () => clearInterval(id);
+  }, [silentRefresh]);
 
   const handleMockPublishToggle = async (mockId: string, current: boolean) => {
     setBusyMocks((prev) => ({ ...prev, [mockId]: true }));
@@ -462,8 +507,10 @@ export default function SuperAdminPanel() {
                   quizResults={quizResults}
                   onDataChanged={loadDashboard}
                   onToast={toast}
+                  refreshTick={refreshTick}
                 />
               )}
+              {activeTab === 'users' && <UsersInsightsTab onToast={toast} refreshTick={refreshTick} />}
               {activeTab === 'settings' && (
                 <SettingsTab
                   settings={settings}

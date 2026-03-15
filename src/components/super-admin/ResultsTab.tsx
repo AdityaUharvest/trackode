@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { MockAttemptItem, MockResultItem, QuizResultItem } from './types';
 import { ResultsCard } from './ui';
 
@@ -10,6 +10,7 @@ type ResultsTabProps = {
   quizResults: QuizResultItem[];
   onDataChanged: () => Promise<void>;
   onToast: (message: string, type: 'success' | 'error' | 'info') => void;
+  refreshTick?: number;
 };
 
 type MockDetail = MockResultItem & {
@@ -143,7 +144,8 @@ function ModalShell({
   );
 }
 
-export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChanged, onToast }: ResultsTabProps) {
+export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChanged, onToast, refreshTick }: ResultsTabProps) {
+  const hasFetchedOnce = useRef(new Set<string>());
   const [activeKind, setActiveKind] = useState<'mock' | 'quiz' | 'attempt'>('mock');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -195,7 +197,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
 
   const fetchListData = useCallback(
     async (kind: 'mock' | 'quiz' | 'attempt', page: number, search: string) => {
-      setListLoading(true);
+      if (!hasFetchedOnce.current.has(kind)) setListLoading(true);
       try {
         const queryParams = new URLSearchParams({
           kind,
@@ -228,6 +230,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         } else {
           setAttemptRows(Array.isArray(payload?.items) ? (payload.items as MockAttemptItem[]) : []);
         }
+        hasFetchedOnce.current.add(kind);
 
         setPaginationByKind((prev) => ({ ...prev, [kind]: pagination }));
       } catch (cause) {
@@ -246,7 +249,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
   useEffect(() => {
     const currentPage = pageByKind[activeKind];
     fetchListData(activeKind, currentPage, debouncedQuery);
-  }, [activeKind, debouncedQuery, fetchListData, pageByKind]);
+  }, [activeKind, debouncedQuery, fetchListData, pageByKind, refreshTick]);
 
   const visibleMockIds = mockRows.map((result) => result._id);
   const visibleAttemptIds = attemptRows.map((attempt) => attempt._id);

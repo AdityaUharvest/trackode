@@ -100,7 +100,7 @@ export type AppSettings = {
   allowMockAttempts: boolean;
 };
 
-export type TabId = 'overview' | 'mocks' | 'quizzes' | 'results' | 'settings';
+export type TabId = 'overview' | 'mocks' | 'quizzes' | 'results' | 'users' | 'settings';
 
 export type ToastType = 'success' | 'error' | 'info';
 export type Toast = { id: number; message: string; type: ToastType };
