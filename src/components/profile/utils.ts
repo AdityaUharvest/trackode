@@ -73,6 +73,8 @@ export async function downloadProfileCertificate(achievement: CertificateAchieve
   const certId = achievement.certificateId || fallbackCertId;
   const verifyUrl = `${window.location.origin}/certificate/verify/${encodeURIComponent(certId)}`;
   const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 1, width: 220 });
+  const holderFontSize = holderName.length > 28 ? 42 : holderName.length > 20 ? 52 : 62;
+  const eventFontSize = (achievement.quizTitle || 'Mock Test').length > 34 ? 32 : 40;
   let logoDataUrl = `${window.location.origin}/logo.png`;
 
   try {
@@ -92,58 +94,45 @@ export async function downloadProfileCertificate(achievement: CertificateAchieve
 
   const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="990" viewBox="0 0 1400 990">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#f8fafc" />
-      <stop offset="65%" stop-color="#e2e8f0" />
-      <stop offset="100%" stop-color="#dbeafe" />
-    </linearGradient>
-    <linearGradient id="topBar" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#1e3a8a" />
-    </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#fef3c7" />
-      <stop offset="100%" stop-color="#f59e0b" />
-    </linearGradient>
-    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.12" />
-    </filter>
-  </defs>
-  <rect width="1400" height="990" fill="url(#bg)" />
-  <rect x="28" y="28" width="1344" height="934" rx="26" fill="none" stroke="#1e293b" stroke-width="3" />
-  <rect x="60" y="60" width="1280" height="140" rx="20" fill="url(#topBar)" filter="url(#softShadow)" />
-  <rect x="92" y="88" width="84" height="84" rx="20" fill="#ffffff" opacity="0.98" />
-  <image href="${logoDataUrl}" x="102" y="98" width="64" height="64" preserveAspectRatio="xMidYMid meet" />
-  <text x="198" y="122" font-family="Arial, sans-serif" font-size="20" fill="#bfdbfe" letter-spacing="2">TRACKODE</text>
-  <text x="198" y="163" font-family="Georgia, serif" font-size="38" fill="#ffffff">Certificate of Achievement</text>
-  <text x="1240" y="127" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="#dbeafe">CERTIFICATE ID</text>
-  <text x="1240" y="155" text-anchor="end" font-family="Courier New, monospace" font-size="18" fill="#ffffff">${escapeXml(certId)}</text>
-  <circle cx="180" cy="300" r="90" fill="#ffffff" opacity="0.45" />
-  <circle cx="1230" cy="330" r="110" fill="#ffffff" opacity="0.35" />
-  <text x="700" y="286" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" fill="#334155">This certificate is proudly presented to</text>
-  <text x="700" y="366" text-anchor="middle" font-family="Georgia, serif" font-size="64" fill="#0f172a">${escapeXml(holderName)}</text>
-  <text x="700" y="426" text-anchor="middle" font-family="Arial, sans-serif" font-size="26" fill="#334155">for outstanding performance in</text>
-  <text x="700" y="484" text-anchor="middle" font-family="Georgia, serif" font-size="46" fill="#1e293b">${escapeXml(achievement.quizTitle || 'Mock Test')}</text>
-  <rect x="160" y="536" width="780" height="190" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#softShadow)" />
-  <rect x="190" y="570" width="220" height="58" rx="29" fill="url(#gold)" />
-  <text x="300" y="608" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#78350f">${escapeXml(badgeLabel)}</text>
-  <text x="460" y="607" font-family="Arial, sans-serif" font-size="30" fill="#0f172a">${escapeXml(rankLabel)}</text>
-  <text x="190" y="674" font-family="Arial, sans-serif" font-size="25" fill="#0f172a">Score: ${achievement.score || 0}/${achievement.totalQuestions || 0}</text>
-  <text x="520" y="674" font-family="Arial, sans-serif" font-size="25" fill="#0f172a">Accuracy: ${achievement.percentage || 0}%</text>
-  <rect x="980" y="536" width="260" height="260" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#softShadow)" />
-  <image href="${qrDataUrl}" x="1010" y="566" width="200" height="200" />
-  <text x="1110" y="785" text-anchor="middle" font-family="Arial, sans-serif" font-size="17" fill="#475569">Scan to verify certificate</text>
-  <text x="160" y="778" font-family="Arial, sans-serif" font-size="21" fill="#334155">Issued on: ${escapeXml(issueDate)}</text>
-  <text x="160" y="806" font-family="Arial, sans-serif" font-size="15" fill="#64748b">Verification URL: ${escapeXml(verifyUrl)}</text>
-  <line x1="190" y1="866" x2="560" y2="866" stroke="#334155" stroke-width="2" />
-  <text x="190" y="852" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="36" fill="#1e293b">/s/ Rohit Kumar Yadav</text>
-  <text x="190" y="902" font-family="Arial, sans-serif" font-size="24" fill="#0f172a">Rohit Kumar Yadav</text>
-  <text x="190" y="930" font-family="Arial, sans-serif" font-size="19" fill="#475569">Chief Technology Officer</text>
-  <line x1="840" y1="866" x2="1210" y2="866" stroke="#334155" stroke-width="2" />
-  <text x="840" y="852" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="36" fill="#1e293b">/s/ Aditya upadhyay</text>
-  <text x="840" y="902" font-family="Arial, sans-serif" font-size="24" fill="#0f172a">Aditya upadhyay</text>
-  <text x="840" y="930" font-family="Arial, sans-serif" font-size="19" fill="#475569">Chief Executive Officer</text>
+  <rect width="1400" height="990" fill="#f8fafc" />
+  <rect x="36" y="36" width="1328" height="918" rx="20" fill="#ffffff" stroke="#0f172a" stroke-width="2" />
+
+  <rect x="92" y="90" width="1216" height="120" rx="12" fill="#0f172a" />
+  <rect x="122" y="116" width="68" height="68" rx="12" fill="#ffffff" />
+  <image href="${logoDataUrl}" x="132" y="126" width="48" height="48" preserveAspectRatio="xMidYMid meet" />
+  <text x="214" y="138" font-family="Arial, sans-serif" font-size="18" fill="#cbd5e1" letter-spacing="2">TRACKODE</text>
+  <text x="214" y="177" font-family="Georgia, serif" font-size="38" fill="#ffffff">Certificate of Achievement</text>
+  <text x="1274" y="140" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#cbd5e1">ID: ${escapeXml(certId)}</text>
+  <text x="1274" y="168" text-anchor="end" font-family="Arial, sans-serif" font-size="14" fill="#cbd5e1">Issued: ${escapeXml(issueDate)}</text>
+
+  <text x="700" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#334155">This certificate is awarded to</text>
+  <text x="700" y="374" text-anchor="middle" font-family="Georgia, serif" font-size="${holderFontSize}" fill="#0f172a">${escapeXml(holderName)}</text>
+  <line x1="420" y1="400" x2="980" y2="400" stroke="#cbd5e1" stroke-width="1.5" />
+
+  <text x="700" y="452" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#334155">for performance in</text>
+  <text x="700" y="506" text-anchor="middle" font-family="Georgia, serif" font-size="${eventFontSize}" fill="#0f172a">${escapeXml(achievement.quizTitle || 'Mock Test')}</text>
+
+  <rect x="140" y="548" width="810" height="228" rx="14" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" />
+  <text x="184" y="610" font-family="Arial, sans-serif" font-size="26" font-weight="700" fill="#0f172a">${escapeXml(rankLabel)}</text>
+  <text x="184" y="652" font-family="Arial, sans-serif" font-size="22" fill="#334155">Status: ${escapeXml(badgeLabel)}</text>
+  <text x="184" y="694" font-family="Arial, sans-serif" font-size="22" fill="#334155">Score: ${achievement.score || 0}/${achievement.totalQuestions || 0}</text>
+  <text x="184" y="736" font-family="Arial, sans-serif" font-size="22" fill="#334155">Accuracy: ${achievement.percentage || 0}%</text>
+
+  <rect x="980" y="548" width="280" height="280" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
+  <image href="${qrDataUrl}" x="1020" y="588" width="200" height="200" />
+  <text x="1120" y="810" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#475569">Scan to verify</text>
+
+  <text x="140" y="845" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Verification URL: ${escapeXml(verifyUrl)}</text>
+
+  <line x1="170" y1="886" x2="510" y2="886" stroke="#334155" stroke-width="1.8" />
+  <text x="340" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">/s/ Rohit Kumar Yadav</text>
+  <text x="340" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Rohit Kumar Yadav</text>
+  <text x="340" y="944" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Chief Technology Officer</text>
+
+  <line x1="890" y1="886" x2="1230" y2="886" stroke="#334155" stroke-width="1.8" />
+  <text x="1060" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">/s/ Aditya upadhyay</text>
+  <text x="1060" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Aditya upadhyay</text>
+  <text x="1060" y="944" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Chief Executive Officer</text>
 </svg>`;
 
   const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
