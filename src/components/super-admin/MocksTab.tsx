@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import { MockActionsMenu } from './MockActionsMenu';
 import { MockEditModal } from './MockEditModal';
 import { MockSectionsModal } from './MockSectionsModal';
+import { CreateMockModal } from './mocks/CreateMockModal';
+import { MockResultsModal } from './mocks/MockResultsModal';
+import type { MockAttempt, ResultsPagination, ResultsSummary } from './mocks/types';
 import type { MockDraft, MockItem } from './types';
 import { DiffBadge, SectionPills } from './ui';
 
@@ -49,46 +52,11 @@ export function MocksTab({
   onDataChanged,
 }: MocksTabProps) {
   const PAGE_SIZE = 25;
-  type MockAttemptSection = {
-    sectionName: string;
-    answered: number;
-    correct: number;
-    totalQuestions: number;
-  };
-
-  type MockAttempt = {
-    _id: string;
-    userName?: string;
-    email?: string;
-    status?: 'completed' | 'in-progress' | 'left';
-    completedAt?: string;
-    lastActivityAt?: string;
-    expectedEndAt?: string;
-    totalAnswered?: number;
-    totalCorrect?: number;
-    totalQuestions?: number;
-    accuracy?: number;
-    sectionStats?: MockAttemptSection[];
-  };
-
   type MockResultsPayload = {
     quizTitle?: string;
     attempts?: MockAttempt[];
-    summary?: {
-      participants?: number;
-      avgAccuracy?: number;
-      avgAnswered?: number;
-      totalQuestions?: number;
-      completions?: number;
-    };
-    pagination?: {
-      page: number;
-      limit: number;
-      total: number;
-      totalPages: number;
-      hasNextPage: boolean;
-      hasPrevPage: boolean;
-    };
+    summary?: Partial<ResultsSummary>;
+    pagination?: ResultsPagination;
   };
 
   const [search, setSearch] = useState('');
@@ -101,20 +69,14 @@ export function MocksTab({
   const [debouncedResultsSearch, setDebouncedResultsSearch] = useState('');
   const [mockPage, setMockPage] = useState(1);
   const [resultsData, setResultsData] = useState<MockAttempt[]>([]);
-  const [resultsSummary, setResultsSummary] = useState<{
-    participants: number;
-    avgAccuracy: number;
-    avgAnswered: number;
-    totalQuestions: number;
-    completions: number;
-  }>({
+  const [resultsSummary, setResultsSummary] = useState<ResultsSummary>({
     participants: 0,
     avgAccuracy: 0,
     avgAnswered: 0,
     totalQuestions: 0,
     completions: 0,
   });
-  const [resultsPagination, setResultsPagination] = useState({
+  const [resultsPagination, setResultsPagination] = useState<ResultsPagination>({
     page: 1,
     limit: 20,
     total: 0,
@@ -123,6 +85,7 @@ export function MocksTab({
     hasPrevPage: false,
   });
   const [selectedAttempt, setSelectedAttempt] = useState<MockAttempt | null>(null);
+  const [mailSendingByAttempt, setMailSendingByAttempt] = useState<Record<string, boolean>>({});
   const [creating, setCreating] = useState(false);
   const [newMockTitle, setNewMockTitle] = useState('');
   const [newMockDuration, setNewMockDuration] = useState(60);
@@ -330,6 +293,39 @@ export function MocksTab({
     }
   };
 
+  const handleSendCertificateMail = async (attempt: MockAttempt) => {
+    if (!resultsMockId) {
+      onToast('Mock context is missing', 'error');
+      return;
+    }
+    if (!attempt._id) {
+      onToast('Attempt id is missing', 'error');
+      return;
+    }
+    if (!attempt.email) {
+      onToast('Participant email is not available', 'error');
+      return;
+    }
+
+    setMailSendingByAttempt((prev) => ({ ...prev, [attempt._id]: true }));
+    try {
+      const response = await fetch(`/api/admin/mocks/${resultsMockId}/certificate-mail`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ attemptId: attempt._id }),
+      });
+      const payload = await response.json();
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.message || 'Failed to send certificate email');
+      }
+      onToast(payload?.message || 'Certificate email sent successfully', 'success');
+    } catch (cause) {
+      onToast(cause instanceof Error ? cause.message : 'Could not send certificate email', 'error');
+    } finally {
+      setMailSendingByAttempt((prev) => ({ ...prev, [attempt._id]: false }));
+    }
+  };
+
   return (
     <div className="space-y-3">
       {managingSectionsMock && (
@@ -354,411 +350,43 @@ export function MocksTab({
         />
       )}
 
-      {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
-            <h3 className="text-base font-semibold text-slate-900">Create Mock</h3>
-            <p className="mt-1 text-sm text-slate-500">Fill basic details and create a new mock.</p>
+      <CreateMockModal
+        open={showCreateModal}
+        title={newMockTitle}
+        duration={newMockDuration}
+        isPublic={newMockPublic}
+        creating={creating}
+        onTitleChange={setNewMockTitle}
+        onDurationChange={setNewMockDuration}
+        onPublicChange={setNewMockPublic}
+        onClose={() => setShowCreateModal(false)}
+        onCreate={handleCreateMock}
+      />
 
-            <div className="mt-4 space-y-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
-                  Title
-                </label>
-                <input
-                  value={newMockTitle}
-                  onChange={(event) => setNewMockTitle(event.target.value)}
-                  placeholder="Mock title"
-                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
-                  Duration (minutes)
-                </label>
-                <input
-                  type="number"
-                  min={10}
-                  max={300}
-                  value={newMockDuration}
-                  onChange={(event) => setNewMockDuration(Math.max(10, Math.min(300, Number(event.target.value || 60))))}
-                  className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
-                />
-              </div>
-
-              <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-                <input
-                  type="checkbox"
-                  checked={newMockPublic}
-                  onChange={(event) => setNewMockPublic(event.target.checked)}
-                />
-                Make this mock public
-              </label>
-            </div>
-
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                onClick={() => setShowCreateModal(false)}
-                className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateMock}
-                disabled={creating}
-                className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {creating ? 'Creating...' : 'Create Mock'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showResultsModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 p-4 backdrop-blur-sm">
-          <div className="flex max-h-[90vh] w-full max-w-5xl flex-col rounded-xl border border-slate-200 bg-white shadow-xl">
-            <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-200 px-5 py-3">
-              <div>
-                <h3 className="text-base font-semibold text-slate-900">Individual Mock Results</h3>
-                <p className="mt-0.5 text-sm text-slate-500">{resultsMockTitle}</p>
-              </div>
-              <button
-                onClick={() => { setShowResultsModal(false); setSelectedAttempt(null); }}
-                className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
-              >
-                Close
-              </button>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto p-5">
-              {/* Summary stats */}
-              {!resultsLoading && resultsData.length > 0 && (
-                <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {[
-                    { label: 'Participants', value: String(resultsSummary.participants || resultsPagination.total || resultsData.length) },
-                    {
-                      label: 'Avg Accuracy',
-                      value: `${resultsSummary.avgAccuracy}%`,
-                    },
-                    {
-                      label: 'Avg Answered',
-                      value: `${resultsSummary.avgAnswered} / ${resultsSummary.totalQuestions}`,
-                    },
-                    {
-                      label: 'Completions',
-                      value: String(resultsSummary.completions),
-                    },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                      <p className="text-xs uppercase tracking-[0.12em] text-slate-500">{label}</p>
-                      <p className="mt-1 text-lg font-semibold text-slate-900">{value}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Attempt detail drill-down */}
-              {selectedAttempt && (() => {
-                const sections = (selectedAttempt.sectionStats || []).map((s) => ({
-                  ...s,
-                  unanswered: Math.max(0, s.totalQuestions - s.answered),
-                  accuracy: s.totalQuestions > 0 ? Math.round((s.correct / s.totalQuestions) * 100) : 0,
-                }));
-                const pct = selectedAttempt.accuracy || 0;
-                const perfLabel = pct >= 85 ? 'Excellent' : pct >= 70 ? 'Strong' : pct >= 50 ? 'Average' : 'Needs Improvement';
-                const perfSummary = pct >= 85 ? 'Very strong outcome with consistently high accuracy.' : pct >= 70 ? 'Good performance with a solid grasp of most areas.' : pct >= 50 ? 'Mixed performance. There are clear strengths, but also gaps to improve.' : 'Low accuracy overall. Review weak sections and wrong answers first.';
-                const strongest = [...sections].sort((a, b) => b.accuracy - a.accuracy)[0] || null;
-                const weakest = [...sections].sort((a, b) => a.accuracy - b.accuracy)[0] || null;
-                const lowSections = sections.filter((s) => s.accuracy < 50);
-                const tone = (t: number) => t >= 70 ? 'border-emerald-200 bg-emerald-50 text-emerald-900' : t < 50 ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50 text-slate-900';
-
-                return (
-                  <div className="mb-5 rounded-lg border border-slate-200 bg-white p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{selectedAttempt.userName || 'Unknown'}</p>
-                        <p className="text-xs text-slate-500">{selectedAttempt.email || '-'}</p>
-                      </div>
-                      <button
-                        onClick={() => setSelectedAttempt(null)}
-                        className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
-                      >
-                        ← Back to list
-                      </button>
-                    </div>
-
-                    {/* 6-stat grid */}
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
-                      {[
-                        { label: 'Score', value: `${selectedAttempt.totalCorrect ?? 0}/${selectedAttempt.totalQuestions ?? 0} (${pct}%)` },
-                        {
-                          label: 'Status',
-                          value:
-                            selectedAttempt.status === 'left'
-                              ? 'Left Quiz'
-                              : selectedAttempt.status === 'in-progress'
-                              ? 'In Progress'
-                              : 'Completed',
-                        },
-                        { label: 'Level', value: perfLabel },
-                        { label: 'Answered', value: String(selectedAttempt.totalAnswered ?? 0) },
-                        { label: 'Unanswered', value: String(Math.max(0, (selectedAttempt.totalQuestions || 0) - (selectedAttempt.totalAnswered || 0))) },
-                        { label: 'Incorrect', value: String(Math.max(0, (selectedAttempt.totalAnswered || 0) - (selectedAttempt.totalCorrect || 0))) },
-                      ].map(({ label, value }) => (
-                        <div key={label} className="rounded-lg border border-slate-200 bg-white p-3">
-                          <p className="text-xs uppercase tracking-[0.12em] text-slate-500">{label}</p>
-                          <p className="mt-1 text-base font-semibold text-slate-900">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Insight cards */}
-                    <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                      <div className={`rounded-lg border p-3 ${tone(pct)}`}>
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Overall Interpretation</p>
-                        <p className="mt-1 text-sm leading-6">{perfSummary}</p>
-                      </div>
-                      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-emerald-900">
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Strongest Section</p>
-                        <p className="mt-1 text-sm leading-6">
-                          {strongest ? `${strongest.sectionName} at ${strongest.accuracy}% accuracy.` : 'No data available.'}
-                        </p>
-                      </div>
-                      <div className={`rounded-lg border p-3 ${lowSections.length ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50 text-slate-900'}`}>
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Needs Attention</p>
-                        <p className="mt-1 text-sm leading-6">
-                          {lowSections.length
-                            ? `${lowSections.length} section(s) below 50% accuracy: ${lowSections.slice(0, 2).map((s) => s.sectionName).join(', ')}.`
-                            : 'No section is below 50% accuracy.'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Section breakdown table */}
-                    {sections.length > 0 && (
-                      <div className="mt-3 overflow-hidden rounded-lg border border-slate-200">
-                        <table className="min-w-full text-sm">
-                          <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
-                            <tr>
-                              <th className="px-3 py-2 text-left">Section</th>
-                              <th className="px-3 py-2 text-left">Correct</th>
-                              <th className="px-3 py-2 text-left">Answered</th>
-                              <th className="px-3 py-2 text-left">Unanswered</th>
-                              <th className="px-3 py-2 text-left">Total</th>
-                              <th className="px-3 py-2 text-left">Accuracy</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-200">
-                            {sections.map((s) => (
-                              <tr key={s.sectionName} className="hover:bg-slate-50">
-                                <td className="px-3 py-2 font-medium text-slate-900">{s.sectionName}</td>
-                                <td className="px-3 py-2 text-slate-700">{s.correct}</td>
-                                <td className="px-3 py-2 text-slate-700">{s.answered}</td>
-                                <td className="px-3 py-2 text-slate-700">{s.unanswered}</td>
-                                <td className="px-3 py-2 text-slate-700">{s.totalQuestions}</td>
-                                <td className="px-3 py-2">
-                                  <span className={`font-medium ${s.accuracy >= 70 ? 'text-emerald-700' : s.accuracy < 50 ? 'text-amber-700' : 'text-slate-700'}`}>
-                                    {s.accuracy}%
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-
-                    {/* Bottom insight row */}
-                    <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                      <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-slate-900">
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Completion Insight</p>
-                        <p className="mt-1 text-sm leading-6">
-                          {selectedAttempt.totalAnswered ?? 0} of {selectedAttempt.totalQuestions ?? 0} questions answered, leaving {Math.max(0, (selectedAttempt.totalQuestions || 0) - (selectedAttempt.totalAnswered || 0))} unanswered.
-                        </p>
-                      </div>
-                      <div className={`rounded-lg border p-3 ${weakest && weakest.accuracy < 50 ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50 text-slate-900'}`}>
-                        <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Weakest Section</p>
-                        <p className="mt-1 text-sm leading-6">
-                          {weakest ? `${weakest.sectionName} is lowest at ${weakest.accuracy}% accuracy.` : 'No section data available.'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Attempts table */}
-              {!selectedAttempt && (
-                <div>
-                  <form
-                    className="mb-3 flex flex-col gap-2 sm:flex-row"
-                    onSubmit={(event) => {
-                      event.preventDefault();
-                      const selectedMock = mocks.find((m) => m._id === resultsMockId);
-                      if (!selectedMock) return;
-                      handleOpenMockResults(selectedMock, 1, resultsSearch);
-                    }}
-                  >
-                    <input
-                      value={resultsSearch}
-                      onChange={(event) => setResultsSearch(event.target.value)}
-                      placeholder="Search by user name or email"
-                      className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-500"
-                    />
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="submit"
-                        className="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                      >
-                        Search
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setResultsSearch('');
-                          const selectedMock = mocks.find((m) => m._id === resultsMockId);
-                          if (!selectedMock) return;
-                          handleOpenMockResults(selectedMock, 1, '');
-                        }}
-                        className="rounded-md border border-slate-300 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  </form>
-
-                  <div className="overflow-x-auto rounded-lg border border-slate-200">
-                    <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-[0.12em] text-slate-500">
-                      <tr>
-                        <th className="px-3 py-2">User</th>
-                        <th className="px-3 py-2">Email</th>
-                        <th className="px-3 py-2">Answered</th>
-                        <th className="px-3 py-2">Score</th>
-                        <th className="px-3 py-2">Accuracy</th>
-                        <th className="px-3 py-2">Status</th>
-                        <th className="px-3 py-2">Completed At</th>
-                        <th className="px-3 py-2 text-right">Details</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {resultsLoading && (
-                        <tr>
-                          <td colSpan={8} className="px-3 py-8">
-                            <div className="flex flex-col items-center justify-center gap-2 text-slate-500">
-                              <span className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-slate-700" />
-                              <span className="text-sm">Loading individual results...</span>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
-                      {!resultsLoading && resultsData.length === 0 && (
-                        <tr>
-                          <td colSpan={8} className="px-3 py-6 text-center text-sm text-slate-400">
-                            {resultsSearch.trim() ? 'No attempts found for this search.' : 'No attempts found for this mock.'}
-                          </td>
-                        </tr>
-                      )}
-                      {!resultsLoading &&
-                        resultsData.map((attempt) => (
-                          <tr key={attempt._id} className="hover:bg-slate-50">
-                            <td className="px-3 py-2 font-medium text-slate-900">{attempt.userName || 'Unknown'}</td>
-                            <td className="px-3 py-2 text-xs text-slate-500">{attempt.email || '-'}</td>
-                            <td className="px-3 py-2 text-slate-700">
-                              {attempt.totalAnswered ?? 0}/{attempt.totalQuestions ?? 0}
-                            </td>
-                            <td className="px-3 py-2 text-slate-700">
-                              {attempt.totalCorrect ?? 0}/{attempt.totalQuestions ?? 0}
-                            </td>
-                            <td className="px-3 py-2">
-                              <span className={`font-medium ${(attempt.accuracy || 0) >= 70 ? 'text-emerald-700' : (attempt.accuracy || 0) < 50 ? 'text-amber-700' : 'text-slate-700'}`}>
-                                {attempt.accuracy ?? 0}%
-                              </span>
-                            </td>
-                            <td className="px-3 py-2">
-                              <span
-                                className={`inline-flex rounded-md px-2 py-1 text-xs font-medium ${
-                                  attempt.status === 'left'
-                                    ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
-                                    : attempt.status === 'in-progress'
-                                    ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-200'
-                                    : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200'
-                                }`}
-                              >
-                                {attempt.status === 'left'
-                                  ? 'Left Quiz'
-                                  : attempt.status === 'in-progress'
-                                  ? 'In Progress'
-                                  : 'Completed'}
-                              </span>
-                            </td>
-                            <td className="px-3 py-2 text-xs text-slate-500">
-                              {attempt.completedAt
-                                ? new Date(attempt.completedAt).toLocaleString()
-                                : attempt.status === 'left' && attempt.expectedEndAt
-                                ? `Left after ${new Date(attempt.expectedEndAt).toLocaleString()}`
-                                : attempt.lastActivityAt
-                                ? `Last active ${new Date(attempt.lastActivityAt).toLocaleString()}`
-                                : '-'}
-                            </td>
-                            <td className="px-3 py-2 text-right">
-                              <button
-                                onClick={() => setSelectedAttempt(attempt)}
-                                className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                              >
-                                View Details
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                    </table>
-                  </div>
-
-                  {!resultsLoading && resultsPagination.total > 0 && (
-                    <div className="mt-3 flex items-center justify-between gap-3">
-                      <p className="text-xs text-slate-500">
-                        Showing {resultsData.length} of {resultsPagination.total} attempts (Page {resultsPagination.page} of {resultsPagination.totalPages})
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => {
-                            const selectedMock = mocks.find((m) => m._id === resultsMockId);
-                            if (!selectedMock || !resultsPagination.hasPrevPage) return;
-                            handleOpenMockResults(selectedMock, resultsPagination.page - 1, resultsSearch);
-                          }}
-                          disabled={!resultsPagination.hasPrevPage || resultsLoading}
-                          className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          Previous
-                        </button>
-                        <button
-                          onClick={() => {
-                            const selectedMock = mocks.find((m) => m._id === resultsMockId);
-                            if (!selectedMock || !resultsPagination.hasNextPage) return;
-                            handleOpenMockResults(selectedMock, resultsPagination.page + 1, resultsSearch);
-                          }}
-                          disabled={!resultsPagination.hasNextPage || resultsLoading}
-                          className="rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
+      <MockResultsModal
+        open={showResultsModal}
+        title={resultsMockTitle}
+        loading={resultsLoading}
+        search={resultsSearch}
+        setSearch={setResultsSearch}
+        data={resultsData}
+        summary={resultsSummary}
+        pagination={resultsPagination}
+        selectedAttempt={selectedAttempt}
+        mailSendingByAttempt={mailSendingByAttempt}
+        onClose={() => setShowResultsModal(false)}
+        onSelectAttempt={setSelectedAttempt}
+        onLoadPage={(page, searchTerm) => {
+          const selectedMock = mocks.find((m) => m._id === resultsMockId);
+          if (!selectedMock) return;
+          handleOpenMockResults(selectedMock, page, searchTerm);
+        }}
+        onSendCertificateMail={handleSendCertificateMail}
+      />
       <div className="flex items-center justify-between gap-3">
         <input
           className="w-full max-w-xs rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-slate-400"
-          placeholder="Search by title or section…"
+          placeholder="Search by title or section..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -919,7 +547,7 @@ export function MocksTab({
 
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
         <p className="text-xs text-slate-500">
-          Page {mockPage} of {totalMockPages} · Showing {paginatedMocks.length} of {filtered.length} mock(s)
+          Page {mockPage} of {totalMockPages} -+ Showing {paginatedMocks.length} of {filtered.length} mock(s)
         </p>
         <div className="flex items-center gap-2">
           <button
@@ -941,3 +569,4 @@ export function MocksTab({
     </div>
   );
 }
+

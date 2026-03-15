@@ -327,6 +327,8 @@ export async function GET(
         title: achievement.quizTitle || 'Quiz',
         kind: 'quiz' as const,
       }));
+    const certificateCount = (Array.isArray(user.achievements) ? user.achievements : [])
+      .filter((achievement: any) => achievement?.type === 'certificate').length;
     const topWins = Array.from(
       new Map(
         [...topMockWins, ...topQuizWins].map((item) => [`${item.kind}:${item.title}`, item])
@@ -351,7 +353,7 @@ export async function GET(
         highestMock,
         highestQuiz,
         topFinishes: isPrivateProfile ? 0 : topWins.length,
-        certificates: isOwner ? Array.isArray(user.achievements) ? user.achievements.length : 0 : 0,
+        certificates: isOwner ? certificateCount : 0,
       },
       mockHistory: visibleMockHistory,
       quizHistory: visibleQuizHistory,

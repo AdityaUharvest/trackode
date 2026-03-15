@@ -2,7 +2,10 @@ import mongoose, { Schema } from 'mongoose';
 
 interface ICertificate {
   type: 'certificate';
+  certificateId?: string;
   rank: number;
+  positionLabel?: string;
+  badgeLabel?: 'Winner' | 'Participant';
   quizTitle: string;
   quizId: mongoose.Types.ObjectId;
   score: number;
@@ -114,6 +117,17 @@ const userSchema = new Schema<IUser>({
       rank: {
         type: Number,
         required: function(this: any) { return this.type === 'certificate'; },
+      },
+      certificateId: {
+        type: String,
+        index: true,
+      },
+      positionLabel: {
+        type: String,
+      },
+      badgeLabel: {
+        type: String,
+        enum: ['Winner', 'Participant'],
       },
       quizTitle: {
         type: String,
