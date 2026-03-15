@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from 'next/server';
 import mongoose, { Types } from 'mongoose';
+import nodemailer from 'nodemailer';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import User from '@/app/model/User';
@@ -84,6 +85,150 @@ interface IMockResult {
 }
 
 type AttemptStatus = 'completed' | 'in-progress' | 'left';
+
+type LeaderboardAttempt = {
+  userId: string;
+  userName: string;
+  email: string;
+  quizTitle: string;
+  completedAt: Date | null;
+  totalCorrect: number;
+  totalQuestions: number;
+  accuracy: number;
+};
+
+const mailTransporter = nodemailer.createTransport({
+  host: 'smtp.gmail.com',
+  service: process.env.EMAIL_SERVICE || 'gmail',
+  port: Number(process.env.EMAIL_PORT) || 587,
+  secure: process.env.EMAIL_SECURE === 'true',
+  auth: {
+    user: process.env.OTP_EMAIL_USER,
+    pass: process.env.OTP_EMAIL_PASSWORD,
+  },
+});
+
+function getOrdinal(rank: number) {
+  const mod10 = rank % 10;
+  const mod100 = rank % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${rank}st`;
+  if (mod10 === 2 && mod100 !== 12) return `${rank}nd`;
+  if (mod10 === 3 && mod100 !== 13) return `${rank}rd`;
+  return `${rank}th`;
+}
+
+async function sendCertificateNotificationEmail(params: {
+  email: string;
+  userName: string;
+  quizTitle: string;
+  certificateId: string;
+  rank: number;
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+}) {
+  if (!params.email || !process.env.OTP_EMAIL_USER || !process.env.OTP_EMAIL_PASSWORD) {
+    return;
+  }
+
+  const badgeLabel = params.rank <= 3 ? 'Winner' : 'Participant';
+  const rankLabel = getOrdinal(params.rank);
+  const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://trackode.in';
+  const verifyUrl = `${appBaseUrl}/certificate/verify/${encodeURIComponent(params.certificateId)}`;
+  const subject = `Certificate Awarded: ${params.quizTitle}`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.5; color: #0f172a; max-width: 640px; margin: 0 auto; padding: 20px;">
+      <h2 style="margin-bottom: 8px;">Congratulations, ${params.userName || 'Participant'}!</h2>
+      <p style="margin-top: 0; color: #334155;">You have received a certificate for <strong>${params.quizTitle}</strong>.</p>
+      <div style="border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin: 16px 0; background: #f8fafc;">
+        <p style="margin: 0 0 6px;"><strong>Rank:</strong> ${rankLabel} Position</p>
+        <p style="margin: 0 0 6px;"><strong>Status:</strong> ${badgeLabel}</p>
+        <p style="margin: 0 0 6px;"><strong>Certificate ID:</strong> ${params.certificateId}</p>
+        <p style="margin: 0 0 6px;"><strong>Score:</strong> ${params.score}/${params.totalQuestions}</p>
+        <p style="margin: 0;"><strong>Accuracy:</strong> ${params.percentage}%</p>
+      </div>
+      <p style="color: #475569;">You can now view and download this certificate from your profile on Trackode.</p>
+      <p style="color: #475569;">Verify certificate: <a href="${verifyUrl}">${verifyUrl}</a></p>
+    </div>
+  `;
+
+  await mailTransporter.sendMail({
+    from: `"Trackode Team" <${process.env.OTP_EMAIL_USER}>`,
+    to: params.email,
+    subject,
+    html,
+  });
+}
+
+async function awardCertificatesForFinalizedLeaderboard(
+  quizId: string,
+  quizTitle: string,
+  leaderboard: LeaderboardAttempt[]
+) {
+  const quizObjectId = new Types.ObjectId(quizId);
+
+  for (let index = 0; index < leaderboard.length; index += 1) {
+    const row = leaderboard[index];
+    if (!Types.ObjectId.isValid(row.userId)) {
+      continue;
+    }
+
+    const rank = index + 1;
+    const badgeLabel: 'Winner' | 'Participant' = rank <= 3 ? 'Winner' : 'Participant';
+    const certificateDate = row.completedAt || new Date();
+    const certificateId = `TRK-${quizId.slice(-6).toUpperCase()}-${row.userId.slice(-6).toUpperCase()}`;
+    const payload = {
+      type: 'certificate' as const,
+      certificateId,
+      rank,
+      positionLabel: `${getOrdinal(rank)} Position`,
+      badgeLabel,
+      quizTitle: quizTitle || row.quizTitle || 'Mock Test',
+      quizId: quizObjectId,
+      score: Number(row.totalCorrect || 0),
+      totalQuestions: Number(row.totalQuestions || 0),
+      percentage: Number(row.accuracy || 0),
+      date: certificateDate,
+    };
+
+    const updateResult = await User.updateOne(
+      {
+        _id: new Types.ObjectId(row.userId),
+        achievements: {
+          $not: {
+            $elemMatch: {
+              type: 'certificate',
+              quizId: quizObjectId,
+            },
+          },
+        },
+      },
+      {
+        $push: {
+          achievements: payload,
+        },
+      }
+    );
+
+    if (updateResult.modifiedCount > 0) {
+      try {
+        await sendCertificateNotificationEmail({
+          email: row.email,
+          userName: row.userName,
+          quizTitle: payload.quizTitle,
+          certificateId: payload.certificateId,
+          rank,
+          score: payload.score,
+          totalQuestions: payload.totalQuestions,
+          percentage: payload.percentage,
+        });
+      } catch (mailError) {
+        console.error('Certificate email failed:', mailError);
+      }
+    }
+  }
+}
 
 function normalizeSectionName(sectionName: string): string {
   return (sectionName || '').trim().toLowerCase();
@@ -327,6 +472,21 @@ export async function GET(
         return (b.completedAt?.getTime() || b.lastActivityAt?.getTime() || 0) -
           (a.completedAt?.getTime() || a.lastActivityAt?.getTime() || 0);
       });
+
+      await awardCertificatesForFinalizedLeaderboard(
+        quizId,
+        quiz.title,
+        results.map((attempt) => ({
+          userId: attempt.userId,
+          userName: attempt.userName,
+          email: attempt.email,
+          quizTitle: attempt.quizTitle,
+          completedAt: attempt.completedAt,
+          totalCorrect: attempt.totalCorrect,
+          totalQuestions: attempt.totalQuestions,
+          accuracy: attempt.accuracy,
+        }))
+      );
     } else {
       // Live monitoring mode: sort by score even while attempts are still in progress.
       results.sort((a, b) => {

@@ -6,9 +6,9 @@ import mongoose from 'mongoose';
 import { auth } from '@/auth';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // Define a basic user type based on your model
@@ -31,9 +31,10 @@ type UserType = {
   public?: boolean;
 };
 
-export async function generateMetadata({ params }: any): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   await connectDB();
-  const identifier = decodeURIComponent(params.id || '');
+  const resolvedParams = await params;
+  const identifier = decodeURIComponent(resolvedParams.id || '');
   const query = mongoose.Types.ObjectId.isValid(identifier)
     ? { _id: identifier }
     : { email: identifier };
@@ -45,9 +46,10 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
   };
 }
 
-export default async function Page({ params }: any) {
+export default async function Page({ params }: PageProps) {
   await connectDB();
-  const identifier = decodeURIComponent(params.id || '');
+  const resolvedParams = await params;
+  const identifier = decodeURIComponent(resolvedParams.id || '');
   const query = mongoose.Types.ObjectId.isValid(identifier)
     ? { _id: identifier }
     : { email: identifier };
@@ -58,28 +60,31 @@ export default async function Page({ params }: any) {
     return <div>User not found</div>;
   }
 
-  const isOwner = String(session?.user?.id || '') === String(user._id || '');
-  const isPrivateProfile = !isOwner && user.public === false;
+  // Normalize possible BSON/ObjectId instances so only plain serializable data reaches client components.
+  const plainUser = JSON.parse(JSON.stringify(user));
+
+  const isOwner = String(session?.user?.id || '') === String(plainUser._id || '');
+  const isPrivateProfile = !isOwner && plainUser.public === false;
 
   const safeUser = isOwner
-    ? user
+    ? plainUser
     : {
-        _id: user._id,
-        name: user.name,
-        image: user.image,
-        bio: user.bio,
-        college: user.college,
-        branch: user.branch,
-        year: user.year,
-        leetcode: user.public ? user.leetcode : '',
-        github: user.public ? user.github : '',
-        linkedin: user.public ? user.linkedin : '',
-        twitter: user.public ? user.twitter : '',
-        interests: Array.isArray(user.interests) ? user.interests : [],
-        languages: Array.isArray(user.languages) ? user.languages : [],
-        skills: Array.isArray((user as any).skills) ? (user as any).skills : [],
-        public: user.public,
-        followerCount: Array.isArray((user as any).followers) ? (user as any).followers.length : 0,
+        _id: plainUser._id,
+        name: plainUser.name,
+        image: plainUser.image,
+        bio: plainUser.bio,
+        college: plainUser.college,
+        branch: plainUser.branch,
+        year: plainUser.year,
+        leetcode: plainUser.public ? plainUser.leetcode : '',
+        github: plainUser.public ? plainUser.github : '',
+        linkedin: plainUser.public ? plainUser.linkedin : '',
+        twitter: plainUser.public ? plainUser.twitter : '',
+        interests: Array.isArray(plainUser.interests) ? plainUser.interests : [],
+        languages: Array.isArray(plainUser.languages) ? plainUser.languages : [],
+        skills: Array.isArray((plainUser as any).skills) ? (plainUser as any).skills : [],
+        public: plainUser.public,
+        followerCount: Array.isArray((plainUser as any).followers) ? (plainUser as any).followers.length : 0,
       };
 
   return <Profile user={safeUser} isOwner={isOwner} isPrivateProfile={isPrivateProfile} />;
