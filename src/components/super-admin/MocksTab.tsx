@@ -547,7 +547,7 @@ export function MocksTab({
 
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
         <p className="text-xs text-slate-500">
-          Page {mockPage} of {totalMockPages} -+ Showing {paginatedMocks.length} of {filtered.length} mock(s)
+          Page {mockPage} of {totalMockPages} - Showing {paginatedMocks.length} of {filtered.length} mock(s)
         </p>
         <div className="flex items-center gap-2">
           <button
