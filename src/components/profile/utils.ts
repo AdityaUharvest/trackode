@@ -119,19 +119,16 @@ export async function downloadProfileCertificate(achievement: CertificateAchieve
   <text x="184" y="736" font-family="Arial, sans-serif" font-size="22" fill="#334155">Accuracy: ${achievement.percentage || 0}%</text>
 
   <rect x="980" y="548" width="280" height="280" rx="14" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" />
-  <image href="${qrDataUrl}" x="1020" y="588" width="200" height="200" />
-  <text x="1120" y="810" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#475569">Scan to verify</text>
-
-  <text x="140" y="845" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Verification URL: ${escapeXml(verifyUrl)}</text>
+  <image href="${qrDataUrl}" x="1020" y="588" width="170" height="170" />
 
   <line x1="170" y1="886" x2="510" y2="886" stroke="#334155" stroke-width="1.8" />
-  <text x="340" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">/s/ Kajal Kasaudhan</text>
+  <text x="340" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">Kajal Kasaudhan</text>
   <text x="340" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Kajal Kasaudhan</text>
   <text x="340" y="944" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Co-founder</text>
 
   <line x1="890" y1="886" x2="1230" y2="886" stroke="#334155" stroke-width="1.8" />
-  <text x="1060" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">/s/ Aditya upadhyay</text>
-  <text x="1060" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Aditya upadhyay</text>
+  <text x="1060" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">Aditya Upadhyay</text>
+  <text x="1060" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Aditya Upadhyay</text>
   <text x="1060" y="944" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Chief Executive Officer</text>
 </svg>`;
 
