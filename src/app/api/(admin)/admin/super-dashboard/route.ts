@@ -24,17 +24,28 @@ export async function GET() {
 
     await connectDB();
 
-    const [mocks, quizzes, quizAttempts, mockResults, quizResults] = await Promise.all([
+    const [mocks, quizzes, quizAttempts, mockResults, quizResults, totalMockAttempts, attemptAggregation] = await Promise.all([
       MockTest.find().sort({ createdAt: -1 }).lean(),
       Quiz.find().sort({ createdAt: -1 }).populate('createdBy', 'name email').lean(),
-      QuizAttempt.find().sort({ startedAt: -1 }).limit(500).lean(),
+      QuizAttempt.find().sort({ startedAt: -1 }).lean(),
       MockResult.find().sort({ completedAt: -1 }).limit(200).populate('userId', 'name email').lean(),
       Attempted.find().sort({ attemptedAt: -1 }).limit(200).populate('student', 'name email').populate('quiz', 'name').lean(),
+      QuizAttempt.countDocuments(),
+      QuizAttempt.aggregate([
+        {
+          $group: {
+            _id: '$quizId',
+            count: { $sum: 1 },
+          },
+        },
+      ]),
     ]);
 
-    const attemptsByMockId = quizAttempts.reduce((acc, attempt: any) => {
-      const key = String(attempt.quizId);
-      acc[key] = (acc[key] || 0) + 1;
+    const attemptsByMockId = attemptAggregation.reduce((acc, item: any) => {
+      const key = String(item?._id || '');
+      if (key) {
+        acc[key] = Number(item?.count || 0);
+      }
       return acc;
     }, {} as Record<string, number>);
 
@@ -141,7 +152,7 @@ export async function GET() {
         stats: {
           totalMocks: mocks.length,
           totalQuizzes: quizzes.length,
-          totalMockAttempts: quizAttempts.length,
+          totalMockAttempts,
           totalQuizAttempts: quizResults.length,
           totalMockResults: mockResults.length,
           publishedMocks: mocks.filter((m: any) => m.isPublished).length,

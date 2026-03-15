@@ -66,12 +66,17 @@ useEffect(() => {
     try {
       const [attemptsRes, resultsRes] = await Promise.all([
         axios.get('/api/mock-tests/dashboard/attempts'),
-        axios.get('/api/mock-tests/dashboard/results')
+        axios.get('/api/mock-tests/dashboard/results?page=1&limit=50')
       ]);
+      const dashboardResults = Array.isArray(resultsRes.data)
+        ? resultsRes.data
+        : Array.isArray(resultsRes.data?.data)
+        ? resultsRes.data.data
+        : [];
       
       // Combine data from both endpoints
       const enrichedAttempts = attemptsRes.data.map(attempt => {
-        const result = resultsRes.data.find(r => r.attemptId.toString() === attempt._id.toString());
+        const result = dashboardResults.find(r => r.attemptId.toString() === attempt._id.toString());
         return {
           ...attempt,
           ...result,
