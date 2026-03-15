@@ -125,8 +125,8 @@ export async function downloadProfileCertificate(achievement: CertificateAchieve
   <text x="140" y="845" font-family="Arial, sans-serif" font-size="14" fill="#64748b">Verification URL: ${escapeXml(verifyUrl)}</text>
 
   <line x1="170" y1="886" x2="510" y2="886" stroke="#334155" stroke-width="1.8" />
-  <text x="340" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">/s/ Rohit Kumar Yadav</text>
-  <text x="340" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Rohit Kumar Yadav</text>
+  <text x="340" y="872" text-anchor="middle" font-family="Brush Script MT, Lucida Handwriting, cursive" font-size="34" fill="#0f172a">/s/ Kajal Kasaudhan</text>
+  <text x="340" y="922" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#0f172a">Kajal Kasaudhan</text>
   <text x="340" y="944" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#64748b">Chief Technology Officer</text>
 
   <line x1="890" y1="886" x2="1230" y2="886" stroke="#334155" stroke-width="1.8" />
