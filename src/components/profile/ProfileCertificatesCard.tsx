@@ -26,13 +26,13 @@ export function ProfileCertificatesCard({ certificates, onDownload }: ProfileCer
         <div className="mt-5 space-y-3">
           {certificates.map((certificate) => (
             <div
-              key={certificate.certificateId || `${certificate.title}-${certificate.issuedAt}`}
+              key={certificate.certificateId || `${certificate.quizTitle}-${certificate.date}`}
               className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 dark:border-slate-800 md:flex-row md:items-center md:justify-between"
             >
               <div>
-                <p className="font-semibold text-slate-900 dark:text-slate-100">{certificate.title}</p>
+                <p className="font-semibold text-slate-900 dark:text-slate-100">{certificate.quizTitle || 'Mock Test'}</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  {certificate.positionLabel} · {certificate.badgeLabel}
+                  {[certificate.positionLabel, certificate.badgeLabel].filter(Boolean).join(' · ') || 'Participant'}
                 </p>
               </div>
               <button

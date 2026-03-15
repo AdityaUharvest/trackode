@@ -115,7 +115,7 @@ const Profile = ({ user, isOwner = false, isPrivateProfile = false }: { user: Pr
     { label: 'Branch', value: formData.branch || '-' },
     { label: 'Year', value: formData.year || '-' },
     { label: 'Visibility', value: isOwner ? (formData.public ? 'Public' : 'Private') : null },
-  ].filter((item): item is { label: string; value: string | boolean } => item.value !== null);
+  ].filter((item): item is { label: string; value: string } => item.value !== null);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
