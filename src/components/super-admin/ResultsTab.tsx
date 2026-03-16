@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import type { MockAttemptItem, MockResultItem, QuizResultItem } from './types';
+import type { LiveMockAttemptDetail, LiveMockAttemptItem, MockAttemptItem, MockResultItem, QuizResultItem } from './types';
 import { ResultsCard } from './ui';
 
 type ResultsTabProps = {
@@ -41,13 +41,13 @@ type MockDetailSection = {
 };
 
 type DeleteIntent = {
-  kind: 'mock' | 'quiz' | 'attempt';
+  kind: 'mock' | 'quiz' | 'attempt' | 'live';
   id: string;
   label: string;
 };
 
 type BulkDeleteIntent = {
-  kind: 'mock' | 'quiz' | 'attempt';
+  kind: 'mock' | 'quiz' | 'attempt' | 'live';
   ids: string[];
   label: string;
 };
@@ -146,7 +146,7 @@ function ModalShell({
 
 export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChanged, onToast, refreshTick }: ResultsTabProps) {
   const hasFetchedOnce = useRef(new Set<string>());
-  const [activeKind, setActiveKind] = useState<'mock' | 'quiz' | 'attempt'>('mock');
+  const [activeKind, setActiveKind] = useState<'mock' | 'quiz' | 'attempt' | 'live'>('mock');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [loadingDetails, setLoadingDetails] = useState(false);
@@ -157,22 +157,27 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
   const [selectedQuizIds, setSelectedQuizIds] = useState<string[]>([]);
   const [selectedAttemptIds, setSelectedAttemptIds] = useState<string[]>([]);
-  const [pageByKind, setPageByKind] = useState({ mock: 1, quiz: 1, attempt: 1 });
+  const [selectedLiveIds, setSelectedLiveIds] = useState<string[]>([]);
+  const [pageByKind, setPageByKind] = useState({ mock: 1, quiz: 1, attempt: 1, live: 1 });
   const [mockRows, setMockRows] = useState<MockResultItem[]>(mockResults);
   const [quizRows, setQuizRows] = useState<QuizResultItem[]>(quizResults);
   const [attemptRows, setAttemptRows] = useState<MockAttemptItem[]>(mockAttempts);
+  const [liveRows, setLiveRows] = useState<LiveMockAttemptItem[]>([]);
   const [paginationByKind, setPaginationByKind] = useState<{
     mock: PaginationState;
     quiz: PaginationState;
     attempt: PaginationState;
+    live: PaginationState;
   }>({
     mock: { ...DEFAULT_PAGINATION, total: mockResults.length },
     quiz: { ...DEFAULT_PAGINATION, total: quizResults.length },
     attempt: { ...DEFAULT_PAGINATION, total: mockAttempts.length },
+    live: { ...DEFAULT_PAGINATION, total: 0 },
   });
 
   const [mockDetail, setMockDetail] = useState<MockDetail | null>(null);
   const [quizDetail, setQuizDetail] = useState<QuizDetail | null>(null);
+  const [liveDetail, setLiveDetail] = useState<LiveMockAttemptDetail | null>(null);
 
   const [editingMock, setEditingMock] = useState<MockDetail | null>(null);
   const [editingQuiz, setEditingQuiz] = useState<QuizDetail | null>(null);
@@ -196,11 +201,10 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
   }, [query]);
 
   const fetchListData = useCallback(
-    async (kind: 'mock' | 'quiz' | 'attempt', page: number, search: string) => {
+    async (kind: 'mock' | 'quiz' | 'attempt' | 'live', page: number, search: string) => {
       if (!hasFetchedOnce.current.has(kind)) setListLoading(true);
       try {
         const queryParams = new URLSearchParams({
-          kind,
           page: String(page),
           limit: '25',
         });
@@ -208,7 +212,15 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
           queryParams.set('q', search);
         }
 
-        const response = await fetch(`/api/admin/results/list?${queryParams.toString()}`, { cache: 'no-store' });
+        if (kind !== 'live') {
+          queryParams.set('kind', kind);
+        }
+
+        const endpoint =
+          kind === 'live'
+            ? `/api/admin/results/in-progress?${queryParams.toString()}`
+            : `/api/admin/results/list?${queryParams.toString()}`;
+        const response = await fetch(endpoint, { cache: 'no-store' });
         const payload = await response.json();
         if (!response.ok || !payload?.success) {
           throw new Error(payload?.message || 'Failed to load results');
@@ -227,8 +239,10 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
           setMockRows(Array.isArray(payload?.items) ? (payload.items as MockResultItem[]) : []);
         } else if (kind === 'quiz') {
           setQuizRows(Array.isArray(payload?.items) ? (payload.items as QuizResultItem[]) : []);
-        } else {
+        } else if (kind === 'attempt') {
           setAttemptRows(Array.isArray(payload?.items) ? (payload.items as MockAttemptItem[]) : []);
+        } else {
+          setLiveRows(Array.isArray(payload?.items) ? (payload.items as LiveMockAttemptItem[]) : []);
         }
         hasFetchedOnce.current.add(kind);
 
@@ -254,6 +268,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
   const visibleMockIds = mockRows.map((result) => result._id);
   const visibleAttemptIds = attemptRows.map((attempt) => attempt._id);
   const visibleQuizIds = quizRows.map((result) => result._id);
+  const visibleLiveIds = liveRows.map((attempt) => attempt._id);
   const activePagination = paginationByKind[activeKind];
 
   const goToActivePage = (page: number) => {
@@ -266,6 +281,8 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
     visibleAttemptIds.length > 0 && visibleAttemptIds.every((id) => selectedAttemptIds.includes(id));
   const allVisibleQuizSelected =
     visibleQuizIds.length > 0 && visibleQuizIds.every((id) => selectedQuizIds.includes(id));
+  const allVisibleLiveSelected =
+    visibleLiveIds.length > 0 && visibleLiveIds.every((id) => selectedLiveIds.includes(id));
 
   const toggleMockSelection = (id: string, checked: boolean) => {
     setSelectedMockIds((prev) => {
@@ -287,6 +304,15 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
 
   const toggleAttemptSelection = (id: string, checked: boolean) => {
     setSelectedAttemptIds((prev) => {
+      if (checked) {
+        return prev.includes(id) ? prev : [...prev, id];
+      }
+      return prev.filter((item) => item !== id);
+    });
+  };
+
+  const toggleLiveSelection = (id: string, checked: boolean) => {
+    setSelectedLiveIds((prev) => {
       if (checked) {
         return prev.includes(id) ? prev : [...prev, id];
       }
@@ -321,6 +347,15 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
     });
   };
 
+  const toggleAllVisibleLive = (checked: boolean) => {
+    setSelectedLiveIds((prev) => {
+      if (checked) {
+        return Array.from(new Set([...prev, ...visibleLiveIds]));
+      }
+      return prev.filter((id) => !visibleLiveIds.includes(id));
+    });
+  };
+
   const fetchMockDetail = async (id: string) => {
     setLoadingDetails(true);
     try {
@@ -344,6 +379,20 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         throw new Error(payload?.message || 'Failed to load quiz result details');
       }
       return payload.result as QuizDetail;
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const fetchLiveDetail = async (id: string) => {
+    setLoadingDetails(true);
+    try {
+      const response = await fetch(`/api/admin/results/in-progress/${id}`, { cache: 'no-store' });
+      const payload = await response.json();
+      if (!response.ok || !payload?.success) {
+        throw new Error(payload?.message || 'Failed to load in-progress attempt');
+      }
+      return payload.result as LiveMockAttemptDetail;
     } finally {
       setLoadingDetails(false);
     }
@@ -382,6 +431,15 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
       setEditingQuiz(detail);
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not load quiz result', 'error');
+    }
+  };
+
+  const handleViewLive = async (id: string) => {
+    try {
+      const detail = await fetchLiveDetail(id);
+      setLiveDetail(detail);
+    } catch (cause) {
+      onToast(cause instanceof Error ? cause.message : 'Could not load in-progress mock', 'error');
     }
   };
 
@@ -480,12 +538,14 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         setSelectedMockIds((prev) => prev.filter((id) => id !== deleteIntent.id));
       } else if (deleteIntent.kind === 'quiz') {
         setSelectedQuizIds((prev) => prev.filter((id) => id !== deleteIntent.id));
+      } else if (deleteIntent.kind === 'live') {
+        setSelectedLiveIds((prev) => prev.filter((id) => id !== deleteIntent.id));
       } else {
         setSelectedAttemptIds((prev) => prev.filter((id) => id !== deleteIntent.id));
       }
       await onDataChanged();
       await fetchListData(activeKind, pageByKind[activeKind], debouncedQuery);
-      onToast(deleteIntent.kind === 'attempt' ? 'Attempt deleted' : 'Result deleted', 'success');
+      onToast(deleteIntent.kind === 'attempt' || deleteIntent.kind === 'live' ? 'Attempt deleted' : 'Result deleted', 'success');
     } catch (cause) {
       onToast(cause instanceof Error ? cause.message : 'Could not delete result', 'error');
     } finally {
@@ -522,6 +582,8 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         setSelectedMockIds([]);
       } else if (bulkDeleteIntent.kind === 'quiz') {
         setSelectedQuizIds([]);
+      } else if (bulkDeleteIntent.kind === 'live') {
+        setSelectedLiveIds([]);
       } else {
         setSelectedAttemptIds([]);
       }
@@ -614,8 +676,9 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-6">
         <StatBlock label="Mock Attempts" value={String(paginationByKind.attempt.total)} />
+        <StatBlock label="Live Mocks" value={String(paginationByKind.live.total)} />
         <StatBlock label="Mock Results" value={String(paginationByKind.mock.total)} />
         <StatBlock label="Avg Mock Score" value={`${avgMockPercent}%`} />
         <StatBlock label="Quiz Results" value={String(paginationByKind.quiz.total)} />
@@ -632,6 +695,14 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
               }`}
             >
               Mock Results
+            </button>
+            <button
+              onClick={() => setActiveKind('live')}
+              className={`rounded px-3 py-1.5 text-sm font-medium ${
+                activeKind === 'live' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              Live Mocks
             </button>
             <button
               onClick={() => setActiveKind('attempt')}
@@ -663,6 +734,8 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
           <p className="text-xs text-slate-500">
             {activeKind === 'mock'
               ? `${selectedMockIds.length} mock result(s) selected`
+              : activeKind === 'live'
+              ? `${selectedLiveIds.length} live attempt(s) selected`
               : activeKind === 'quiz'
               ? `${selectedQuizIds.length} quiz result(s) selected`
               : `${selectedAttemptIds.length} attempt(s) selected`}
@@ -672,6 +745,8 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
               onClick={() => {
                 if (activeKind === 'mock') {
                   setSelectedMockIds([]);
+                } else if (activeKind === 'live') {
+                  setSelectedLiveIds([]);
                 } else if (activeKind === 'quiz') {
                   setSelectedQuizIds([]);
                 } else {
@@ -686,6 +761,8 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
               disabled={
                 activeKind === 'mock'
                   ? selectedMockIds.length === 0
+                  : activeKind === 'live'
+                  ? selectedLiveIds.length === 0
                   : activeKind === 'quiz'
                   ? selectedQuizIds.length === 0
                   : selectedAttemptIds.length === 0
@@ -696,12 +773,16 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
                   ids:
                     activeKind === 'mock'
                       ? selectedMockIds
+                      : activeKind === 'live'
+                      ? selectedLiveIds
                       : activeKind === 'quiz'
                       ? selectedQuizIds
                       : selectedAttemptIds,
                   label:
                     activeKind === 'mock'
                       ? `${selectedMockIds.length} mock result(s)`
+                      : activeKind === 'live'
+                      ? `${selectedLiveIds.length} live attempt(s)`
                       : activeKind === 'quiz'
                       ? `${selectedQuizIds.length} quiz result(s)`
                       : `${selectedAttemptIds.length} attempt(s)`,
@@ -811,6 +892,102 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
           </tbody>
         </table>
       </ResultsCard>
+      )}
+
+      {activeKind === 'live' && (
+        <ResultsCard title="Live Mock Sessions">
+          <table className="min-w-full text-sm">
+            <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+              <tr>
+                <th className="px-3 py-2 text-left">
+                  <input
+                    type="checkbox"
+                    checked={allVisibleLiveSelected}
+                    onChange={(event) => toggleAllVisibleLive(event.target.checked)}
+                    aria-label="Select all visible live mock attempts"
+                  />
+                </th>
+                <th className="px-3 py-2 text-left">User</th>
+                <th className="px-3 py-2 text-left">Mock</th>
+                <th className="px-3 py-2 text-left">Answered</th>
+                <th className="px-3 py-2 text-left">Current Score</th>
+                <th className="px-3 py-2 text-left">Accuracy</th>
+                <th className="px-3 py-2 text-left">Flags</th>
+                <th className="px-3 py-2 text-left">Last Active</th>
+                <th className="px-3 py-2 text-left">Expected End</th>
+                <th className="px-3 py-2 text-right">Controls</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200">
+              {liveRows.length === 0 && (
+                <tr>
+                  <td colSpan={10} className="px-3 py-6 text-center text-xs text-slate-400">
+                    No live mock sessions
+                  </td>
+                </tr>
+              )}
+              {liveRows.map((attempt) => (
+                <tr key={attempt._id} className="hover:bg-slate-50">
+                  <td className="px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedLiveIds.includes(attempt._id)}
+                      onChange={(event) => toggleLiveSelection(attempt._id, event.target.checked)}
+                      aria-label={`Select live mock attempt ${attempt._id}`}
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-700">
+                    {attempt.user?.name ?? attempt.user?.email ?? 'Unknown'}
+                  </td>
+                  <td className="px-3 py-2 text-xs font-medium text-slate-900">{attempt.quizTitle || '—'}</td>
+                  <td className="px-3 py-2 text-xs text-slate-700">
+                    {attempt.answeredCount ?? 0}/{attempt.totalQuestions ?? 0}
+                    <span className="ml-1 text-slate-400">({attempt.progressPercentage ?? 0}%)</span>
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-700">
+                    {attempt.currentScore ?? 0}/{attempt.totalQuestions ?? 0}
+                    <span className="ml-1 text-slate-400">({attempt.scorePercentage ?? 0}%)</span>
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-700">{attempt.accuracyPercentage ?? 0}%</td>
+                  <td className="px-3 py-2 text-xs text-slate-700">
+                    <span className="font-semibold">{attempt.proctoringFlags ?? 0}</span>
+                    <span className="ml-1 text-slate-400">
+                      (F:{attempt.fullscreenExitCount ?? 0} T:{attempt.tabSwitchCount ?? 0} C:{attempt.copyAttemptCount ?? 0} M:{attempt.contextMenuCount ?? 0})
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-400">
+                    {attempt.lastActivityAt ? new Date(attempt.lastActivityAt).toLocaleString() : '-'}
+                  </td>
+                  <td className="px-3 py-2 text-xs text-slate-400">
+                    {attempt.expectedEndAt ? new Date(attempt.expectedEndAt).toLocaleString() : '-'}
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => handleViewLive(attempt._id)}
+                        className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() =>
+                          setDeleteIntent({
+                            kind: 'live',
+                            id: attempt._id,
+                            label: attempt.quizTitle || 'this live mock attempt',
+                          })
+                        }
+                        className="rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ResultsCard>
       )}
 
       {activeKind === 'attempt' && (
@@ -1016,6 +1193,88 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
           Loading result details...
         </div>
+      )}
+
+      {liveDetail && (
+        <ModalShell title={`Live Mock: ${liveDetail.quizTitle || 'Untitled'}`} onClose={() => setLiveDetail(null)}>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3 xl:grid-cols-6">
+            <StatBlock label="User" value={liveDetail.user?.name || liveDetail.user?.email || 'Unknown'} />
+            <StatBlock
+              label="Current Score"
+              value={`${liveDetail.currentScore || 0}/${liveDetail.totalQuestions || 0} (${liveDetail.scorePercentage || 0}%)`}
+            />
+            <StatBlock label="Accuracy" value={`${liveDetail.accuracyPercentage || 0}%`} />
+            <StatBlock label="Answered" value={`${liveDetail.answeredCount || 0}/${liveDetail.totalQuestions || 0}`} />
+            <StatBlock label="Last Active" value={liveDetail.lastActivityAt ? new Date(liveDetail.lastActivityAt).toLocaleTimeString() : '-'} />
+            <StatBlock label="Expected End" value={liveDetail.expectedEndAt ? new Date(liveDetail.expectedEndAt).toLocaleTimeString() : '-'} />
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-3">
+            <InsightCard
+              title="Live Progress"
+              text={`${liveDetail.answeredCount || 0} of ${liveDetail.totalQuestions || 0} questions answered (${liveDetail.progressPercentage || 0}% progress).`}
+              tone={liveDetail.progressPercentage && liveDetail.progressPercentage >= 70 ? 'good' : 'neutral'}
+            />
+            <InsightCard
+              title="Current Accuracy"
+              text={`${liveDetail.currentScore || 0} correct answers so far with ${liveDetail.accuracyPercentage || 0}% live accuracy.`}
+              tone={liveDetail.accuracyPercentage && liveDetail.accuracyPercentage < 50 ? 'warn' : 'neutral'}
+            />
+            <InsightCard
+              title="Proctoring Signals"
+              text={`${liveDetail.proctoringFlags || 0} total event(s). Fullscreen: ${liveDetail.fullscreenExitCount || 0}, Tab: ${liveDetail.tabSwitchCount || 0}, Copy: ${liveDetail.copyAttemptCount || 0}, Menu: ${liveDetail.contextMenuCount || 0}.`}
+              tone={liveDetail.proctoringFlags ? 'warn' : 'good'}
+            />
+          </div>
+
+          <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
+            <table className="min-w-full text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-[0.12em] text-slate-500">
+                <tr>
+                  <th className="px-3 py-2 text-left">Section</th>
+                  <th className="px-3 py-2 text-left">Correct</th>
+                  <th className="px-3 py-2 text-left">Answered</th>
+                  <th className="px-3 py-2 text-left">Unanswered</th>
+                  <th className="px-3 py-2 text-left">Total</th>
+                  <th className="px-3 py-2 text-left">Progress</th>
+                  <th className="px-3 py-2 text-left">Accuracy</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200">
+                {(liveDetail.sectionStats || []).map((section) => (
+                  <tr key={section.sectionName}>
+                    <td className="px-3 py-2 font-medium text-slate-900">{section.sectionName}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.correct}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.answered}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.unanswered}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.totalQuestions}</td>
+                    <td className="px-3 py-2 text-slate-700">{section.progressPercentage}%</td>
+                    <td className="px-3 py-2 text-slate-700">{section.accuracyPercentage}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+            <h4 className="text-sm font-semibold text-slate-900">Recent Proctoring Events</h4>
+            {liveDetail.recentEvents && liveDetail.recentEvents.length > 0 ? (
+              <div className="mt-2 space-y-2">
+                {liveDetail.recentEvents.map((event, index) => (
+                  <div key={`${event.type || 'event'}-${index}`} className="rounded-md bg-white p-3 ring-1 ring-slate-200">
+                    <p className="text-sm font-medium text-slate-900">{event.type || 'Unknown event'}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {event.at ? new Date(event.at).toLocaleString() : 'Time unavailable'}
+                    </p>
+                    {event.detail ? <p className="mt-1 text-xs text-slate-600">{event.detail}</p> : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-slate-500">No recent proctoring events recorded.</p>
+            )}
+          </div>
+        </ModalShell>
       )}
 
       {mockDetail && (
