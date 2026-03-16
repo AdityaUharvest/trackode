@@ -1,5 +1,10 @@
 import type { MockAttempt, ResultsPagination, ResultsSummary } from './types';
 
+const getSafePercentage = (numerator: number, denominator: number) => {
+  if (!denominator || denominator <= 0) return 0;
+  return Math.round((numerator / denominator) * 100);
+};
+
 type MockResultsModalProps = {
   open: boolean;
   title: string;
@@ -79,9 +84,10 @@ export function MockResultsModal({
               unanswered: Math.max(0, s.totalQuestions - s.answered),
               accuracy: s.totalQuestions > 0 ? Math.round((s.correct / s.totalQuestions) * 100) : 0,
             }));
-            const pct = selectedAttempt.accuracy || 0;
-            const perfLabel = pct >= 85 ? 'Excellent' : pct >= 70 ? 'Strong' : pct >= 50 ? 'Average' : 'Needs Improvement';
-            const perfSummary = pct >= 85 ? 'Very strong outcome with consistently high accuracy.' : pct >= 70 ? 'Good performance with a solid grasp of most areas.' : pct >= 50 ? 'Mixed performance. There are clear strengths, but also gaps to improve.' : 'Low accuracy overall. Review weak sections and wrong answers first.';
+            const scorePct = getSafePercentage(selectedAttempt.totalCorrect ?? 0, selectedAttempt.totalQuestions ?? 0);
+            const accuracyPct = getSafePercentage(selectedAttempt.totalCorrect ?? 0, selectedAttempt.totalAnswered ?? 0);
+            const perfLabel = scorePct >= 85 ? 'Excellent' : scorePct >= 70 ? 'Strong' : scorePct >= 50 ? 'Average' : 'Needs Improvement';
+            const perfSummary = scorePct >= 85 ? 'Very strong outcome with consistently high accuracy.' : scorePct >= 70 ? 'Good performance with a solid grasp of most areas.' : scorePct >= 50 ? 'Mixed performance. There are clear strengths, but also gaps to improve.' : 'Low accuracy overall. Review weak sections and wrong answers first.';
             const strongest = [...sections].sort((a, b) => b.accuracy - a.accuracy)[0] || null;
             const weakest = [...sections].sort((a, b) => a.accuracy - b.accuracy)[0] || null;
             const lowSections = sections.filter((s) => s.accuracy < 50);
@@ -104,7 +110,11 @@ export function MockResultsModal({
 
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
                   {[
-                    { label: 'Score', value: `${selectedAttempt.totalCorrect ?? 0}/${selectedAttempt.totalQuestions ?? 0} (${pct}%)` },
+                    {
+                      label: 'Score',
+                      value: `${selectedAttempt.totalCorrect ?? 0}/${selectedAttempt.totalQuestions ?? 0} (${scorePct}%)`,
+                    },
+                    { label: 'Accuracy', value: `${accuracyPct}%` },
                     {
                       label: 'Status',
                       value:
@@ -127,7 +137,7 @@ export function MockResultsModal({
                 </div>
 
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <div className={`rounded-lg border p-3 ${tone(pct)}`}>
+                  <div className={`rounded-lg border p-3 ${tone(scorePct)}`}>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] opacity-70">Overall Interpretation</p>
                     <p className="mt-1 text-sm leading-6">{perfSummary}</p>
                   </div>
@@ -269,17 +279,22 @@ export function MockResultsModal({
                     {!loading &&
                       data.map((attempt) => (
                         <tr key={attempt._id} className="hover:bg-slate-50">
+                          {(() => {
+                            const scorePct = getSafePercentage(attempt.totalCorrect ?? 0, attempt.totalQuestions ?? 0);
+                            const accuracyPct = getSafePercentage(attempt.totalCorrect ?? 0, attempt.totalAnswered ?? 0);
+                            return (
+                              <>
                           <td className="px-3 py-2 font-medium text-slate-900">{attempt.userName || 'Unknown'}</td>
                           <td className="px-3 py-2 text-xs text-slate-500">{attempt.email || '-'}</td>
                           <td className="px-3 py-2 text-slate-700">
                             {attempt.totalAnswered ?? 0}/{attempt.totalQuestions ?? 0}
                           </td>
                           <td className="px-3 py-2 text-slate-700">
-                            {attempt.totalCorrect ?? 0}/{attempt.totalQuestions ?? 0}
+                            {attempt.totalCorrect ?? 0}/{attempt.totalQuestions ?? 0} ({scorePct}%)
                           </td>
                           <td className="px-3 py-2">
-                            <span className={`font-medium ${(attempt.accuracy || 0) >= 70 ? 'text-emerald-700' : (attempt.accuracy || 0) < 50 ? 'text-amber-700' : 'text-slate-700'}`}>
-                              {attempt.accuracy ?? 0}%
+                            <span className={`font-medium ${accuracyPct >= 70 ? 'text-emerald-700' : accuracyPct < 50 ? 'text-amber-700' : 'text-slate-700'}`}>
+                              {accuracyPct}%
                             </span>
                           </td>
                           <td className="px-3 py-2">
@@ -325,6 +340,9 @@ export function MockResultsModal({
                               View Details
                             </button>
                           </td>
+                              </>
+                            );
+                          })()}
                         </tr>
                       ))}
                   </tbody>
