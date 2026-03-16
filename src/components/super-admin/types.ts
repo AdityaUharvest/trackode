@@ -91,6 +91,45 @@ export type MockAttemptItem = {
   proctoringFlags?: number;
 };
 
+export type LiveMockAttemptItem = {
+  _id: string;
+  quizId?: string;
+  quizTitle?: string;
+  userId?: string;
+  user?: { name?: string; email?: string };
+  startedAt?: string;
+  lastActivityAt?: string;
+  expectedEndAt?: string;
+  answeredCount?: number;
+  currentScore?: number;
+  totalQuestions?: number;
+  progressPercentage?: number;
+  scorePercentage?: number;
+  accuracyPercentage?: number;
+  fullscreenExitCount?: number;
+  tabSwitchCount?: number;
+  copyAttemptCount?: number;
+  contextMenuCount?: number;
+  proctoringFlags?: number;
+};
+
+export type LiveMockAttemptDetail = LiveMockAttemptItem & {
+  recentEvents?: Array<{
+    type?: string;
+    at?: string | null;
+    detail?: string;
+  }>;
+  sectionStats?: Array<{
+    sectionName: string;
+    answered: number;
+    correct: number;
+    unanswered: number;
+    totalQuestions: number;
+    progressPercentage: number;
+    accuracyPercentage: number;
+  }>;
+};
+
 export type AppSettings = {
   maintenanceMode: boolean;
   quizzesEnabled: boolean;
