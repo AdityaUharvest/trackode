@@ -130,7 +130,7 @@ export default function PrivacyPolicy() {
               9. Contact Us
             </h2>
             <p className={`mt-2 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-              If you have any questions about this Privacy Policy, please contact us at privacy@trackode.com.
+              If you have any questions about this Privacy Policy, please contact us at trackode.ai@gmail.com.
             </p>
           </section>
         </div>

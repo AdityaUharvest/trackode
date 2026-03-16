@@ -12,7 +12,7 @@ export async function createMockTest(data: {
   userPlayed?: number;
   tag: string;
   creator: string;
-
+  autoSendResults?: boolean;
 }) {
   await connectDB();
   const session = await auth();

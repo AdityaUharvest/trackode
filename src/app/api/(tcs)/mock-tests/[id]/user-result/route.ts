@@ -3,8 +3,9 @@ import mongoose, { Types } from 'mongoose';
 import QuizAttempt from '@/app/model/QuizAttempt';
 import MockTest from '@/app/model/MoockTest';
 import Question from '@/app/model/MockQuestions';
-import { auth } from '@/auth';
 import MockResult from '@/app/model/MockResult';
+import { getAppSettings } from '@/lib/settings';
+import { auth } from '@/auth';
 
 // Define TypeScript interfaces
 interface IQuestion {
@@ -189,6 +190,17 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const userId = session.user.id;
+
+    const settings = await getAppSettings();
+    const isSuperAdmin = session.user.isSuperAdmin;
+
+    // Check Results Visible setting
+    if (!settings.resultsVisible && !isSuperAdmin) {
+        return NextResponse.json({ 
+            success: false, 
+            message: "Results are currently hidden by the administrator." 
+        }, { status: 403 });
+    }
 
     // Connect to MongoDB
     if (mongoose.connection.readyState !== 1) {

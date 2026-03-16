@@ -38,6 +38,7 @@ interface UserAttempt {
   accuracy: number;
   sectionStats: Record<string, SectionStats>;
   rank?: number;
+  mailSent?: boolean;
 }
 
 export default function QuizResultsDashboard({ params }: any) {
@@ -112,7 +113,7 @@ export default function QuizResultsDashboard({ params }: any) {
       const response = await fetch('/api/otp/send-result', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quizId }),
+        body: JSON.stringify({ quizId, force: true }),
       });
 
       const data = await response.json();
@@ -622,6 +623,7 @@ export default function QuizResultsDashboard({ params }: any) {
                   )}
                 </Button>
               </TableHead>
+              <TableHead className={`text-right ${textColor}`}>Mail Status</TableHead>
               <TableHead className={`text-right ${textColor}`}>Time taken</TableHead>
               <TableHead className={`text-right ${textColor}`}>Details</TableHead>
             </TableRow>
@@ -672,11 +674,22 @@ export default function QuizResultsDashboard({ params }: any) {
                         {attempt.accuracy}%
                       </span>
                     </TableCell>
-                    <TableCell className="text-right">
+                     <TableCell className="text-right">
                       <span className={textColor}>{new Date(attempt.completedAt).toLocaleDateString()}</span>
                       <div className={`text-xs ${secondaryText}`}>
                         {new Date(attempt.startedAt).toLocaleTimeString()}
                       </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {attempt.mailSent ? (
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                          Sent
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
+                          Pending
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className={`text-sm ${textColor}`}>

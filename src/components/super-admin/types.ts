@@ -25,9 +25,15 @@ export type MockItem = {
   createdAt?: string;
   sections?: MockSection[];
   questionCount?: number;
+  autoSendResults?: boolean;
 };
 
-export type MockDraft = { title: string; difficulty: string; isPublic: boolean };
+export type MockDraft = {
+  title: string;
+  difficulty: string;
+  isPublic: boolean;
+  autoSendResults: boolean;
+};
 
 export type QuizItem = {
   _id: string;
@@ -47,6 +53,7 @@ export type MockResultItem = {
   totalQuestions?: number;
   percentage?: number;
   rank?: number;
+  mailSent?: boolean;
   completedAt?: string;
   userId?: { name?: string; email?: string };
   sections?: Array<{
@@ -137,6 +144,7 @@ export type AppSettings = {
   resultsVisible: boolean;
   allowPublicQuizJoin: boolean;
   allowMockAttempts: boolean;
+  autoSendResults: boolean;
 };
 
 export type TabId = 'overview' | 'mocks' | 'quizzes' | 'results' | 'users' | 'settings';
@@ -159,4 +167,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   resultsVisible: true,
   allowPublicQuizJoin: true,
   allowMockAttempts: true,
+  autoSendResults: true,
 };

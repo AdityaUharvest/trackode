@@ -13,6 +13,7 @@ interface IMockTest extends Document {
   userPlayed: number;
   creator: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  autoSendResults: boolean;
 }
 
 const MockTestSchema: Schema = new Schema({
@@ -30,6 +31,7 @@ const MockTestSchema: Schema = new Schema({
   userPlayed: { type: Number, default: 0 },
   difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' },
   creator: { type: String, default: 'Anonymous' },
+  autoSendResults: { type: Boolean, default: true },
 });
 
 const MockTest= mongoose.models.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);

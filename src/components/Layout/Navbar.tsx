@@ -55,7 +55,7 @@ const useOutsideClick = <T extends HTMLElement>(
 
 const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
-  const canAccessSuperAdmin = Boolean((session?.user as any)?.isSuperAdmin);
+  const canAccessSuperAdmin = Boolean(session?.user?.isSuperAdmin);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setNavOpen] = useState(false);
   const [isNotificationOpen, setNotificationOpen] = useState(false);

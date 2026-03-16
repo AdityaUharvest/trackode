@@ -397,8 +397,18 @@ export async function GET(
       const percentage = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
       const totalAnswered = sectionResults.reduce((sum, section) => sum + section.questions.length, 0);
 
+      const getMailSent = (doc: unknown) => {
+        if (!doc) return false;
+        if (Array.isArray(doc)) {
+          const first = doc[0] as { mailSent?: boolean } | undefined;
+          return Boolean(first?.mailSent);
+        }
+        return Boolean((doc as { mailSent?: boolean }).mailSent);
+      };
+
+      let mailSent = false;
       if (safeCompletedAt) {
-        await MockResult.findOneAndUpdate(
+        const mr = await MockResult.findOneAndUpdate(
           { attemptId: new Types.ObjectId(attempt._id) },
           {
             $set: {
@@ -425,8 +435,12 @@ export async function GET(
               attemptId: new Types.ObjectId(attempt._id)
             }
           },
-          { upsert: true }
-        );
+          { upsert: true, new: true }
+        ).lean();
+        mailSent = getMailSent(mr);
+      } else {
+        const mr = await MockResult.findOne({ attemptId: new Types.ObjectId(attempt._id) }).lean();
+        mailSent = getMailSent(mr);
       }
 
       const userDetails = userMap.get(attempt.userId) || { name: 'Unknown', email: '' };
@@ -446,6 +460,7 @@ export async function GET(
         totalCorrect: totalScore,
         totalQuestions,
         accuracy: percentage,
+        mailSent,
         sectionStats: sectionResults.map(section => ({
           sectionName: section.sectionName,
           answered: section.questions.length,

@@ -2,6 +2,8 @@ import StructuredData from "@/components/StructuredData";
 import ClientLayout from "@/app/client-layout/ClientLayout";
 import { SessionProvider } from "next-auth/react";
 import { Metadata } from "next";
+import { auth } from "@/auth";
+import { getAppSettings } from "@/lib/settings";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -9,9 +11,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 const inter = Inter({ subsets: ["latin"] });
 
 import "./globals.css";
-import { useTheme } from "@/components/ThemeContext";
 import { Roboto } from "next/font/google";
-import Head from "next/head";
 
 const roboto = Roboto({
   weight: "400",
@@ -28,6 +28,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
     apple: "/favicon.ico", // Use same favicon for consistency
   },
+  manifest: "/manifest.json",
   keywords: [
     "Trackode",
     "Coding",
@@ -83,28 +84,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {// Replace with your theme logic or context
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getAppSettings();
+  const session = await auth();
+  const isSuperAdmin = Boolean(session?.user?.isSuperAdmin);
+  const showMaintenance = settings.maintenanceMode && !isSuperAdmin;
+
   return (
-    
       <html lang="en" className={roboto.className}>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap"
-          rel="stylesheet"
-        />
-         <link rel="manifest" href="/manifest.json" />
-      </Head>
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-      </head>
       <body className={inter.className}>
         <SessionProvider>
           <ClientLayout>
-            
-           <div className="px-2">{children}</div>
-              
-            
-            
+            {showMaintenance ? (
+              <div className="container mt-20 mx-auto text-center p-8">
+                <h1 className="text-3xl font-bold mb-4">Under Maintenance</h1>
+                <p className="text-gray-600">The site is currently undergoing scheduled maintenance. Please check back later.</p>
+              </div>
+            ) : (
+              <div className="px-2">{children}</div>
+            )}
             <StructuredData />
             <Analytics />
             <SpeedInsights />

@@ -819,6 +819,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
               <th className="px-3 py-2 text-left">Mock</th>
               <th className="px-3 py-2 text-left">Score</th>
               <th className="px-3 py-2 text-left">Sections</th>
+              <th className="px-3 py-2 text-left">Mail Status</th>
               <th className="px-3 py-2 text-left">Date</th>
               <th className="px-3 py-2 text-right">Controls</th>
             </tr>
@@ -826,7 +827,7 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
           <tbody className="divide-y divide-slate-200">
             {mockRows.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-3 py-6 text-center text-xs text-slate-400">
+                <td colSpan={8} className="px-3 py-6 text-center text-xs text-slate-400">
                   No results
                 </td>
               </tr>
@@ -856,6 +857,17 @@ export function ResultsTab({ mockAttempts, mockResults, quizResults, onDataChang
                   </span>
                 </td>
                 <td className="px-3 py-2 text-xs text-slate-500">{(r.sections || []).length}</td>
+                <td className="px-3 py-2 text-xs">
+                  {r.mailSent ? (
+                    <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                      Sent
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full bg-slate-50 px-2.5 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-600/20">
+                      Pending
+                    </span>
+                  )}
+                </td>
                 <td className="px-3 py-2 text-xs text-slate-400">
                   {r.completedAt ? new Date(r.completedAt).toLocaleDateString() : '-'}
                 </td>

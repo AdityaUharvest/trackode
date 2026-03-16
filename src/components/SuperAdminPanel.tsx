@@ -203,6 +203,7 @@ export default function SuperAdminPanel() {
         title: mock.title,
         difficulty: mock.difficulty ?? 'Medium',
         isPublic: Boolean(mock.public),
+        autoSendResults: typeof mock.autoSendResults === 'boolean' ? mock.autoSendResults : true,
       },
     }));
   };
@@ -211,7 +212,7 @@ export default function SuperAdminPanel() {
     setMockDrafts((prev) => ({
       ...prev,
       [mockId]: {
-        ...(prev[mockId] ?? { title: '', difficulty: 'Medium', isPublic: false }),
+        ...(prev[mockId] ?? { title: '', difficulty: 'Medium', isPublic: false, autoSendResults: true }),
         ...patch,
       },
     }));
@@ -233,6 +234,7 @@ export default function SuperAdminPanel() {
           title: draft.title,
           difficulty: draft.difficulty,
           public: draft.isPublic,
+          autoSendResults: draft.autoSendResults,
         }),
       });
       const payload = await response.json();
@@ -249,6 +251,7 @@ export default function SuperAdminPanel() {
                 title: payload.mock?.title ?? draft.title,
                 difficulty: payload.mock?.difficulty ?? draft.difficulty,
                 public: typeof payload.mock?.public === 'boolean' ? payload.mock.public : draft.isPublic,
+                autoSendResults: typeof payload.mock?.autoSendResults === 'boolean' ? payload.mock.autoSendResults : draft.autoSendResults,
               }
             : mock
         )

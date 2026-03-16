@@ -5,10 +5,12 @@ import MockTest from '@/app/model/MoockTest';
 import MockResult from '@/app/model/MockResult';
 import connectDB from '@/lib/util';
 import QuizAttempt from '@/app/model/QuizAttempt';
+import AppSettings from '@/app/model/AppSettings';
 // Define TypeScript interfaces
 interface IMockTest {
   _id: Types.ObjectId;
   title: string;
+  autoSendResults?: boolean;
 }
 interface IQuizAttempt {
   _id: Types.ObjectId;
@@ -36,6 +38,7 @@ interface IStoredSectionResult {
 }
 
 interface IMockResult {
+  _id: Types.ObjectId;
   userId: Types.ObjectId;
   quizId: Types.ObjectId;
   quizTitle: string;
@@ -45,6 +48,7 @@ interface IMockResult {
   percentage: number;
   sections: IStoredSectionResult[];
   completedAt: Date;
+  mailSent: boolean;
 }
 
 interface IPopulatedUserId {
@@ -61,6 +65,11 @@ interface IPopulatedQuizId {
 interface IPopulatedMockResult extends Omit<IMockResult, 'userId' | 'quizId'> {
   userId: IPopulatedUserId;
   quizId: IPopulatedQuizId;
+}
+
+interface IAppSettings {
+  key: string;
+  autoSendResults: boolean;
 }
 
 // Configure nodemailer transporter
@@ -341,7 +350,7 @@ const generateQuizResultEmail = (userName: string, quizTitle: string, attempt: a
 export async function POST(request: NextRequest) {
   await connectDB();
   try {
-    const { quizId } = await request.json();
+    const { quizId, force } = await request.json();
 
     // Validate quizId
     if (!quizId || !Types.ObjectId.isValid(quizId)) {
@@ -357,6 +366,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, message: 'Quiz not found' },
         { status: 404 }
+      );
+    }
+
+    // Check settings
+    const settings = await AppSettings.findOne({ key: 'global' }).lean() as IAppSettings | null;
+    const isAutoSendEnabled = quiz.autoSendResults !== false && settings?.autoSendResults !== false;
+
+    // Allow manual send if force is true
+    if (!isAutoSendEnabled && !force) {
+      return NextResponse.json(
+        { success: false, message: 'Email sending is disabled for this quiz or globally' },
+        { status: 403 }
       );
     }
 
@@ -380,32 +401,47 @@ export async function POST(request: NextRequest) {
       attemptMap.set(attempt._id.toString(), attempt);
     });
 
-    // Prepare results
-    const results = mockResults.map((result, index) => {
-      const attempt = attemptMap.get(result.attemptId.toString());
-      return {
-        _id: result.attemptId.toString(),
-        userId: result.userId._id.toString(),
-        userName: result.userId.name || 'Unknown',
-        email: result.userId.email || '',
-        quizTitle: result.quizTitle,
-        startedAt: attempt?.startedAt || new Date(),
-        completedAt: result.completedAt,
-        totalAnswered: result.sections.reduce((sum, s) => sum + s.questions.length, 0),
-        totalCorrect: result.totalScore,
-        totalQuestions: result.totalQuestions,
-        accuracy: result.percentage,
-        sectionStats: result.sections.reduce((acc, section) => ({
-          ...acc,
-          [section.sectionName]: {
-            answered: section.questions.length,
-            correct: section.correct,
-            totalQuestions: section.total
-          }
-        }), {}),
-        rank: 0 // Will be updated after sorting
-      };
+    const resultIdMap = new Map<string, string>();
+    mockResults.forEach(r => {
+      resultIdMap.set(r.attemptId.toString(), r._id.toString());
     });
+
+    // Prepare results
+    const results = mockResults
+      .filter(r => !r.mailSent) // Only send to those who haven't received it
+      .map((result, index) => {
+        const attempt = attemptMap.get(result.attemptId.toString());
+        return {
+          _id: result.attemptId.toString(),
+          resultId: result._id.toString(),
+          userId: result.userId._id.toString(),
+          userName: result.userId.name || 'Unknown',
+          email: result.userId.email || '',
+          quizTitle: result.quizTitle,
+          startedAt: attempt?.startedAt || new Date(),
+          completedAt: result.completedAt,
+          totalAnswered: result.sections.reduce((sum, s) => sum + s.questions.length, 0),
+          totalCorrect: result.totalScore,
+          totalQuestions: result.totalQuestions,
+          accuracy: result.percentage,
+          sectionStats: result.sections.reduce((acc, section) => ({
+            ...acc,
+            [section.sectionName]: {
+              answered: section.questions.length,
+              correct: section.correct,
+              totalQuestions: section.total
+            }
+          }), {}),
+          rank: 0 // Will be updated after sorting
+        };
+      });
+
+    if (!results.length) {
+      return NextResponse.json(
+        { success: true, message: 'All participants have already received their result emails' },
+        { status: 200 }
+      );
+    }
 
     // Sort by accuracy (descending) and assign ranks
     results.sort((a, b) => b.accuracy - a.accuracy);
@@ -432,6 +468,7 @@ export async function POST(request: NextRequest) {
 
       try {
         await sendMailWithRetry(mailOptions, 3);
+        await MockResult.findByIdAndUpdate(attempt.resultId, { mailSent: true });
         sentCount += 1;
       } catch (mailError: any) {
         failedEmails.push({

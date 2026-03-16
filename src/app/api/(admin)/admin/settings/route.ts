@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
   resultsVisible: true,
   allowPublicQuizJoin: true,
   allowMockAttempts: true,
+  autoSendResults: true,
 };
 
 export async function GET() {
@@ -60,6 +61,7 @@ export async function PUT(request: NextRequest) {
           resultsVisible: Boolean(payload.resultsVisible),
           allowPublicQuizJoin: Boolean(payload.allowPublicQuizJoin),
           allowMockAttempts: Boolean(payload.allowMockAttempts),
+          autoSendResults: Boolean(payload.autoSendResults),
           updatedBy: session?.user?.email || '',
         },
       },

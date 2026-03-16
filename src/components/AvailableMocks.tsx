@@ -318,8 +318,8 @@ export default function MockTestsListClient({
                 "card"
               )} ${getThemeClasses("card-hover")} transition-shadow duration-300`}
             >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
+              <div className="px-4 py-3">
+                <div className="flex justify-between items-start mb-2">
                   <h2 className="text-sm font-semibold">
                     {mock.title}
                   </h2>
@@ -332,12 +332,7 @@ export default function MockTestsListClient({
                   </span>
                 </div>
 
-                <div className={`flex items-center text-sm mb-3 ${getThemeClasses("text-muted")}`}>
-                  <BarChart size={16} className="mr-2 text-blue-500" />
-                  {(mock.attemptCount || 0) + (mock.userPlayed || 0)} attempts
-                </div>
-
-                <div className="mb-4 flex flex-wrap items-center gap-2">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
                   <span
                     className={`inline-block text-xs px-2 py-1 rounded ${
                       theme === "dark"
@@ -347,14 +342,6 @@ export default function MockTestsListClient({
                   >
                     {mock.tag || "TCS"}
                   </span>
-
-                  
-
-                  {mock.createdAt && (
-                    <span className={getThemeClasses("text-muted") + " text-xs"}>
-                      Conducted On : {new Date(mock.createdAt).toLocaleDateString()}
-                    </span>
-                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-4 mb-6">
@@ -375,9 +362,7 @@ export default function MockTestsListClient({
 
                 {Array.isArray(mock.sections) && mock.sections.length > 0 && (
                   <div className="mb-4">
-                    <p className={`mb-2 text-xs font-medium uppercase tracking-wide ${getThemeClasses("text-muted")}`}>
-                      Sections
-                    </p>
+              
                     <div className="flex flex-wrap gap-2">
                       {mock.sections.slice(0, 4).map((section) => (
                         <span
@@ -389,7 +374,7 @@ export default function MockTestsListClient({
                           }`}
                           title={`${section.count} questions`}
                         >
-                          <span>{section.name}</span>
+                          <span>{section.name.replace("-", " ").trim()}</span>
                           <span className={`rounded-full px-1 ${theme === "dark" ? "bg-gray-600" : "bg-white"}`}>
                             {section.count}
                           </span>

@@ -27,6 +27,9 @@ export async function PATCH(request: NextRequest, { params }: any) {
     if (['Easy', 'Medium', 'Hard'].includes(payload.difficulty)) {
       updates.difficulty = payload.difficulty;
     }
+    if (typeof payload.autoSendResults === 'boolean') {
+      updates.autoSendResults = payload.autoSendResults;
+    }
 
     const mock = await MockTest.findByIdAndUpdate(id, updates, { new: true });
     if (!mock) {

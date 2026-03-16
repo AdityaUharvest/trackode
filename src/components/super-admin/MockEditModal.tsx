@@ -72,6 +72,18 @@ export function MockEditModal({
               </label>
             </div>
           </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">Email Settings</label>
+            <label className="flex h-[42px] items-center gap-2 rounded-md border border-slate-300 px-3 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                checked={draft.autoSendResults}
+                onChange={(event) => onDraftChange({ autoSendResults: event.target.checked })}
+              />
+              Automatically email results to players
+            </label>
+          </div>
         </div>
 
         <div className="mt-6 flex justify-end gap-3">

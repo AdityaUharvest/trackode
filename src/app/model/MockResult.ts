@@ -40,6 +40,7 @@ interface IQuizResult extends Document {
   totalQuestions: number;
   percentage: number;
   rank: number; // New field for storing rank
+  mailSent: boolean;
   sections: ISectionResult[];
   completedAt: Date;
   createdAt: Date;
@@ -89,6 +90,7 @@ const QuizResultSchema = new Schema({
   totalQuestions: { type: Number, required: true },
   percentage: { type: Number, required: true },
   rank: { type: Number, default: 0 }, // New field for rank
+  mailSent: { type: Boolean, default: false }, // New field to track if mail has been sent
   sections: [SectionResultSchema],
   completedAt: { type: Date, required: true },
   overallFeedback: OverallFeedbackSchema,

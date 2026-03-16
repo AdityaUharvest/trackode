@@ -8,6 +8,7 @@ export interface IAppSettings extends Document {
   resultsVisible: boolean;
   allowPublicQuizJoin: boolean;
   allowMockAttempts: boolean;
+  autoSendResults: boolean;
   updatedBy?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -22,6 +23,7 @@ const AppSettingsSchema = new Schema<IAppSettings>(
     resultsVisible: { type: Boolean, default: true },
     allowPublicQuizJoin: { type: Boolean, default: true },
     allowMockAttempts: { type: Boolean, default: true },
+    autoSendResults: { type: Boolean, default: true },
     updatedBy: { type: String, default: '' },
   },
   { timestamps: true }

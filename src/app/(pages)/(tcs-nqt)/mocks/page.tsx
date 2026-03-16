@@ -120,7 +120,24 @@ async function fetchMockTests(): Promise<MockTestType[]> {
   });
 }
 
+import { getAppSettings } from "@/lib/settings";
+import { auth } from "@/auth";
+
 export default async function MockTestsPage() {
+  const settings = await getAppSettings();
+  const session = await auth();
+  const isSuperAdmin = session?.user?.isSuperAdmin;
+
+  // 2. Check if Mocks are enabled
+  if (!settings.mocksEnabled && !isSuperAdmin) {
+    return (
+      <div className="container mt-20 mx-auto text-center p-8">
+        <h1 className="text-3xl font-bold mb-4">Mocks Disabled</h1>
+        <p className="text-gray-600">Mock tests are currently disabled by the administrator.</p>
+      </div>
+    );
+  }
+
   const mockTests = await fetchMockTests();
 
   return (

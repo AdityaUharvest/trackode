@@ -21,6 +21,7 @@ interface FormData {
   public: boolean;
   generatedInstructions?: string;
   tag: string;
+  autoSendResults: boolean;
 }
 
 const MockTestCreator: React.FC = () => {
@@ -33,6 +34,7 @@ const MockTestCreator: React.FC = () => {
     durationMinutes: 75,
     public: false,
     tag: 'TCS',
+    autoSendResults: true,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -192,8 +194,38 @@ const MockTestCreator: React.FC = () => {
             </span>
           </div>
 
-        
-
+          <div className="flex mb-4 items-center gap-3 pt-2">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Auto Send Results</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" className="focus:outline-none">
+                    <Info className="h-4 w-4 text-gray-500 hover:text-indigo-600" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64 p-3 text-sm">
+                  <p className="mb-2 font-medium">Auto Send Results:</p>
+                  <p>When enabled, quiz result emails will be automatically sent to participants after they complete the test.</p>
+                </PopoverContent>
+              </Popover>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, autoSendResults: !formData.autoSendResults })}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors text-white ${
+                formData.autoSendResults ? 'bg-indigo-500 ' : 'bg-gray-500'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  formData.autoSendResults ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+            <span className="text-sm ">
+              {formData.autoSendResults ? 'Enabled' : 'Disabled'}
+            </span>
+          </div>
         <button
           type="submit"
           disabled={isLoading}

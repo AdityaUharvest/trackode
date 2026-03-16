@@ -44,6 +44,12 @@ const TOGGLE_CONFIG: Array<{
     desc: 'Allow new mock test attempts from players.',
     danger: false,
   },
+  {
+    key: 'autoSendResults',
+    label: 'Auto Send Results',
+    desc: 'Automatically send result emails to players after they complete a mock test.',
+    danger: false,
+  },
 ];
 
 type SettingsTabProps = {
@@ -90,7 +96,6 @@ export function SettingsTab({
                   onChange={(e) => onSettingChange(key, e.target.checked)}
                 />
                 <div
-                  onClick={() => onSettingChange(key, !checked)}
                   className={`h-6 w-11 rounded-full transition-colors ${
                     checked ? (danger ? 'bg-red-500' : 'bg-slate-900') : 'bg-slate-300'
                   }`}

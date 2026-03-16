@@ -4,6 +4,7 @@ import connectDB from '@/lib/util';
 import MockTest from '@/app/model/MoockTest';
 import Question from '@/app/model/MockQuestions';
 import { auth } from '@/auth';
+import { getAppSettings } from "@/lib/settings";
 
 function hasUnsafeMongoPathChars(value: string): boolean {
   return value.includes('.') || value.includes('$');
@@ -23,7 +24,17 @@ export async function POST(
       );
     }
 
+    const settings = await getAppSettings();
     const session = await auth();
+    const isSuperAdmin = session?.user?.isSuperAdmin;
+
+    if (settings.maintenanceMode && !isSuperAdmin) {
+        return NextResponse.json({ 
+            success: false, 
+            message: "System is under maintenance. Please try again later." 
+        }, { status: 503 });
+    }
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { message: 'Unauthorized' },
@@ -66,6 +77,15 @@ export async function POST(
         { status: 404 }
       );
     }
+
+    // 2. Check if Mocks are enabled
+    if (!settings.mocksEnabled && !isSuperAdmin) {
+        return NextResponse.json({ 
+            success: false, 
+            message: "Mock tests are currently disabled by the administrator." 
+        }, { status: 403 });
+    }
+
     if (!quiz.isPublished) {
       return NextResponse.json(
         { message: 'Quiz is not published' },
@@ -91,6 +111,14 @@ export async function POST(
         { message: 'Quiz already completed' },
         { status: 409 }
       );
+    }
+
+    // 3. Check if new mock attempts are allowed (if this is a new attempt)
+    if (!existingAttempt && !settings.allowMockAttempts && !isSuperAdmin) {
+        return NextResponse.json({ 
+            success: false, 
+            message: "New mock attempts are currently disabled by the administrator." 
+        }, { status: 403 });
     }
 
     if (existingAttempt?.startedAt && quiz.durationMinutes) {
