@@ -165,11 +165,17 @@ export default function UserQuizResult() {
         // Fetch user's own result
         const userResponse = await fetch(`/api/mock-tests/${quizId}/user-result`);
         if (!userResponse.ok) {
+          const errorPayload = await userResponse.json().catch(() => ({}));
+          const apiMessage =
+            typeof errorPayload?.message === 'string' && errorPayload.message.trim()
+              ? errorPayload.message
+              : null;
+
           if (userResponse.status === 409) {
-            setError('Result is not available yet. Please complete the quiz first.');
+            setError(apiMessage || 'Result is not available yet. Please complete the quiz first.');
             return;
           }
-          throw new Error('Failed to fetch user results');
+          throw new Error(apiMessage || 'Failed to fetch user results');
         }
         const userData = await userResponse.json();
         setResult(userData);
