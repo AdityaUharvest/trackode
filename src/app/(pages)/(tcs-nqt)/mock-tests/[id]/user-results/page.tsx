@@ -111,6 +111,18 @@ export default function UserQuizResult() {
     return Math.round((numerator / denominator) * 100);
   };
 
+  const getAttemptScorePercentage = (attempt: UserAttempt) => {
+    const score = attempt.totalCorrect ?? 0;
+    const total = attempt.totalQuestions ?? 0;
+    return getSafePercentage(score, total);
+  };
+
+  const getAttemptAccuracyPercentage = (attempt: UserAttempt) => {
+    const score = attempt.totalCorrect ?? 0;
+    const attempted = attempt.totalAnswered ?? 0;
+    return getSafePercentage(score, attempted);
+  };
+
   const normalizedLeaderboardSearch = leaderboardSearch.trim().toLowerCase();
 
   const filteredAttempts = useMemo(() => {
@@ -133,14 +145,6 @@ export default function UserQuizResult() {
   // Theme-based styles
   const bgColor = theme === 'dark' ? 'bg-gray-950' : 'bg-gray-50';
   const textColor = theme === 'dark' ? 'text-gray-100' : 'text-gray-900';
-                  <div className="border-b border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/60">
-                    <input
-                      value={leaderboardSearch}
-                      onChange={(event) => setLeaderboardSearch(event.target.value)}
-                      placeholder="Search player by name, email, or status"
-                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 md:max-w-md"
-                    />
-                  </div>
   const borderColor = theme === 'dark' ? 'border-gray-800' : 'border-gray-200';
   const cardBg = theme === 'dark' ? 'bg-gray-900' : 'bg-white';
   const sectionHeaderBg = theme === 'dark' ? 'bg-gray-800/70' : 'bg-gray-50';
@@ -597,8 +601,10 @@ export default function UserQuizResult() {
     );
   }
 
-  const overallPercentage = getSafePercentage(result.totalScore, result.totalQuestions);
-  const performanceBadge = getScoreBadge(overallPercentage);
+  const attemptedQuestions = result.sections.reduce((sum, section) => sum + section.questions.length, 0);
+  const overallScorePercentage = getSafePercentage(result.totalScore, result.totalQuestions);
+  const overallAccuracyPercentage = getSafePercentage(result.totalScore, attemptedQuestions);
+  const performanceBadge = getScoreBadge(overallScorePercentage);
   const availableQuestionSections = result.sections.filter((section) => section.total > 0);
   const selectedQuestionSection =
     availableQuestionSections.find((section) => section.sectionName === activeQuestionSection) ||
@@ -607,7 +613,7 @@ export default function UserQuizResult() {
 
   // For the circular progress indicator
   const circumference = 2 * Math.PI * 40; // r = 40
-  const strokeDashoffset = circumference - (overallPercentage / 100) * circumference;
+  const strokeDashoffset = circumference - (overallScorePercentage / 100) * circumference;
 
   // Format rank with ordinal suffix
   const getOrdinalSuffix = (n: number) => {
@@ -694,8 +700,8 @@ export default function UserQuizResult() {
                       <Trophy className="h-5 w-5 text-yellow-700" />
                     </div>
                     <p className="line-clamp-1 text-base font-bold text-gray-900 dark:text-gray-900">{topPerformers[0].userName}</p>
-                    <p className="mt-1 text-sm font-medium text-yellow-900">{topPerformers[0].accuracy}% accuracy</p>
-                    <p className="mt-1 text-xs text-yellow-800/90">Score {topPerformers[0].totalCorrect}/{topPerformers[0].totalQuestions}</p>
+                    <p className="mt-1 text-sm font-medium text-yellow-900">{getAttemptScorePercentage(topPerformers[0])}% score</p>
+                    <p className="mt-1 text-xs text-yellow-800/90">{getAttemptAccuracyPercentage(topPerformers[0])}% Accuracy</p>
                   </div>
                 )}
                 {topPerformers[1] && (
@@ -704,8 +710,8 @@ export default function UserQuizResult() {
                       <Medal className="h-4 w-4" /> Rank #2
                     </div>
                     <p className="line-clamp-1 text-base font-semibold text-gray-900">{topPerformers[1].userName}</p>
-                    <p className="mt-1 text-sm font-medium text-slate-700">{topPerformers[1].accuracy}% accuracy</p>
-                    <p className="mt-1 text-xs text-slate-600">Score {topPerformers[1].totalCorrect}/{topPerformers[1].totalQuestions}</p>
+                    <p className="mt-1 text-sm font-medium text-slate-700">{getAttemptScorePercentage(topPerformers[1])}% score</p>
+                    <p className="mt-1 text-xs text-slate-600">{getAttemptAccuracyPercentage(topPerformers[1])}% Accuracy</p>
                   </div>
                 )}
                 {topPerformers[2] && (
@@ -714,22 +720,31 @@ export default function UserQuizResult() {
                       <Medal className="h-4 w-4" /> Rank #3
                     </div>
                     <p className="line-clamp-1 text-base font-semibold text-gray-900">{topPerformers[2].userName}</p>
-                    <p className="mt-1 text-sm font-medium text-orange-700">{topPerformers[2].accuracy}% accuracy</p>
-                    <p className="mt-1 text-xs text-orange-700/80">Score {topPerformers[2].totalCorrect}/{topPerformers[2].totalQuestions}</p>
+                    <p className="mt-1 text-sm font-medium text-orange-700">{getAttemptScorePercentage(topPerformers[2])}% score</p>
+                    <p className="mt-1 text-xs text-orange-700/80">{getAttemptAccuracyPercentage(topPerformers[2])}% Accuracy</p>
                   </div>
                 )}
               </div>
 
               {attempts.length > 0 && (
                 <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700">
+                  <div className="border-b border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-900/60">
+                    <input
+                      value={leaderboardSearch}
+                      onChange={(event) => setLeaderboardSearch(event.target.value)}
+                      placeholder="Search player by name, email, or status"
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 outline-none placeholder:text-gray-400 focus:border-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 md:max-w-md"
+                    />
+                  </div>
                   <div className="max-h-[380px] overflow-auto">
                     <table className="min-w-full text-sm">
                       <thead className="sticky top-0 z-10 border-b border-gray-200 bg-gray-100 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200">
                         <tr>
                           <th className="p-3 text-left font-semibold">Rank</th>
                           <th className="p-3 text-left font-semibold">Player Name</th>
-                          <th className="p-3 text-left font-semibold">Score</th>
+                          <th className="p-3 text-left font-semibold">Correct</th>
                           <th className="p-3 text-left font-semibold">Answered</th>
+                          <th className="p-3 text-left font-semibold">Score</th>
                           <th className="p-3 text-left font-semibold">Accuracy</th>
                           <th className="p-3 text-left font-semibold">Status</th>
                         </tr>
@@ -737,7 +752,7 @@ export default function UserQuizResult() {
                       <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                         {filteredAttempts.length === 0 && (
                           <tr>
-                            <td colSpan={6} className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <td colSpan={7} className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
                               No matching users found.
                             </td>
                           </tr>
@@ -746,6 +761,8 @@ export default function UserQuizResult() {
                           const originalIndex = attempts.findIndex((item) => item._id === attempt._id);
                           const rank = attempt.rank || originalIndex + 1 || index + 1;
                           const medalIcon = renderMedal(rank);
+                          const scorePercentage = getAttemptScorePercentage(attempt);
+                          const accuracyPercentage = getAttemptAccuracyPercentage(attempt);
 
                           return (
                             <tr
@@ -768,9 +785,12 @@ export default function UserQuizResult() {
                               </td>
                               <td className="p-3">
                                 <div className="h-2 w-24 rounded-full bg-gray-200 dark:bg-gray-700">
-                                  <div className="h-2 rounded-full bg-indigo-600" style={{ width: `${attempt.accuracy ?? 0}%` }} />
+                                  <div className="h-2 rounded-full bg-indigo-600" style={{ width: `${scorePercentage}%` }} />
                                 </div>
-                                <div className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300">{attempt.accuracy ?? 0}%</div>
+                                <div className="mt-1 text-xs font-medium text-gray-600 dark:text-gray-300">{scorePercentage}%</div>
+                              </td>
+                              <td className="p-3 text-gray-700 dark:text-gray-200">
+                                {accuracyPercentage}%
                               </td>
                               <td className="p-3">
                                 <span
@@ -845,7 +865,7 @@ export default function UserQuizResult() {
               </div>
               <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
                 <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Accuracy</p>
-                <p className="mt-1 text-lg font-semibold">{overallPercentage}%</p>
+                <p className="mt-1 text-lg font-semibold">{overallAccuracyPercentage}%</p>
               </div>
               <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
                 <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Sections</p>
@@ -854,7 +874,7 @@ export default function UserQuizResult() {
               <div className={`rounded-lg border p-3 ${panelBg} ${borderColor}`}>
                 <p className={`text-xs font-medium uppercase tracking-wide ${mutedText}`}>Attempted</p>
                 <p className="mt-1 text-lg font-semibold">
-                  {result.sections.reduce((sum, section) => sum + section.questions.length, 0)}/{result.totalQuestions}
+                  {attemptedQuestions}/{result.totalQuestions}
                 </p>
               </div>
             </div>
@@ -930,20 +950,20 @@ export default function UserQuizResult() {
                           strokeDashoffset={strokeDashoffset}
                           transform="rotate(-90 50 50)"
                           className={`${
-                            overallPercentage >= 80
+                            overallScorePercentage >= 80
                               ? 'stroke-green-500'
-                              : overallPercentage >= 70
+                              : overallScorePercentage >= 70
                               ? 'stroke-emerald-500'
-                              : overallPercentage >= 60
+                              : overallScorePercentage >= 60
                               ? 'stroke-yellow-500'
-                              : overallPercentage >= 50
+                              : overallScorePercentage >= 50
                               ? 'stroke-orange-500'
                               : 'stroke-red-500'
                           } transition-all duration-1000 ease-in-out`}
                         />
                       </svg>
                       <div className="absolute flex flex-col items-center">
-                        <span className="text-xl font-bold">{overallPercentage}%</span>
+                        <span className="text-xl font-bold">{overallScorePercentage}%</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">Overall Score</span>
                       </div>
                     </div>
