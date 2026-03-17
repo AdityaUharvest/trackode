@@ -19,14 +19,14 @@ import { BookOpen, List, Award, Home } from 'lucide-react';
 export default function StudentDashboard() {
   const { theme, toggleTheme } = useTheme();
   const { data: session, status } = useSession();
-  
+
   const [loading, setLoading] = useState(true);
   const [quizResults, setQuizResults] = useState([]);
   const [attempts, setAttempts] = useState([]);
   const [quizzes, setQuizzes] = useState([]);
   const [mockTests, setMockTests] = useState([]);
   const [quizResultss, setQuizResultss] = useState([]);
-  
+
   const isMobile = useMediaQuery({ maxWidth: 768 });
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -34,13 +34,13 @@ export default function StudentDashboard() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         const quizResponse = await axios.get("/api/total-quizes");
         setQuizzes(quizResponse.data.quizes);
-        
+
         const resultsResponse = await axios.get("/api/attempted-public");
         setQuizResultss(resultsResponse.data);
-        
+
         const mockResponse = await axios.get("/api/mock-tests/getAll");
         if (mockResponse.data) {
           const testsWithPlayers = mockResponse.data.mocks.map((mock) => ({
@@ -61,40 +61,40 @@ export default function StudentDashboard() {
   }, []);
 
   // Update the useEffect for fetching mock attempts
-useEffect(() => {
-  const fetchAttempts = async () => {
-    try {
-      const [attemptsRes, resultsRes] = await Promise.all([
-        axios.get('/api/mock-tests/dashboard/attempts'),
-        axios.get('/api/mock-tests/dashboard/results?page=1&limit=50')
-      ]);
-      const dashboardResults = Array.isArray(resultsRes.data)
-        ? resultsRes.data
-        : Array.isArray(resultsRes.data?.data)
-        ? resultsRes.data.data
-        : [];
-      
-      // Combine data from both endpoints
-      const enrichedAttempts = attemptsRes.data.map(attempt => {
-        const result = dashboardResults.find(r => r.attemptId.toString() === attempt._id.toString());
-        return {
-          ...attempt,
-          ...result,
-          percentage: result ? result.percentage : (attempt.score / attempt.totalQuestions * 100).toFixed(1),
-          sectionScores: result ? result.sections : []
-        };
-      });
-      
-      setAttempts(enrichedAttempts);
-      
-    } catch (error) {
-      console.error('Error fetching attempts:', error);
-    }
-  };
-  
-  if (session) fetchAttempts();
-}, [session]);
-console.log(attempts);
+  useEffect(() => {
+    const fetchAttempts = async () => {
+      try {
+        const [attemptsRes, resultsRes] = await Promise.all([
+          axios.get('/api/mock-tests/dashboard/attempts'),
+          axios.get('/api/mock-tests/dashboard/results?page=1&limit=50')
+        ]);
+        const dashboardResults = Array.isArray(resultsRes.data)
+          ? resultsRes.data
+          : Array.isArray(resultsRes.data?.data)
+            ? resultsRes.data.data
+            : [];
+
+        // Combine data from both endpoints
+        const enrichedAttempts = attemptsRes.data.map(attempt => {
+          const result = dashboardResults.find(r => r.attemptId.toString() === attempt._id.toString());
+          return {
+            ...attempt,
+            ...result,
+            percentage: result ? result.percentage : (attempt.score / attempt.totalQuestions * 100).toFixed(1),
+            sectionScores: result ? result.sections : []
+          };
+        });
+
+        setAttempts(enrichedAttempts);
+
+      } catch (error) {
+        console.error('Error fetching attempts:', error);
+      }
+    };
+
+    if (session) fetchAttempts();
+  }, [session]);
+  console.log(attempts);
   useEffect(() => {
     const fetchQuizResults = async () => {
       const response = await axios.get("/api/attempted");
@@ -105,31 +105,31 @@ console.log(attempts);
 
   // Quiz statistics
   const totalQuizzes = quizResults.length;
-  const percentages = quizResults.map(result => 
+  const percentages = quizResults.map(result =>
     Number(((result?.score / result?.totalQuestions) * 100).toFixed(1))
   );
-  const averagePercentage = totalQuizzes > 0 ? 
+  const averagePercentage = totalQuizzes > 0 ?
     (percentages.reduce((a, b) => a + Number(b), 0) / totalQuizzes) : 0;
-  const highestPercentage = totalQuizzes > 0 ? 
+  const highestPercentage = totalQuizzes > 0 ?
     Math.max(...percentages.map(p => Number(p))) : 0;
   const recentPercentage = totalQuizzes > 0 ? percentages[0] : 0;
 
   // Mock test statistics
   const totalMocks = attempts.length;
-  const mockPercentages = attempts.map(attempt => 
+  const mockPercentages = attempts.map(attempt =>
     Number(((attempt.totalScore / attempt.totalQuestions) * 100).toFixed(1))
   );
   console.log(mockPercentages);
   //there is nan in the mockPercentages array
   //replace it with 0
   const filteredMockPercentages = mockPercentages.map(p => isNaN(p) ? 0 : p);
-  const mockAveragePercentage = totalMocks > 0 ? 
+  const mockAveragePercentage = totalMocks > 0 ?
     (filteredMockPercentages.reduce((a, b) => Number(a) + Number(b), 0) / totalMocks) : 0;
-  
-  const mockHighestPercentage = totalMocks > 0 ? 
+
+  const mockHighestPercentage = totalMocks > 0 ?
     Math.max(...filteredMockPercentages.map(p => Number(p))) : 0;
   const mockRecentPercentage = totalMocks > 0 ? filteredMockPercentages[0] : 0;
-  
+
   // Accuracy trends
   let accuracyTrend = 'stable';
   if (totalQuizzes >= 6) {
@@ -140,10 +140,10 @@ console.log(attempts);
 
   let mockAccuracyTrend = 'stable';
   if (totalMocks >= 3) {
-    const firstHalf = mockPercentages.slice(0, Math.floor(mockPercentages.length/2))
-      .reduce((a, b) => Number(a) + Number(b), 0) / Math.floor(mockPercentages.length/2);
-    const secondHalf = mockPercentages.slice(Math.floor(mockPercentages.length/2))
-      .reduce((a, b) => Number(a) + Number(b), 0) / Math.ceil(mockPercentages.length/2);
+    const firstHalf = mockPercentages.slice(0, Math.floor(mockPercentages.length / 2))
+      .reduce((a, b) => Number(a) + Number(b), 0) / Math.floor(mockPercentages.length / 2);
+    const secondHalf = mockPercentages.slice(Math.floor(mockPercentages.length / 2))
+      .reduce((a, b) => Number(a) + Number(b), 0) / Math.ceil(mockPercentages.length / 2);
     mockAccuracyTrend = secondHalf > firstHalf ? 'improving' : secondHalf < firstHalf ? 'declining' : 'stable';
   }
 
@@ -178,61 +178,61 @@ console.log(attempts);
   const OverviewTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard 
-          theme={theme} 
-          icon="📚" 
-          title="Overall Progress" 
-          value={`${averagePercentage.toFixed(1)}%`} 
-          color="indigo" 
+        <StatCard
+          theme={theme}
+          icon="📚"
+          title="Overall Progress"
+          value={`${averagePercentage.toFixed(1)}%`}
+          color="indigo"
         />
         <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="indigo" />
         <StatCard theme={theme} icon="📝" title="Mocks Attempted" value={totalMocks} color="indigo" />
-        <StatCard 
-          theme={theme} 
-          icon="🏆" 
-          title="Highest Score" 
-          value={`${highestPercentage}%`} 
-          color="green" 
+        <StatCard
+          theme={theme}
+          icon="🏆"
+          title="Highest Score"
+          value={`${highestPercentage}%`}
+          color="green"
         />
-        <StatCard 
-          theme={theme} 
-          icon="⏱" 
-          title=" Recent Performance" 
-          value={`${recentPercentage}%`} 
-          color="orange" 
+        <StatCard
+          theme={theme}
+          icon="⏱"
+          title=" Recent Performance"
+          value={`${recentPercentage}%`}
+          color="orange"
         />
-        <StatCard 
-          theme={theme} 
-          icon="📈" 
-          title="Average Performance" 
-          value={`${averagePercentage.toFixed(1)}%`} 
-          color="purple" 
-          trend={accuracyTrend} 
+        <StatCard
+          theme={theme}
+          icon="📈"
+          title="Average Performance"
+          value={`${averagePercentage.toFixed(1)}%`}
+          color="purple"
+          trend={accuracyTrend}
         />
-        <StatCard 
-          theme={theme} 
-          icon="📝" 
+        <StatCard
+          theme={theme}
+          icon="📝"
           title="Highest Mock Score"
-          value={totalMocks > 0 ? `${mockHighestPercentage}%` : 'N/A'} 
-          color="green" 
+          value={totalMocks > 0 ? `${mockHighestPercentage}%` : 'N/A'}
+          color="green"
         />
-        <StatCard 
-          theme={theme} 
-          icon="📊" 
+        <StatCard
+          theme={theme}
+          icon="📊"
           title="Avg Mock Score"
-          value={totalMocks > 0 ? `${mockAveragePercentage.toFixed(1)}%` : 'N/A'} 
-          color="purple" 
+          value={totalMocks > 0 ? `${mockAveragePercentage.toFixed(1)}%` : 'N/A'}
+          color="purple"
         />
       </div>
-     
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <QuizHistory results={quizResults} theme={theme} />
-        <MockTestsOverview 
-          attempts={attempts} 
-          theme={theme} 
-          cardBg={cardBg} 
-          textColor={textColor} 
-          secondaryText={secondaryText} 
+        <MockTestsOverview
+          attempts={attempts}
+          theme={theme}
+          cardBg={cardBg}
+          textColor={textColor}
+          secondaryText={secondaryText}
         />
       </div>
       <PerformanceChart chartData={chartData} theme={theme} />
@@ -242,35 +242,35 @@ console.log(attempts);
   const QuizzesTab = () => (
     <>
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        
+
         <StatCard theme={theme} icon="📚" title="Quizzes Attempted" value={totalQuizzes} color="indigo" />
-        <StatCard 
-          theme={theme} 
-          icon="🏆" 
-          title="Highest Score" 
-          value={`${highestPercentage}%`} 
-          color="green" 
+        <StatCard
+          theme={theme}
+          icon="🏆"
+          title="Highest Score"
+          value={`${highestPercentage}%`}
+          color="green"
         />
-        <StatCard 
-          theme={theme} 
-          icon="⏱" 
-          title="Recent Performance" 
-          value={`${recentPercentage}%`} 
-          color="orange" 
+        <StatCard
+          theme={theme}
+          icon="⏱"
+          title="Recent Performance"
+          value={`${recentPercentage}%`}
+          color="orange"
         />
-        <StatCard 
-          theme={theme} 
-          icon="📈" 
-          title="Average Performance" 
-          value={`${averagePercentage.toFixed(1)}%`} 
-          color="purple" 
-          trend={accuracyTrend} 
+        <StatCard
+          theme={theme}
+          icon="📈"
+          title="Average Performance"
+          value={`${averagePercentage.toFixed(1)}%`}
+          color="purple"
+          trend={accuracyTrend}
         />
-        
+
       </div>
       <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <QuizHistory results={quizResults} theme={theme} />
-        
+
       </div>
     </>
   );
@@ -279,33 +279,33 @@ console.log(attempts);
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatCard 
-            theme={theme} 
-            icon="📝" 
-            title="Total Mocks Taken" 
-            value={totalMocks} 
-            color="indigo" 
+          <StatCard
+            theme={theme}
+            icon="📝"
+            title="Total Mocks Taken"
+            value={totalMocks}
+            color="indigo"
           />
-          <StatCard 
-            theme={theme} 
-            icon="🏆" 
-            title="Highest Mock Score" 
-            value={totalMocks > 0 ? `${mockHighestPercentage}%` : 'N/A'} 
-            color="green" 
+          <StatCard
+            theme={theme}
+            icon="🏆"
+            title="Highest Mock Score"
+            value={totalMocks > 0 ? `${mockHighestPercentage}%` : 'N/A'}
+            color="green"
           />
-          <StatCard 
-            theme={theme} 
-            icon="📊" 
-            title="Average Mock Score" 
-            value={totalMocks > 0 ? `${mockAveragePercentage.toFixed(1)}%` : 'N/A'} 
-            color="purple" 
+          <StatCard
+            theme={theme}
+            icon="📊"
+            title="Average Mock Score"
+            value={totalMocks > 0 ? `${mockAveragePercentage.toFixed(1)}%` : 'N/A'}
+            color="purple"
           />
-          <StatCard 
-            theme={theme} 
-            icon="📈" 
-            title="Recent Mock Score" 
-            value={totalMocks > 0 ? `${mockRecentPercentage}%` : 'N/A'} 
-            color="orange" 
+          <StatCard
+            theme={theme}
+            icon="📈"
+            title="Recent Mock Score"
+            value={totalMocks > 0 ? `${mockRecentPercentage}%` : 'N/A'}
+            color="orange"
             trend={mockAccuracyTrend}
           />
         </div>
@@ -313,43 +313,43 @@ console.log(attempts);
         {attempts.length === 0 ? (
           <div className={`text-center py-12 ${textColor}`}>
             <p className={`mb-4 ${secondaryText}`}>You haven't taken any mock tests yet</p>
-            <Link 
-              href="/mock-tests" 
+            <Link
+              href="/mocks"
               className={`px-4 py-2 rounded-md ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
             >
               Browse Available Mocks
             </Link>
           </div>
         ) : (
-        <MockTestsOverview 
-          attempts={attempts} 
-          theme={theme} 
-          cardBg={cardBg} 
-          textColor={textColor} 
-          secondaryText={secondaryText} 
-        />
-      )}
-    </div>
-  );
-};
+          <MockTestsOverview
+            attempts={attempts}
+            theme={theme}
+            cardBg={cardBg}
+            textColor={textColor}
+            secondaryText={secondaryText}
+          />
+        )}
+      </div>
+    );
+  };
   return (
     <div className={`min-h-screen ${bgColor} ${textColor} p-4 ${isMobile ? 'pb-24' : ''}`}>
       <div className="mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className={`text-base text-purple-500 font-bold flex items-center gap-1`}>
-            
-            <img 
+
+            <img
               className="w-8  rounded-full mr-1"
-            src={session?.user?.image || '/trackode.png'}
+              src={session?.user?.image || '/trackode.png'}
               alt="User Avatar">
-              
+
             </img>
             Welcome
             <span className={`text-base  ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
               {session?.user?.name || 'Student'}
             </span>
 
-            
+
           </h1>
         </div>
 
@@ -365,9 +365,9 @@ console.log(attempts);
             <TabsContent value="overview">
               <OverviewTab />
             </TabsContent>
-<TabsContent value="mocks">
-              <ResultsTab 
-                attempts={attempts} 
+            <TabsContent value="mocks">
+              <ResultsTab
+                attempts={attempts}
                 cardBg={cardBg}
                 borderColor={borderColor}
                 textColor={textColor}
@@ -384,7 +384,7 @@ console.log(attempts);
               <QuizDashboard quizzes={quizzes} mockTests={mockTests} quizResults={quizResultss} />
             </TabsContent>
 
-            
+
           </Tabs>
         )}
 
@@ -392,10 +392,10 @@ console.log(attempts);
           <div className="space-y-6">
             {activeTab === 'overview' && <OverviewTab />}
             {activeTab === 'quizzes' && <QuizzesTab />}
-            
+
             {activeTab === 'mocks' && (
-              <ResultsTab 
-                attempts={attempts} 
+              <ResultsTab
+                attempts={attempts}
                 cardBg={cardBg}
                 borderColor={borderColor}
                 textColor={textColor}
@@ -412,35 +412,35 @@ console.log(attempts);
 
         {isMobile && (
           <div className={`fixed bottom-0 left-0 right-0 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-200'} border-t ${borderColor} flex justify-around items-center h-16`}>
-            <button 
+            <button
               onClick={() => setActiveTab('overview')}
               className={`flex flex-col items-center justify-center p-2 ${activeTab === 'overview' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <Home className="w-5 h-5" />
               <span className="text-xs mt-1">Overview</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('quizzes')}
               className={`flex flex-col items-center justify-center p-2 ${activeTab === 'quizzes' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <BookOpen className="w-5 h-5" />
               <span className="text-xs mt-1">Quizzes</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('mocks')}
               className={`flex flex-col items-center justify-center p-2 ${activeTab === 'mocks' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <Award className="w-5 h-5" />
               <span className="text-xs mt-1">Mocks</span>
             </button>
-            <button 
+            <button
               onClick={() => setActiveTab('available-quizzes')}
               className={`flex flex-col items-center justify-center p-2 ${activeTab === 'available-quizzes' ? (theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600') : secondaryText}`}
             >
               <List className="w-5 h-5" />
               <span className="text-xs mt-1">Available Quizzes</span>
             </button>
-            
+
           </div>
         )}
       </div>
@@ -467,9 +467,8 @@ const StatCard = ({ theme, icon, title, value, color, trend }) => {
           <p className="text-sm font-bold">
             {value}
             {trend && trend !== 'stable' && (
-              <span className={`text-sm ml-2 ${
-                trend === 'improving' ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <span className={`text-sm ml-2 ${trend === 'improving' ? 'text-green-600' : 'text-red-600'
+                }`}>
                 ({trend === 'improving' ? '↑' : '↓'})
               </span>
             )}
@@ -494,37 +493,36 @@ const MockTestsOverview = ({ attempts, theme, cardBg, textColor, secondaryText }
             <div className="flex justify-between items-start">
               <div>
                 <div className='flex items-center gap-2'>
-                   <p className={`text-sm ${textColor}`}>{attempt.quizTitle}</p>
-                   {attempt.totalScore&&attempt.totalQuestions && (
+                  <p className={`text-sm ${textColor}`}>{attempt.quizTitle}</p>
+                  {attempt.totalScore && attempt.totalQuestions && (
                     <p className={`text-xs ${textColor}`}>
                       • Score: {attempt.totalScore}/{attempt.totalQuestions} ({attempt.percentage}%)
                     </p>
-                    )}
-                 
-                  </div>
-               
+                  )}
+
+                </div>
+
                 <p className={`text-xs ${secondaryText}`}>
-                 Attempted at: {new Date(attempt.completedAt).toLocaleDateString()}
-                 
+                  Attempted at: {new Date(attempt.completedAt).toLocaleDateString()}
+
                 </p>
-                
+
                 <div className="mt-2 flex flex-wrap gap-1">
                   {attempt.sections?.map((section, i) => (
-                  <> 
-                    {section.total> 0 && (
-                      <span key={i} className={`text-xs px-2 py-1 rounded ${
-                        theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
-                      }`}>
-                        {section.sectionName}: {section.correct}/{section.total}
-                      </span>
-                    )
-                    }
-                    </> 
+                    <>
+                      {section.total > 0 && (
+                        <span key={i} className={`text-xs px-2 py-1 rounded ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100'
+                          }`}>
+                          {section.sectionName}: {section.correct}/{section.total}
+                        </span>
+                      )
+                      }
+                    </>
                   ))}
                 </div>
               </div>
-              <Link 
-                href={`/mock-tests/${attempt.attemptId?attempt.attemptId:attempt._id}/user-results`}
+              <Link
+                href={`/mock-tests/${attempt.attemptId ? attempt.attemptId : attempt._id}/user-results`}
                 className={`text-sm ${theme === 'dark' ? 'text-indigo-400' : 'text-indigo-600'}`}
               >
                 View
