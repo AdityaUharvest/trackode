@@ -85,15 +85,15 @@ export async function GET(
         : Promise.resolve([]),
       mockIds.length
         ? QuizAttempt.find({
-            quizId: { $in: mockIds },
-            userId: { $ne: userId },
-          }).sort({ startedAt: -1 }).lean<any[]>()
+          quizId: { $in: mockIds },
+          userId: { $ne: userId },
+        }).sort({ startedAt: -1 }).lean<any[]>()
         : Promise.resolve([]),
       quizIds.length
         ? Attempted.find({
-            quiz: { $in: quizIds },
-            student: { $ne: user._id },
-          }).sort({ attemptedAt: -1 }).lean<any[]>()
+          quiz: { $in: quizIds },
+          student: { $ne: user._id },
+        }).sort({ attemptedAt: -1 }).lean<any[]>()
         : Promise.resolve([]),
     ]);
 
@@ -115,8 +115,8 @@ export async function GET(
       const status = completedAt
         ? 'completed'
         : expectedEndAt && Date.now() > expectedEndAt.getTime()
-        ? 'left'
-        : 'in-progress';
+          ? 'left'
+          : 'in-progress';
       const totalQuestions = Number(resultDoc?.totalQuestions || 0);
       const totalCorrect = Number(resultDoc?.totalScore || 0);
       const accuracy = totalQuestions > 0
@@ -227,8 +227,8 @@ export async function GET(
     const participantIds = Array.from(participantMetaById.keys());
     const participantUsers = participantIds.length
       ? await User.find({ _id: { $in: participantIds } })
-          .select('name email image college branch year public')
-          .lean<any[]>()
+        .select('name email image college branch year public')
+        .lean<any[]>()
       : [];
     const participantUserById = new Map(
       participantUsers.map((participant) => [String(participant._id), participant])
@@ -317,23 +317,32 @@ export async function GET(
       }
 
       return [{
+        id: mockId,
         title: leader.title,
         kind: 'mock' as const,
       }];
     });
+
     const topQuizWins = (Array.isArray(user.achievements) ? user.achievements : [])
       .filter((achievement: any) => achievement?.type === 'certificate' && Number(achievement?.rank || 0) === 1)
       .map((achievement: any) => ({
+        id: String(achievement.quizId),
         title: achievement.quizTitle || 'Quiz',
         kind: 'quiz' as const,
       }));
+
     const certificateCount = (Array.isArray(user.achievements) ? user.achievements : [])
       .filter((achievement: any) => achievement?.type === 'certificate').length;
-    const topWins = Array.from(
-      new Map(
-        [...topMockWins, ...topQuizWins].map((item) => [`${item.kind}:${item.title}`, item])
-      ).values()
-    );
+
+    const topWinsMap = new Map();
+    [...topMockWins, ...topQuizWins].forEach(item => {
+      const key = item.id || item.title;
+      if (!topWinsMap.has(key)) {
+        topWinsMap.set(key, item);
+      }
+    });
+
+    const topWins = Array.from(topWinsMap.values());
 
     const visibleMockHistory = isOwner ? mockHistory : isPrivateProfile ? [] : mockHistory.slice(0, 4);
     const visibleQuizHistory = isOwner ? quizHistory : isPrivateProfile ? [] : quizHistory.slice(0, 4);

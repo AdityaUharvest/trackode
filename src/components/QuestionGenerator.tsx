@@ -658,7 +658,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
   };
 
   const handleShareLink = async () => {
-    navigator.clipboard.writeText(`${window.location.origin}/playy/${shareCode}`).then(
+    navigator.clipboard.writeText(`${window.location.origin}/assessment/${shareCode}`).then(
       () => {
         setSuccessMessage('Share link copied to clipboard!');
         setCopied(true);
@@ -1092,7 +1092,7 @@ export default function QuestionGenerator({ isPublished, mockTest, shareCode }: 
               
               <button
                 onClick={() =>
-                  navigator.clipboard.writeText(`${window.location.origin}/playy/${shareCode}`)
+                  navigator.clipboard.writeText(`${window.location.origin}/assessment/${shareCode}`)
                     .then(() => toast.success('Quiz link copied to clipboard!'))
                     .catch(() => toast.error('Failed to copy link'))
                 }

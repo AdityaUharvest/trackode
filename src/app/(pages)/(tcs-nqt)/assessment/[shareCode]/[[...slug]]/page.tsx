@@ -31,14 +31,25 @@ interface Section {
   unlocked: boolean;
 }
 
+interface IMockTest {
+  _id: string;
+  title: string;
+  description?: string;
+  isPublished: boolean;
+  shareCode: string;
+  durationMinutes: number;
+}
+
 export default function QuizPlayer() {
   const { theme } = useTheme();
-  const { shareCode } = useParams();
+  const params = useParams();
+  const shareCode = Array.isArray(params.shareCode) ? params.shareCode[0] : params.shareCode;
+
   const router = useRouter();
   const quizContainerRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null); // Store timer reference
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [quiz, setQuiz] = useState<any>(null);
+  const [quiz, setQuiz] = useState<IMockTest | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [sections, setSections] = useState<Section[]>([]);
   const [currentSection, setCurrentSection] = useState<string>('');
@@ -238,7 +249,7 @@ export default function QuizPlayer() {
           questionCountMap[q.section] = (questionCountMap[q.section] || 0) + 1;
         });
 
-        const normalizedSections = res.data.sections.map((s: any) => {
+        const normalizedSections = res.data.sections.map((s: { value: string; label: string }) => {
           const questionCount = questionCountMap[s.value] || 0;
           return {
             name: s.value,
@@ -251,10 +262,10 @@ export default function QuizPlayer() {
         });
 
         // Count questions in each section
-       
+
 
         // Filter out sections with 0 questions
-        const filteredSections = normalizedSections.filter((s: any) => s.questionCount > 0);
+        const filteredSections = normalizedSections.filter((s: Section) => s.questionCount > 0);
 
         // Unlock the first section
         if (filteredSections.length > 0) {
@@ -281,23 +292,20 @@ export default function QuizPlayer() {
             });
           }
 
-          const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
+          const firstUnsubmitted = filteredSections.find((s: Section) => !s.submitted);
           if (firstUnsubmitted) {
             setCurrentSection(firstUnsubmitted.name);
           }
         } else if (attempted.data?.hasInProgress && Array.isArray(attempted.data?.submittedSections) && (attempted.data.submittedSections as string[]).length > 0) {
-          // No localStorage but the DB has a partial attempt from another session.
-          // Restore the submitted sections so the user resumes from where they left off.
           const dbSubmitted: string[] = attempted.data.submittedSections;
           const normalizedDbSubmitted = dbSubmitted.map((s: string) => s.trim().toLowerCase());
-          filteredSections.forEach((section: any) => {
+          filteredSections.forEach((section: Section) => {
             if (normalizedDbSubmitted.includes(section.name.trim().toLowerCase())) {
               section.submitted = true;
               section.unlocked = true;
             }
           });
-          // Unlock the next unsubmitted section
-          const firstUnsubmitted = filteredSections.find((s: any) => !s.submitted);
+          const firstUnsubmitted = filteredSections.find((s: Section) => !s.submitted);
           if (firstUnsubmitted) {
             firstUnsubmitted.unlocked = true;
             setCurrentSection(firstUnsubmitted.name);
@@ -434,17 +442,17 @@ export default function QuizPlayer() {
     }
 
     try {
-     
+
       setQuizStarted(true);
       setHideNavAndFooter(true);
-      
+
     } catch (error) {
       console.error('Fullscreen setup error:', error);
       toast.error('Failed to start quiz in fullscreen mode.');
       setQuizStarted(false);
       setHideNavAndFooter(false);
     }
-    
+
   };
 
   // Handle user interactions to re-enter fullscreen
@@ -791,7 +799,7 @@ export default function QuizPlayer() {
   if (hasAttempted) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-8 rounded-lg max-w-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-lg'}`}>
+        <div className={`p-8 rounded-md max-w-lg text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-lg'}`}>
           <h2 className="text-2xl font-bold mb-6">Quiz Already Attempted</h2>
           <p className="text-sm mb-8 text-gray-500">
             You have already completed this quiz. Explore other quizzes or mocks to continue your learning journey.
@@ -799,19 +807,19 @@ export default function QuizPlayer() {
           <div className="flex flex-col gap-4">
             <button
               onClick={() => router.push('/dashboard')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-md font-medium ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-indigo-500 hover:bg-indigo-600'} text-white`}
             >
               Go to Dashboard
             </button>
             <button
               onClick={() => router.push('/programming-quizzes')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-md font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white`}
             >
               Explore Free Live Quizzes
             </button>
             <button
               onClick={() => router.push('/mocks')}
-              className={`w-full px-6 py-3 rounded-lg font-medium ${theme === 'dark' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+              className={`w-full px-6 py-3 rounded-md font-medium ${theme === 'dark' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
             >
               Explore Free Live Mocks
             </button>
@@ -823,7 +831,7 @@ export default function QuizPlayer() {
   if (!isPublished) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+        <div className={`p-6 rounded-md max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
           <h2 className="text-lg font-bold mb-4">The Quiz is ended</h2>
           <p className="mb-6">This quiz is not yet published. Please check back later.</p>
           <button
@@ -855,7 +863,7 @@ export default function QuizPlayer() {
   if (error) {
     return (
       <div className={`flex items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-6 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+        <div className={`p-6 rounded-md max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
           <h2 className="text-lg font-bold mb-4">Error</h2>
           <p className="mb-6">{error}</p>
           <button
@@ -872,7 +880,7 @@ export default function QuizPlayer() {
   if (!quizStarted) {
     return (
       <div className={`flex items-center justify-center min-h-[calc(100vh-4rem)] py-8 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <div className={`p-8 rounded-xl shadow-lg w-full max-w-3xl mx-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className={`p-8 rounded-lg shadow-sm-lg w-full max-w-3xl mx-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
           <div className="text-center mb-8">
             <h1 className="text-xl font-bold mb-2">{quiz?.title}</h1>
             {(hasAttemptedQuestions || hasInProgressFromDB) && (
@@ -889,9 +897,8 @@ export default function QuizPlayer() {
                 {sections.map((section) => (
                   <div
                     key={section.name}
-                    className={`p-4 rounded-lg border flex items-center justify-between ${
-                      theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
-                    } ${!section.unlocked ? 'opacity-70' : ''}`}
+                    className={`p-4 rounded-md border flex items-center justify-between ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+                      } ${!section.unlocked ? 'opacity-70' : ''}`}
                   >
                     <div className="flex items-center gap-3">
                       {!section.unlocked && <Lock size={16} className="flex-shrink-0" />}
@@ -926,9 +933,8 @@ export default function QuizPlayer() {
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
                     <div
-                      className={`mt-1 w-5 h-5 p-2 rounded-full flex items-center justify-center ${
-                        theme === 'dark' ? 'bg-indigo-900 text-indigo-200' : 'bg-indigo-100 text-indigo-800'
-                      }`}
+                      className={`mt-1 w-5 h-5 p-2 rounded-full flex items-center justify-center ${theme === 'dark' ? 'bg-indigo-900 text-indigo-200' : 'bg-indigo-100 text-indigo-800'
+                        }`}
                     >
                       {index + 1}
                     </div>
@@ -938,36 +944,36 @@ export default function QuizPlayer() {
               </ul>
             </div>
           </div>
-           
+
           <div className="text-center">
             {/* adding terms and i am ready for full screen check box */}
             <div className="flex items-center justify-center mb-4">
               <input
-              type="checkbox"
-              id="terms"
-              className={`mr-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
-              checked={hideNavAndFooter}
-              onChange={(e) => {setHideNavAndFooter(e.target.checked)
-              setFullscreenPrompt(e.target.checked);
-              }}
+                type="checkbox"
+                id="terms"
+                className={`mr-2 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}
+                checked={hideNavAndFooter}
+                onChange={(e) => {
+                  setHideNavAndFooter(e.target.checked)
+                  setFullscreenPrompt(e.target.checked);
+                }}
               />
               <label htmlFor="terms" className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-              I agree to the terms and conditions
+                I agree to the terms and conditions
               </label>
             </div>
 
             <button
-              onClick={()=>{startQuiz() 
+              onClick={() => {
+                startQuiz()
                 requestFullscreen()
               }}
               disabled={!hideNavAndFooter}
-              className={`px-8 py-3 rounded-lg font-medium text-base ${
-              theme === 'dark'
+              className={`px-8 py-3 rounded-md font-medium text-base ${theme === 'dark'
                 ? 'bg-green-700 hover:bg-green-600'
                 : 'bg-green-600 hover:bg-green-700'
-              } text-white shadow-md transition-all ${
-              !hideNavAndFooter ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+                } text-white shadow-md transition-all ${!hideNavAndFooter ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               {hasAttemptedQuestions || hasInProgressFromDB ? 'Resume Attempt' : 'Start Quiz Now'}
             </button>
@@ -1029,14 +1035,13 @@ export default function QuizPlayer() {
 
           <div className="flex items-center gap-3">
             {currentSectionData?.timeLimit && !isSectionSubmitted && (
-              <QuestionTimer timeRemaining={sectionTimeRemaining} onTimeUp={handleSectionSubmit} />
+              <QuestionTimer timeRemaining={sectionTimeRemaining} onTimeUp={handleSectionSubmit} theme={theme} />
             )}
 
             <button
               onClick={() => setShowCalculator(!showCalculator)}
-              className={`p-2 rounded-full ${
-                theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-              } ${showCalculator ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
+              className={`p-2 rounded-full ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+                } ${showCalculator ? (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100') : ''}`}
               title="Calculator"
             >
               <Calculator size={20} />
@@ -1062,7 +1067,7 @@ export default function QuizPlayer() {
       {/* Fullscreen Prompt Modal */}
       {fullscreenPrompt && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center">
-          <div className={`p-8 rounded-lg max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`p-8 rounded-md max-w-md text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <h2 className="text-lg font-bold mb-4">Fullscreen Required</h2>
             <p className="mb-6">This quiz requires fullscreen mode. Please enable it to continue.</p>
             <button
@@ -1079,7 +1084,7 @@ export default function QuizPlayer() {
       )}
 
       {/* Main Quiz Content */}
-      <div className="mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="mx-auto px-4 py-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Section Navigation - Left Sidebar */}
         <div className="lg:col-span-3">
           <SectionProgress
@@ -1087,21 +1092,21 @@ export default function QuizPlayer() {
             currentSection={currentSection}
             answers={sectionAnswers}
             onChangeSection={changeSection}
+            theme={theme}
           />
         </div>
 
         {/* Question Area - Middle Content */}
         <div className="lg:col-span-6">
           {hasQuestions ? (
-            <div className={`p-6 rounded-xl shadow ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className={`p-6 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
               {/* Question Navigation */}
               <div className="flex justify-between items-center mb-6">
                 <button
                   onClick={goToPrevQuestion}
                   disabled={currentQuestionIndex === 0 || isSectionSubmitted || isTimeUp}
-                  className={`flex items-center gap-1 px-3 py-1 rounded ${
-                    theme === 'dark' ? 'hover:bg-gray-700 disabled:opacity-40' : 'hover:bg-gray-100 disabled:opacity-40'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1 rounded ${theme === 'dark' ? 'hover:bg-gray-700 disabled:opacity-40' : 'hover:bg-gray-100 disabled:opacity-40'
+                    }`}
                 >
                   <ChevronLeft size={18} />
                   <span>Previous</span>
@@ -1116,9 +1121,8 @@ export default function QuizPlayer() {
                 <button
                   onClick={goToNextQuestion}
                   disabled={currentQuestionIndex === currentQuestions.length - 1 || isSectionSubmitted || isTimeUp}
-                  className={`flex items-center gap-1 px-3 py-1 rounded ${
-                    theme === 'dark' ? 'hover:bg-gray-700 disabled:opacity-40' : 'hover:bg-gray-100 disabled:opacity-40'
-                  }`}
+                  className={`flex items-center gap-1 px-3 py-1 rounded ${theme === 'dark' ? 'hover:bg-gray-700 disabled:opacity-40' : 'hover:bg-gray-100 disabled:opacity-40'
+                    }`}
                 >
                   <span>Next</span>
                   <ChevronRight size={18} />
@@ -1138,34 +1142,32 @@ export default function QuizPlayer() {
                   const isSelected = answers[currentQuestion._id] === originalOptionIndex;
 
                   return (
-                  <div
-                    key={index}
-                    onClick={() => !isSectionSubmitted && !isTimeUp && handleAnswerSelect(currentQuestion._id, index)}
-                    className={`p-4 rounded-lg transition-all border option ${
-                      isSelected
+                    <div
+                      key={index}
+                      onClick={() => !isSectionSubmitted && !isTimeUp && handleAnswerSelect(currentQuestion._id, index)}
+                      className={`p-4 rounded-md transition-all border option ${isSelected
                         ? theme === 'dark'
                           ? 'border-indigo-500 bg-indigo-900/30'
                           : 'border-indigo-500 bg-indigo-50'
                         : theme === 'dark'
                           ? 'border-gray-700 hover:bg-gray-700'
                           : 'border-gray-200 hover:bg-gray-50'
-                    } ${isSectionSubmitted || isTimeUp ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
-                  >
-                    <div className="flex items-center">
-                      <div
-                        className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${
-                          isSelected
+                        } ${isSectionSubmitted || isTimeUp ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
+                    >
+                      <div className="flex items-center">
+                        <div
+                          className={`w-6 h-6 rounded-full border flex items-center justify-center mr-3 flex-shrink-0 ${isSelected
                             ? 'border-indigo-500 bg-indigo-500 text-white'
                             : theme === 'dark'
                               ? 'border-gray-500'
                               : 'border-gray-300'
-                        }`}
-                      >
-                        {String.fromCharCode(65 + index)}
+                            }`}
+                        >
+                          {String.fromCharCode(65 + index)}
+                        </div>
+                        <span className="break-words">{option}</span>
                       </div>
-                      <span className="break-words">{option}</span>
                     </div>
-                  </div>
                   );
                 })}
               </div>
@@ -1177,9 +1179,8 @@ export default function QuizPlayer() {
                     <button
                       onClick={() => setShowSubmitModal(true)}
                       disabled={isTimeUp}
-                      className={`flex-1 py-2.5 rounded-lg font-medium ${
-                        theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                      } ${isTimeUp ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      className={`flex-1 py-2.5 rounded-md font-medium ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+                        } ${isTimeUp ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {isLastSection ? 'Submit Quiz' : 'Submit Section'}
                     </button>
@@ -1187,11 +1188,10 @@ export default function QuizPlayer() {
                     <button
                       onClick={goToNextQuestion}
                       disabled={currentQuestionIndex === currentQuestions.length - 1 || isTimeUp}
-                      className={`flex-1 py-2.5 rounded-lg font-medium ${
-                        theme === 'dark'
-                          ? 'bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50'
-                          : 'bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-500/50'
-                      } text-white`}
+                      className={`flex-1 py-2.5 rounded-md font-medium ${theme === 'dark'
+                        ? 'bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/50'
+                        : 'bg-indigo-500 hover:bg-indigo-600 disabled:bg-indigo-500/50'
+                        } text-white`}
                     >
                       {currentQuestionIndex === currentQuestions.length - 1 ? 'Review' : 'Next Question'}
                     </button>
@@ -1206,9 +1206,8 @@ export default function QuizPlayer() {
                         handleQuizSubmit();
                       }
                     }}
-                    className={`flex-1 py-2.5 rounded-lg font-medium ${
-                      theme === 'dark' ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-600'
-                    } text-white`}
+                    className={`flex-1 py-2.5 rounded-md font-medium ${theme === 'dark' ? 'bg-green-600 hover:bg-green-500' : 'bg-green-500 hover:bg-green-600'
+                      } text-white`}
                   >
                     {isLastSection ? 'View Results' : 'Continue to Next Section'}
                   </button>
@@ -1216,7 +1215,7 @@ export default function QuizPlayer() {
               </div>
             </div>
           ) : (
-            <div className={`p-6 rounded-xl shadow text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className={`p-6 rounded-lg shadow-sm text-center ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
               <h3 className="text-base font-medium mb-4">No questions available in this section</h3>
               <button
                 onClick={() => {
@@ -1225,9 +1224,8 @@ export default function QuizPlayer() {
                     changeSection(nextSection.name);
                   }
                 }}
-                className={`px-4 py-2 rounded-lg ${
-                  theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-500 hover:bg-indigo-600'
-                } text-white`}
+                className={`px-4 py-2 rounded-md ${theme === 'dark' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-indigo-500 hover:bg-indigo-600'
+                  } text-white`}
               >
                 Continue to Next Section
               </button>
@@ -1237,26 +1235,25 @@ export default function QuizPlayer() {
 
         {/* Question Navigator - Right Sidebar */}
         <div className="lg:col-span-3">
-          <div className={`p-4 rounded-xl shadow mb-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+          <div className={`p-4 rounded-lg shadow-sm mb-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
             <h3 className="font-medium mb-3">Question Navigator</h3>
             <div className="grid grid-cols-5 gap-2">
               {currentQuestions.map((q, index) => (
                 <button
                   key={q._id}
                   onClick={() => !isSectionSubmitted && !isTimeUp && goToQuestion(index)}
-                  className={`aspect-square rounded flex items-center justify-center transition-all ${
-                    currentQuestionIndex === index
+                  className={`aspect-square rounded flex items-center justify-center transition-all ${currentQuestionIndex === index
+                    ? theme === 'dark'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-indigo-500 text-white'
+                    : answers[q._id] !== undefined
                       ? theme === 'dark'
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-indigo-500 text-white'
-                      : answers[q._id] !== undefined
-                        ? theme === 'dark'
-                          ? 'bg-green-900/50 text-green-200'
-                          : 'bg-green-100 text-green-800'
-                        : theme === 'dark'
-                          ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  } ${isSectionSubmitted || isTimeUp ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                        ? 'bg-green-900/50 text-green-200'
+                        : 'bg-green-100 text-green-800'
+                      : theme === 'dark'
+                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    } ${isSectionSubmitted || isTimeUp ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                   disabled={isSectionSubmitted || isTimeUp}
                 >
                   {index + 1}
@@ -1266,11 +1263,10 @@ export default function QuizPlayer() {
           </div>
 
           {showCalculator && (
-            <div className={`p-4 rounded-xl shadow ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+            <div className={`p-4 rounded-lg shadow-sm ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
               <div
-                className={`mb-3 p-3 rounded text-right font-mono text-base ${
-                  theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
-                }`}
+                className={`mb-3 p-3 rounded text-right font-mono text-base ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'
+                  }`}
               >
                 {calcInput || '0'}
               </div>
@@ -1293,21 +1289,18 @@ export default function QuizPlayer() {
                           setCalcInput((prev) => prev + btn);
                         }
                       }}
-                      className={`p-3 rounded text-sm font-medium ${
-                        theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
-                      } ${
-                        ['/', '*', '-', '+', '='].includes(btn)
+                      className={`p-3 rounded text-sm font-medium ${theme === 'dark' ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'
+                        } ${['/', '*', '-', '+', '='].includes(btn)
                           ? theme === 'dark'
                             ? 'bg-indigo-900 hover:bg-indigo-800'
                             : 'bg-indigo-500 hover:bg-indigo-600 text-white'
                           : ''
-                      } ${
-                        btn === 'C'
+                        } ${btn === 'C'
                           ? theme === 'dark'
                             ? 'bg-red-900 hover:bg-red-800'
                             : 'bg-red-500 hover:bg-red-600 text-white'
                           : ''
-                      }`}
+                        }`}
                     >
                       {btn}
                     </button>
@@ -1344,7 +1337,7 @@ export default function QuizPlayer() {
       {/* Tab Switch Warning */}
       {!isTabActive && (
         <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-          <div className="bg-red-600 text-white p-8 rounded-lg max-w-md text-center">
+          <div className="bg-red-600 text-white p-8 rounded-md max-w-md text-center">
             <AlertTriangle className="h-12 w-12 mx-auto mb-4" />
             <h2 className="text-lg font-bold mb-4">Warning!</h2>
             <p className="mb-6">
@@ -1364,15 +1357,14 @@ export default function QuizPlayer() {
       <FeedbackForm
         isOpen={showFeedbackModal}
         onClose={handleFeedbackDismiss}
-        quizId={quiz?._id}
-        quizTitle={quiz?.title}
+        quizId={quiz?._id || ''}
+        quizTitle={quiz?.title || ''}
         theme={theme}
       />
 
       {/* Results Modal */}
-      <QuizResultModal isOpen={showResultModal} onClose={() => router.push('/programming-quizzes')} quizId={quiz?._id} />
+      <QuizResultModal isOpen={showResultModal} onClose={() => router.push('/programming-quizzes')} quizId={quiz?._id || ''} />
 
-      <Toaster />
     </div>
   );
 }

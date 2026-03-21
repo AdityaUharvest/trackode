@@ -226,7 +226,6 @@ export default function StudentDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <QuizHistory results={quizResults} theme={theme} />
         <MockTestsOverview
           attempts={attempts}
           theme={theme}
@@ -234,8 +233,10 @@ export default function StudentDashboard() {
           textColor={textColor}
           secondaryText={secondaryText}
         />
+        <QuizHistory results={quizResults} theme={theme} />
+
       </div>
-      <PerformanceChart chartData={chartData} theme={theme} />
+      {/* <PerformanceChart chartData={chartData} theme={theme} /> */}
     </div>
   );
 

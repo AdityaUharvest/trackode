@@ -20,6 +20,7 @@ export type ProfileSummary = {
     };
   };
   topWins: Array<{
+    id?: string;
     title: string;
     kind: 'mock' | 'quiz';
   }>;

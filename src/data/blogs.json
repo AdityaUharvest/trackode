@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "ai-technical-interview-preparation",
+    "title": "Mastering Technical Interviews with AI-Powered Adaptive Learning",
+    "description": "Learn how Trackode uses AI to create personalized mock tests and coding quizzes tailored to your career goals.",
+    "date": "2024-03-20",
+    "author": "Aditya Upadhyay",
+    "category": "Technology",
+    "content": "Exploring the intersection of artificial intelligence and developer education. How adaptive quizzes significantly improve knowledge retention."
+  },
+  {
+    "slug": "tcs-nqt-preparation-roadmap-2024",
+    "title": "Complete TCS NQT 2024 Preparation Strategy and Roadmap",
+    "description": "The ultimate guide to clearing TCS NQT and Ninja interviews using Trackode's specialized mock tests.",
+    "date": "2024-03-18",
+    "author": "Trackode Team",
+    "category": "Career",
+    "content": "A detailed step-by-step guide on what topics to study, common coding problems, and how to use mock tests for success."
+  },
+  {
+    "slug": "javascript-performance-optimization-tips",
+    "title": "Top JavaScript Performance Optimization Techniques for Modern Developers",
+    "description": "Improve your web application speed with these essential JavaScript optimization tips for 2024.",
+    "date": "2024-03-15",
+    "author": "Aditya Upadhyay",
+    "category": "Programming",
+    "content": "Deep dive into memory management, event loop efficiency, and DOM optimization for high-performance React applications."
+  }
+]

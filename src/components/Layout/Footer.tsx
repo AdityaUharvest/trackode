@@ -44,13 +44,13 @@ export default function Footer() {
                 alt="Trackode Logo"
                 className="transition-transform duration-300 bg-gradient-to-r from-white via-violet-200  to-violet-300 p-1 group-hover:scale-110 rounded-lg shadow-sm"
                 />
-                <div className="ml-2 flex flex-col justify-center">
-                <span className={`text-xl font-extrabold tracking-tight text-gray-700 dark:text-gray-100 leading-tight`}>
-                  Trackode
-                </span>
-                <span className={`text-xs font-medium  leading-tight`}>
-                  Quizzes & Mocks
-                </span>
+                 <div className="ml-2 flex flex-col justify-center">
+                  <span className={`text-xl font-extrabold tracking-tight text-gray-700 dark:text-gray-100 leading-tight`}>
+                    Trackode
+                  </span>
+                  <span className={`text-[10px] font-bold uppercase tracking-[0.12em] text-indigo-500/80 dark:text-indigo-400/80 leading-tight`}>
+                    Trace Your Excellence
+                  </span>
                 </div>
               </div>
               </Link>
@@ -173,6 +173,17 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
+                  href="/about" 
+                  className="text-sm hover:underline transition-all flex items-center"
+                >
+                  <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
+                  </svg>
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link 
                   href="/programming-quizzes" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
@@ -184,7 +195,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link 
-                  href="/premium-mock-tests" 
+                  href="/mocks" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
@@ -223,15 +234,17 @@ export default function Footer() {
                   </svg>
                   Roadmaps
                 </Link>
-                {/* <Link 
-                  href="https://www.devblogger.in" 
+              </li>
+              <li>
+                <Link 
+                  href="/blogs" 
                   className="text-sm hover:underline transition-all flex items-center"
                 >
                   <svg className="w-3 h-3 mr-2" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
                   </svg>
-                  Blog
-                </Link> */}
+                  Tech Blogs
+                </Link>
               </li>
               <li>
                 <Link 

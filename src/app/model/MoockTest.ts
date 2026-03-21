@@ -14,6 +14,11 @@ interface IMockTest extends Document {
   creator: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   autoSendResults: boolean;
+  totalMarks: number;
+  instructions: string;
+  public: boolean;
+  tag: string;
+  createdBy: mongoose.Types.ObjectId;
 }
 
 const MockTestSchema: Schema = new Schema({
@@ -32,6 +37,8 @@ const MockTestSchema: Schema = new Schema({
   difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' },
   creator: { type: String, default: 'Anonymous' },
   autoSendResults: { type: Boolean, default: true },
+  totalMarks: { type: Number, default: 100 },
+  instructions: { type: String, default: 'Please read all questions carefully before answering.' },
 });
 
 const MockTest= mongoose.models.MockTest || mongoose.model<IMockTest>('MockTest', MockTestSchema);

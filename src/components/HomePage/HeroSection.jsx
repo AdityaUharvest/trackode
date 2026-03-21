@@ -107,29 +107,29 @@ const HeroSection = () => {
                
                 <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
-                  <img src="/icons/book.gif" alt="" className='w-10 h-10' />
+                  <img src="/icons/book.gif" alt="Adaptive Learning Icon" className='w-10 h-10' />
                   Adaptive Learning
                   </span>
               </div>
               <div className="flex items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-pink-200/50 dark:border-gray-700/50">
                  <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
-                  <img src="/icons/task-management.gif" alt="" className='w-10 h-10' />
+                  <img src="/icons/task-management.gif" alt="Real-time Feedback Icon" className='w-10 h-10' />
                   Real-time Feedback
                   </span>
                
               </div>
               <div className="flex items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-purple-200/50 dark:border-gray-700/50">
-                <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
+                 <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
-                  <img src="/icons/coding.gif" alt="" className='w-10 h-10' />
+                  <img src="/icons/coding.gif" alt="AI Powered Icon" className='w-10 h-10' />
                   AI - Powered
                   </span>
               </div>
               <div className="flex sm:hidden  items-center  bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-md px-4 py-2 border border-purple-200/50 dark:border-gray-700/50">
                 <span className="sm:text-base text-sm font-medium flex gap-4 items-center  text-gray-700 dark:text-gray-300">
                   
-                  <img src="/icons/goals.gif" alt="" className='w-10 h-10' />
+                  <img src="/icons/goals.gif" alt="Mocks and Quizzes Icon" className='w-10 h-10' />
                   Mocks & Quizzes
                   </span>
               </div>

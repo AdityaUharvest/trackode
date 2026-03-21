@@ -12,6 +12,7 @@ import {
   Filter,
   User,
   X,
+  ArrowRight
 } from "lucide-react";
 import Link from "next/link";
 import { useTheme } from "./ThemeContext";
@@ -117,7 +118,7 @@ export default function MockTestsListClient({
           ? "bg-gray-700 hover:bg-gray-600 text-gray-200 border-gray-600"
           : "bg-gray-50 hover:bg-gray-100 text-gray-800 border-gray-200";
       case "text-muted":
-        return theme === "dark" ? "text-gray-400" : "text-gray-500";
+        return theme === "dark" ? "text-gray-400" : "text-gray-600";
       case "creator":
         return theme === "dark"
           ? "bg-violet-900 text-violet-300"
@@ -391,13 +392,13 @@ export default function MockTestsListClient({
 
                 <div className="flex flex-col gap-3">
                   <Link
-                    href={`/playy/${mock.shareCode}`}
-                    className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 shadow-md hover:shadow-lg ${getThemeClasses(
+                    href={`/mocks/${mock.shareCode}`}
+                    className={`flex items-center justify-center py-2.5 px-6 rounded-xl transition duration-200 shadow-md hover:shadow-lg font-bold tracking-tight ${getThemeClasses(
                       "button-primary"
                     )}`}
                   >
-                    <Play size={18} className="mr-2" />
-                    Play Now
+                    View Details
+                    <ArrowRight size={18} className="ml-2" />
                   </Link>
                 </div>
               </div>

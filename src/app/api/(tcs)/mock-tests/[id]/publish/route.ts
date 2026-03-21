@@ -1,9 +1,10 @@
 import { NextResponse ,NextRequest} from 'next/server';
 import MockTest from '@/app/model/MoockTest';
 import connectDB from '@/lib/util';
+import { slugify } from '@/lib/utils';
 export async function POST(
   request: Request,
-  { params }: any 
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
@@ -27,7 +28,7 @@ export async function POST(
     
     return NextResponse.json(
       {
-      shareLink: `/playy/${mockTest.shareCode}`,
+      shareLink: `/assessment/${mockTest.shareCode}/${slugify(mockTest.title)}`,
       message: message,
       success: true,
       }

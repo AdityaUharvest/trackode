@@ -146,7 +146,7 @@ const Navbar: React.FC = () => {
     cardBorder: theme === 'dark' ? 'border-gray-700' : 'border-gray-100',
     tagBg: {
       indigo: theme === 'dark' ? 'bg-indigo-900 text-indigo-300' : 'bg-indigo-100 text-indigo-700',
-      
+
       green: theme === 'dark' ? 'bg-green-900 text-green-300' : 'bg-green-100 text-green-700'
     }
   };
@@ -167,9 +167,10 @@ const Navbar: React.FC = () => {
   return (
     <>
       <nav className={`
-        fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b
-        ${themeStyles.navbar}
-        ${scrolled ? 'shadow-lg backdrop-blur-2xl' : 'bg-gray-900/50 backdrop-blur-2xl'}
+        fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b
+        ${scrolled
+          ? `${themeStyles.navbar} shadow-lg shadow-indigo-500/10`
+          : 'bg-transparent border-transparent'}
       `}>
         <div className="mx-auto px-4 sm:px-6 py-1 lg:px-8">
           <div className="flex items-center justify-between h-16">
@@ -177,31 +178,35 @@ const Navbar: React.FC = () => {
             {/* Logo Section */}
             <div className="flex items-center">
               <Link
-              href="/"
-              className="flex items-center gap-3 group  transition-transform hover:-translate-y-1   rounded-lg px-1 py-1"
-              aria-label="Trackode Home"
+                href="/"
+                className="flex items-center gap-3 group  transition-transform   rounded-lg px-1 py-1"
+                aria-label="Trackode Home"
               >
-              <div className="flex items-center">
-                <Image
-                priority
-                width={100}
-                height={100}
-                
-                src="/brand-dark.png"
-                alt="Trackode Logo"
-                className="transition-transform duration-300 w-11 h-10  rounded-sm  group-hover:scale-105  "
-                />
-                <div className="ml-1 flex flex-col justify-center">
-                <span className={`text-xl font-black  text-gray-900 dark:text-gray-100 `}>
-                  Track<span className="text-indigo-500">ode</span>
-                </span>
-                
+                <div className="flex items-center">
+                  <Image
+                    priority
+                    width={50}
+                    height={50}
+
+                    src="/brand-dark.png"
+                    alt="Trackode Logo"
+                    className="transition-transform duration-300 w-15 h-15  rounded-sm  group-hover:scale-105  "
+                  />
+                  <div className="ml-2 flex flex-col justify-center">
+                    <div className="flex items-center gap-0.5">
+                      <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white sm:text-3xl leading-none">
+                        Track<span className="text-indigo-600 dark:text-indigo-400">ode</span>
+                      </span>
+                      <div className="hidden sm:block h-1.5 w-1.5 rounded-full bg-indigo-500 ml-1 animate-pulse"></div>
+                    </div>
+                    <span className="text-[10px] ml-1 font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.25em] mt-0.5 leading-none block">
+                      Trace Your Excellence
+                    </span>
+                  </div>
                 </div>
-              </div>
               </Link>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-1">
                 {navigationItems.map((item) => (

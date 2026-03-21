@@ -279,7 +279,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 text-base lg:text-lg font-semimedium text-gray-900 dark:text-white">AI Powered Quiz Generation</h1>
+                <h3 className="mt-6 text-base lg:text-lg font-semimedium text-gray-900 dark:text-white">AI Powered Quiz Generation</h3>
                 <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Generate quizzes tailored to your learning needs using our AI-driven platform.
                 </p>
@@ -292,7 +292,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 lg:text-lg font-semimedium text-gray-900 dark:text-white">Interactive Challenges</h1>
+                <h3 className="mt-6 lg:text-lg font-semimedium text-gray-900 dark:text-white">Interactive Challenges</h3>
                 <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Hands-on coding exercises with real-time feedback to improve your skills efficiently.
                 </p>
@@ -305,7 +305,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 lg:text-lg font-medium text-gray-900 dark:text-white">Progress Tracking</h1>
+                <h3 className="mt-6 lg:text-lg font-medium text-gray-900 dark:text-white">Progress Tracking</h3>
                 <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Monitor your growth with detailed analytics and personalized skill assessments.
                 </p>
@@ -318,7 +318,7 @@ export default function HomePage() {
                     </svg>
                   </div>
                 </div>
-                <h1 className="mt-6 lg:text-lg font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h1>
+                <h3 className="mt-6 lg:text-lg font-medium text-gray-900 dark:text-white">Detailed Result and Dashboard</h3>
                 <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
                   Detailed dashboard for student with leaderboard and result analysis, AI based personalized feedback.
                 </p>

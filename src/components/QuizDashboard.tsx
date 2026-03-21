@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "./ThemeContext";
 import Link from "next/link";
+import { slugify } from "@/lib/utils";
 import {
   Clock,
   Play,
@@ -1009,7 +1010,7 @@ const QuizDashboard = ({ quizzes, mockTests, quizResults }: Props) => {
 
                         <div className="flex flex-col gap-3">
                           <Link
-                            href={`/playy/${mock.shareCode}`}
+                            href={`/assessment/${mock.shareCode}/${slugify(mock.title)}`}
                             className={`flex items-center justify-center py-2 px-4 rounded-lg transition duration-200 border-indigo-500 border-2 hover:shadow-lg  bg-transparent hover:bg-indigo-600 text-indigo-700 hover:text-white font-medium`}
                           >
                             <Play size={18} className="mr-2" />

@@ -47,7 +47,7 @@ export  default  function QuizJoinComponent() {
     if (quizCode.length === 7) {
       handleJoinCode(quizCode);
     } else {
-      router.push(`/playy/${quizCode}`);
+      router.push(`/assessment/${quizCode}`);
     }
   };
 

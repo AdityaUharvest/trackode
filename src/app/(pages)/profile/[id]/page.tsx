@@ -40,9 +40,41 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     : { email: identifier };
   const user = await User.findOne(query).lean().exec() as UserType | null;
 
+  const name = user?.name || 'Trackode User';
+  const description = user?.bio ? `${name}'s professional profile and coding journey on Trackode. ${user.bio.substring(0, 100)}...` : `Check out ${name}'s coding progress, achievements, and technical expertise on Trackode.`;
+  const profileUrl = `https://trackode.in/profile/${identifier}`;
+
   return {
-    title: `${user?.name || 'User'}'s Profile`,
-    description: user?.bio || 'Profile page',
+    title: `${name} | Trackode Developer Profile`,
+    description,
+    alternates: {
+      canonical: profileUrl,
+    },
+    openGraph: {
+      title: `${name} - Developer Profile`,
+      description,
+      url: profileUrl,
+      siteName: 'Trackode',
+      images: [
+        {
+          url: user?.image || 'https://trackode.in/og-image.png',
+          width: 800,
+          height: 800,
+          alt: `${name}'s Profile Image`,
+        },
+      ],
+      type: 'profile',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${name}'s Coding Profile`,
+      description,
+      images: [user?.image || 'https://trackode.in/og-image.png'],
+    },
+    robots: {
+      index: user?.public !== false,
+      follow: true,
+    }
   };
 }
 

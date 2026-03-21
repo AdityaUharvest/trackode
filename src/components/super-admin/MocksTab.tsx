@@ -9,6 +9,7 @@ import { MockResultsModal } from './mocks/MockResultsModal';
 import type { MockAttempt, ResultsPagination, ResultsSummary } from './mocks/types';
 import type { MockDraft, MockItem } from './types';
 import { DiffBadge, SectionPills } from './ui';
+import { slugify } from '@/lib/utils';
 
 type MocksTabProps = {
   mocks: MockItem[];
@@ -180,7 +181,7 @@ export function MocksTab({
       return;
     }
 
-    const shareLink = `${window.location.origin}/playy/${mock.shareCode}`;
+    const shareLink = `${window.location.origin}/assessment/${mock.shareCode}/${slugify(mock.title)}`;
 
     try {
       await navigator.clipboard.writeText(shareLink);

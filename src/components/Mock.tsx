@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { slugify } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -393,7 +394,7 @@ function MockTestsTab({
   };
 
   const handleShare = async (mock: MockTest) => {
-    const shareUrl = `https://trackode.in/playy/${mock.shareCode}`;
+    const shareUrl = `https://trackode.in/assessment/${mock.shareCode}/${slugify(mock.title)}`;
     if (typeof window !== 'undefined' && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(shareUrl);
